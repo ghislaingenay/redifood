@@ -2,12 +2,10 @@
  * @type {import('next').NextConfig}
  */
 
+const { ModuleResolutionKind } = require("typescript");
+
 const securityHeaders = [
     { key: "X-Frame-Options", value: "DENY" },
-    // {
-    //     key: "Content-Security-Policy",
-    //     value: "default-src 'self' https: data: blob: 'unsafe-inline' 'unsafe-eval'",
-    // },
     {
         key: "Permissions-Policy",
         value: "camera=(), microphone=(), geolocation=(), interest-cohort=()",
@@ -34,14 +32,14 @@ const nextConfig = {
         // You can, for example, get the latest git commit hash here
         return "my-build-id";
     },
-    poweredByHeader: false,
+    // poweredByHeader: false,
     // Use the CDN in production and localhost for development.
     // assetPrefix: isProd ? 'https://cdn.mydomain.com' : undefined,
     // async rewrites() {
     //   return []}
-    compiler: {
-        removeConsole: true,
-    },
+    // compiler: {
+    // removeConsole: true,
+    // },
     // apply HTTP response headers to all routes in your application
 
     async headers() {
@@ -54,4 +52,4 @@ const nextConfig = {
     },
 };
 
-export default nextConfig;
+module.exports = nextConfig;

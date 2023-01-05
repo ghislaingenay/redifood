@@ -1,18 +1,22 @@
-import React from "react";
+import "antd/dist/reset.css";
 import { AppProps } from "next/app";
-import "antd/dist/antd.css";
-import { StyledThemeProvider } from "@definitions/styled-components";
-import { Provider } from "react-redux";
+// import { StyledThemeProvider } from "@definitions/styled-components";
 import store from "@redux/store";
+import { Provider } from "react-redux";
+// import "../dist/output.css";
+import "../src/styles/globals.css";
 
-function MyApp({ Component, pageProps }: AppProps): JSX.Element {
-    return (
-        <StyledThemeProvider>
-            <Provider store={store}>
-                <Component {...pageProps} />
-            </Provider>
-        </StyledThemeProvider>
-    );
+function MyApp({
+  Component,
+  pageProps,
+}: AppProps): JSX.Element {
+  return (
+    <>
+      <Provider store={store}>
+        <Component {...pageProps} />
+      </Provider>
+    </>
+  );
 }
 
 export default MyApp;
