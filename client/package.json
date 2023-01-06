@@ -9,7 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@types/antd": "^1.0.0",
     "antd": "^5.1.2",
     "axios": "^1.2.2",
     "next": "13.1.1",
@@ -21,6 +20,7 @@
     "@testing-library/cypress": "^9.0.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^14.4.3",
+    "@types/antd": "^1.0.0",
     "@types/jest": "^29.2.5",
     "@types/node": "18.11.18",
     "@types/react": "18.0.26",
