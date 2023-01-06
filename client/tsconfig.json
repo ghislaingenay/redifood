@@ -8,9 +8,10 @@
     ],
     "allowJs": true,
     "skipLibCheck": true,
-    "strict": true,
+    "strict": false,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
+    "incremental": true,
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "node",
@@ -24,15 +25,9 @@
       "@components/*": [
         "src/components/*"
       ],
-      "@components": [
-        "src/components"
-      ],
-      "@public/*": [
-        "public/*"
-      ],
-      "@public": [
-        "public"
-      ],
+      "@components": ["src/components"],
+      "@public/*": ["public/*"],
+      "@public": ["public"],
       "@definitions/*": [
         "src/definitions/*"
       ],
@@ -42,38 +37,19 @@
       "@interfaces/*": [
         "src/interfaces/*"
       ],
-      "@interfaces": [
-        "src/interfaces"
-      ],
-      "@styles/*": [
-        "src/styles/*"
-      ],
-      "@styles": [
-        "src/styles"
-      ],
-      "@redux/*": [
-        "src/redux/*"
-      ],
-      "@redux": [
-        "src/redux"
-      ],
-      "@test/*": [
-        "test/*"
-      ],
-      "@test": [
-        "test"
-      ]
-    },
-    "incremental": true
+      "@interfaces": ["src/interfaces"],
+      "@styles/*": ["src/styles/*"],
+      "@styles": ["src/styles"],
+      "@redux/*": ["src/redux/*"],
+      "@redux": ["src/redux"],
+      "@test/*": ["test/*"],
+      "@test": ["test"]
+    }
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx"
   ],
-  "exclude": [
-    "node_modules",
-    "test/*",
-    "cypress/*"
-  ]
+  "exclude": ["node_modules"]
 }
