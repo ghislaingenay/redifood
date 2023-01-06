@@ -1,0 +1,25 @@
+{
+  "name": "redifood-ms",
+  "version": "1.0.0",
+  "description": "## Creation of POS system as a web application using microservices architecture",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ghislaingenay/redifood.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ghislaingenay/redifood/issues"
+  },
+  "homepage": "https://github.com/ghislaingenay/redifood#readme",
+  "devDependencies": {
+    "husky": "^8.0.0",
+    "lint-staged": "^13.1.0"
+  }
+}
