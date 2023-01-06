@@ -31,6 +31,18 @@ export default function Home() {
         </h1>
         <Input />
         <Title level={1}>Test</Title>
+
+        <h1>Hello world!</h1>
+
+        <h1 className="text-3xl font-bold underline">
+          Hello world!
+        </h1>
+        <Title className="text-3xl font-bold underline">
+          Test
+        </Title>
+        <div className="text-3xl text-green-600 p-2">
+          Hello Geeks!
+        </div>
         <p
           className={styles.description}
         >
