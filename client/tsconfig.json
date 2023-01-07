@@ -23,7 +23,7 @@
     "baseUrl": ".",
     "paths": {
       "@components/*": [
-        "src/components/*"
+        "src/components/auth/*"
       ],
       "@components": ["src/components"],
       "@public/*": ["public/*"],
@@ -50,7 +50,8 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "test/jest.config.js"
+    "test/jest.config.js",
+    "tailwind.config.js"
   ],
   "exclude": ["node_modules"]
 }
