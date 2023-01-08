@@ -1,3 +1,4 @@
+import { ITestUserAuth } from "@interfaces/test.interface";
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -13,34 +14,40 @@ window!.matchMedia =
     };
   };
 
-const typeIntoForm = async ({ username, password, confirmPassword }) => {
-  const user = userEvent.setup();
-  let usernameInput: string;
-  let passwordInput: string;
-  let confirmPasswordInput: string;
+let userKeys = ["usernameElement", "passwordElement", "confirmPasswordElement"];
+const typeIntoForm = async (
+  user,
+  { username, password, confirmPassword },
+): Promise<ITestUserAuth> => {
+  let finalData = {};
   if (username) {
-    const usernameInput: HTMLElement = screen.getByRole("textbox", {
+    const usernameInput = screen.getByRole("textbox", {
       name: /username/i,
     });
     await user.type(usernameInput, username);
+    console.log("value", usernameInput);
+    Object.assign(finalData, { usernameElement: usernameInput });
   }
   if (password) {
-    const passwordInput: HTMLElement = screen.getByLabelText("Password");
+    const passwordInput: HTMLElement = screen.getByLabelText(/password/i);
     await user.type(passwordInput, password);
+    Object.assign(finalData, { passwordElement: passwordInput });
   }
   if (confirmPassword) {
     const confirmPasswordInput: HTMLElement = screen.getByLabelText(/confirm/i);
     await user.type(confirmPasswordInput, confirmPassword);
+    Object.assign(finalData, { confirmPasswordElement: confirmPasswordInput });
   }
-  return {
-    usernameInput,
-    passwordInput,
-    confirmPasswordInput,
-  };
+  userKeys.forEach((key) => {
+    if (!finalData.hasOwnProperty(key)) {
+      finalData[key] = undefined;
+    }
+  });
+  console.log("finalData", finalData);
+  return finalData;
 };
 
-const clickButton = async (reg: RegExp) => {
-  const user = userEvent.setup();
+const clickButton = async (reg: RegExp, user) => {
   const clickButton: HTMLElement = screen.getByRole("button", {
     name: reg,
   });
@@ -55,7 +62,9 @@ describe("Login", () => {
 
   it("input should be initially in the document", () => {
     render(<Login />);
-    expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole("textbox", { name: /username/i }),
+    ).toBeInTheDocument();
     expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
   });
 
@@ -69,26 +78,25 @@ describe("Login", () => {
     expect(screen.getByLabelText(/password/i).ariaValueText).toBe(undefined);
   });
 
-  // it("should show error message when password is empty", async () => {
-  //   render(<Login />);
-  //   expect(
-  //     screen.queryByText(/Please input your password/i),
-  //   ).not.toBeInTheDocument();
-
-  //   const { usernameInput, passwordInput } = await typeIntoForm({
-  //     username: "test",
-  //     password: undefined,
-  //     confirmPassword: "",
-  //   });
-  //   await clickButton(/submit/i);
-  //   expect(usernameInput).toBe("test");
-  //   expect(passwordInput).toBe(undefined);
-  // expect(
-  //   screen.getByText(
-  //     /password is required/i,
-  //   ),
-  // ).toBeInTheDocument();
-  // });
+  it.only("should show error message when password is empty", async () => {
+    const user = userEvent.setup();
+    render(<Login />);
+    expect(
+      screen.queryByText(/Please input your password/i),
+    ).not.toBeInTheDocument();
+    const { usernameElement, passwordElement } = await typeIntoForm(user, {
+      username: "test",
+      password: undefined,
+      confirmPassword: "",
+    });
+    await clickButton(/submit/i, user);
+    expect(usernameElement).toHaveValue("test");
+    expect(passwordElement).toBe(undefined);
+    expect(await screen.findAllByRole("alert")).toHaveLength(1);
+    expect(
+      await screen.findByText(/please input your password/i),
+    ).toBeInTheDocument();
+  });
 
   // it("should show error message when username is empty", async () => {
   //   render(<Login />);
