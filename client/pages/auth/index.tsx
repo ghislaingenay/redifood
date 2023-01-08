@@ -1,7 +1,9 @@
+import Login from "@components/Login";
+
 const Auth = () => {
   return (
     <div>
-      <h1>Auth</h1>
+      <Login />
     </div>
   );
 };
