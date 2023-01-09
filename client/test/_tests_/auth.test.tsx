@@ -1,31 +1,24 @@
 import { ITestUserAuth } from "@interfaces/test.interface";
 import "@testing-library/jest-dom";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import Login from "../../src/components/auth/Login";
 
-window!.matchMedia =
-  window.matchMedia ||
-  function () {
-    return {
-      matches: false,
-      addListener: function () {},
-      removeListener: function () {},
-    };
-  };
-
-let userKeys = ["usernameElement", "passwordElement", "confirmPasswordElement"];
 const typeIntoForm = async (
   user,
   { username, password, confirmPassword },
 ): Promise<ITestUserAuth> => {
+  let userKeys = [
+    "usernameElement",
+    "passwordElement",
+    "confirmPasswordElement",
+  ];
   let finalData = {};
   if (username) {
     const usernameInput = screen.getByRole("textbox", {
       name: /username/i,
     });
     await user.type(usernameInput, username);
-    console.log("value", usernameInput);
     Object.assign(finalData, { usernameElement: usernameInput });
   }
   if (password) {
@@ -43,7 +36,6 @@ const typeIntoForm = async (
       finalData[key] = undefined;
     }
   });
-  console.log("finalData", finalData);
   return finalData;
 };
 
@@ -51,7 +43,7 @@ const clickButton = async (reg: RegExp, user) => {
   const clickButton: HTMLElement = screen.getByRole("button", {
     name: reg,
   });
-  return await user.click(clickButton);
+  await user.click(clickButton);
 };
 
 describe("Login", () => {
@@ -78,7 +70,7 @@ describe("Login", () => {
     expect(screen.getByLabelText(/password/i).ariaValueText).toBe(undefined);
   });
 
-  it.only("should show error message when password is empty", async () => {
+  it("should show error message when password is empty", async () => {
     const user = userEvent.setup();
     render(<Login />);
     expect(
@@ -98,32 +90,52 @@ describe("Login", () => {
     ).toBeInTheDocument();
   });
 
-  // it("should show error message when username is empty", async () => {
-  //   render(<Login />);
-  //   expect(
-  //     screen.queryByText(/Please input your username/i),
-  //   ).not.toBeInTheDocument();
-  //   const { usernameInput, passwordInput, confirmPasswordInput } =
-  //     await typeIntoForm({
-  //       username: undefined,
-  //       password: "pit",
-  //       confirmPassword: "pit",
-  //     });
-  //   await clickButton(/submit/i);
-  //   expect(usernameInput).toBe(undefined);
-  //   expect(passwordInput).toBe("pit");
-  //   expect(confirmPasswordInput).toBe("pit");
-  // expect(
-  //   screen.getByText(
-  //     /username is required/i,
-  //   ),
-  // ).toBeInTheDocument();
-  // });
+  it("should show error message when username is empty", async () => {
+    const user = userEvent.setup();
+    render(<Login />);
+    expect(
+      screen.queryByText(/Please input your username/i),
+    ).not.toBeInTheDocument();
+    const { usernameElement, passwordElement } = await typeIntoForm(user, {
+      username: undefined,
+      password: "pit",
+      confirmPassword: "",
+    });
+    await clickButton(/submit/i, user);
+    expect(usernameElement).toBe(undefined);
+    expect(passwordElement).toHaveValue("pit");
+    expect(await screen.findAllByRole("alert")).toHaveLength(1);
+    expect(
+      await screen.findByText(/please input your username/i),
+    ).toBeInTheDocument();
+  });
 
-  // it.todo(
-  //   "should show invalid credentials when username doesn't match",
-  //   // mocking the api call
-  // );
+  it("should show error message when username and password are empty", async () => {
+    const user = userEvent.setup();
+    render(<Login />);
+    expect(
+      screen.queryByText(/Please input your username/i),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/Please input your password/i),
+    ).not.toBeInTheDocument();
+    const { usernameElement, passwordElement } = await typeIntoForm(user, {
+      username: undefined,
+      password: undefined,
+      confirmPassword: "",
+    });
+    await clickButton(/submit/i, user);
+    expect(usernameElement).toBe(undefined);
+    expect(passwordElement).toBe(undefined);
+    expect(await screen.findAllByRole("alert")).toHaveLength(2);
+    expect(
+      await screen.findByText(/please input your username/i),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByText(/please input your password/i),
+    ).toBeInTheDocument();
+  });
+
   // it.todo(
   //   "should show invalid credentials when password doesn't match",
   //   // mocking the api call
