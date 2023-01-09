@@ -28,8 +28,7 @@
       "@interfaces": ["src/interfaces"],
       "@styles/*": ["src/styles/*"],
       "@styles": ["src/styles"],
-      "@redux/*": ["src/redux/*"],
-      "@redux": ["src/redux"],
+      "@functions/*": ["src/functions/*"],
       "@test/*": ["test/*"],
       "@test": ["test"]
     }

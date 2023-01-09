@@ -10,6 +10,6 @@ export const handlers = [
       return res(ctx.status(401), ctx.json({ message: "Invalid username" }));
     if (password !== "pit")
       return res(ctx.status(401), ctx.json({ message: "Invalid password" }));
-    return res(ctx.status(200), ctx.json({ message: "Success" }));
+    return res(ctx.status(201), ctx.json({ message: "Success" }));
   }),
 ];
