@@ -2,7 +2,10 @@ import "@testing-library/jest-dom";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import Login from "../../../src/components/auth/Login";
-import { clickButton, typeIntoFormAuth } from "../helpers.fn";
+import {
+  clickButton,
+  typeIntoFormAuth,
+} from "../../../src/functions/testhelpers.fn";
 
 describe("Login - Validation", () => {
   it("should render without crash", () => {
