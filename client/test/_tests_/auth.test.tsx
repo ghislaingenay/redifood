@@ -175,6 +175,48 @@ describe("Login", () => {
     });
   });
 
+  it("should indicate success when username and password match", async () => {
+    const user = userEvent.setup();
+    render(<Login />);
+    const { usernameElement, passwordElement } = await typeIntoForm(user, {
+      username: "test",
+      password: "pit",
+      confirmPassword: "",
+    });
+    await clickButton(/submit/i, user);
+
+    expect(usernameElement).toHaveValue("test");
+    expect(passwordElement).toHaveValue("pit");
+    expect(await screen.findByText(/status: 201/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Success/i)).toBeInTheDocument();
+    // mocking the api call
+  });
+
+  it("should show invalid password when password doesn't match", async () => {
+    const user = userEvent.setup();
+    render(<Login />);
+    await typeIntoForm(user, {
+      username: "test",
+      password: "pith",
+      confirmPassword: "",
+    });
+    await clickButton(/submit/i, user);
+    expect(await screen.findByText(/status: 401/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Invalid password/i)).toBeInTheDocument();
+  });
+  it("should show invalid password when username doesn't match", async () => {
+    const user = userEvent.setup();
+    render(<Login />);
+    await typeIntoForm(user, {
+      username: "testa",
+      password: "pit",
+      confirmPassword: "",
+    });
+    await clickButton(/submit/i, user);
+    expect(await screen.findByText(/status: 401/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Invalid username/i)).toBeInTheDocument();
+  });
+
   // it.todo(
   //   "should show invalid credentials when password doesn't match",
   //   // mocking the api call
