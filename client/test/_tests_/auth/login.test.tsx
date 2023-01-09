@@ -1,10 +1,10 @@
 import "@testing-library/jest-dom";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import Login from "../../src/components/auth/Login";
-import { clickButton, typeIntoFormAuth } from "./helpers.fn";
+import Login from "../../../src/components/auth/Login";
+import { clickButton, typeIntoFormAuth } from "../helpers.fn";
 
-describe("Login", () => {
+describe("Login - Validation", () => {
   it("should render without crash", () => {
     render(<Login />);
     expect(screen.getByText(/Login/i)).toBeInTheDocument();
@@ -132,7 +132,9 @@ describe("Login", () => {
       ).not.toBeInTheDocument();
     });
   });
+});
 
+describe("Login - Integration", () => {
   it("should indicate success when username and password match", async () => {
     const user = userEvent.setup();
     render(<Login />);
@@ -222,43 +224,4 @@ describe("Login", () => {
     expect(await screen.findByText(/status: 201/i)).toBeInTheDocument();
     expect(await screen.findByText(/Success/i)).toBeInTheDocument();
   });
-});
-
-describe("Signup", () => {
-  // it("should render without crash", () => {
-  //   render(<SignUp />);
-  //   expect(screen.getByText(/Sign Up/i)).toBeInTheDocument();
-  // });
-  it.todo("input fields should be empty when rendered");
-  it.todo("should show error message when password is empty");
-  it.todo("should show error message when confirm password is empty");
-  it.todo("should show error message when username is empty");
-  it.todo(
-    "should show error when username contains special characters except ._",
-  );
-  it.todo(
-    "display error when password don't contain  more than 8 characters and less than 20 characters",
-  );
-  it.todo(
-    "display error when password don't contain  at least one lowercase letter",
-  );
-  it.todo(
-    "display error when password don't contain at least one uppercase letter",
-  );
-  it.todo(
-    "display error when password don't contain at least one special characters",
-  );
-  it.todo(
-    "should show invalid credentials error message if username already exists",
-  );
-});
-
-describe("Auth", () => {
-  it.todo("show display signup section when signup page is clicked");
-  it.todo("Should show login if user click on SignUp and then click on Login");
-  it.todo(
-    "Should not able to switch between login and signup if user submit the form",
-  );
-  it.todo("show already user message if user login with existing credentials");
-  it.todo("show not invalid credentials if signup with user already in db");
 });
