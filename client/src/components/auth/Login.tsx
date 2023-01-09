@@ -1,10 +1,33 @@
 import { Button, Form, Input, Typography } from "antd";
+import axios from "axios";
+import { useState } from "react";
 const { Title } = Typography;
 const Login = () => {
   const [form] = Form.useForm();
+  const [statusCode, setStatusCode] = useState(0);
+  const [message, setMessage] = useState("");
 
-  const onFinish = (values: any) => {
+  const onFinish = async (values: any) => {
+    setStatusCode(0);
+    setMessage("");
     console.log("Success:", values);
+    await axios
+      .post("http://localhost:3030/api/auth/login", values)
+      .then(({ data: { message }, status }) => {
+        setStatusCode(status);
+        setMessage(message);
+      })
+      .catch(
+        ({
+          response: {
+            data: { message },
+            status,
+          },
+        }) => {
+          setStatusCode(status);
+          setMessage(message);
+        },
+      );
   };
   return (
     <>
@@ -13,10 +36,10 @@ const Login = () => {
         form={form}
         layout="vertical"
         onFinish={onFinish}
-        onValuesChange={(e, all) => {
-          console.log(e);
-          console.log(all);
-        }}
+        // onValuesChange={(e, all) => {
+        //   console.log(e);
+        //   console.log(all);
+        // }}
       >
         <Form.Item
           label="Username"
@@ -44,6 +67,8 @@ const Login = () => {
         </Form.Item>
         <Button onClick={() => form.submit()}>Submit</Button>
       </Form>
+      {statusCode !== 0 && <p>Status: {statusCode}</p>}
+      {message !== "" && <p>{message}</p>}
     </>
   );
 };
