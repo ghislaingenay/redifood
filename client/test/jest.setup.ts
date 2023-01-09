@@ -16,9 +16,9 @@ beforeAll(() => {
     };
   });
 
-  global.console = {
-    warn: jest.fn(),
-  } as JestMock.MockedFunction<any>;
+  // global.console = {
+  //   warn: jest.fn(),
+  // } as any;
 
   window.scroll = jest.fn() as JestMock.Mock<any>;
   window.alert = jest.fn();

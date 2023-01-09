@@ -1,15 +1,11 @@
-import { ITestUserAuth } from "@interfaces/test.interface";
+import { IFormAuthFields, ITestUserAuth } from "@interfaces/test.interface";
 import { screen } from "@testing-library/react";
 
 export const typeIntoFormAuth = async (
   user,
-  { username, password, confirmPassword },
+  { username, password, confirmPassword }: IFormAuthFields,
 ): Promise<ITestUserAuth> => {
-  let userKeys = [
-    "usernameElement",
-    "passwordElement",
-    "confirmPasswordElement",
-  ];
+  let userKeys = ["usernameElement", "passwordElement", "confirmPasswordElement"];
   let finalData = {};
   if (username) {
     const usernameInput = screen.getByRole("textbox", {
@@ -19,7 +15,7 @@ export const typeIntoFormAuth = async (
     Object.assign(finalData, { usernameElement: usernameInput });
   }
   if (password) {
-    const passwordInput: HTMLElement = screen.getByLabelText(/password/i);
+    const passwordInput: HTMLElement = screen.getByLabelText("Password");
     await user.type(passwordInput, password);
     Object.assign(finalData, { passwordElement: passwordInput });
   }

@@ -4,7 +4,6 @@ export const handlers = [
   rest.post("http://localhost:3030/api/auth/login", async (req, res, ctx) => {
     console.log(req);
     const { username, password }: { username: string; password: string } = await req.json();
-    console.log(username, password);
     if (username === "test" && password === "pit") {
       return res(ctx.status(201), ctx.json({ message: "Success" }));
     } else {
@@ -22,12 +21,11 @@ export const handlers = [
   }),
 
   rest.post("http://localhost:3030/api/auth/signup", async (req, res, ctx) => {
-    const { username, password }: { username: string; password: string } = await req.json();
-    console.log(username, password);
+    const { username }: { username: string; password: string } = await req.json();
     if (username === "test") {
       return res(ctx.status(400), ctx.json({ message: "Invalid credentials" }));
     } else {
-      return res(ctx.status(201), ctx.json({ message: "Success" }));
+      return res(ctx.status(201), ctx.json({ message: "Account succesfully created" }));
     }
   }),
 ];
