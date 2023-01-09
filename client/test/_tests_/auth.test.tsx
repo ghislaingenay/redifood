@@ -173,6 +173,55 @@ describe("Login", () => {
     expect(await screen.findByText(/status: 401/i)).toBeInTheDocument();
     expect(await screen.findByText(/error username/i)).toBeInTheDocument();
   });
+
+  it("should show invalid credentials when password or username doesn't match", async () => {
+    const user = userEvent.setup();
+    render(<Login />);
+    const { usernameElement, passwordElement } = await typeIntoFormAuth(user, {
+      username: "test",
+      password: "pith",
+      confirmPassword: "",
+    });
+    await clickButton(/submit/i, user);
+    expect(await screen.findByText(/status: 401/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Invalid credentials/i)).toBeInTheDocument();
+
+    expect(await screen.findByText(/error password/i)).toBeInTheDocument(),
+      await user.clear(usernameElement);
+    await user.clear(passwordElement);
+    await typeIntoFormAuth(user, {
+      username: "testa",
+      password: "pit",
+      confirmPassword: "",
+    });
+    await clickButton(/submit/i, user);
+    expect(await screen.findByText(/status: 401/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Invalid credentials/i)).toBeInTheDocument();
+    expect(await screen.findByText(/error username/i)).toBeInTheDocument();
+    await user.clear(usernameElement);
+    await user.clear(passwordElement);
+    await typeIntoFormAuth(user, {
+      username: "testa",
+      password: "pith",
+      confirmPassword: "",
+    });
+    await clickButton(/submit/i, user);
+    expect(await screen.findByText(/status: 401/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Invalid credentials/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/error username, error password/i),
+    ).toBeInTheDocument();
+    await user.clear(usernameElement);
+    await user.clear(passwordElement);
+    await typeIntoFormAuth(user, {
+      username: "test",
+      password: "pit",
+      confirmPassword: "",
+    });
+    await clickButton(/submit/i, user);
+    expect(await screen.findByText(/status: 201/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Success/i)).toBeInTheDocument();
+  });
 });
 
 describe("Signup", () => {
