@@ -119,7 +119,7 @@ describe("Signup - Validation", () => {
     expect(await screen.findByText(/username can only contain letters, dot and underscore/i)).not.toBeInTheDocument();
   });
 
-  it("display error when password don't contain  more than 8 characters and less than 20 characters", async () => {
+  it("display error when password contains less than 8 characters and more than 20 characters", async () => {
     const user = userEvent.setup();
     render(<SignUp />);
     expect(screen.queryByText(/password too long/i)).not.toBeInTheDocument();
@@ -147,6 +147,32 @@ describe("Signup - Validation", () => {
     await user.type(confirmPasswordElement, "123456789");
     await clickButton(/submit/i, user);
     expect(await screen.findByText(/password too short/i)).not.toBeInTheDocument();
+    expect(await screen.findAllByRole("alert")).toHaveLength(0);
+  });
+  it("display error when username contains less than 4 characters and more than 12 characters", async () => {
+    const user = userEvent.setup();
+    render(<SignUp />);
+    expect(screen.queryByText(/username too long/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/username too short/i)).not.toBeInTheDocument();
+    const { usernameElement } = await typeIntoFormAuth(user, {
+      username: "teshbsfhbsbsjfbsjfbsjffssfdsfdf",
+      password: "H-àbhbhbBJNJ*",
+      confirmPassword: "H-àbhbhbBJNJ*",
+    });
+    await clickButton(/submit/i, user);
+    expect(usernameElement).toHaveValue("test");
+    expect(await screen.findAllByRole("alert")).toHaveLength(1);
+    expect(await screen.findByText(/username too long/i)).toBeInTheDocument();
+    await user.clear(usernameElement);
+    await user.type(usernameElement, "te");
+    await clickButton(/submit/i, user);
+    expect(await screen.findByText(/username too long/i)).not.toBeInTheDocument();
+    expect(await screen.findByText(/username too short/i)).toBeInTheDocument();
+    expect(await screen.findAllByRole("alert")).toHaveLength(1);
+    await user.clear(usernameElement);
+    await user.type(usernameElement, "test_");
+    await clickButton(/submit/i, user);
+    expect(await screen.findByText(/username too short/i)).not.toBeInTheDocument();
     expect(await screen.findAllByRole("alert")).toHaveLength(0);
   });
 
