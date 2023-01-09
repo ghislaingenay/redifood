@@ -16,10 +16,12 @@ beforeAll(() => {
     };
   });
 
+  global.console = {
+    warn: jest.fn(),
+  } as JestMock.MockedFunction<any>;
+
   window.scroll = jest.fn() as JestMock.Mock<any>;
   window.alert = jest.fn();
-
-  console.log("entrered");
   server.listen();
 });
 afterEach(() => server.resetHandlers());
