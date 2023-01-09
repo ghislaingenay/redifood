@@ -136,6 +136,45 @@ describe("Login", () => {
     ).toBeInTheDocument();
   });
 
+  it("user clicked several times on username", async () => {
+    render(<Login />);
+    const user = userEvent.setup();
+
+    const usernameInput = screen.getByRole("textbox", {
+      name: /username/i,
+    });
+    await user.click(usernameInput);
+    expect(usernameInput).toHaveFocus();
+    expect(
+      screen.queryByText(/Please input your username/i),
+    ).not.toBeInTheDocument();
+    const { usernameElement } = await typeIntoForm(user, {
+      username: undefined,
+      password: "pit",
+      confirmPassword: "",
+    });
+    await clickButton(/submit/i, user);
+    expect(usernameElement).toBe(undefined);
+    expect(await screen.findAllByRole("alert")).toHaveLength(1);
+    expect(
+      await screen.findByText(/please input your username/i),
+    ).toBeInTheDocument();
+    await user.clear(usernameInput);
+    const { usernameElement: usernameElement2 } = await typeIntoForm(user, {
+      username: "test",
+      password: "",
+      confirmPassword: "",
+    });
+
+    await clickButton(/submit/i, user);
+    expect(usernameElement2).toHaveValue("test");
+    await waitFor(async () => {
+      expect(
+        await screen.queryByText(/please input your username/i),
+      ).not.toBeInTheDocument();
+    });
+  });
+
   // it.todo(
   //   "should show invalid credentials when password doesn't match",
   //   // mocking the api call
