@@ -6,10 +6,12 @@ const Login = () => {
   const [form] = Form.useForm();
   const [statusCode, setStatusCode] = useState(0);
   const [message, setMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const onFinish = async (values: any) => {
     setStatusCode(0);
     setMessage("");
+    setErrorMessage("");
     console.log("Success:", values);
     await axios
       .post("http://localhost:3030/api/auth/login", values)
@@ -20,10 +22,12 @@ const Login = () => {
       .catch(
         ({
           response: {
-            data: { message },
+            data: { message, errorMessage },
             status,
           },
         }) => {
+          console.log("hey", errorMessage);
+          setErrorMessage(errorMessage);
           setStatusCode(status);
           setMessage(message);
         },
@@ -69,6 +73,7 @@ const Login = () => {
       </Form>
       {statusCode !== 0 && <p>Status: {statusCode}</p>}
       {message !== "" && <p>{message}</p>}
+      {errorMessage !== "" && <p>{errorMessage}</p>}
     </>
   );
 };
