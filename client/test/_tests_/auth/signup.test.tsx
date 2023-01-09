@@ -31,14 +31,11 @@ describe("Signup - Validation", () => {
     const user = userEvent.setup();
     render(<SignUp />);
     expect(screen.queryByText(/Please input your password/i)).not.toBeInTheDocument();
-    const { usernameElement, passwordElement, confirmPasswordElement } = await typeIntoFormAuth(
-      user,
-      {
-        username: "test",
-        password: undefined,
-        confirmPassword: "pit",
-      },
-    );
+    const { usernameElement, passwordElement, confirmPasswordElement } = await typeIntoFormAuth(user, {
+      username: "test",
+      password: undefined,
+      confirmPassword: "pit",
+    });
     await clickButton(/submit/i, user);
     expect(usernameElement).toHaveValue("test");
     expect(passwordElement).toBe(undefined);
@@ -69,14 +66,11 @@ describe("Signup - Validation", () => {
     const user = userEvent.setup();
     render(<SignUp />);
     expect(screen.queryByText(/Please input your username/i)).not.toBeInTheDocument();
-    const { usernameElement, passwordElement, confirmPasswordElement } = await typeIntoFormAuth(
-      user,
-      {
-        username: undefined,
-        password: "pit",
-        confirmPassword: "pit",
-      },
-    );
+    const { usernameElement, passwordElement, confirmPasswordElement } = await typeIntoFormAuth(user, {
+      username: undefined,
+      password: "pit",
+      confirmPassword: "pit",
+    });
     await clickButton(/submit/i, user);
     expect(usernameElement).toBe(undefined);
     expect(passwordElement).toHaveValue("pit");
@@ -89,14 +83,11 @@ describe("Signup - Validation", () => {
     const user = userEvent.setup();
     render(<SignUp />);
     expect(screen.queryByText(/Please input your password/i)).not.toBeInTheDocument();
-    const { usernameElement, passwordElement, confirmPasswordElement } = await typeIntoFormAuth(
-      user,
-      {
-        username: "test",
-        password: "pit",
-        confirmPassword: undefined,
-      },
-    );
+    const { usernameElement, passwordElement, confirmPasswordElement } = await typeIntoFormAuth(user, {
+      username: "test",
+      password: "pit",
+      confirmPassword: undefined,
+    });
     await clickButton(/submit/i, user);
     expect(usernameElement).toHaveValue("test");
     expect(passwordElement).toBe("pit");
@@ -108,33 +99,24 @@ describe("Signup - Validation", () => {
   it("should show error when username contains special characters except ._", async () => {
     const user = userEvent.setup();
     render(<SignUp />);
-    expect(
-      screen.queryByText(/username can only contain letters, dot and underscore/i),
-    ).not.toBeInTheDocument();
-    const { usernameElement, passwordElement, confirmPasswordElement } = await typeIntoFormAuth(
-      user,
-      {
-        username: "test*&",
-        password: "pit",
-        confirmPassword: "pit",
-      },
-    );
+    expect(screen.queryByText(/username can only contain letters, dot and underscore/i)).not.toBeInTheDocument();
+    const { usernameElement, passwordElement, confirmPasswordElement } = await typeIntoFormAuth(user, {
+      username: "test*&",
+      password: "pit",
+      confirmPassword: "pit",
+    });
     await clickButton(/submit/i, user);
     expect(usernameElement).toHaveValue("test*&");
     expect(passwordElement).toHaveValue("pit");
     expect(confirmPasswordElement).toHaveValue("pit");
     expect(await screen.findAllByRole("alert")).toHaveLength(1);
-    expect(
-      await screen.findByText(/username can only contain letters, dot and underscore/i),
-    ).toBeInTheDocument();
+    expect(await screen.findByText(/username can only contain letters, dot and underscore/i)).toBeInTheDocument();
     await user.clear(usernameElement);
     await user.type(usernameElement, "test_");
     await clickButton(/submit/i, user);
     expect(usernameElement).toHaveValue("test_");
     expect(await screen.findAllByRole("alert")).toHaveLength(0);
-    expect(
-      await screen.findByText(/username can only contain letters, dot and underscore/i),
-    ).not.toBeInTheDocument();
+    expect(await screen.findByText(/username can only contain letters, dot and underscore/i)).not.toBeInTheDocument();
   });
 
   it("display error when password don't contain  more than 8 characters and less than 20 characters", async () => {
@@ -142,14 +124,11 @@ describe("Signup - Validation", () => {
     render(<SignUp />);
     expect(screen.queryByText(/password too long/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/password too short/i)).not.toBeInTheDocument();
-    const { usernameElement, passwordElement, confirmPasswordElement } = await typeIntoFormAuth(
-      user,
-      {
-        username: "test",
-        password: "1234567891011121314151617181920",
-        confirmPassword: "1234567891011121314151617181920",
-      },
-    );
+    const { usernameElement, passwordElement, confirmPasswordElement } = await typeIntoFormAuth(user, {
+      username: "test",
+      password: "1234567891011121314151617181920",
+      confirmPassword: "1234567891011121314151617181920",
+    });
     await clickButton(/submit/i, user);
     expect(usernameElement).toHaveValue("test");
     expect(await screen.findAllByRole("alert")).toHaveLength(1);
@@ -174,9 +153,7 @@ describe("Signup - Validation", () => {
   it("display error when password don't contain  at least one lowercase letter", async () => {
     const user = userEvent.setup();
     render(<SignUp />);
-    expect(
-      screen.queryByText(/password must contain at least one lowercase letter/i),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText(/password must contain at least one lowercase letter/i)).not.toBeInTheDocument();
     const { passwordElement, confirmPasswordElement } = await typeIntoFormAuth(user, {
       username: "test",
       password: "FHTUBV9*H_",
@@ -184,27 +161,21 @@ describe("Signup - Validation", () => {
     });
     await clickButton(/submit/i, user);
     expect(await screen.findAllByRole("alert")).toHaveLength(1);
-    expect(
-      await screen.findByText(/password must contain at least one lowercase letter/i),
-    ).toBeInTheDocument();
+    expect(await screen.findByText(/password must contain at least one lowercase letter/i)).toBeInTheDocument();
     await user.clear(passwordElement);
 
     await user.type(passwordElement, "fhtubv9*H_");
     await user.clear(confirmPasswordElement);
     await user.type(confirmPasswordElement, "fhtubv9*H_");
     await clickButton(/submit/i, user);
-    expect(
-      await screen.findByText(/password must contain at least one lowercase letter/i),
-    ).not.toBeInTheDocument();
+    expect(await screen.findByText(/password must contain at least one lowercase letter/i)).not.toBeInTheDocument();
     expect(await screen.findAllByRole("alert")).toHaveLength(0);
   });
 
   it("display error when password don't contain at least one uppercase letter", async () => {
     const user = userEvent.setup();
     render(<SignUp />);
-    expect(
-      screen.queryByText(/password must contain at least one uppercase letter/i),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText(/password must contain at least one uppercase letter/i)).not.toBeInTheDocument();
     const { passwordElement, confirmPasswordElement } = await typeIntoFormAuth(user, {
       username: "test",
       password: "fhtubv9*a_",
@@ -212,26 +183,20 @@ describe("Signup - Validation", () => {
     });
     await clickButton(/submit/i, user);
     expect(screen.getAllByRole("alert")).toHaveLength(1);
-    expect(
-      await screen.findByText(/password must contain at least one uppercase letter/i),
-    ).toBeInTheDocument();
+    expect(await screen.findByText(/password must contain at least one uppercase letter/i)).toBeInTheDocument();
     await user.clear(passwordElement);
     await user.type(passwordElement, "FHtuBV9*h_");
     await user.clear(confirmPasswordElement);
     await user.type(confirmPasswordElement, "FHtuBV9*h_");
     await clickButton(/submit/i, user);
-    expect(
-      await screen.queryByText(/password must contain at least one uppercase letter/i),
-    ).not.toBeInTheDocument();
+    expect(await screen.queryByText(/password must contain at least one uppercase letter/i)).not.toBeInTheDocument();
     expect(await screen.findAllByRole("alert")).toHaveLength(0);
   });
 
   it("display error when password don't contain at least one special characters", async () => {
     const user = userEvent.setup();
     render(<SignUp />);
-    expect(
-      screen.queryByText(/password must contain at least one special character/i),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText(/password must contain at least one special character/i)).not.toBeInTheDocument();
     const { passwordElement, confirmPasswordElement } = await typeIntoFormAuth(user, {
       username: "test",
       password: "FHTUvn9H",
@@ -239,25 +204,19 @@ describe("Signup - Validation", () => {
     });
     await clickButton(/submit/i, user);
     expect(await screen.getAllByRole("alert")).toHaveLength(1);
-    expect(
-      await screen.findByText(/password must contain at least one special character/i),
-    ).toBeInTheDocument();
+    expect(await screen.findByText(/password must contain at least one special character/i)).toBeInTheDocument();
     await user.clear(passwordElement);
     await user.type(passwordElement, "FHTU*vn9H_");
     await user.clear(confirmPasswordElement);
     await user.type(confirmPasswordElement, "FHTU*vn9H_");
     await clickButton(/submit/i, user);
-    expect(
-      await screen.queryByText(/password must contain at least one special character/i),
-    ).not.toBeInTheDocument();
+    expect(await screen.queryByText(/password must contain at least one special character/i)).not.toBeInTheDocument();
     expect(screen.getAllByRole("alert")).toHaveLength(0);
   });
   it("display error when password don't contain at least one number", async () => {
     const user = userEvent.setup();
     render(<SignUp />);
-    expect(
-      screen.queryByText(/password must contain at least one number/i),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText(/password must contain at least one number/i)).not.toBeInTheDocument();
     const { passwordElement, confirmPasswordElement } = await typeIntoFormAuth(user, {
       username: "test",
       password: "FHTUvgjnH*",
@@ -265,17 +224,13 @@ describe("Signup - Validation", () => {
     });
     await clickButton(/submit/i, user);
     expect(await screen.getAllByRole("alert")).toHaveLength(1);
-    expect(
-      await screen.findByText(/password must contain at least one number/i),
-    ).toBeInTheDocument();
+    expect(await screen.findByText(/password must contain at least one number/i)).toBeInTheDocument();
     await user.clear(passwordElement);
     await user.type(passwordElement, "FHTU*vn9H_");
     await user.clear(confirmPasswordElement);
     await user.type(confirmPasswordElement, "FHTU*vn9H_");
     await clickButton(/submit/i, user);
-    expect(
-      await screen.queryByText(/password must contain at least one number/i),
-    ).not.toBeInTheDocument();
+    expect(await screen.queryByText(/password must contain at least one number/i)).not.toBeInTheDocument();
     expect(screen.getAllByRole("alert")).toHaveLength(0);
   });
   it("show error if the password and confirm password don't match", async () => {
@@ -289,19 +244,39 @@ describe("Signup - Validation", () => {
     });
     await clickButton(/submit/i, user);
     expect(await screen.findAllByRole("alert")).toHaveLength(1);
-    expect(
-      await screen.findByText(/password and confirm password must match/i),
-    ).toBeInTheDocument();
+    expect(await screen.findByText(/password and confirm password must match/i)).toBeInTheDocument();
     await user.clear(confirmPasswordElement);
     await user.type(confirmPasswordElement, "FHTU*vn9H_");
     await clickButton(/submit/i, user);
-    expect(
-      await screen.queryByText(/password and confirm password must match/i),
-    ).not.toBeInTheDocument();
+    expect(await screen.queryByText(/password and confirm password must match/i)).not.toBeInTheDocument();
     expect(await screen.findAllByRole("alert")).toHaveLength(0);
   });
 
   // it.todo("show not invalid credentials if signup with user already in db");
-  it.todo("should send username already taken message if username already exists");
-  it.todo("should send success if user properly created");
+  it("should have invalid credentials msg if username already exists", async () => {
+    const user = userEvent.setup();
+    render(<SignUp />);
+    expect(await screen.findByText(/Invalid credentials/i)).toBeInTheDocument();
+    await typeIntoFormAuth(user, {
+      username: "test",
+      password: "FHTU*vn9H_",
+      confirmPassword: "FHTU*vn9H_",
+    });
+    await clickButton(/submit/i, user);
+    expect(await screen.findAllByRole("alert")).toHaveLength(1);
+    expect(await screen.queryByText(/Invalid credentials/i)).toBeInTheDocument();
+  });
+
+  it("should send success if user properly created", async () => {
+    const user = userEvent.setup();
+    render(<SignUp />);
+    expect(await screen.findByText(/Account succesfully created/i)).toBeInTheDocument();
+    await typeIntoFormAuth(user, {
+      username: "test",
+      password: "FHtuBV9*h_",
+      confirmPassword: "FHtuBV9*h_",
+    });
+    expect(await screen.findAllByRole("alert")).toHaveLength(1);
+    expect(await screen.queryByText(/Account succesfully created/i)).toBeInTheDocument();
+  });
 });
