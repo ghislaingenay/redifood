@@ -1,50 +1,8 @@
-import { ITestUserAuth } from "@interfaces/test.interface";
 import "@testing-library/jest-dom";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import Login from "../../src/components/auth/Login";
-
-const typeIntoForm = async (
-  user,
-  { username, password, confirmPassword },
-): Promise<ITestUserAuth> => {
-  let userKeys = [
-    "usernameElement",
-    "passwordElement",
-    "confirmPasswordElement",
-  ];
-  let finalData = {};
-  if (username) {
-    const usernameInput = screen.getByRole("textbox", {
-      name: /username/i,
-    });
-    await user.type(usernameInput, username);
-    Object.assign(finalData, { usernameElement: usernameInput });
-  }
-  if (password) {
-    const passwordInput: HTMLElement = screen.getByLabelText(/password/i);
-    await user.type(passwordInput, password);
-    Object.assign(finalData, { passwordElement: passwordInput });
-  }
-  if (confirmPassword) {
-    const confirmPasswordInput: HTMLElement = screen.getByLabelText(/confirm/i);
-    await user.type(confirmPasswordInput, confirmPassword);
-    Object.assign(finalData, { confirmPasswordElement: confirmPasswordInput });
-  }
-  userKeys.forEach((key) => {
-    if (!finalData.hasOwnProperty(key)) {
-      finalData[key] = undefined;
-    }
-  });
-  return finalData;
-};
-
-const clickButton = async (reg: RegExp, user) => {
-  const clickButton: HTMLElement = screen.getByRole("button", {
-    name: reg,
-  });
-  await user.click(clickButton);
-};
+import { clickButton, typeIntoFormAuth } from "./helpers.fn";
 
 describe("Login", () => {
   it("should render without crash", () => {
@@ -76,7 +34,7 @@ describe("Login", () => {
     expect(
       screen.queryByText(/Please input your password/i),
     ).not.toBeInTheDocument();
-    const { usernameElement, passwordElement } = await typeIntoForm(user, {
+    const { usernameElement, passwordElement } = await typeIntoFormAuth(user, {
       username: "test",
       password: undefined,
       confirmPassword: "",
@@ -96,7 +54,7 @@ describe("Login", () => {
     expect(
       screen.queryByText(/Please input your username/i),
     ).not.toBeInTheDocument();
-    const { usernameElement, passwordElement } = await typeIntoForm(user, {
+    const { usernameElement, passwordElement } = await typeIntoFormAuth(user, {
       username: undefined,
       password: "pit",
       confirmPassword: "",
@@ -119,7 +77,7 @@ describe("Login", () => {
     expect(
       screen.queryByText(/Please input your password/i),
     ).not.toBeInTheDocument();
-    const { usernameElement, passwordElement } = await typeIntoForm(user, {
+    const { usernameElement, passwordElement } = await typeIntoFormAuth(user, {
       username: undefined,
       password: undefined,
       confirmPassword: "",
@@ -148,7 +106,7 @@ describe("Login", () => {
     expect(
       screen.queryByText(/Please input your username/i),
     ).not.toBeInTheDocument();
-    const { usernameElement } = await typeIntoForm(user, {
+    const { usernameElement } = await typeIntoFormAuth(user, {
       username: undefined,
       password: "pit",
       confirmPassword: "",
@@ -160,7 +118,7 @@ describe("Login", () => {
       await screen.findByText(/please input your username/i),
     ).toBeInTheDocument();
     await user.clear(usernameInput);
-    const { usernameElement: usernameElement2 } = await typeIntoForm(user, {
+    const { usernameElement: usernameElement2 } = await typeIntoFormAuth(user, {
       username: "test",
       password: "",
       confirmPassword: "",
@@ -178,7 +136,7 @@ describe("Login", () => {
   it("should indicate success when username and password match", async () => {
     const user = userEvent.setup();
     render(<Login />);
-    const { usernameElement, passwordElement } = await typeIntoForm(user, {
+    const { usernameElement, passwordElement } = await typeIntoFormAuth(user, {
       username: "test",
       password: "pit",
       confirmPassword: "",
@@ -189,42 +147,32 @@ describe("Login", () => {
     expect(passwordElement).toHaveValue("pit");
     expect(await screen.findByText(/status: 201/i)).toBeInTheDocument();
     expect(await screen.findByText(/Success/i)).toBeInTheDocument();
-    // mocking the api call
   });
 
   it("should show invalid password when password doesn't match", async () => {
     const user = userEvent.setup();
     render(<Login />);
-    await typeIntoForm(user, {
+    await typeIntoFormAuth(user, {
       username: "test",
       password: "pith",
       confirmPassword: "",
     });
     await clickButton(/submit/i, user);
     expect(await screen.findByText(/status: 401/i)).toBeInTheDocument();
-    expect(await screen.findByText(/Invalid password/i)).toBeInTheDocument();
+    expect(await screen.findByText(/error password/i)).toBeInTheDocument();
   });
   it("should show invalid password when username doesn't match", async () => {
     const user = userEvent.setup();
     render(<Login />);
-    await typeIntoForm(user, {
+    await typeIntoFormAuth(user, {
       username: "testa",
       password: "pit",
       confirmPassword: "",
     });
     await clickButton(/submit/i, user);
     expect(await screen.findByText(/status: 401/i)).toBeInTheDocument();
-    expect(await screen.findByText(/Invalid username/i)).toBeInTheDocument();
+    expect(await screen.findByText(/error username/i)).toBeInTheDocument();
   });
-
-  // it.todo(
-  //   "should show invalid credentials when password doesn't match",
-  //   // mocking the api call
-  // );
-  // it.todo(
-  //   "should indicate sucess when password doesn't match",
-  //   // mocking the api call
-  // );
 });
 
 describe("Signup", () => {
