@@ -2,9 +2,14 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import Login from "../../../src/components/auth/Login";
 import { clickButton, typeIntoFormAuth } from "../../../src/functions/testhelpers.fn";
+
+beforeEach(() => {
+  jest.resetModules();
+  render(<Login setButtonWasClicked={jest.fn} />);
+});
+
 describe("Login - Validation", () => {
   it("input should be initially in the document", () => {
-    render(<Login />);
     expect(
       screen.getByRole("textbox", {
         name: /username/i,
@@ -14,7 +19,6 @@ describe("Login - Validation", () => {
   });
 
   it("input fields should be empty, required, not disabled when rendered", () => {
-    render(<Login />);
     const usernameInput = screen.getByRole("textbox", {
       name: /username/i,
     });
@@ -30,7 +34,6 @@ describe("Login - Validation", () => {
 
   it("should show error message when password is empty", async () => {
     const user = userEvent.setup();
-    render(<Login />);
     expect(screen.queryByText(/Please input your password/i)).not.toBeInTheDocument();
     const { usernameElement, passwordElement } = await typeIntoFormAuth(user, {
       username: "test",
@@ -46,7 +49,6 @@ describe("Login - Validation", () => {
 
   it("should show error message when username is empty", async () => {
     const user = userEvent.setup();
-    render(<Login />);
     expect(screen.queryByText(/Please input your username/i)).not.toBeInTheDocument();
     await typeIntoFormAuth(user, {
       username: undefined,
@@ -60,7 +62,6 @@ describe("Login - Validation", () => {
 
   it("should show error message when username and password are empty", async () => {
     const user = userEvent.setup();
-    render(<Login />);
     expect(screen.queryByText(/Please input your username/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Please input your password/i)).not.toBeInTheDocument();
     await typeIntoFormAuth(user, {
@@ -74,7 +75,6 @@ describe("Login - Validation", () => {
   });
 
   it("user clicked several times on username", async () => {
-    render(<Login />);
     const user = userEvent.setup();
     await user.click(
       screen.getByRole("textbox", {
@@ -117,7 +117,6 @@ describe("Login - Validation", () => {
 describe("Login - Integration", () => {
   it("should indicate success when username and password match", async () => {
     const user = userEvent.setup();
-    render(<Login />);
     const { usernameElement, passwordElement } = await typeIntoFormAuth(user, {
       username: "test",
       password: "pit",
@@ -133,7 +132,6 @@ describe("Login - Integration", () => {
 
   it("should show invalid password when password doesn't match", async () => {
     const user = userEvent.setup();
-    render(<Login />);
     await typeIntoFormAuth(user, {
       username: "test",
       password: "pith",
@@ -146,7 +144,6 @@ describe("Login - Integration", () => {
 
   it("should show invalid password when username doesn't match", async () => {
     const user = userEvent.setup();
-    render(<Login />);
     await typeIntoFormAuth(user, {
       username: "testa",
       password: "pit",
@@ -159,7 +156,6 @@ describe("Login - Integration", () => {
 
   it("should show invalid credentials when password or username doesn't match", async () => {
     const user = userEvent.setup();
-    render(<Login />);
     await typeIntoFormAuth(user, {
       username: "test",
       password: "pith",

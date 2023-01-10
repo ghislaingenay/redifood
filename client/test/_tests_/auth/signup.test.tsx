@@ -4,16 +4,19 @@ import userEvent from "@testing-library/user-event";
 import SignUp from "../../../src/components/auth/SignUp";
 import { clickButton, typeIntoFormAuth } from "../../../src/functions/testhelpers.fn";
 
+beforeEach(() => {
+  jest.resetModules();
+  render(<SignUp setButtonWasClicked={jest.fn} />);
+});
+
 describe("Signup - Validation", () => {
   it("input should be initially in the document", () => {
-    render(<SignUp />);
     expect(screen.getByRole("textbox", { name: /username/i })).toBeInTheDocument();
     expect(screen.getByLabelText("Password")).toBeInTheDocument();
     expect(screen.queryByLabelText(/confirm/i)).toBeInTheDocument();
   });
 
   it("input fields should be empty, enabled and required when rendered", () => {
-    render(<SignUp />);
     const usernameInput = screen.getByRole("textbox", {
       name: /username/i,
     });
@@ -33,7 +36,7 @@ describe("Signup - Validation", () => {
 
   it("should show error message when password is empty", async () => {
     const user = userEvent.setup();
-    render(<SignUp />);
+
     expect(screen.queryByText(/Please input your password/i)).not.toBeInTheDocument();
     const { usernameElement, passwordElement, confirmPasswordElement } = await typeIntoFormAuth(user, {
       username: "test",
@@ -50,7 +53,7 @@ describe("Signup - Validation", () => {
 
   it("should show password and username missing if no fields are filled before submit", async () => {
     const user = userEvent.setup();
-    render(<SignUp />);
+
     expect(screen.queryByText(/Please input your username/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Please input your password/i)).not.toBeInTheDocument();
     const { usernameElement, passwordElement } = await typeIntoFormAuth(user, {
@@ -67,7 +70,7 @@ describe("Signup - Validation", () => {
 
   it("should show error message when username is empty", async () => {
     const user = userEvent.setup();
-    render(<SignUp />);
+
     expect(screen.queryByText(/Please input your username/i)).not.toBeInTheDocument();
     const { usernameElement, passwordElement, confirmPasswordElement } = await typeIntoFormAuth(user, {
       username: undefined,
@@ -83,7 +86,7 @@ describe("Signup - Validation", () => {
 
   it("should show error message when confirm password is empty", async () => {
     const user = userEvent.setup();
-    render(<SignUp />);
+
     expect(screen.queryByText(/Please input your password/i)).not.toBeInTheDocument();
     const { usernameElement, passwordElement, confirmPasswordElement } = await typeIntoFormAuth(user, {
       username: "test",
@@ -99,7 +102,7 @@ describe("Signup - Validation", () => {
 
   it("should show error when username contains special characters except ._", async () => {
     const user = userEvent.setup();
-    render(<SignUp />);
+
     expect(screen.queryByText(/username can only contain letters, dot and underscore/i)).not.toBeInTheDocument();
     const { usernameElement } = await typeIntoFormAuth(user, {
       username: "test*&",
@@ -115,7 +118,7 @@ describe("Signup - Validation", () => {
 
   it("display error when password contains more than 20 characters", async () => {
     const user = userEvent.setup();
-    render(<SignUp />);
+
     expect(screen.queryByText(/password should contains between 8 to 20 characters/i)).not.toBeInTheDocument();
     await typeIntoFormAuth(user, {
       username: "test",
@@ -128,7 +131,7 @@ describe("Signup - Validation", () => {
 
   it("display error when password contains less than 8 characters", async () => {
     const user = userEvent.setup();
-    render(<SignUp />);
+
     expect(screen.queryByText(/password should contains between 8 to 20 characters/i)).not.toBeInTheDocument();
     const { passwordElement, confirmPasswordElement } = await typeIntoFormAuth(user, {
       // username: "test",
@@ -154,7 +157,7 @@ describe("Signup - Validation", () => {
 
   it("display error when username contains less than 4 characters and more than 12 characters", async () => {
     const user = userEvent.setup();
-    render(<SignUp />);
+
     expect(screen.queryByText(/username should contains between 4 to 12 characters/i)).not.toBeInTheDocument();
     await typeIntoFormAuth(user, {
       username: "teshbsfhbsbsjfbsjfbsjffssfdsfdf",
@@ -196,7 +199,7 @@ describe("Signup - Validation", () => {
 
   it("display error when password don't contain  at least one lowercase letter", async () => {
     const user = userEvent.setup();
-    render(<SignUp />);
+
     expect(screen.queryByText(/password must contain at least one lowercase letter/i)).not.toBeInTheDocument();
     const { passwordElement, confirmPasswordElement } = await typeIntoFormAuth(user, {
       username: "test",
@@ -219,7 +222,7 @@ describe("Signup - Validation", () => {
 
   it("display error when password don't contain at least one uppercase letter", async () => {
     const user = userEvent.setup();
-    render(<SignUp />);
+
     expect(screen.queryByText(/password must contain at least one uppercase letter/i)).not.toBeInTheDocument();
     const { passwordElement, confirmPasswordElement } = await typeIntoFormAuth(user, {
       username: "test",
@@ -242,7 +245,7 @@ describe("Signup - Validation", () => {
 
   it("display error when password don't contain at least one special characters", async () => {
     const user = userEvent.setup();
-    render(<SignUp />);
+
     expect(screen.queryByText(/password must contain at least one special character/i)).not.toBeInTheDocument();
     const { passwordElement, confirmPasswordElement } = await typeIntoFormAuth(user, {
       username: "test",
@@ -265,7 +268,7 @@ describe("Signup - Validation", () => {
 
   it("display error when password don't contain at least one number", async () => {
     const user = userEvent.setup();
-    render(<SignUp />);
+
     expect(screen.queryByText(/password must contain at least one number/i)).not.toBeInTheDocument();
     const { passwordElement, confirmPasswordElement } = await typeIntoFormAuth(user, {
       username: "test",
@@ -288,7 +291,7 @@ describe("Signup - Validation", () => {
 
   it("show error if the password and confirm password don't match", async () => {
     const user = userEvent.setup();
-    render(<SignUp />);
+
     expect(screen.queryByText(/password and confirm password must match/i)).not.toBeInTheDocument();
     const { confirmPasswordElement } = await typeIntoFormAuth(user, {
       username: "test",
@@ -307,7 +310,7 @@ describe("Signup - Validation", () => {
 
   it("should have invalid credentials msg if username already exists", async () => {
     const user = userEvent.setup();
-    render(<SignUp />);
+
     expect(screen.queryByText(/Invalid credentials/i)).not.toBeInTheDocument();
     await typeIntoFormAuth(user, {
       username: "test",
@@ -321,7 +324,7 @@ describe("Signup - Validation", () => {
 
   it("should send success if user properly created", async () => {
     const user = userEvent.setup();
-    render(<SignUp />);
+
     expect(screen.queryByText(/Account succesfully created/i)).not.toBeInTheDocument();
     await typeIntoFormAuth(user, {
       username: "test12",
