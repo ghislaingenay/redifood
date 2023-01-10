@@ -22,8 +22,8 @@
       "@components": ["src/components"],
       "@public/*": ["public/*"],
       "@public": ["public"],
-      "@definitions/*": ["src/definitions/*"],
-      "@definitions": ["src/definitions"],
+      "@constants/*": ["src/constants/*"],
+      "@constants": ["src/constants"],
       "@interfaces/*": ["src/interfaces/*"],
       "@interfaces": ["src/interfaces"],
       "@styles/*": ["src/styles/*"],
@@ -38,7 +38,8 @@
     "**/*.ts",
     "**/*.tsx",
     "test/jest.config.js",
-    "tailwind.config.js"
+    "tailwind.config.js",
+    "./test/jest.setup.ts"
   ],
   "exclude": ["node_modules"]
 }

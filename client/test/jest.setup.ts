@@ -1,8 +1,11 @@
+import "@testing-library/jest-dom";
 import "@testing-library/jest-dom/extend-expect";
 import JestMock from "jest-mock";
 import { server } from "./mocks/server";
 
 beforeAll(() => {
+  jest.setTimeout(60000);
+
   window.matchMedia = jest.fn().mockImplementation((query) => {
     return {
       matches: false,

@@ -4,9 +4,13 @@
   "plugins": ["@typescript-eslint", "testing-library", "jest-dom", "prettier", "jsx-a11y"],
   "overrides": [
     {
-      "files": ["*.js"],
+      "files": ["*.js", "*.ts", "*.tsx"],
       "rules": {
-        "@typescript-eslint/no-var-requires": "off"
+        "@typescript-eslint/no-var-requires": "on",
+        "jest-dom/prefer-checked": "error",
+        "jest-dom/prefer-enabled-disabled": "error",
+        "jest-dom/prefer-required": "error",
+        "jest-dom/prefer-to-have-attribute": "error"
       }
     }
   ],
@@ -24,6 +28,7 @@
     "amd": true
   },
   "extends": [
+    "plugin:jest-dom/recommended",
     "next/babel",
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
