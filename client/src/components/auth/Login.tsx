@@ -1,14 +1,17 @@
 import { Button, Form, Input, Typography } from "antd";
 import axios from "axios";
 import { useState } from "react";
+import { IPropsAuth } from "../../interfaces/auth.interface";
 const { Title } = Typography;
-const Login = () => {
+const Login = (props: IPropsAuth) => {
+  const { setButtonWasClicked } = props;
   const [form] = Form.useForm();
   const [statusCode, setStatusCode] = useState(0);
   const [message, setMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
   const onFinish = async (values: any) => {
+    setButtonWasClicked(true);
     setStatusCode(0);
     setMessage("");
     setErrorMessage("");
@@ -30,6 +33,7 @@ const Login = () => {
           setErrorMessage(errorMessage);
           setStatusCode(status);
           setMessage(message);
+          setButtonWasClicked(false);
         },
       );
   };
