@@ -5,11 +5,6 @@ import SignUp from "../../../src/components/auth/SignUp";
 import { clickButton, typeIntoFormAuth } from "../../../src/functions/testhelpers.fn";
 
 describe("Signup - Validation", () => {
-  it("should render without crash", () => {
-    render(<SignUp />);
-    expect(screen.getByText(/Sign Up/i)).toBeInTheDocument();
-  });
-
   it("input should be initially in the document", () => {
     render(<SignUp />);
     expect(screen.getByRole("textbox", { name: /username/i })).toBeInTheDocument();

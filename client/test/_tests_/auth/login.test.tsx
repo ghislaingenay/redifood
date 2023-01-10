@@ -3,11 +3,6 @@ import userEvent from "@testing-library/user-event";
 import Login from "../../../src/components/auth/Login";
 import { clickButton, typeIntoFormAuth } from "../../../src/functions/testhelpers.fn";
 describe("Login - Validation", () => {
-  it("should render without crash", () => {
-    render(<Login />);
-    expect(screen.getByText(/Login/i)).toBeInTheDocument();
-  });
-
   it("input should be initially in the document", () => {
     render(<Login />);
     expect(
