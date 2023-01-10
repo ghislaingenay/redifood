@@ -7,7 +7,6 @@ const SignUp = () => {
   const [form] = Form.useForm();
   const [statusCode, setStatusCode] = useState(0);
   const [message, setMessage] = useState("");
-  const passwordValue = Form.useWatch("password", form);
 
   const onFinish = async (values: any) => {
     setStatusCode(0);
@@ -32,7 +31,7 @@ const SignUp = () => {
   };
   return (
     <>
-      <Title>Sign up page</Title>
+      <Title>SIGN UP</Title>
       <Form
         form={form}
         layout="vertical"
@@ -46,6 +45,7 @@ const SignUp = () => {
           label="Username"
           name="username"
           rules={[
+            { required: true, message: "Please input your username!" },
             { min: 4, message: "username should contains between 4 to 12 characters" },
             { max: 12, message: "username should contains between 4 to 12 characters" },
             () => ({
@@ -57,15 +57,6 @@ const SignUp = () => {
                 return Promise.reject(
                   new Error("username can only contain letters, numbers, dot, hyphens and underscore"),
                 );
-              },
-            }),
-            () => ({
-              validator(_, value) {
-                // regex only . _ - are allowed
-                if (typeof value === "undefined" || value === null) {
-                  return Promise.reject(new Error("Please input your username!"));
-                }
-                return Promise.resolve();
               },
             }),
           ]}
@@ -80,16 +71,21 @@ const SignUp = () => {
               required: true,
               message: "Please input your password!",
             },
-            { min: 8, message: "password should contains between 8 to 20 characters" },
-            { max: 20, message: "password should contains between 8 to 20 characters" },
             () => ({
               validator(_, value) {
                 if (/\d/.test(value)) {
-                  // regex at least one lowercase
-                  // regex at least one uppercase
                   return Promise.resolve();
                 } else {
                   return Promise.reject(new Error("password must contain at least one number"));
+                }
+              },
+            }),
+            () => ({
+              validator(_, value) {
+                if (value.length >= 8 && value.length <= 20) {
+                  return Promise.resolve();
+                } else {
+                  return Promise.reject(new Error("password should contains between 8 to 20 characters"));
                 }
               },
             }),
@@ -127,28 +123,28 @@ const SignUp = () => {
         >
           <Input type="password" />
         </Form.Item>
-        {passwordValue && (
-          <Form.Item
-            label="Confirm Password"
-            name="confirmPassword"
-            rules={[
-              {
-                required: true,
-                message: "Please input your password!",
+
+        <Form.Item
+          label="Confirm Password"
+          name="confirmPassword"
+          rules={[
+            {
+              required: true,
+              message: "Please confirm your password!",
+            },
+            () => ({
+              validator(_, value) {
+                if (value === form.getFieldValue("password")) {
+                  return Promise.resolve();
+                }
+                return Promise.reject(new Error("passwords do not match"));
               },
-              () => ({
-                validator(_, value) {
-                  if (value === form.getFieldValue("password")) {
-                    return Promise.resolve();
-                  }
-                  return Promise.reject(new Error("passwords do not match"));
-                },
-              }),
-            ]}
-          >
-            <Input type="password" />
-          </Form.Item>
-        )}
+            }),
+          ]}
+        >
+          <Input type="password" />
+        </Form.Item>
+
         <Button onClick={() => form.submit()}>Submit</Button>
       </Form>
       {statusCode !== 0 && <p>Status: {statusCode}</p>}

@@ -35,7 +35,7 @@ const Login = () => {
   };
   return (
     <>
-      <Title>Login page</Title>
+      <Title>LOGIN</Title>
       <Form
         form={form}
         layout="vertical"
