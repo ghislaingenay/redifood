@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "prepare": "husky install",
-    "test": "jest -c test/jest.config.js --watchAll"
+    "test": "jest -c test/jest.config.js --watchAll --no-cache",
+    "test:ci": "jest -c test/jest.config.js"
   },
   "dependencies": {
     "@ant-design/icons": "^4.8.0",
