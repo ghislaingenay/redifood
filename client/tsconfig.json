@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "target": "es2015",
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": false,
@@ -22,26 +18,17 @@
     "jsx": "preserve",
     "baseUrl": ".",
     "paths": {
-      "@components/*": [
-        "src/components/*"
-      ],
+      "@components/*": ["src/components/auth/*"],
       "@components": ["src/components"],
       "@public/*": ["public/*"],
       "@public": ["public"],
-      "@definitions/*": [
-        "src/definitions/*"
-      ],
-      "@definitions": [
-        "src/definitions"
-      ],
-      "@interfaces/*": [
-        "src/interfaces/*"
-      ],
+      "@constants/*": ["src/constants/*"],
+      "@constants": ["src/constants"],
+      "@interfaces/*": ["src/interfaces/*"],
       "@interfaces": ["src/interfaces"],
       "@styles/*": ["src/styles/*"],
       "@styles": ["src/styles"],
-      "@redux/*": ["src/redux/*"],
-      "@redux": ["src/redux"],
+      "@functions/*": ["src/functions/*"],
       "@test/*": ["test/*"],
       "@test": ["test"]
     }
@@ -49,7 +36,10 @@
   "include": [
     "next-env.d.ts",
     "**/*.ts",
-    "**/*.tsx"
+    "**/*.tsx",
+    "test/jest.config.js",
+    "tailwind.config.js",
+    "./test/jest.setup.ts"
   ],
   "exclude": ["node_modules"]
 }
