@@ -5,13 +5,16 @@ import { validateRequest } from "../middlewares/validationrequestnode.mdwr";
 import { User } from "../models/users";
 import { validationUsers } from "../services/auth.const";
 import { PasswordManager } from "../services/password-manager";
+
 const router = express.Router();
 
 router.post("/api/auth/signup", validationUsers, validateRequest, async (req: Request, res: Response) => {
   const { username, password } = req.body;
 
   const existingUser = await User.findOne({ username });
-  if (existingUser) throw new BadRequestError("Username already in use");
+  if (existingUser) {
+    throw new BadRequestError("Username already in use");
+  }
   const newUser = User.build({ username, password });
   const createdUser = await newUser.save();
 
@@ -31,9 +34,13 @@ router.post("/api/auth/signup", validationUsers, validateRequest, async (req: Re
 router.post("/api/auth/login", validationUsers, validateRequest, async (req: Request, res: Response) => {
   const { username, password } = req.body;
   const existingUser = await User.findOne({ username });
-  if (!existingUser) throw new BadRequestError("Invalid credentials");
+  if (!existingUser) {
+    throw new BadRequestError("Invalid credentials");
+  }
   const passwordsMatch = await PasswordManager.compare(existingUser.password, password);
-  if (!passwordsMatch) throw new BadRequestError("Invalid credentials");
+  if (!passwordsMatch) {
+    throw new BadRequestError("Invalid credentials");
+  }
   // Generate JWT
   const userJwt: string = jwt.sign(
     {
