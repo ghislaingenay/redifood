@@ -1,26 +1,33 @@
 import express, { Request, Response } from "express";
-import { validationResult } from "express-validator";
-import { BadRequestError } from "../errors/bad-request.err";
-import { RequestValidationNodeError } from "../errors/request-validation-node.err";
+import jwt from "jsonwebtoken";
+// import { BadRequestError } from "../errors/bad-request.err";
+import { validateRequest } from "../middlewares/validationrequestnode.mdwr";
 import { User } from "../models/users";
 import { validationUsers } from "../services/auth.const";
 const router = express.Router();
 
-router.post("/api/auth/signup", validationUsers, async (req: Request, res: Response) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    throw new RequestValidationNodeError(errors.array());
-  }
+router.post("/api/auth/signup", validationUsers, validateRequest, async (req: Request, res: Response) => {
   const { username, password } = req.body;
 
-  const existingUser = await User.findOne({ username });
-  if (existingUser) throw new BadRequestError("Username already in use");
-  const newUser = User.build({ username, password });
-  const createdUser = await newUser.save();
-  res.send(createdUser);
+  // const existingUser = await User.findOne({ username });
+  // if (existingUser) throw new BadRequestError("Username already in use");
+  // const newUser = User.build({ username, password });
+  const createdUser = User.build({ username, password });
+  // const createdUser = await newUser.save();
+
+  // Generate JWT
+  const userJwt: string = jwt.sign(
+    {
+      id: createdUser.id,
+      username: createdUser.username,
+    },
+    "addsod",
+  );
+  req.session = { jwt: userJwt };
+  res.status(201).send(createdUser);
 });
 
-router.post("/api/auth/login", validationUsers, (req: Request, res: Response) => {
+router.post("/api/auth/login", validationUsers, validateRequest, (req: Request, res: Response) => {
   res.send("Hi there");
 });
 
