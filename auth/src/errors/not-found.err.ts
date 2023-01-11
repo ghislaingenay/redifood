@@ -9,6 +9,6 @@ export class NotFoundError extends CustomError {
   }
 
   serializeErrors() {
-    return [{ message: "Not Found", status: this.statusCode }];
+    return [{ message: "Not Found" }];
   }
 }

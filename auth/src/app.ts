@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { json } from "body-parser";
+import { json, urlencoded } from "body-parser";
 import cookieSession from "cookie-session";
 import express from "express";
 import "express-async-errors";
@@ -10,6 +10,11 @@ import { errorHandler } from "./middlewares/error-handler.mdwr";
 
 const app = express();
 
+app.use(
+  urlencoded({
+    extended: true,
+  }),
+);
 app.set("trust proxy", true);
 app.use(json());
 app.use(

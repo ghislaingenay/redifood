@@ -6,14 +6,13 @@ export class DatabaseConnectionError extends CustomError {
   errorMessage = "Error connecting to database";
 
   constructor() {
-    super("Error database connection");
+    super("rror connecting to db");
     Object.setPrototypeOf(this, DatabaseConnectionError.prototype);
   }
   serializeErrors() {
     return [
       {
         message: this.errorMessage,
-        status: this.statusCode,
       },
     ];
   }
