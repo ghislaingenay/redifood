@@ -1,19 +1,19 @@
 import express, { Request, Response } from "express";
 import jwt from "jsonwebtoken";
-// import { BadRequestError } from "../errors/bad-request.err";
+import { BadRequestError } from "../errors/bad-request.err";
 import { validateRequest } from "../middlewares/validationrequestnode.mdwr";
 import { User } from "../models/users";
 import { validationUsers } from "../services/auth.const";
+import { PasswordManager } from "../services/password-manager";
 const router = express.Router();
 
 router.post("/api/auth/signup", validationUsers, validateRequest, async (req: Request, res: Response) => {
   const { username, password } = req.body;
 
-  // const existingUser = await User.findOne({ username });
-  // if (existingUser) throw new BadRequestError("Username already in use");
-  // const newUser = User.build({ username, password });
-  const createdUser = User.build({ username, password });
-  // const createdUser = await newUser.save();
+  const existingUser = await User.findOne({ username });
+  if (existingUser) throw new BadRequestError("Username already in use");
+  const newUser = User.build({ username, password });
+  const createdUser = await newUser.save();
 
   // Generate JWT
   const userJwt: string = jwt.sign(
@@ -27,8 +27,22 @@ router.post("/api/auth/signup", validationUsers, validateRequest, async (req: Re
   res.status(201).send(createdUser);
 });
 
-router.post("/api/auth/login", validationUsers, validateRequest, (req: Request, res: Response) => {
-  res.send("Hi there");
+router.post("/api/auth/login", validationUsers, validateRequest, async (req: Request, res: Response) => {
+  const { username, password } = req.body;
+  const existingUser = await User.findOne({ username });
+  if (!existingUser) throw new BadRequestError("Invalid credentials");
+  const passwordsMatch: boolean = await PasswordManager.compare(existingUser.password, password);
+  if (!passwordsMatch) throw new BadRequestError("Invalid credentials");
+  // Generate JWT
+  const userJwt: string = jwt.sign(
+    {
+      id: existingUser.id,
+      username: existingUser.username,
+    },
+    "vxvxvxvxvx",
+  );
+  req.session = { jwt: userJwt };
+  res.status(201).send(existingUser);
 });
 
 router.post("/api/auth/signout", (req: Request, res: Response) => {

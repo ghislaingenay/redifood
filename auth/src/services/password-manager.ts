@@ -11,8 +11,7 @@ export class PasswordManager {
 
   static async compare(storedpassword: string, suppliedPassword: string) {
     // const [hashedPassword, salt] = storedpassword.split(".");
-    await bcrypt.compare(suppliedPassword, storedpassword).then((res: boolean) => {
-      return res;
-    });
+    const result = await bcrypt.compare(suppliedPassword, storedpassword);
+    return result;
   }
 }
