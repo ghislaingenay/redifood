@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { PasswordManager } from "../services/password-manager";
 
 // what it takes to cerate a user
 interface UserAttrs {
@@ -19,15 +20,40 @@ interface UserModel extends mongoose.Model<UserDoc> {
   build(attrs: UserAttrs): UserDoc;
 }
 
-const userSchema = new mongoose.Schema({
-  username: {
-    type: String,
-    required: true,
+const userSchema = new mongoose.Schema(
+  {
+    username: {
+      type: String,
+      required: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
   },
-  password: {
-    type: String,
-    required: true,
+  {
+    toJSON: {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      transform(doc: mongoose.Document, ret: any) {
+        // Make direct changes to the JSON OBJECT
+        delete ret.password;
+        delete ret.__v;
+        ret.id = ret._id;
+        delete ret._id;
+      },
+    },
   },
+);
+
+// Not possible to add ES6 syntax, otherwise it will be overwritten (context of the file)
+// before we save the user, we want to hash the password
+userSchema.pre("save", async function (done) {
+  // hash the password if it is has been modified
+  if (this.isModified("password")) {
+    const hashed = await PasswordManager.toHash(this.get("password"));
+    this.set("password", hashed);
+  }
+  done();
 });
 
 // Add a static method to the model to check type
