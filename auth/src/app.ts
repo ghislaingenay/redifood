@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { json } from "body-parser";
 import cookieSession from "cookie-session";
 import express from "express";
@@ -8,12 +9,13 @@ import { NotFoundError } from "./errors/not-found.err";
 import { errorHandler } from "./middlewares/error-handler.mdwr";
 
 const app = express();
+
 app.set("trust proxy", true);
 app.use(json());
 app.use(
   cookieSession({
     signed: false,
-    secure: true,
+    secure: process.env.NODE_ENV !== "test",
   }),
 );
 
@@ -21,7 +23,7 @@ app.use(
 app.use(currentUserRouter);
 app.use(authRouter);
 
-app.all("*", async () => {
+app.all("*", async (req, res) => {
   throw new NotFoundError();
 });
 

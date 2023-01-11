@@ -21,7 +21,8 @@ router.post("/api/auth/signup", validationUsers, validateRequest, async (req: Re
       id: createdUser.id,
       username: createdUser.username,
     },
-    "addsod",
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    process.env.JWT_TOKEN!,
   );
   req.session = { jwt: userJwt };
   res.status(201).send(createdUser);
@@ -39,10 +40,11 @@ router.post("/api/auth/login", validationUsers, validateRequest, async (req: Req
       id: existingUser.id,
       username: existingUser.username,
     },
-    "vxvxvxvxvx",
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    process.env.JWT_TOKEN!,
   );
   req.session = { jwt: userJwt };
-  res.status(201).send(existingUser);
+  res.status(200).send(existingUser);
 });
 
 router.post("/api/auth/signout", (req: Request, res: Response) => {

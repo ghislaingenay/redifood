@@ -13,7 +13,7 @@
     "preset": "ts-jest",
     "testEnvironment": "node",
     "testMatch": [
-      "<rootDir>/src/controllers/__test__/**/*.test.ts"
+      "<rootDir>/src/controllers/__test__/**/*.test.tsx"
     ],
     "setupFilesAfterEnv": [
       "<rootDir>/src/test/jest.setup.ts"
@@ -26,7 +26,10 @@
     "coverageReporters": [
       "text-summary",
       "lcov"
-    ]
+    ],
+    "transform": {
+      "^.+\\.ts$": "ts-jest"
+    }
   },
   "keywords": [],
   "author": "",
