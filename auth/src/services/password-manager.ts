@@ -9,9 +9,9 @@ export class PasswordManager {
     return bcrypt.hashSync(password, 10);
   }
 
-  static async compare(storedpassword: string, suppliedPassword: string) {
+  static async compare(storedpassword: string, suppliedPassword: string): Promise<boolean> {
     // const [hashedPassword, salt] = storedpassword.split(".");
-    const result = await bcrypt.compare(suppliedPassword, storedpassword);
+    const result: boolean = await bcrypt.compare(suppliedPassword, storedpassword);
     return result;
   }
 }

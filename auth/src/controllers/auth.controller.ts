@@ -31,7 +31,7 @@ router.post("/api/auth/login", validationUsers, validateRequest, async (req: Req
   const { username, password } = req.body;
   const existingUser = await User.findOne({ username });
   if (!existingUser) throw new BadRequestError("Invalid credentials");
-  const passwordsMatch: boolean = await PasswordManager.compare(existingUser.password, password);
+  const passwordsMatch = await PasswordManager.compare(existingUser.password, password);
   if (!passwordsMatch) throw new BadRequestError("Invalid credentials");
   // Generate JWT
   const userJwt: string = jwt.sign(

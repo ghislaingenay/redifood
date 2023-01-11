@@ -1,32 +1,23 @@
-import { json } from "body-parser";
-import cookieSession from "cookie-session";
-import express from "express";
-import "express-async-errors";
-import { authRouter } from "./controllers/auth.controller";
-import { currentUserRouter } from "./controllers/currentuser.controller";
-import { NotFoundError } from "./errors/not-found.err";
-import { errorHandler } from "./middlewares/error-handler.mdwr";
+import mongoose from "mongoose";
+import { app } from "./app";
 
-const app = express();
-app.set("trust proxy", true);
-app.use(json());
-app.use(
-  cookieSession({
-    signed: false,
-    secure: true,
-  }),
-);
+const start = async () => {
+  if (!process.env.JWT_TOKEN) {
+    throw new Error("JWT_TOKEN must be defined");
+  }
 
-// routes
-app.use(currentUserRouter);
-app.use(authRouter);
+  if (!process.env.MONGO_URI) {
+    throw new Error("MONGO_URI must be defined");
+  }
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("Connected to MongoDB");
+  } catch (err) {
+    console;
+  }
+};
 
-app.all("*", async () => {
-  throw new NotFoundError();
-});
-
-app.use(errorHandler);
-
+start();
 app.listen(3002, () => {
   console.log("Listening on port 3002!");
 });
