@@ -1,15 +1,17 @@
 import express, { Request, Response } from "express";
-import { body, validationResult } from "express-validator";
+import { validationResult } from "express-validator";
+import { RequestValidationNodeError } from "../errors/request-validation-node.err";
 import { validationUsers } from "../services/auth.const";
 const router = express.Router();
 
 router.post("/api/auth/signup", validationUsers, (req: Request, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).send(errors.array());
+    throw new RequestValidationNodeError(errors.array());
   }
   const { username, password } = req.body;
   console.log("Creating a user...", username, password);
+  // if (!user) throw new DatabaseConnectionError()
   res.send({});
 });
 
