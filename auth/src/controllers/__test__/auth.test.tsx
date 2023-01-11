@@ -149,3 +149,33 @@ describe("POST /api/auth/signup", () => {
     expect(response.get("Set-Cookie")).toBeDefined();
   });
 });
+
+describe("signout", () => {
+  it("verify that the cookies is cleared", async () => {
+    const response1 = await request(app)
+      .post("/api/auth/signup")
+      .send({
+        username: "test",
+        password: "Fyu89*_vhhvgh",
+      })
+      .expect(201);
+    expect(response1.get("Set-Cookie")).toBeDefined();
+    const response2 = await request(app)
+      .post("/api/auth/login")
+      .send({
+        username: "test",
+        password: "Fyu89*_vhhvgh",
+      })
+      .expect(200);
+
+    expect(response2.get("Set-Cookie")).toBeDefined();
+    const response = await request(app).post("/api/auth/signout").send({}).expect(200);
+    expect(response.get("Set-Cookie")).toBeDefined();
+    expect(response.get("Set-Cookie")[0]).toEqual("session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; httponly");
+
+    const arrayElements = response.get("Set-Cookie")[0].split("; ");
+    expect(arrayElements[0]).toEqual("session=");
+    expect(arrayElements[1]).toEqual("path=/");
+    expect(arrayElements[2]).toEqual("expires=Thu, 01 Jan 1970 00:00:00 GMT");
+  });
+});
