@@ -20,6 +20,7 @@ interface UserModel extends mongoose.Model<UserDoc> {
   build(attrs: UserAttrs): UserDoc;
 }
 
+mongoose.set("strictQuery", false);
 const userSchema = new mongoose.Schema(
   {
     username: {
