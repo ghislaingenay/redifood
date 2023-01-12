@@ -1,3 +1,4 @@
+import { AuthRadioButton } from "@styles";
 import { Radio } from "antd";
 import { useState } from "react";
 import { Else, If, Then } from "react-if";
@@ -16,8 +17,12 @@ const Auth = () => {
   return (
     <div>
       <Radio.Group onChange={handleAuthChoice} value={authChoice} disabled={isDisabled}>
-        <Radio.Button value={EAuthChoice.SIGNIN}>Sign In</Radio.Button>
-        <Radio.Button value={EAuthChoice.REGISTER}>Register</Radio.Button>
+        <AuthRadioButton type="primary" value={EAuthChoice.SIGNIN}>
+          Sign In
+        </AuthRadioButton>
+        <AuthRadioButton type="primary" value={EAuthChoice.REGISTER}>
+          Register
+        </AuthRadioButton>
       </Radio.Group>
       <If condition={authChoice === EAuthChoice.SIGNIN}>
         <Then>
