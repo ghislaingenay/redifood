@@ -8,10 +8,10 @@ import buildClient from "./api/build-client";
 
 const { Header, Footer } = Layout;
 
-const AppComponent = ({ Component, pageProps }) => {
+const AppComponent = ({ Component, pageProps, currentUser }) => {
   const router = useRouter();
   return (
-    <>
+    <div>
       <ConfigProvider theme={{ token: tokenProvider, inherit: false }}>
         <Layout className="layout">
           <Header>
@@ -32,7 +32,10 @@ const AppComponent = ({ Component, pageProps }) => {
           <Footer className="text-center mb-0.5">Redifood ©{new Date().getFullYear()} Created by Ghislain Genay</Footer>
         </Layout>
       </ConfigProvider>
-    </>
+      {/* <Modal title="Vertically centered modal dialog" centered open={currentUser === null}>
+        <p>Some contents...</p>
+      </Modal> */}
+    </div>
   );
 };
 
@@ -41,7 +44,16 @@ AppComponent.getInitialProps = async (appContext) => {
   const client = buildClient(appContext.ctx);
   const { data } = await client.get("/api/auth/currentuser");
   console.log("data", data);
-  return { pageProps: {} };
+  let pageProps = {};
+  if (appContext.Component.getInitialProps) {
+    pageProps = await appContext.Component.getInitialProps(appContext.ctx);
+  }
+
+  console.log("user", data.currentUser);
+  return {
+    pageProps,
+    currentUser: data.currentUser,
+  };
 };
 
 export default AppComponent;
