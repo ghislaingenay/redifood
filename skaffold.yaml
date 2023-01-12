@@ -7,7 +7,6 @@ deploy:
 build:
   local:
     push: false
-    useBuildkit:
   artifacts:
     - image: ghislaingenay/redifood-auth
       context: auth
@@ -24,5 +23,5 @@ build:
         dockerfile: Dockerfile
       sync:
         manual:
-          - src: "src/**/*.ts"
+          - src: "**/*.ts"
             dest: .

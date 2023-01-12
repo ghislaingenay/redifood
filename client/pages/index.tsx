@@ -1,8 +1,5 @@
-import Login from "@components/Login";
-import { Input, Typography } from "antd";
-
+import { Typography } from "antd";
 import Head from "next/head";
-const { Title } = Typography;
 
 export default function Home() {
   return (
@@ -14,21 +11,8 @@ export default function Home() {
       </Head>
 
       <main>
-        <h1>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-        <Input />
-        <Title level={1}>Test</Title>
-        <Login />
-
-        <h1>Hello world!</h1>
-
-        <h1 className="text-3xl font-bold underline">Hello world!</h1>
-        <Title className="text-3xl font-bold underline">Test</Title>
-        <div className="text-3xl text-green-600 p-2">Hello Geeks!</div>
-        <p>
-          Get started by editing <code>pages/index.js</code>
-        </p>
+        <Typography.Title level={5}>Hello</Typography.Title>
+        <h1 className="text-2xl font-bold underline">Hello world!</h1>
       </main>
     </div>
   );
