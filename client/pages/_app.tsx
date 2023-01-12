@@ -4,10 +4,11 @@ import { RediContent, RediMenu, tokenProvider } from "@styles";
 import { ConfigProvider, Layout } from "antd";
 import { useRouter } from "next/router";
 import "../src/styles/globals.css";
+import buildClient from "./api/build-client";
 
 const { Header, Footer } = Layout;
 
-function MyApp({ Component, pageProps }) {
+const AppComponent = ({ Component, pageProps }) => {
   const router = useRouter();
   return (
     <>
@@ -33,6 +34,14 @@ function MyApp({ Component, pageProps }) {
       </ConfigProvider>
     </>
   );
-}
+};
 
-export default MyApp;
+AppComponent.getInitialProps = async (appContext) => {
+  console.log("appContext", appContext);
+  const client = buildClient(appContext.ctx);
+  const { data } = await client.get("/api/auth/currentuser");
+  console.log("data", data);
+  return { pageProps: {} };
+};
+
+export default AppComponent;
