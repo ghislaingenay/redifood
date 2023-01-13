@@ -1,4 +1,5 @@
 import React, { useContext } from "react";
+import Auth from "src/components/Auth";
 
 export const AuthContext = React.createContext(null);
 
@@ -8,4 +9,8 @@ export function useAuth() {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return userValue;
+}
+
+export function AuthProvider({ children, currentUser }) {
+  return <AuthContext.Provider value={currentUser}>{currentUser ? children : <Auth />}</AuthContext.Provider>;
 }
