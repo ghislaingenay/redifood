@@ -9,4 +9,6 @@ export enum ENavList {
   SETTINGS_LABEL = "Settings",
   ABOUT_US = "/about-us",
   ABOUT_US_LABEL = "About Us",
+  SIGNOUT = "/signout",
+  SIGNOUT_LABEL = "Sign Out",
 }
