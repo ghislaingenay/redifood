@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { BadRequestError } from "../errors/bad-request.err";
+import { EMessageErrors, EStatusCodes } from "../interfaces/err.interface";
 import { validateRequest } from "../middlewares/validationrequestnode.mdwr";
 import { User } from "../models/users";
 import { validationUsers } from "../services/auth.const";
@@ -13,6 +14,7 @@ router.post("/api/auth/signup", validationUsers, validateRequest, async (req: Re
 
   const existingUser = await User.findOne({ username });
   if (existingUser) {
+    res.status(EStatusCodes.BAD_REQUEST).send({ errors: [{ message: EMessageErrors.ALREADY_USERNAME }] });
     throw new BadRequestError("Username already in use");
   }
   const newUser = User.build({ username, password });
@@ -35,10 +37,12 @@ router.post("/api/auth/login", validationUsers, validateRequest, async (req: Req
   const { username, password } = req.body;
   const existingUser = await User.findOne({ username });
   if (!existingUser) {
+    res.status(EStatusCodes.BAD_REQUEST).send({ errors: [{ message: EMessageErrors.INVALID_CREDENTIALS }] });
     throw new BadRequestError("Invalid credentials");
   }
   const passwordsMatch = await PasswordManager.compare(existingUser.password, password);
   if (!passwordsMatch) {
+    res.status(EStatusCodes.BAD_REQUEST).send({ errors: [{ message: EMessageErrors.INVALID_CREDENTIALS }] });
     throw new BadRequestError("Invalid credentials");
   }
   // Generate JWT
