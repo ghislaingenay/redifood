@@ -1,20 +1,14 @@
-import { navRoutes } from "@constants/routes.const";
-import { ENavList } from "@interfaces/nav.interface";
-import { RediContent, RediMenu, tokenProvider } from "@styles";
+import { RediContent, tokenProvider } from "@styles";
 import { ConfigProvider, Layout, Spin } from "antd";
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { Else, If, Then } from "react-if";
 import Auth from "src/components/Auth";
+import { RediFooter, RediHeader } from "src/components/Page";
 import { AuthContext } from "src/contexts/auth.context";
 import "../src/styles/globals.css";
 import buildClient from "./api/build-client";
 
-const { Header, Footer } = Layout;
-
 const AppComponent = ({ Component, pageProps, currentUser, loading }) => {
-  const router = useRouter();
-
   const [loadingSpin, setLoadingSpin] = useState<boolean>(loading || true);
 
   useEffect(() => {
@@ -30,24 +24,11 @@ const AppComponent = ({ Component, pageProps, currentUser, loading }) => {
         <If condition={currentUser}>
           <Then>
             <Layout className="layout">
-              <Header>
-                <div className="logo" />
-                <RediMenu
-                  theme="dark"
-                  mode="horizontal"
-                  onClick={(e) => {
-                    router.push(e.key);
-                  }}
-                  items={navRoutes}
-                  defaultSelectedKeys={[ENavList.HOME]}
-                />
-              </Header>
+              <RediHeader />
               <RediContent>
                 <Component {...pageProps} />
               </RediContent>
-              <Footer className="text-center mb-0.5">
-                Redifood ©{new Date().getFullYear()} Created by Ghislain Genay
-              </Footer>
+              <RediFooter />
             </Layout>
           </Then>
           <Else>
