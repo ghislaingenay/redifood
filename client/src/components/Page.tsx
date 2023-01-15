@@ -3,7 +3,6 @@ import { ENavList } from "@interfaces/nav.interface";
 import { RediMenu } from "@styles";
 import { Layout } from "antd";
 import { useRouter } from "next/router";
-import "../src/styles/globals.css";
 
 const { Header, Footer } = Layout;
 const RediHeader = () => {
