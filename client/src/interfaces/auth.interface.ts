@@ -6,3 +6,7 @@ export enum EAuthChoice {
 export interface IPropsAuth {
   setButtonWasClicked: (value: boolean) => void;
 }
+
+export interface IAuthContext {
+  currentUser: any;
+}
