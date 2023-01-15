@@ -1,18 +1,46 @@
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import useRequest from "src/hooks/useRequest.hook";
+import { NotificationRes } from "src/definitions/notification.class";
+import { AxiosFunction } from "../src/functions/axios.function";
 
 const SignOut = () => {
   const router = useRouter();
-  const [doRequest] = useRequest({
-    url: "/api/users/signout",
-    method: "post",
-    onSuccess: () => router.push("/"),
-  });
 
+  const logOut = async () => {
+    await AxiosFunction({
+      url: "/api/auth/signout",
+      method: "post",
+      body: {},
+      params: {},
+    })
+      .then(() => {
+        console.log("success");
+        NotificationRes.onSuccess({
+          title: "Sign out",
+          description: "You have been signed out successfully",
+          placement: "top",
+        });
+        setTimeout(() => {
+          router.push("/");
+        }, 1000);
+      })
+      .catch((err) => {
+        console.log("failure");
+        console.log("err", err);
+        NotificationRes.onFailure({
+          title: "Sign out",
+          description: "Error while sign out, please try again",
+          placement: "top",
+        });
+        setTimeout(() => {
+          router.push("/");
+        }, 1000);
+      });
+  };
   useEffect(() => {
-    doRequest();
-  }, [doRequest]);
+    logOut();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return <div>Signing you out ...</div>;
 };
