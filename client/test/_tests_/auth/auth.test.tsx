@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import Auth from "src/components/Auth";
-
+// import { render } from "../../index";
 describe("Auth", () => {
   it("show display signup section when signup page is clicked", async () => {
     render(<Auth />);

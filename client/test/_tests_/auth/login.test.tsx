@@ -2,6 +2,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import Auth from "src/components/Auth";
 import { clickButton, typeIntoFormAuth } from "../../../src/functions/testhelpers.fn";
+// import { render } from "../../index";
 
 beforeEach(() => {
   jest.resetModules();
