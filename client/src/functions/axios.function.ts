@@ -15,24 +15,24 @@ const returnAxiosCall = (data: IAxiosRequest) => {
   const params = paramsInfo ? paramsInfo : {};
 
   const headers = {
-    authorization: userValue,
+    Cookie: "session",
   };
   switch (method) {
     case "get":
-      return axios.get(url, {
-        headers,
-        params,
-      });
+      return axios.get(url, { withCredentials: true, headers, params });
     case "post":
       return axios.post(url, body, {
+        withCredentials: true,
         headers,
       });
     case "put":
       return axios.put(url, body, {
+        withCredentials: true,
         headers,
       });
     case "delete":
       return axios.delete(url, {
+        withCredentials: true,
         headers,
       });
     default:
