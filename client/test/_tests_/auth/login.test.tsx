@@ -107,7 +107,7 @@ describe("Login - Validation", () => {
     });
     await clickButton(/submit/i, user);
     expect(usernameElement).toHaveValue("test");
-    await waitFor(async () => {
+    await waitFor(() => {
       expect(screen.queryByText(/please input your username/i)).toBe(null);
     });
   });
