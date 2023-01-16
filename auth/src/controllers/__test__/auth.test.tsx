@@ -73,7 +73,7 @@ describe("POST /api/auth/signup", () => {
         password: "Fyu89*_vhhvgh",
       })
       .expect(400);
-    expect(response.body.errors[0].message).toEqual("username should be defineda and have between 4 and 12 characters");
+    expect(response.body.errors[0].message).toEqual("username should be defined and have between 4 and 12 characters");
   });
 
   it("returns a 400 with an invalid password", async () => {
