@@ -1,15 +1,9 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import Auth from "src/components/Auth";
-import { clickButton, typeIntoFormAuth } from "../../../src/functions/testhelpers.fn";
-// import { render } from "../../index";
-
-beforeEach(() => {
-  jest.resetModules();
-  jest.setTimeout(50000);
-  jest.clearAllMocks();
-});
-
+import { clickButton, typeIntoFormAuth } from "src/functions/testhelpers.fn";
+jest.mock("next/navigation", () => require("next-router-mock"));
+jest.setTimeout(10000);
 describe("Login - Validation", () => {
   it("input should be initially in the document", () => {
     render(<Auth />);
