@@ -11,8 +11,8 @@ describe("GET /api/users/currentuser", () => {
   });
 
   it("current user of null is not authenticated", async () => {
-    await request(app).get("/api/auth/currentuser").send().expect(401);
-    // console.log(response);
-    // expect(response.statusMessage).toEqual("Unauthorized");
+    const response = await request(app).get("/api/auth/currentuser").send().expect(200);
+    console.log(response.body);
+    expect(response.body.currentUser).toEqual(null);
   });
 });
