@@ -325,7 +325,9 @@ describe("Signup - Validation", () => {
     await user.clear(confirmPasswordElement);
     await user.type(confirmPasswordElement, "FHTU*vn9H_");
     await clickButton(/submit/i, user);
-    expect(await screen.findByText(/passwords do not match/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByText(/passwords do not match/i)).toBe(null);
+    });
   });
 });
 
