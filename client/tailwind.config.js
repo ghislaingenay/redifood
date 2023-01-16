@@ -3,10 +3,7 @@ module.exports = {
   corePlugins: {
     preflight: false,
   },
-  content: [
-    "./pages/**/*.{tsx,js}",
-    "./components/**/*.{tsx,js}",
-  ],
+  content: ["./pages/**/*.{tsx,js}", "./components/**/*.{tsx,js}"],
   presets: [],
   darkMode: "media", // or 'class'
   theme: {
@@ -116,8 +113,7 @@ module.exports = {
       none: "none",
       spin: "spin 1s linear infinite",
       ping: "ping 1s cubic-bezier(0, 0, 0.2, 1) infinite",
-      pulse:
-        "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+      pulse: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
       bounce: "bounce 1s infinite",
     },
     aria: {
@@ -135,47 +131,32 @@ module.exports = {
       square: "1 / 1",
       video: "16 / 9",
     },
-    backdropBlur: ({ theme }) =>
-      theme("blur"),
-    backdropBrightness: ({ theme }) =>
-      theme("brightness"),
-    backdropContrast: ({ theme }) =>
-      theme("contrast"),
-    backdropGrayscale: ({ theme }) =>
-      theme("grayscale"),
-    backdropHueRotate: ({ theme }) =>
-      theme("hueRotate"),
-    backdropInvert: ({ theme }) =>
-      theme("invert"),
-    backdropOpacity: ({ theme }) =>
-      theme("opacity"),
-    backdropSaturate: ({ theme }) =>
-      theme("saturate"),
-    backdropSepia: ({ theme }) =>
-      theme("sepia"),
-    backgroundColor: ({ theme }) =>
-      theme("colors"),
+    backdropBlur: ({ theme }) => theme("blur"),
+    backdropBrightness: ({ theme }) => theme("brightness"),
+    backdropContrast: ({ theme }) => theme("contrast"),
+    backdropGrayscale: ({ theme }) => theme("grayscale"),
+    backdropHueRotate: ({ theme }) => theme("hueRotate"),
+    backdropInvert: ({ theme }) => theme("invert"),
+    backdropOpacity: ({ theme }) => theme("opacity"),
+    backdropSaturate: ({ theme }) => theme("saturate"),
+    backdropSepia: ({ theme }) => theme("sepia"),
+    backgroundColor: ({ theme }) => theme("colors"),
     backgroundImage: {
       none: "none",
-      "gradient-to-t":
-        "linear-gradient(to top, var(--tw-gradient-stops))",
+      "gradient-to-t": "linear-gradient(to top, var(--tw-gradient-stops))",
       "gradient-to-tr":
         "linear-gradient(to top right, var(--tw-gradient-stops))",
-      "gradient-to-r":
-        "linear-gradient(to right, var(--tw-gradient-stops))",
+      "gradient-to-r": "linear-gradient(to right, var(--tw-gradient-stops))",
       "gradient-to-br":
         "linear-gradient(to bottom right, var(--tw-gradient-stops))",
-      "gradient-to-b":
-        "linear-gradient(to bottom, var(--tw-gradient-stops))",
+      "gradient-to-b": "linear-gradient(to bottom, var(--tw-gradient-stops))",
       "gradient-to-bl":
         "linear-gradient(to bottom left, var(--tw-gradient-stops))",
-      "gradient-to-l":
-        "linear-gradient(to left, var(--tw-gradient-stops))",
+      "gradient-to-l": "linear-gradient(to left, var(--tw-gradient-stops))",
       "gradient-to-tl":
         "linear-gradient(to top left, var(--tw-gradient-stops))",
     },
-    backgroundOpacity: ({ theme }) =>
-      theme("opacity"),
+    backgroundOpacity: ({ theme }) => theme("opacity"),
     backgroundPosition: {
       bottom: "bottom",
       center: "center",
@@ -218,13 +199,9 @@ module.exports = {
     },
     borderColor: ({ theme }) => ({
       ...theme("colors"),
-      DEFAULT: theme(
-        "colors.gray.200",
-        "currentColor",
-      ),
+      DEFAULT: theme("colors.gray.200", "currentColor"),
     }),
-    borderOpacity: ({ theme }) =>
-      theme("opacity"),
+    borderOpacity: ({ theme }) => theme("opacity"),
     borderRadius: {
       none: "0px",
       sm: "0.125rem",
@@ -248,21 +225,16 @@ module.exports = {
     },
     boxShadow: {
       sm: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
-      DEFAULT:
-        "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
+      DEFAULT: "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
       md: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
       lg: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
       xl: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
-      "2xl":
-        "0 25px 50px -12px rgb(0 0 0 / 0.25)",
-      inner:
-        "inset 0 2px 4px 0 rgb(0 0 0 / 0.05)",
+      "2xl": "0 25px 50px -12px rgb(0 0 0 / 0.25)",
+      inner: "inset 0 2px 4px 0 rgb(0 0 0 / 0.05)",
       none: "none",
     },
-    boxShadowColor: ({ theme }) =>
-      theme("colors"),
-    caretColor: ({ theme }) =>
-      theme("colors"),
+    boxShadowColor: ({ theme }) => theme("colors"),
+    caretColor: ({ theme }) => theme("colors"),
     accentColor: ({ theme }) => ({
       ...theme("colors"),
       auto: "auto",
@@ -318,32 +290,16 @@ module.exports = {
       "zoom-in": "zoom-in",
       "zoom-out": "zoom-out",
     },
-    divideColor: ({ theme }) =>
-      theme("borderColor"),
-    divideOpacity: ({ theme }) =>
-      theme("borderOpacity"),
-    divideWidth: ({ theme }) =>
-      theme("borderWidth"),
+    divideColor: ({ theme }) => theme("borderColor"),
+    divideOpacity: ({ theme }) => theme("borderOpacity"),
+    divideWidth: ({ theme }) => theme("borderWidth"),
     dropShadow: {
       sm: "0 1px 1px rgb(0 0 0 / 0.05)",
-      DEFAULT: [
-        "0 1px 2px rgb(0 0 0 / 0.1)",
-        "0 1px 1px rgb(0 0 0 / 0.06)",
-      ],
-      md: [
-        "0 4px 3px rgb(0 0 0 / 0.07)",
-        "0 2px 2px rgb(0 0 0 / 0.06)",
-      ],
-      lg: [
-        "0 10px 8px rgb(0 0 0 / 0.04)",
-        "0 4px 3px rgb(0 0 0 / 0.1)",
-      ],
-      xl: [
-        "0 20px 13px rgb(0 0 0 / 0.03)",
-        "0 8px 5px rgb(0 0 0 / 0.08)",
-      ],
-      "2xl":
-        "0 25px 25px rgb(0 0 0 / 0.15)",
+      DEFAULT: ["0 1px 2px rgb(0 0 0 / 0.1)", "0 1px 1px rgb(0 0 0 / 0.06)"],
+      md: ["0 4px 3px rgb(0 0 0 / 0.07)", "0 2px 2px rgb(0 0 0 / 0.06)"],
+      lg: ["0 10px 8px rgb(0 0 0 / 0.04)", "0 4px 3px rgb(0 0 0 / 0.1)"],
+      xl: ["0 20px 13px rgb(0 0 0 / 0.03)", "0 8px 5px rgb(0 0 0 / 0.08)"],
+      "2xl": "0 25px 25px rgb(0 0 0 / 0.15)",
       none: "0 0 #0000",
     },
     fill: ({ theme }) => ({
@@ -448,58 +404,19 @@ module.exports = {
       ],
     },
     fontSize: {
-      xs: [
-        "0.75rem",
-        { lineHeight: "1rem" },
-      ],
-      sm: [
-        "0.875rem",
-        { lineHeight: "1.25rem" },
-      ],
-      base: [
-        "1rem",
-        { lineHeight: "1.5rem" },
-      ],
-      lg: [
-        "1.125rem",
-        { lineHeight: "1.75rem" },
-      ],
-      xl: [
-        "1.25rem",
-        { lineHeight: "1.75rem" },
-      ],
-      "2xl": [
-        "1.5rem",
-        { lineHeight: "2rem" },
-      ],
-      "3xl": [
-        "1.875rem",
-        { lineHeight: "2.25rem" },
-      ],
-      "4xl": [
-        "2.25rem",
-        { lineHeight: "2.5rem" },
-      ],
-      "5xl": [
-        "3rem",
-        { lineHeight: "1" },
-      ],
-      "6xl": [
-        "3.75rem",
-        { lineHeight: "1" },
-      ],
-      "7xl": [
-        "4.5rem",
-        { lineHeight: "1" },
-      ],
-      "8xl": [
-        "6rem",
-        { lineHeight: "1" },
-      ],
-      "9xl": [
-        "8rem",
-        { lineHeight: "1" },
-      ],
+      xs: ["0.75rem", { lineHeight: "1rem" }],
+      sm: ["0.875rem", { lineHeight: "1.25rem" }],
+      base: ["1rem", { lineHeight: "1.5rem" }],
+      lg: ["1.125rem", { lineHeight: "1.75rem" }],
+      xl: ["1.25rem", { lineHeight: "1.75rem" }],
+      "2xl": ["1.5rem", { lineHeight: "2rem" }],
+      "3xl": ["1.875rem", { lineHeight: "2.25rem" }],
+      "4xl": ["2.25rem", { lineHeight: "2.5rem" }],
+      "5xl": ["3rem", { lineHeight: "1" }],
+      "6xl": ["3.75rem", { lineHeight: "1" }],
+      "7xl": ["4.5rem", { lineHeight: "1" }],
+      "8xl": ["6rem", { lineHeight: "1" }],
+      "9xl": ["8rem", { lineHeight: "1" }],
     },
     fontWeight: {
       thin: "100",
@@ -512,10 +429,8 @@ module.exports = {
       extrabold: "800",
       black: "900",
     },
-    gap: ({ theme }) =>
-      theme("spacing"),
-    gradientColorStops: ({ theme }) =>
-      theme("colors"),
+    gap: ({ theme }) => theme("spacing"),
+    gradientColorStops: ({ theme }) => theme("colors"),
     gridAutoColumns: {
       auto: "auto",
       min: "min-content",
@@ -685,13 +600,11 @@ module.exports = {
       bounce: {
         "0%, 100%": {
           transform: "translateY(-25%)",
-          animationTimingFunction:
-            "cubic-bezier(0.8,0,1,1)",
+          animationTimingFunction: "cubic-bezier(0.8,0,1,1)",
         },
         "50%": {
           transform: "none",
-          animationTimingFunction:
-            "cubic-bezier(0,0,0.2,1)",
+          animationTimingFunction: "cubic-bezier(0,0,0.2,1)",
         },
       },
     },
@@ -736,10 +649,7 @@ module.exports = {
       max: "max-content",
       fit: "fit-content",
     }),
-    maxWidth: ({
-      theme,
-      breakpoints,
-    }) => ({
+    maxWidth: ({ theme, breakpoints }) => ({
       none: "none",
       0: "0rem",
       xs: "20rem",
@@ -820,14 +730,10 @@ module.exports = {
       11: "11",
       12: "12",
     },
-    padding: ({ theme }) =>
-      theme("spacing"),
-    placeholderColor: ({ theme }) =>
-      theme("colors"),
-    placeholderOpacity: ({ theme }) =>
-      theme("opacity"),
-    outlineColor: ({ theme }) =>
-      theme("colors"),
+    padding: ({ theme }) => theme("spacing"),
+    placeholderColor: ({ theme }) => theme("colors"),
+    placeholderOpacity: ({ theme }) => theme("opacity"),
+    outlineColor: ({ theme }) => theme("colors"),
     outlineOffset: {
       0: "0px",
       1: "1px",
@@ -843,14 +749,10 @@ module.exports = {
       8: "8px",
     },
     ringColor: ({ theme }) => ({
-      DEFAULT: theme(
-        "colors.blue.500",
-        "#3b82f6",
-      ),
+      DEFAULT: theme("colors.blue.500", "#3b82f6"),
       ...theme("colors"),
     }),
-    ringOffsetColor: ({ theme }) =>
-      theme("colors"),
+    ringOffsetColor: ({ theme }) => theme("colors"),
     ringOffsetWidth: {
       0: "0px",
       1: "1px",
@@ -903,8 +805,7 @@ module.exports = {
     scrollMargin: ({ theme }) => ({
       ...theme("spacing"),
     }),
-    scrollPadding: ({ theme }) =>
-      theme("spacing"),
+    scrollPadding: ({ theme }) => theme("spacing"),
     sepia: {
       0: "0",
       DEFAULT: "100%",
@@ -929,10 +830,8 @@ module.exports = {
       1: "1",
       2: "2",
     },
-    textColor: ({ theme }) =>
-      theme("colors"),
-    textDecorationColor: ({ theme }) =>
-      theme("colors"),
+    textColor: ({ theme }) => theme("colors"),
+    textDecorationColor: ({ theme }) => theme("colors"),
     textDecorationThickness: {
       auto: "auto",
       "from-font": "from-font",
@@ -953,8 +852,7 @@ module.exports = {
     textIndent: ({ theme }) => ({
       ...theme("spacing"),
     }),
-    textOpacity: ({ theme }) =>
-      theme("opacity"),
+    textOpacity: ({ theme }) => theme("opacity"),
     transformOrigin: {
       center: "center",
       top: "top",
@@ -999,13 +897,11 @@ module.exports = {
       transform: "transform",
     },
     transitionTimingFunction: {
-      DEFAULT:
-        "cubic-bezier(0.4, 0, 0.2, 1)",
+      DEFAULT: "cubic-bezier(0.4, 0, 0.2, 1)",
       linear: "linear",
       in: "cubic-bezier(0.4, 0, 1, 1)",
       out: "cubic-bezier(0, 0, 0.2, 1)",
-      "in-out":
-        "cubic-bezier(0.4, 0, 0.2, 1)",
+      "in-out": "cubic-bezier(0.4, 0, 0.2, 1)",
     },
     translate: ({ theme }) => ({
       ...theme("spacing"),

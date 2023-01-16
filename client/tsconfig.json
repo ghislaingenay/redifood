@@ -1,13 +1,10 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "target": "es2015",
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
+    "types": ["node", "cypress", "@testing-library/cypress", "@types/testing-library__cypress"],
     "strict": false,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
@@ -16,32 +13,23 @@
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "isolatedModules": true,
+    "isolatedModules": false,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "jsx": "preserve",
     "baseUrl": ".",
     "paths": {
-      "@components/*": [
-        "src/components/*"
-      ],
+      "@components/*": ["src/components/auth/*"],
       "@components": ["src/components"],
       "@public/*": ["public/*"],
       "@public": ["public"],
-      "@definitions/*": [
-        "src/definitions/*"
-      ],
-      "@definitions": [
-        "src/definitions"
-      ],
-      "@interfaces/*": [
-        "src/interfaces/*"
-      ],
+      "@constants/*": ["src/constants/*"],
+      "@constants": ["src/constants"],
+      "@interfaces/*": ["src/interfaces/*"],
       "@interfaces": ["src/interfaces"],
-      "@styles/*": ["src/styles/*"],
-      "@styles": ["src/styles"],
-      "@redux/*": ["src/redux/*"],
-      "@redux": ["src/redux"],
+      "@styles/*": ["src/styles/*.css"],
+      "@styles": ["src/styles/index"],
+      "@functions/*": ["src/functions/*"],
       "@test/*": ["test/*"],
       "@test": ["test"]
     }
@@ -49,7 +37,11 @@
   "include": [
     "next-env.d.ts",
     "**/*.ts",
-    "**/*.tsx"
+    "**/*.tsx",
+    "test/jest.config.js",
+    "tailwind.config.js",
+    "./test/jest.setup.ts",
+    "cypress/integration/test.cy.js"
   ],
   "exclude": ["node_modules"]
 }

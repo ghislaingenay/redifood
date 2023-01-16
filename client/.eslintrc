@@ -1,30 +1,23 @@
 {
   "root": true,
   "parser": "@typescript-eslint/parser",
-  "plugins": [
-    "@typescript-eslint",
-    "testing-library",
-    "jest-dom",
-    "prettier",
-    "jsx-a11y"
-  ],
+  "plugins": ["@typescript-eslint", "testing-library", "jest-dom", "prettier", "jsx-a11y"],
   "overrides": [
     {
-      "files": ["*.js"],
+      "files": ["*.js", "*.ts", "*.tsx"],
       "rules": {
-        "@typescript-eslint/no-var-requires": "off"
+        "@typescript-eslint/no-var-requires": "on",
+        "jest-dom/prefer-checked": "error",
+        "jest-dom/prefer-enabled-disabled": "error",
+        "jest-dom/prefer-required": "error",
+        "jest-dom/prefer-to-have-attribute": "error"
       }
     }
   ],
   "settings": {
     "import/resolver": {
       "node": {
-        "extensions": [
-          ".js",
-          ".jsx",
-          ".ts",
-          ".tsx"
-        ],
+        "extensions": [".js", ".jsx", ".ts", ".tsx"],
         "paths": ["src"]
       }
     }
@@ -35,12 +28,13 @@
     "amd": true
   },
   "extends": [
+    "plugin:jest-dom/recommended",
+    "next/babel",
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
     "prettier/@typescript-eslint",
     "plugin:prettier/recommended",
-    "airbnb",
     "plugin:testing-library/recommended",
     "plugin:testing-library/react",
     "plugin:jsx-a11y/recommended",
