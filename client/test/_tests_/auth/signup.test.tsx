@@ -4,9 +4,8 @@ import userEvent from "@testing-library/user-event";
 import Auth from "src/components/Auth";
 import { clickButton, typeIntoFormAuth } from "../../../src/functions/testhelpers.fn";
 
-beforeEach(async () => {
-  jest.resetModules();
-});
+jest.mock("next/navigation", () => require("next-router-mock"));
+jest.setTimeout(30000);
 
 describe("Signup - Validation", () => {
   it("input should be initially in the document", async () => {
@@ -97,7 +96,7 @@ describe("Signup - Validation", () => {
     const user = userEvent.setup();
 
     expect(screen.queryByText(/Please input your password/i)).not.toBeInTheDocument();
-    const { usernameElement, passwordElement, confirmPasswordElement } = await typeIntoFormAuth(user, {
+    const { confirmPasswordElement } = await typeIntoFormAuth(user, {
       username: "test",
       password: "FHTU*vn9H_",
       confirmPassword: undefined,

@@ -4,6 +4,7 @@ import Auth from "src/components/Auth";
 import { clickButton, typeIntoFormAuth } from "src/functions/testhelpers.fn";
 jest.mock("next/navigation", () => require("next-router-mock"));
 jest.setTimeout(10000);
+
 describe("Login - Validation", () => {
   it("input should be initially in the document", () => {
     render(<Auth />);
