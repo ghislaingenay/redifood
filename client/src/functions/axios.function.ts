@@ -11,7 +11,7 @@ interface IAxiosRequest {
 
 const returnAxiosCall = (data: IAxiosRequest) => {
   const { authContext, body, params: paramsInfo, method, url } = data;
-  const userValue = authContext?.currentUser;
+  const userValue = authContext?.authorization;
   const params = paramsInfo ? paramsInfo : {};
 
   const headers = {

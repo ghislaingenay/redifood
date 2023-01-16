@@ -1,12 +1,14 @@
 import { Button, Divider, Form, Input, Modal, Radio, Typography } from "antd";
-import axios from "axios";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Else, If, Then } from "react-if";
+import { AxiosFunction } from "../../src/functions/axios.function";
 import { EAuthChoice } from "../../src/interfaces/auth.interface";
 import { AuthRadioButton } from "../styles/button.style";
 const { Title } = Typography;
 const Auth = () => {
   // ------------ CONSTANTS ---------
+  const router = useRouter();
   const [formLogin] = Form.useForm();
   const [formSignUp] = Form.useForm();
   // const router = useRouter();
@@ -20,14 +22,6 @@ const Auth = () => {
   const [isError, setIsError] = useState(false);
 
   const textColor = isError ? "red" : "green";
-  // const [errorLogin, doRequestLogin] = useRequest({
-  //   url: "/api/auth/login",
-  //   method: "post",
-  //   onSuccess: () => {
-  //     setButtonWasClicked(false);
-  //     router.replace(router.refresh);
-  //   },
-  // });
 
   // ------------ HANDLERS ---------
   const handleAuthChoice = (e: any) => {
@@ -37,12 +31,19 @@ const Auth = () => {
   const handleLogin = async (values: any) => {
     setResponse(null);
     setIsError(false);
-    await axios
-      .post("/api/auth/login", values)
-      .then((res) => {
-        return setResponse("Successfully logged in");
+    await AxiosFunction({
+      params: {},
+      url: "/api/auth/login",
+      method: "post",
+      body: values,
+    })
+      .then(() => {
+        setResponse("Successfully logged in");
+        setTimeout(() => {
+          router.push("/");
+        }, 2000);
       })
-      .catch((err) => {
+      .catch(() => {
         setIsError(true);
         return setResponse("Invalid credentials");
         // console.log(err);
@@ -53,12 +54,19 @@ const Auth = () => {
     setButtonWasClicked(true);
     setResponse(null);
     setIsError(false);
-    await axios
-      .post("/api/auth/signup", values)
-      .then((res) => {
-        return setResponse("Account succesfully created");
+    await AxiosFunction({
+      params: {},
+      url: "/api/auth/signup",
+      method: "post",
+      body: values,
+    })
+      .then(() => {
+        setResponse("Account succesfully created");
+        setTimeout(() => {
+          router.push("/");
+        }, 2000);
       })
-      .catch((err) => {
+      .catch(() => {
         setIsError(true);
         return setResponse("Invalid credentials");
       });
@@ -243,7 +251,11 @@ const Auth = () => {
             </Form>
           </Else>
         </If>
-        {response && <Title style={{ color: textColor }}>{response}</Title>}
+        {response && (
+          <Title level={5} className="text-center" style={{ color: textColor }}>
+            {response}
+          </Title>
+        )}
       </Modal>
 
       <div style={{ width: "100vw", height: "100vh", backgroundColor: "gray" }} />
