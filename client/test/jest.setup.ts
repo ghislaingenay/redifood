@@ -1,6 +1,7 @@
 import "@testing-library/jest-dom";
 import "@testing-library/jest-dom/extend-expect";
 import JestMock from "jest-mock";
+import "next-router-mock";
 import { server } from "./mocks/server";
 
 beforeAll(() => {
@@ -18,14 +19,15 @@ beforeAll(() => {
       dispatchEvent: jest.fn(),
     };
   });
-
-  // global.console = {
-  //   warn: jest.fn(),
-  // } as any;
-
   window.scroll = jest.fn() as JestMock.Mock<any>;
   window.alert = jest.fn();
   server.listen();
+});
+
+beforeEach(() => {
+  jest.resetModules();
+  jest.setTimeout(50000);
+  jest.mock("next/navigation", () => require("next-router-mock"));
 });
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());

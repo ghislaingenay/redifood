@@ -1,15 +1,17 @@
 import request from "supertest";
 import { app } from "../../app";
+import { EMessageErrors } from "../../interfaces/err.interface";
 
 describe("POST /api/auth/login", () => {
   it("fails when a username that does not exist is supplied", async () => {
-    await request(app)
+    const response = await request(app)
       .post("/api/auth/login")
       .send({
         username: "test",
         password: "hueheFy*_6",
       })
       .expect(400);
+    expect(response.body.errors[0].message).toEqual(EMessageErrors.INVALID_CREDENTIALS);
   });
 
   it("fails when an incorrect password is supplied", async () => {
@@ -20,13 +22,16 @@ describe("POST /api/auth/login", () => {
         password: "Fyu89*_vhVgh",
       })
       .expect(201);
-    await request(app)
+    const response = await request(app)
       .post("/api/auth/login")
       .send({
         username: "test",
         password: "passd",
       })
       .expect(400);
+    expect(response.body.errors[0].message).toEqual(
+      "password must contain at least one uppercase, one lowercase, one number and one special character",
+    );
   });
 
   it("valid cookies with correct credentials", async () => {
@@ -61,13 +66,14 @@ describe("POST /api/auth/signup", () => {
   });
 
   it("returns a 400 with an invalid username", async () => {
-    await request(app)
+    const response = await request(app)
       .post("/api/auth/signup")
       .send({
         username: "te",
         password: "Fyu89*_vhhvgh",
       })
       .expect(400);
+    expect(response.body.errors[0].message).toEqual("username should be defineda and have between 4 and 12 characters");
   });
 
   it("returns a 400 with an invalid password", async () => {
@@ -108,6 +114,7 @@ describe("POST /api/auth/signup", () => {
         password: "fyu*_vHhvgh",
       })
       .expect(400);
+
     await request(app)
       .post("/api/auth/signup")
       .send({

@@ -1,5 +1,5 @@
+import { EStatusCodes } from "../interfaces/err.interface";
 import { CustomError } from "./custom.err";
-import { EStatusCodes } from "./err.interface";
 
 export class BadRequestError extends CustomError {
   statusCode = EStatusCodes.BAD_REQUEST;

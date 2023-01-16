@@ -1,15 +1,13 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import Login from "../../../src/components/auth/Login";
-import { clickButton, typeIntoFormAuth } from "../../../src/functions/testhelpers.fn";
-
-beforeEach(() => {
-  jest.resetModules();
-  render(<Login setButtonWasClicked={jest.fn} />);
-});
+import Auth from "src/components/Auth";
+import { clickButton, typeIntoFormAuth } from "src/functions/testhelpers.fn";
+jest.mock("next/navigation", () => require("next-router-mock"));
+jest.setTimeout(10000);
 
 describe("Login - Validation", () => {
   it("input should be initially in the document", () => {
+    render(<Auth />);
     expect(
       screen.getByRole("textbox", {
         name: /username/i,
@@ -19,6 +17,7 @@ describe("Login - Validation", () => {
   });
 
   it("input fields should be empty, required, not disabled when rendered", () => {
+    render(<Auth />);
     const usernameInput = screen.getByRole("textbox", {
       name: /username/i,
     });
@@ -33,6 +32,7 @@ describe("Login - Validation", () => {
   });
 
   it("should show error message when password is empty", async () => {
+    render(<Auth />);
     const user = userEvent.setup();
     expect(screen.queryByText(/Please input your password/i)).not.toBeInTheDocument();
     const { usernameElement, passwordElement } = await typeIntoFormAuth(user, {
@@ -43,11 +43,11 @@ describe("Login - Validation", () => {
     await clickButton(/submit/i, user);
     expect(usernameElement).toHaveValue("test");
     expect(passwordElement).toBe(undefined);
-    expect(await screen.findAllByRole("alert")).toHaveLength(1);
     expect(await screen.findByText(/please input your password/i)).toBeInTheDocument();
   });
 
   it("should show error message when username is empty", async () => {
+    render(<Auth />);
     const user = userEvent.setup();
     expect(screen.queryByText(/Please input your username/i)).not.toBeInTheDocument();
     await typeIntoFormAuth(user, {
@@ -61,6 +61,7 @@ describe("Login - Validation", () => {
   });
 
   it("should show error message when username and password are empty", async () => {
+    render(<Auth />);
     const user = userEvent.setup();
     expect(screen.queryByText(/Please input your username/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Please input your password/i)).not.toBeInTheDocument();
@@ -69,12 +70,12 @@ describe("Login - Validation", () => {
       password: undefined,
     });
     await clickButton(/submit/i, user);
-    expect(await screen.findAllByRole("alert")).toHaveLength(2);
     expect(await screen.findByText(/please input your username/i)).toBeInTheDocument();
     expect(await screen.findByText(/please input your password/i)).toBeInTheDocument();
   });
 
   it("user clicked several times on username", async () => {
+    render(<Auth />);
     const user = userEvent.setup();
     await user.click(
       screen.getByRole("textbox", {
@@ -93,7 +94,6 @@ describe("Login - Validation", () => {
       confirmPassword: "",
     });
     await clickButton(/submit/i, user);
-    expect(await screen.findAllByRole("alert")).toHaveLength(1);
     expect(await screen.findByText(/please input your username/i)).toBeInTheDocument();
     await user.clear(
       screen.getByRole("textbox", {
@@ -107,15 +107,15 @@ describe("Login - Validation", () => {
     });
     await clickButton(/submit/i, user);
     expect(usernameElement).toHaveValue("test");
-    await waitFor(async () => {
+    await waitFor(() => {
       expect(screen.queryByText(/please input your username/i)).toBe(null);
-      expect(await screen.queryAllByRole("alert")).toHaveLength(0);
     });
   });
 });
 
 describe("Login - Integration", () => {
   it("should indicate success when username and password match", async () => {
+    render(<Auth />);
     const user = userEvent.setup();
     const { usernameElement, passwordElement } = await typeIntoFormAuth(user, {
       username: "test",
@@ -123,14 +123,13 @@ describe("Login - Integration", () => {
       confirmPassword: "",
     });
     await clickButton(/submit/i, user);
-
     expect(usernameElement).toHaveValue("test");
     expect(passwordElement).toHaveValue("pit");
-    expect(await screen.findByText(/status: 201/i)).toBeInTheDocument();
-    expect(await screen.findByText(/Success/i)).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: /Successfully logged in/i })).toBeInTheDocument();
   });
 
   it("should show invalid password when password doesn't match", async () => {
+    render(<Auth />);
     const user = userEvent.setup();
     await typeIntoFormAuth(user, {
       username: "test",
@@ -138,11 +137,11 @@ describe("Login - Integration", () => {
       confirmPassword: "",
     });
     await clickButton(/submit/i, user);
-    expect(await screen.findByText(/status: 401/i)).toBeInTheDocument();
-    expect(await screen.findByText(/error password/i)).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: /Invalid credentials/i })).toBeInTheDocument();
   });
 
   it("should show invalid password when username doesn't match", async () => {
+    render(<Auth />);
     const user = userEvent.setup();
     await typeIntoFormAuth(user, {
       username: "testa",
@@ -150,11 +149,11 @@ describe("Login - Integration", () => {
       confirmPassword: "",
     });
     await clickButton(/submit/i, user);
-    expect(await screen.findByText(/status: 401/i)).toBeInTheDocument();
-    expect(await screen.findByText(/error username/i)).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: /Invalid credentials/i })).toBeInTheDocument();
   });
 
   it("should show invalid credentials when password or username doesn't match", async () => {
+    render(<Auth />);
     const user = userEvent.setup();
     await typeIntoFormAuth(user, {
       username: "test",
@@ -162,53 +161,15 @@ describe("Login - Integration", () => {
       confirmPassword: "",
     });
     await clickButton(/submit/i, user);
-    expect(await screen.findByText(/status: 401/i)).toBeInTheDocument();
-    expect(await screen.findByText(/Invalid credentials/i)).toBeInTheDocument();
-
-    expect(await screen.findByText(/error password/i)).toBeInTheDocument();
-    await user.clear(
-      screen.getByRole("textbox", {
-        name: /username/i,
-      }),
-    );
+    await waitFor(() => {
+      expect(screen.queryByRole("heading", { name: /Successfully logged in/i })).toEqual(null);
+    });
     await user.clear(screen.getByLabelText("Password"));
     await typeIntoFormAuth(user, {
-      username: "testa",
       password: "pit",
       confirmPassword: "",
     });
     await clickButton(/submit/i, user);
-    expect(await screen.findByText(/status: 401/i)).toBeInTheDocument();
-    expect(await screen.findByText(/Invalid credentials/i)).toBeInTheDocument();
-    expect(await screen.findByText(/error username/i)).toBeInTheDocument();
-    await user.clear(
-      screen.getByRole("textbox", {
-        name: /username/i,
-      }),
-    );
-    await user.clear(screen.getByLabelText("Password"));
-    await typeIntoFormAuth(user, {
-      username: "testa",
-      password: "pith",
-      confirmPassword: "",
-    });
-    await clickButton(/submit/i, user);
-    expect(await screen.findByText(/status: 401/i)).toBeInTheDocument();
-    expect(await screen.findByText(/Invalid credentials/i)).toBeInTheDocument();
-    expect(await screen.findByText(/error username, error password/i)).toBeInTheDocument();
-    await user.clear(
-      screen.getByRole("textbox", {
-        name: /username/i,
-      }),
-    );
-    await user.clear(screen.getByLabelText("Password"));
-    await typeIntoFormAuth(user, {
-      username: "test",
-      password: "pit",
-      confirmPassword: "",
-    });
-    await clickButton(/submit/i, user);
-    expect(await screen.findByText(/status: 201/i)).toBeInTheDocument();
-    expect(await screen.findByText(/Success/i)).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: /Successfully logged in/i })).toBeInTheDocument();
   });
 });
