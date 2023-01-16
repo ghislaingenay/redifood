@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Else, If, Then } from "react-if";
 import Auth from "src/components/Auth";
 import { RediFooter, RediHeader } from "src/components/Page";
+import { AuthContext } from "src/contexts/auth.context";
 import "../src/styles/globals.css";
 import buildClient from "./api/build-client";
 
@@ -18,24 +19,24 @@ const AppComponent = ({ Component, pageProps, currentUser, loading }) => {
     return <Spin />;
   }
   return (
-    // <AuthContext.Provider value={currentUser}>
-    <ConfigProvider theme={{ token: tokenProvider, inherit: false }}>
-      <If condition={currentUser}>
-        <Then>
-          <Layout className="layout">
-            <RediHeader />
-            <RediContent>
-              <Component {...pageProps} />
-            </RediContent>
-            <RediFooter />
-          </Layout>
-        </Then>
-        <Else>
-          <Auth />
-        </Else>
-      </If>
-    </ConfigProvider>
-    // </AuthContext.Provider>
+    <AuthContext.Provider value={{ authorization: currentUser }}>
+      <ConfigProvider theme={{ token: tokenProvider, inherit: false }}>
+        <If condition={currentUser}>
+          <Then>
+            <Layout className="layout">
+              <RediHeader />
+              <RediContent>
+                <Component {...pageProps} />
+              </RediContent>
+              <RediFooter />
+            </Layout>
+          </Then>
+          <Else>
+            <Auth />
+          </Else>
+        </If>
+      </ConfigProvider>
+    </AuthContext.Provider>
   );
 };
 

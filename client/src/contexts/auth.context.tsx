@@ -1,7 +1,7 @@
-import { AxiosFunction } from "@functions/axios.function";
 import { Skeleton } from "antd";
 import React, { useContext, useEffect, useState } from "react";
 import Auth from "src/components/Auth";
+import { AxiosFunction } from "../functions/axios.function";
 
 export const AuthContext = React.createContext({});
 
@@ -15,7 +15,7 @@ export function useAuth() {
 }
 
 export function AuthProvider({ children }) {
-  const [currentUser, setCurrentUser] = useState();
+  const [currentUser, setCurrentUser] = useState(null);
   const [spinLoading, setSpinLoading] = useState(true);
 
   useEffect(() => {
@@ -39,5 +39,9 @@ export function AuthProvider({ children }) {
     return <Skeleton />;
   }
 
-  return <AuthContext.Provider value={currentUser}>{currentUser ? children : <Auth />}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ authorization: currentUser }}>
+      {currentUser ? children : <Auth />}
+    </AuthContext.Provider>
+  );
 }

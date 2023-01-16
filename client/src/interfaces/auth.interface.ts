@@ -8,5 +8,5 @@ export interface IPropsAuth {
 }
 
 export interface IAuthContext {
-  currentUser: any;
+  authorization: any;
 }
