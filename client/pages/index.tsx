@@ -24,12 +24,17 @@ const AllOrdersPage = () => {
       </Head>
       <Title level={2}>List of all orders</Title>
       <Select
-        showSearch
         value={selectedOption}
-        onChange={(value) => setSelectedOption(value)}
-        options={optionsSelect}
+        onChange={(e) => setSelectedOption(e)}
         showArrow={false}
-      />
+        // options={optionsSelect}
+      >
+        {optionsSelect.map((option) => (
+          <Select.Option key={option.value} value={option.value}>
+            {option.label}
+          </Select.Option>
+        ))}
+      </Select>
     </>
   );
 };
