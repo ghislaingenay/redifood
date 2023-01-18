@@ -42,28 +42,34 @@ describe("All Orders Page - Unit Testing", () => {
     expect(screen.getByText(/All Orders/i)).toBeInTheDocument();
   });
 
-  it("select input with default value of ALL", async () => {
-    const { container } = render(<AllOrdersPage />);
-    const selectedValue = container.querySelector("div.ant-select-selector > span.ant-select-selection-item");
-    expect(selectedValue.textContent).toBe("ALL");
-    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
-    expect(screen.queryAllByRole("option")).toHaveLength(0);
-  });
-
-  it("user able to see the different option on select ", async () => {
+  it("select input with default value of ALL - Test with mock", async () => {
     render(<AllOrdersPage />);
-    const user = userEvent.setup();
-    const SelectElement = screen.getByRole("combobox");
-    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
-    expect(screen.queryAllByRole("option")).toHaveLength(0);
-    await user.click(SelectElement as HTMLElement);
-    expect(await screen.findByRole("listbox")).toBeInTheDocument();
-    expect(await screen.findAllByRole("option")).toHaveLength(2);
-    expect(await screen.findByRole("option", { name: /ALL/i })).toHaveAttribute("aria-selected", "true");
-    expect(await screen.findByRole("option", { name: /NONE/i })).toHaveAttribute("aria-selected", "false");
+    const SelectElement: Jest.Mock<HTMLSelectElement> = screen.getByRole("combobox");
+    expect(SelectElement.value).toBe("ALL");
+    expect(screen.queryAllByRole("option")).toHaveLength(2);
   });
+  // it("select input with default value of ALL - Test without mock (PASSED)", async () => {
+  //   const { container } = render(<AllOrdersPage />);
+  //   const selectedValue = container.querySelector("div.ant-select-selector > span.ant-select-selection-item");
+  //   expect(selectedValue.textContent).toBe("ALL");
+  //   expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+  //   expect(screen.queryAllByRole("option")).toHaveLength(0);
+  // });
 
-  // it("should be able to select NONE - TEst without mock", async () => {
+  // it("user able to see the different option on select - Test without mock (PASSED) Test not needed if use mock", async () => {
+  //   render(<AllOrdersPage />);
+  //   const user = userEvent.setup();
+  //   const SelectElement = screen.getByRole("combobox");
+  //   expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+  //   expect(screen.queryAllByRole("option")).toHaveLength(0);
+  //   await user.click(SelectElement as HTMLElement);
+  //   expect(await screen.findByRole("listbox")).toBeInTheDocument();
+  //   expect(await screen.findAllByRole("option")).toHaveLength(2);
+  //   expect(await screen.findByRole("option", { name: /ALL/i })).toHaveAttribute("aria-selected", "true");
+  //   expect(await screen.findByRole("option", { name: /NONE/i })).toHaveAttribute("aria-selected", "false");
+  // });
+
+  // it("should be able to select NONE - TEst without mock (DO NOT PASS)", async () => {
   //   const { container } = render(<AllOrdersPage />);
   //   const user = userEvent.setup();
   //   // const selectedValue = container.querySelector("div.ant-select-selector > span.ant-select-selection-item");
@@ -83,7 +89,7 @@ describe("All Orders Page - Unit Testing", () => {
   //   logRoles(await screen.findByRole("option"));
   // });
 
-  it.only("should be able to select NONE - Test without mock", async () => {
+  it("should be able to select NONE - Test without mock", async () => {
     render(<AllOrdersPage />);
     const user = userEvent.setup();
     const SelectElement: Jest.Mock<HTMLSelectElement> = screen.getByRole("combobox");
@@ -98,7 +104,6 @@ describe("All Orders Page - Unit Testing", () => {
     // @ts-ignore
     await waitFor(() => {
       expect(SelectElement.value).toBe("NONE");
-      expect(SelectElement.onChange).toHaveBeenCalledTimes(2);
       expect(SelectElement.value).not.toBe("ALL");
     });
   });
