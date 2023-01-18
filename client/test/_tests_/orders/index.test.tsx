@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-// import userEvent from "@testing-library/user-event";
+import userEvent from "@testing-library/user-event";
 import AllOrdersPage from "../../../pages/index";
 
 // jest.mock("antd", () => {
@@ -48,6 +48,24 @@ describe("All Orders Page - Unit Testing", () => {
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
     expect(screen.queryAllByRole("option")).toHaveLength(0);
   });
+
+  it("user able to see the different option on select", async () => {
+    render(<AllOrdersPage />);
+    const user = userEvent.setup();
+    const SelectElement = screen.getByRole("combobox");
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+    expect(screen.queryAllByRole("option")).toHaveLength(0);
+    screen.debug();
+    await user.click(SelectElement as HTMLElement);
+    screen.debug();
+    expect(await screen.findByRole("listbox")).toBeInTheDocument();
+    expect(await screen.findAllByRole("option")).toHaveLength(2);
+    expect(await screen.findByRole("option", { name: /ALL/i })).toHaveAttribute("aria-selected", "true");
+    expect(await await screen.findByRole("option", { name: /NONE/i })).toHaveAttribute("aria-selected", "false");
+    expect(await screen.findAllByRole("option")).toHaveLength(2);
+  });
+
+  // logRoles(await screen.findByRole("option"));
 });
 
 describe("All Orders Page - Unit Testing", () => {
