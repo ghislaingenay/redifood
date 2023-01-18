@@ -110,8 +110,58 @@ describe("All Orders Page - Unit Testing", () => {
 });
 
 describe("All Orders Page - Unit Testing", () => {
-  it.todo("should have a options length of 5 in select after fetching get unpaid orders");
-  it.todo("should have a table with 5 columns initially after get request");
-  it.todo("user select one option qnd only one result is found");
-  it.todo("user select one option qnd only one result is found and then set back to ALL");
+  it("should have a options length of 5 in select after fetching get unpaid orders", async () => {
+    render(<AllOrdersPage />);
+    const SelectElement: Jest.Mock<HTMLSelectElement> = screen.getByRole("combobox");
+    expect(SelectElement.value).toBe("ALL");
+    expect(screen.queryAllByRole("option")).toHaveLength(2);
+    screen.debug();
+    await waitFor(() => {
+      expect(screen.queryAllByRole("option")).toHaveLength(3);
+      expect(SelectElement.value).toBe("ALL");
+    });
+  });
+
+  it("should have a table with 5 columns initially after get request", async () => {
+    render(<AllOrdersPage />);
+    expect(screen.queryAllByRole("row")).toBe(null);
+    await waitFor(() => {
+      screen.debug();
+      ["Order #", "Total", "Status", "Table Number", "Actions"].forEach((text) => {
+        expect(screen.getByText(text)).toBeInTheDocument();
+      });
+      expect(screen.queryByText("Order Menu")).toBeInTheDocument();
+      ["Order #APP1", "Order #FTP2", "Order #KBB3"].forEach((text) => {
+        expect(screen.getByText(text)).toBeInTheDocument();
+      });
+      expect(screen.queryAllByRole("row")).toHaveLength(3);
+    });
+  });
+
+  it("user select one option qnd only one result is found and then set back to ALL", async () => {
+    render(<AllOrdersPage />);
+    const user = userEvent.setup();
+    const SelectElement: Jest.Mock<HTMLSelectElement> = screen.getByRole("combobox");
+    expect(SelectElement.value).toBe("ALL");
+    expect(screen.queryAllByRole("option")).toBe(null);
+    screen.debug();
+    await user.click(SelectElement as HTMLElement);
+    fireEvent.change(SelectElement, { target: { value: "KBB3" } });
+    await waitFor(() => {
+      expect(SelectElement.value).toBe("KBB3");
+      ["Order #APP1", "Order #FTP2"].forEach((text) => {
+        expect(screen.getByText(text)).not.toBeInTheDocument();
+      });
+    });
+    expect(await screen.findAllByRole("row")).toHaveLength(1);
+    await user.click(SelectElement as HTMLElement);
+    fireEvent.change(SelectElement, { target: { value: "ALL" } });
+    await waitFor(() => {
+      screen.debug();
+      ["Order #APP1", "Order #FTP2", "Order #KBB3"].forEach((text) => {
+        expect(screen.getByText(text)).toBeInTheDocument();
+      });
+    });
+    expect(await screen.findAllByRole("row")).toHaveLength(3);
+  });
 });
