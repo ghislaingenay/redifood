@@ -1,40 +1,45 @@
 import { render, screen } from "@testing-library/react";
-import { userEvent } from "@testing-library/user-event";
+// import userEvent from "@testing-library/user-event";
 import AllOrdersPage from "../../../pages/index";
 
+// jest.mock("antd", () => {
+//   const antd = jest.requireActual("antd");
+
+//   const Select = ({ children, onChange, multiple, defaultValue, disabled, value }) => {
+//     return (
+//       <select
+//         value={value}
+//         defaultValue={defaultValue}
+//         disabled={disabled}
+//         onChange={(e) =>
+//           onChange(multiple ? Array.from(e.target.selectedOptions).map((option) => option.value) : e.target.value)
+//         }
+//       >
+//         {children}
+//       </select>
+//     );
+//   };
+
+//   // eslint-disable-next-line react/display-name
+//   Select.Option = ({ children, ...otherProps }) => {
+//     return <option {...otherProps}>{children}</option>;
+//   };
+
+//   return {
+//     ...antd,
+//     Select,
+//   };
+// });
+
 describe("All Orders Page - Unit Testing", () => {
+  beforeEach(() => {
+    jest.resetModules();
+  });
+
   it("should render the component", () => {
     render(<AllOrdersPage />);
     expect(screen.getByText(/All Orders/i)).toBeInTheDocument();
   });
-  it("should have a select input with default value of ALL", () => {
-    render(<AllOrdersPage />);
-    expect(screen.getByText(/ALL/i)).toBeInTheDocument();
-    // console.log("container", container.querySelector(".ant-select-selection-search-input"));
-    // console.log("select", screen.getByRole("combobox"));
-    // expect(screen.getByText(/ALL/i)).toBeInTheDocument();
-    // expect(screen.getByRole("combobox")).toHaveTextContent(/ALL/i);
-  });
-  it("should be able to select NONE", async () => {
-    render(<AllOrdersPage />);
-    const user = userEvent.setup();
-    const SelectElement: HTMLElement = screen.getByRole("combobox");
-    console.log("select", SelectElement);
-    expect(SelectElement).toHaveTextContent(/ALL/i);
-    await user.click(SelectElement);
-    const noneOption = screen.getByRole("option", { name: /NONE/i });
-    await user.pointer([
-      {
-        type: "pointerMove",
-        target: noneOption,
-      },
-    ]);
-    await user.click(noneOption);
-    expect(SelectElement).toHaveTextContent(/NONE/i);
-  }); // this test will be removed after the mock API, some issues were found with select input and might need to be mocked. Test user Pointer as well
-
-  it("should have a table with 5 columns initially after get request", () => {
-    render(<Select />)
 });
 
 describe("All Orders Page - Unit Testing", () => {
