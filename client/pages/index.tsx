@@ -1,6 +1,7 @@
-import { Select, Typography } from "antd";
+import { Typography } from "antd";
 import Head from "next/head";
 import { useState } from "react";
+import { RediSelect } from "src/components/RediSelect";
 
 const AllOrdersPage = () => {
   const { Title } = Typography;
@@ -23,18 +24,7 @@ const AllOrdersPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Title level={2}>List of all orders</Title>
-      <Select
-        value={selectedOption}
-        onChange={(e) => setSelectedOption(e)}
-        showArrow={false}
-        // options={optionsSelect}
-      >
-        {optionsSelect.map((option) => (
-          <Select.Option key={option.value} value={option.value}>
-            {option.label}
-          </Select.Option>
-        ))}
-      </Select>
+      <RediSelect value={selectedOption} onChange={(e: string) => setSelectedOption(e)} options={optionsSelect} />
     </>
   );
 };
