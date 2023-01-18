@@ -40,6 +40,14 @@ describe("All Orders Page - Unit Testing", () => {
     render(<AllOrdersPage />);
     expect(screen.getByText(/All Orders/i)).toBeInTheDocument();
   });
+
+  it("select input with default value of ALL", async () => {
+    const { container } = render(<AllOrdersPage />);
+    const selectedValue = container.querySelector("div.ant-select-selector > span.ant-select-selection-item");
+    expect(selectedValue.textContent).toBe("ALL");
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+    expect(screen.queryAllByRole("option")).toHaveLength(0);
+  });
 });
 
 describe("All Orders Page - Unit Testing", () => {
