@@ -1,5 +1,5 @@
+import { EStatusCodes } from "../interfaces/err.interface";
 import { CustomError } from "./custom.err";
-import { EStatusCodes } from "./err.interface";
 
 export class DatabaseConnectionError extends CustomError {
   statusCode = EStatusCodes.DATABASE_CONNECTION;

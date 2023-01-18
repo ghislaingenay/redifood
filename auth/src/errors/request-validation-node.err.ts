@@ -1,6 +1,6 @@
 import { ValidationError } from "express-validator";
+import { EStatusCodes } from "../interfaces/err.interface";
 import { CustomError } from "./custom.err";
-import { EStatusCodes } from "./err.interface";
 export class RequestValidationNodeError extends CustomError {
   statusCode = EStatusCodes.VALIDATION_NODE;
   constructor(public errors: ValidationError[]) {
