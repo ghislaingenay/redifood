@@ -3,10 +3,6 @@ export enum EAuthChoice {
   REGISTER = "register",
 }
 
-export interface IPropsAuth {
-  setButtonWasClicked: (value: boolean) => void;
-}
-
 export interface IAuthContext {
   authorization: any;
 }

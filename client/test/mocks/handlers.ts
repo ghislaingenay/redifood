@@ -1,5 +1,5 @@
 import { rest } from "msw";
-import { allDataOrders, getListUnpaidOrders } from "./mocked.data";
+import { allDataOrders, getListUnpaidOrders } from "./mockOrdersData";
 
 export const handlers = [
   rest.post("/api/auth/login", async (req, res, ctx) => {
