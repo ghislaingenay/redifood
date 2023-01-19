@@ -23,12 +23,12 @@ describe("Create Order - Unit Testing", () => {
   it.todo("Order cart should include a button to validate the order");
   it.todo("should send an error and refresh the page if food data is not recovered");
   it.todo("order cart should be empty when the page is loaded");
-  it.todo("DESSERT button selected should contains 4 cards");
+  it.todo("DESSERT button selected should contains 3 cards");
   it.todo("After fetching data, should obtain ALL, PIZZA, DRINK, DESSERT buttons");
   it.todo("ALL button should be selected when the page is loaded");
   it.todo("ALL button selected should contains 9 cards");
-  it.todo("DRINK button selected should contains 2 cards");
-  it.todo("PIZZA button selected should contains 3 cards");
+  it.todo("DRINK button selected should contains 4 cards");
+  it.todo("PIZZA button selected should contains 2 cards");
 });
 
 describe("Create Order - Integration", () => {
