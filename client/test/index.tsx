@@ -1,7 +1,7 @@
 import { render as baseRender, RenderOptions, RenderResult } from "@testing-library/react";
 import { ComponentType, ReactElement } from "react";
 
-import { AuthContext, useAuth } from "src/contexts/auth.context";
+import { AuthContext } from "src/contexts/auth.context";
 
 /**
  * Custom renderer example with @testing-library/react
@@ -11,7 +11,13 @@ import { AuthContext, useAuth } from "src/contexts/auth.context";
  * please visit https://testing-library.com/docs/react-testing-library/setup
  */
 export const AllTheProviders = ({ children }: { children: any }) => {
-  const userValue = useAuth();
+  // const userValue = useAuth();
+  const userValue = {
+    authorization: {
+      id: "5f9f1b9b0b5b9c0017b5b1a5",
+      email: "",
+    },
+  };
   return (
     <>
       <AuthContext.Provider value={userValue}>{children}</AuthContext.Provider>
