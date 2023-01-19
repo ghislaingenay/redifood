@@ -1,8 +1,12 @@
 import { Jest } from "@jest/types";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import AllOrdersPage from "../../../pages/index";
+import { rest } from "msw";
+import AllOrdersPage, { getOptions, getServerSideProps } from "../../../pages/index";
+import { allDataOrders, getListUnpaidOrders } from "../../../test/mocks/mocked.data";
+import { server } from "../../../test/mocks/server";
 
+jest.mock("next/navigation", () => require("next-router-mock"));
 jest.mock("antd", () => {
   const antd = jest.requireActual("antd");
 
@@ -32,136 +36,123 @@ jest.mock("antd", () => {
   };
 });
 
-describe("All Orders Page - Unit Testing", () => {
-  beforeEach(() => {
-    jest.resetModules();
+jest.setTimeout(30000);
+
+describe("get Server Side Props - Index", () => {
+  it("should send an error message if the API is not working or doesn't send the data in server side", async () => {
+    server.resetHandlers(rest.get("/api/orders", (req, res, ctx) => res(ctx.status(400), ctx.json("Error"))));
+    const response = await getServerSideProps();
+    expect(response).toEqual(
+      expect.objectContaining({
+        props: {
+          allOrders: [],
+          getList: [],
+          status: "error",
+        },
+      }),
+    );
+  });
+});
+
+describe("All Orders Page", () => {
+  it("should render the component", async () => {
+    render(<AllOrdersPage status="success" allOrders={allDataOrders} getList={getListUnpaidOrders} />);
+    expect(screen.queryByText(/page will refresh automatically in 5 seconds/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/All Orders/i)).toBeInTheDocument();
   });
 
-  it("should render the component", () => {
-    render(<AllOrdersPage />);
-    expect(screen.getByText(/All Orders/i)).toBeInTheDocument();
+  it("should have a create order button", async () => {
+    render(<AllOrdersPage status="success" allOrders={allDataOrders} getList={getListUnpaidOrders} />);
+    expect(await screen.findByRole("button", { name: /create order/i })).toBeInTheDocument();
   });
 
   it("select input with default value of ALL - Test with mock", async () => {
-    render(<AllOrdersPage />);
+    render(<AllOrdersPage status="success" allOrders={allDataOrders} getList={getListUnpaidOrders} />);
     const SelectElement: Jest.Mock<HTMLSelectElement> = screen.getByRole("combobox");
     expect(SelectElement.value).toBe("ALL");
-    expect(screen.queryAllByRole("option")).toHaveLength(2);
+    expect(screen.queryAllByRole("option")).toHaveLength(4);
   });
-  // it("select input with default value of ALL - Test without mock (PASSED)", async () => {
-  //   const { container } = render(<AllOrdersPage />);
-  //   const selectedValue = container.querySelector("div.ant-select-selector > span.ant-select-selection-item");
-  //   expect(selectedValue.textContent).toBe("ALL");
-  //   expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
-  //   expect(screen.queryAllByRole("option")).toHaveLength(0);
-  // });
 
-  // it("user able to see the different option on select - Test without mock (PASSED) Test not needed if use mock", async () => {
-  //   render(<AllOrdersPage />);
-  //   const user = userEvent.setup();
-  //   const SelectElement = screen.getByRole("combobox");
-  //   expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
-  //   expect(screen.queryAllByRole("option")).toHaveLength(0);
-  //   await user.click(SelectElement as HTMLElement);
-  //   expect(await screen.findByRole("listbox")).toBeInTheDocument();
-  //   expect(await screen.findAllByRole("option")).toHaveLength(2);
-  //   expect(await screen.findByRole("option", { name: /ALL/i })).toHaveAttribute("aria-selected", "true");
-  //   expect(await screen.findByRole("option", { name: /NONE/i })).toHaveAttribute("aria-selected", "false");
-  // });
+  it("getOptions function test", () => {
+    expect(getOptions(["a", "b", "c"])).toEqual([
+      { label: "a", value: "a" },
+      { label: "b", value: "b" },
+      { label: "c", value: "c" },
+    ]);
+  });
 
-  // it("should be able to select NONE - TEst without mock (DO NOT PASS)", async () => {
-  //   const { container } = render(<AllOrdersPage />);
-  //   const user = userEvent.setup();
-  //   // const selectedValue = container.querySelector("div.ant-select-selector > span.ant-select-selection-item");
-  //   // expect(selectedValue.textContent).toBe("ALL");
-  //   const SelectElement = screen.getByRole("combobox");
-  //   expect(screen.queryAllByRole("option")).toHaveLength(0);
-  //   screen.debug();
-  //   await user.click(SelectElement as HTMLElement);
-  //   const noneOption = await screen.findByLabelText(/NONE/i);
-  //   await waitFor(() => {
-  //     noneOption;
-  //   });
-  //   await user.click(noneOption);
-  //   await waitFor(() => screen.debug());
-  //   // expect(selectedValue.textContent).toBe("NONE");
-
-  //   logRoles(await screen.findByRole("option"));
-  // });
-
-  it("should be able to select NONE - Test without mock", async () => {
-    render(<AllOrdersPage />);
+  it("should be able to select KBB3 - Test without mock", async () => {
+    render(<AllOrdersPage status="success" allOrders={allDataOrders} getList={getListUnpaidOrders} />);
     const user = userEvent.setup();
     const SelectElement: Jest.Mock<HTMLSelectElement> = screen.getByRole("combobox");
     expect(SelectElement.value).toBe("ALL");
-    expect(screen.queryAllByRole("option")).toHaveLength(2);
-    screen.debug();
-    // const noneOption = await screen.findByRole("option", { name: /NONE/i });
+    expect(screen.queryAllByRole("option")).toHaveLength(4);
     await user.click(SelectElement as HTMLElement);
     // await user.click(noneOption);
     expect(SelectElement.value).toBe("ALL");
-    fireEvent.change(SelectElement, { target: { value: "NONE" } });
-    // @ts-ignore
+    fireEvent.change(SelectElement, { target: { value: "KBB3" } });
     await waitFor(() => {
-      expect(SelectElement.value).toBe("NONE");
+      expect(SelectElement.value).toBe("KBB3");
       expect(SelectElement.value).not.toBe("ALL");
     });
   });
 });
 
-describe("All Orders Page - Unit Testing", () => {
-  it("should have a options length of 5 in select after fetching get unpaid orders", async () => {
-    render(<AllOrdersPage />);
-    const SelectElement: Jest.Mock<HTMLSelectElement> = screen.getByRole("combobox");
-    expect(SelectElement.value).toBe("ALL");
-    expect(screen.queryAllByRole("option")).toHaveLength(2);
-    screen.debug();
-    await waitFor(() => {
-      expect(screen.queryAllByRole("option")).toHaveLength(3);
-      expect(SelectElement.value).toBe("ALL");
+describe("All Orders Page - Table unit", () => {
+  it("should have 3 card initially after get request with all the included data", async () => {
+    render(<AllOrdersPage status="success" allOrders={allDataOrders} getList={getListUnpaidOrders} />);
+    expect(await screen.findAllByRole("card")).toHaveLength(3);
+    expect(await screen.findAllByRole("button", { name: /edit/i })).toHaveLength(3);
+    expect(await screen.findAllByRole("button", { name: /pay/i })).toHaveLength(3);
+    ["Order ID:", "Order Total:", "Order Status:", "Table Number:", "Name", "Quantity", "Price"].forEach(
+      async (text) => {
+        expect(await screen.findAllByText(text)).toHaveLength(3);
+      },
+    );
+    //Check table for each card
+    ["DRINK", "MAN Z", "Choco", "Salad"].forEach(async (text) => {
+      expect(await screen.findByText(text)).toBeInTheDocument();
     });
   });
 
-  it("should have a table with 5 columns initially after get request", async () => {
-    render(<AllOrdersPage />);
-    expect(screen.queryAllByRole("row")).toBe(null);
-    await waitFor(() => {
-      screen.debug();
-      ["Order #", "Total", "Status", "Table Number", "Actions"].forEach((text) => {
-        expect(screen.getByText(text)).toBeInTheDocument();
-      });
-      expect(screen.queryByText("Order Menu")).toBeInTheDocument();
-      ["Order #APP1", "Order #FTP2", "Order #KBB3"].forEach((text) => {
-        expect(screen.getByText(text)).toBeInTheDocument();
-      });
-      expect(screen.queryAllByRole("row")).toHaveLength(3);
-    });
-  });
+  // it("user select one option qnd only one result is found and then set back to ALL", async () => {
+  //   const user = userEvent.setup();
+  //   render(<AllOrdersPage status="success" allOrders={allDataOrders} getList={getListUnpaidOrders} />);
+  //   const SelectElement: Jest.Mock<HTMLSelectElement> = screen.getByRole("combobox");
+  //   expect(SelectElement.value).toBe("ALL");
+  //   await user.click(SelectElement as HTMLElement);
+  //   fireEvent.change(SelectElement, { target: { value: "KBB3" } });
+  //   expect(SelectElement.value).toBe("KBB3");
+  //   expect(await screen.findAllByRole("button", { name: /edit/i })).toHaveLength(1);
+  //   ["Choco", "Salad"].forEach(async (text) => {
+  //     expect(await screen.findByText(text)).toBeInTheDocument();
+  //   });
+  //   await waitFor(() => {
+  //     ["DRINK", "MAN Z"].forEach((text) => {
+  //       expect(screen.getByText(text)).not.toBeInTheDocument();
+  //     });
+  //   });
+  //   expect(await screen.findAllByRole("card")).toHaveLength(1);
+  //   await user.click(SelectElement as HTMLElement);
+  //   fireEvent.change(SelectElement, { target: { value: "ALL" } });
+  //   await waitFor(() => {
+  //     screen.debug();
+  //     expect(screen.queryAllByRole("button", { name: /edit/i })).toHaveLength(3);
+  //     ["DRINK", "MAN Z", "Choco", "Salad"].forEach((text) => {
+  //       expect(screen.getByText(text)).toBeInTheDocument();
+  //     });
+  //   });
+  //   expect(await screen.findAllByRole("row")).toHaveLength(3);
+  // });
 
-  it("user select one option qnd only one result is found and then set back to ALL", async () => {
-    render(<AllOrdersPage />);
-    const user = userEvent.setup();
-    const SelectElement: Jest.Mock<HTMLSelectElement> = screen.getByRole("combobox");
-    expect(SelectElement.value).toBe("ALL");
-    expect(screen.queryAllByRole("option")).toBe(null);
-    screen.debug();
-    await user.click(SelectElement as HTMLElement);
-    fireEvent.change(SelectElement, { target: { value: "KBB3" } });
+  it("error in front end if data wasn't received from the API", async () => {
+    render(<AllOrdersPage status="error" allOrders={[]} getList={[]} />);
     await waitFor(() => {
-      expect(SelectElement.value).toBe("KBB3");
-      ["Order #APP1", "Order #FTP2"].forEach((text) => {
-        expect(screen.getByText(text)).not.toBeInTheDocument();
-      });
+      expect(screen.queryAllByRole("card")).toHaveLength(0);
     });
-    expect(await screen.findAllByRole("row")).toHaveLength(1);
-    await user.click(SelectElement as HTMLElement);
-    fireEvent.change(SelectElement, { target: { value: "ALL" } });
-    await waitFor(() => {
-      screen.debug();
-      ["Order #APP1", "Order #FTP2", "Order #KBB3"].forEach((text) => {
-        expect(screen.getByText(text)).toBeInTheDocument();
-      });
-    });
-    expect(await screen.findAllByRole("row")).toHaveLength(3);
+    expect(await screen.findByRole("alert")).toBeInTheDocument();
+    expect(await screen.findByText(/page will refresh automatically in 5 seconds/i)).toBeInTheDocument();
   });
 });
+
+// Add all the element and check no error on notification

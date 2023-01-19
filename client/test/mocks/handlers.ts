@@ -21,13 +21,15 @@ export const handlers = [
   }),
 
   rest.get("/api/orders", async (req, res, ctx) => {
-    const { orderId }: { orderId: string } = await req.json();
-    const filter = orderId ? { orderId } : null;
+    const resres = await req.json();
+    console.log("rerererer", resres);
+    const { selectedOption }: { selectedOption: string } = await req.json();
+    const filter = selectedOption ? selectedOption : null;
 
     if (!filter) {
       return res(ctx.status(200), ctx.json({ allDataOrders, getListUnpaidOrders }));
     } else {
-      let res: any = allDataOrders.find((item) => item.orderId === filter.orderId);
+      let res: any = allDataOrders.find((item) => item.orderId === filter);
       return res(ctx.status(200), ctx.json({ allDataOrders: res, getListUnpaidOrders }));
     }
   }),
