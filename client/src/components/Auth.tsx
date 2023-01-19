@@ -2,7 +2,7 @@ import { Button, Divider, Form, Input, Modal, Radio, Typography } from "antd";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Else, If, Then } from "react-if";
-import { AxiosFunction } from "../../src/functions/axios.function";
+import { AxiosFunction } from "../../pages/api/axios-request";
 import { EAuthChoice } from "../../src/interfaces/auth.interface";
 import { AuthRadioButton } from "../styles/button.style";
 const { Title } = Typography;
