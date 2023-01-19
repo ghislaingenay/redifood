@@ -2,24 +2,28 @@ import { IAuthContext } from "@interfaces/auth.interface";
 import axios from "axios";
 
 interface IAxiosRequest {
-  authContext?: IAuthContext;
+  authToken?: IAuthContext;
   body: any;
-  params: any;
+  paramsInfo: any;
   method: "get" | "post" | "put" | "delete";
   url: string;
 }
 
 const returnAxiosCall = (data: IAxiosRequest) => {
-  const { authContext, body, params: paramsInfo, method, url } = data;
-  const userValue = authContext?.authorization;
-  const params = paramsInfo ? paramsInfo : {};
+  const { authToken, body, paramsInfo, method, url } = data;
+  const userValue = authToken?.authorization;
 
   const headers = {
     Cookie: "session",
+    authToken: userValue,
   };
   switch (method) {
     case "get":
-      return axios.get(url, { withCredentials: true, headers, params });
+      return axios.get(url, {
+        withCredentials: true,
+        headers,
+        params: { paramsInfo },
+      });
     case "post":
       return axios.post(url, body, {
         withCredentials: true,
