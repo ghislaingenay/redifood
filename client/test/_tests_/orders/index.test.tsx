@@ -3,8 +3,8 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { rest } from "msw";
 import AllOrdersPage, { getOptions, getServerSideProps } from "../../../pages/index";
-import { allDataOrders, getListUnpaidOrders } from "../../../test/mocks/mocked.data";
 import { server } from "../../../test/mocks/server";
+import { allDataOrders, getListUnpaidOrders } from "../../mocks/mockOrdersData";
 
 jest.mock("next/navigation", () => require("next-router-mock"));
 jest.mock("antd", () => {
