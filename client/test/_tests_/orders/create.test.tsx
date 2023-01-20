@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import CreateOrder from "pages/orders/create";
+import CreateOrder from "../../../pages/orders/create";
+import { convertApiDataToDbData } from "../../../src/functions/db.fn";
 import { mockedFoodData } from "../../../test/mocks/mockFoodData";
 
 describe("Create Order - Server Side Props", () => {
@@ -14,16 +15,30 @@ describe("Create Order - Unit Testing", () => {
     expect(true).toBe(true);
   });
 
-  it("test convertDataForAPI function", () => {
-    expect(convertApiData({ history_id: 1, user_order_new: 5678, order_status: true }, "dBToApi")).toBe({
+  it.only("test convertDataForAPI function", () => {
+    expect(
+      convertApiDataToDbData({ history_id: 1, user_order_new: 5678, order_status: true }, "sql", "dbToApi"),
+    ).toStrictEqual({
       historyId: 1,
       userOrderNew: 5678,
       orderStatus: true,
     });
-    expect(convertApiData({ tableNumber: 1, orderId: 5678, orderPaid: true }, "apiToDb")).toBe({
+    expect(convertApiDataToDbData({ tableNumber: 1, orderId: 5678, orderPaid: true }, "sql", "apiToDb")).toStrictEqual({
       table_number: 1,
       order_id: 5678,
       order_paid: true,
+    });
+    expect(
+      convertApiDataToDbData({ tableNumber: 1, orderId: 5678, orderPaid: true }, "db", "apiToDb"),
+    ).not.toStrictEqual({
+      table_number: 1,
+      order_id: 5678,
+      order_paid: true,
+    });
+    expect(convertApiDataToDbData({ tableNumber: 1, orderId: 5678, orderPaid: true }, "db", "apiToDb")).toStrictEqual({
+      tableNumber: 1,
+      orderId: 5678,
+      orderPaid: true,
     });
   });
 
@@ -33,7 +48,7 @@ describe("Create Order - Unit Testing", () => {
     expect(screen.getByLabelText(/Table number/i)).toBeInTheDocument();
   });
 
-  it.todo("should show an alert if table number is already allocated", async () => {
+  it("should show an alert if table number is already allocated", async () => {
     render(<CreateOrder />);
     const user = userEvent.setup();
     // onFocus
@@ -111,7 +126,6 @@ describe("Create Order - Unit Testing", () => {
 
   it("ALL button selected should contains 9 cards", async () => {
     render(<CreateOrder />);
-    const user = userEvent.setup();
     expect(await (await screen.findByRole("button", { name: /ALL/i })).ariaSelected).toBeTruthy();
     expect(await screen.findAllByRole("card")).toHaveLength(9);
   });
