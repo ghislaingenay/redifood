@@ -7,7 +7,6 @@ export const convertApiDataToDbData = (data: any, type: "sql" | "db", direction:
     let newObj = {};
     let newKey: string;
     for (let key in data) {
-      console.log("key", key);
       newKey = key.replace(/([-_][a-z])/gi, ($1) => {
         return $1.toUpperCase().replace("_", "");
       });
