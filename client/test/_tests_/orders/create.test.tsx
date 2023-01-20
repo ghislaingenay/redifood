@@ -1,5 +1,7 @@
-import { render } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import CreateOrder from "pages/orders/create";
+import { mockedFoodData } from "../../../test/mocks/mockFoodData";
 
 describe("Create Order - Server Side Props", () => {
   it.todo("should return food data if API call is successful");
@@ -12,27 +14,133 @@ describe("Create Order - Unit Testing", () => {
     expect(true).toBe(true);
   });
 
-  it.todo("test convertDataForAPI function");
+  it("test convertDataForAPI function", () => {
+    expect(convertApiData({ history_id: 1, user_order_new: 5678, order_status: true }, "dBToApi")).toBe({
+      historyId: 1,
+      userOrderNew: 5678,
+      orderStatus: true,
+    });
+    expect(convertApiData({ tableNumber: 1, orderId: 5678, orderPaid: true }, "apiToDb")).toBe({
+      table_number: 1,
+      order_id: 5678,
+      order_paid: true,
+    });
+  });
 
-  it.todo("should indicate a tumber number input");
-  it.todo("should show an alert if table number is already allocated");
-  it.todo("should show an alert if table number is not selected");
-  it.todo("Order cart should include a button to validate the order");
-  it.todo("Validate button should not be enabled if the cart is empty");
-  it.todo("Validate button should be enabled if the cart is not empty");
-  it.todo("Order cart should include a button to validate the order");
-  it.todo("should send an error and refresh the page if food data is not recovered");
-  it.todo("order cart should be empty when the page is loaded");
-  it.todo("DESSERT button selected should contains 3 cards");
-  it.todo("After fetching data, should obtain ALL, PIZZA, DRINK, DESSERT buttons");
-  it.todo("ALL button should be selected when the page is loaded");
-  it.todo("ALL button selected should contains 9 cards");
-  it.todo("DRINK button selected should contains 4 cards");
-  it.todo("PIZZA button selected should contains 2 cards");
+  it("should have a number input", () => {
+    render(<CreateOrder />);
+    expect(screen.getByRole("spinbutton")).toBeInTheDocument();
+    expect(screen.getByLabelText(/Table number/i)).toBeInTheDocument();
+  });
+
+  it.todo("should show an alert if table number is already allocated", async () => {
+    render(<CreateOrder />);
+    const user = userEvent.setup();
+    // onFocus
+    await user.type(screen.getByRole("spinbutton"), "1");
+    // UNFOCUS
+    expect(screen.getByRole("alert")).toBeInTheDocument();
+    expect(screen.getByText(/This table number is already allocated/i)).toBeInTheDocument();
+  });
+
+  it("Order cart should include a button to validate the order", () => {
+    render(<CreateOrder />);
+    expect(screen.getByRole("button", { name: /Validate/i })).toBeInTheDocument();
+  });
+
+  it("Validate button should not be enabled if the cart is empty", () => {
+    render(<CreateOrder />);
+    expect(screen.getByRole("button", { name: /Validate/i })).toBeDisabled();
+  });
+
+  it("Validate button should be enabled if the cart is not empty", async () => {
+    render(<CreateOrder />);
+    const user = userEvent.setup();
+    await user.click(screen.getByText(/espresso/i));
+    expect(screen.getByRole("button", { name: /Validate/i })).toBeEnabled();
+  });
+
+  it("should send an error and refresh the page if food data is not recovered", async () => {
+    render(<CreateOrder />);
+    expect(await screen.findByRole("alert")).toBeInTheDocument();
+    expect(screen.getByText(/Error while loading food data/i)).toBeInTheDocument();
+  });
+
+  it("order cart should be empty when the page is loaded", () => {
+    render(<CreateOrder />);
+    expect(screen.getByRole("button", { name: /Validate/i })).toBeDisabled();
+    mockedFoodData.forEach(async (food) => {
+      expect(await screen.findAllByText(food.itemName)).toHaveLength(1);
+    });
+  });
+
+  it("After fetching data, should obtain ALL, PIZZA, DRINK, DESSERT buttons", async () => {
+    render(<CreateOrder />);
+    expect(await screen.findByRole("button", { name: /ALL/i })).toBeEnabled();
+    expect(await screen.findByRole("button", { name: /DESSERT/i })).toBeEnabled();
+    expect(await screen.findByRole("button", { name: /DRINK/i })).toBeEnabled();
+    expect(await screen.findByRole("button", { name: /PIZZA/i })).toBeEnabled();
+  });
+
+  it("DESSERT button selected should contains 3 cards", async () => {
+    render(<CreateOrder />);
+    const user = userEvent.setup();
+    expect(await screen.findAllByRole("card")).toHaveLength(9);
+    await user.click(screen.getByRole("button", { name: /DESSERT/i }));
+    // expect some text food to be here and not to be here
+  });
+
+  it("ALL button should be selected when the page is loaded", async () => {
+    render(<CreateOrder />);
+    expect(await (await screen.findByRole("button", { name: /ALL/i })).ariaSelected).toBeTruthy();
+    expect(await (await screen.findByRole("button", { name: /DESSERT/i })).ariaSelected).not.toBeTruthy();
+    expect(await (await screen.findByRole("button", { name: /DRINK/i })).ariaSelected).not.toBeTruthy();
+    expect(await (await screen.findByRole("button", { name: /PIZZA/i })).ariaSelected).not.toBeTruthy();
+  });
+
+  it("DRINK should be selected when clicked", async () => {
+    render(<CreateOrder />);
+    const user = userEvent.setup();
+    expect(await (await screen.findByRole("button", { name: /ALL/i })).ariaSelected).toBeTruthy();
+    expect(await (await screen.findByRole("button", { name: /DRINK/i })).ariaSelected).not.toBeTruthy();
+    await user.click(screen.getByRole("button", { name: /DRINK/i }));
+    expect(await screen.findAllByRole("card")).toHaveLength(4);
+    expect(await (await screen.findByRole("button", { name: /ALL/i })).ariaSelected).not.toBeTruthy();
+    expect(await (await screen.findByRole("button", { name: /DRINK/i })).ariaSelected).toBeTruthy();
+  });
+
+  it("ALL button selected should contains 9 cards", async () => {
+    render(<CreateOrder />);
+    const user = userEvent.setup();
+    expect(await (await screen.findByRole("button", { name: /ALL/i })).ariaSelected).toBeTruthy();
+    expect(await screen.findAllByRole("card")).toHaveLength(9);
+  });
+
+  it("PIZZA button selected should contains 2 cards", async () => {
+    render(<CreateOrder />);
+    const user = userEvent.setup();
+    expect(await screen.findAllByRole("card")).toHaveLength(9);
+    await user.click(screen.getByRole("button", { name: /PIZZA/i }));
+    expect(await screen.findAllByRole("card")).toHaveLength(2);
+  });
+  it("DRINK button selected should contains 4 cards", async () => {
+    render(<CreateOrder />);
+    const user = userEvent.setup();
+    expect(await screen.findAllByRole("card")).toHaveLength(9);
+    await user.click(screen.getByRole("button", { name: /DRINK/i }));
+    expect(await screen.findAllByRole("card")).toHaveLength(4);
+  });
+  it("DESSERT button selected should contains 3 cards", async () => {
+    render(<CreateOrder />);
+    const user = userEvent.setup();
+    expect(await screen.findAllByRole("card")).toHaveLength(9);
+    await user.click(screen.getByRole("button", { name: /DRINK/i }));
+    expect(await screen.findAllByRole("card")).toHaveLength(4);
+  });
 });
 
 describe("Create Order - Integration", () => {
-  it.todo("should add food to the cart when clicking on the food card");
+  it("should add food to the cart when clicking on the food card", () => {});
   it.todo("should add one quantity to the food if already in the cart");
   it.todo("should be able to add one food quantity inside the order when clicking on the food card");
   it.todo("should be able to remove one food quantity inside the order when clicking on the food card");
@@ -43,4 +151,12 @@ describe("Create Order - Integration", () => {
   it.todo("should be able to cancel the order when clicking on the cancel button if cart is empty");
   it.todo("should show a cancel confirmation button to user if orer cart is not empty");
   it.todo("show ask to cancel order if order is not empty and user click outside the foodlayout");
+  it("should show an alert if table number is not selected", async () => {
+    render(<CreateOrder />);
+    const user = userEvent.setup();
+    await user.click(screen.getByText(/espresso/i));
+    await user.click(screen.getByRole("button", { name: /Validate/i }));
+    expect(await screen.findByRole("alert")).toBeInTheDocument();
+    expect(await screen.findByText(/Please select a table number/i)).toBeInTheDocument();
+  });
 });

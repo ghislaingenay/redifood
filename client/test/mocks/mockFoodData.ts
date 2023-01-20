@@ -52,7 +52,7 @@ export const mockedFoodData = [
   },
   {
     itemId: "6",
-    itemName: "Expresso",
+    itemName: "Espresso",
     itemPhoto:
       "https://images.unsplash.com/photo-1610889556528-9a770e32642f?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1015&q=80",
     itemPrice: 1,
