@@ -1,10 +1,9 @@
 import { Button, Card, Table, Typography } from "antd";
-import axios from "axios";
 import Head from "next/head";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { RediSelect } from "src/components/RediSelect";
-import { NotificationRes } from "src/definitions/notification.class";
+import { allDataOrders, getListUnpaidOrders } from "../test/mocks/mockOrdersData";
 
 export const getOptions = (array: string[]) => {
   const newArray = array.map((item) => {
@@ -50,31 +49,31 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
     },
   ];
 
-  const loadData = async () => {
-    await axios
-      .get("/api/orders", { params: { selectedOption } })
-      .then((res) => {
-        setFilteredOrders(res.data);
-      })
-      .catch((err) => {
-        console.log("loaded", err);
-      });
-  };
+  // const loadData = async () => {
+  //   await axios
+  //     .get("/api/orders", { params: { selectedOption } })
+  //     .then((res) => {
+  //       setFilteredOrders(res.data);
+  //     })
+  //     .catch(() => {
+  //       console.log("filled");
+  //     });
+  // };
 
-  useEffect(() => {
-    if (status === "error") {
-      NotificationRes.onFailure({
-        title: "Error",
-        placement: "topRight",
-        description: "The page will refresh automatically in 5 seconds",
-      });
-      // setTimeout(() => {
-      //   window.location.reload();
-      // }, 5000);
-    }
-    loadData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedOption]);
+  // useEffect(() => {
+  //   if (status === "error") {
+  //     NotificationRes.onFailure({
+  //       title: "Error",
+  //       placement: "topRight",
+  //       description: "The page will refresh automatically in 5 seconds",
+  //     });
+  // setTimeout(() => {
+  //   window.location.reload();
+  // }, 5000);
+  // }
+  // loadData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [selectedOption]);
   return (
     <>
       <Head>
@@ -106,21 +105,22 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
 export default AllOrdersPage;
 
 export async function getServerSideProps() {
-  const url = "/api/orders";
-  await axios
-    .get(url)
-    .then((res) => {
-      const {
-        data: { allDataOrders, getListUnpaidOrders },
-      } = res;
-      return {
-        props: { allOrders: allDataOrders, getList: getListUnpaidOrders, status: "success" },
-      };
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-  return {
-    props: { allOrders: [], getList: [], status: "error" },
-  };
+  return { props: { allOrders: allDataOrders, getList: getListUnpaidOrders, status: "error" } };
+  // const url = "/api/orders";
+  // await axios
+  //   .get(url, { params: { selectedOption: "ALL" } })
+  // .then((res) => {
+  //   const {
+  //     data: { allDataOrders, getListUnpaidOrders },
+  //   } = res;
+  //   return {
+  //     props: { allOrders: allDataOrders, getList: getListUnpaidOrders, status: "success" },
+  //   };
+  // })
+  // .catch((err) => {
+  //   console.log("erre", err);
+  // });
+  // return {
+  //   props: { allOrders: [], getList: [], status: "error" },
+  // };
 }

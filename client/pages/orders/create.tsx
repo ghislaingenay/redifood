@@ -1,7 +1,7 @@
 import { Button, Card, Col, Divider, InputNumber, Row, Typography } from "antd";
-import axios from "axios";
 import { useState } from "react";
 import { Else, If, Then } from "react-if";
+import { foodSectionArray, mockedFoodData } from "../../test/mocks/mockFoodData";
 
 const { Title } = Typography;
 
@@ -9,10 +9,11 @@ const CreateOrder = ({ foodList, foodSection, status }) => {
   const [globalStatus, setGlobalStatus] = useState(status);
   const [sortedFoods, setSortedFoods] = useState(foodList);
   const [selectedSection, setSelectedSection] = useState("all");
-
   const [foodOrder, setFoodOrder] = useState([]);
+
   const isDisabled = foodOrder.length === 0 ? true : false;
   const canCancel = foodOrder.length === 0 ? false : true;
+
   return (
     <>
       <h1>Create Order</h1>
@@ -89,20 +90,23 @@ const CreateOrder = ({ foodList, foodSection, status }) => {
 export default CreateOrder;
 
 export async function getServerSideProps() {
-  await axios
-    .get("/api/foods", { params: { selectedSection: "all" } })
-    .then((res: any) => {
-      const {
-        data: { foodList, foodSection },
-      } = res;
-      return {
-        props: { foodList, foodSection, status: "success" },
-      };
-    })
-    .catch((err) => {
-      console.log(err);
-    });
   return {
-    props: { foodList: [], foodSection: [], status: "error" },
+    props: { foodList: mockedFoodData, foodSection: foodSectionArray, status: "error" },
   };
+  // await axios
+  //   .get("/api/foods", { params: { selectedSection: "all" } })
+  //   .then((res: any) => {
+  //     const {
+  //       data: { foodList, foodSection },
+  //     } = res;
+  //     return {
+  //       props: { foodList, foodSection, status: "success" },
+  //     };
+  //   })
+  //   .catch((err) => {
+  //     console.log(err);
+  //   });
+  // return {
+  //   props: { foodList: [], foodSection: [], status: "error" },
+  // };
 }
