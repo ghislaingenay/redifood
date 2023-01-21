@@ -24,7 +24,11 @@ const RediHeader = () => {
 };
 
 const RediFooter = () => {
-  return <Footer className="text-center mb-0.5">Redifood ©{new Date().getFullYear()} Created by Ghislain Genay</Footer>;
+  return (
+    <Footer style={{ textAlign: "center", marginTop: 0, paddingTop: 0, marginBottom: "0.3rem" }}>
+      Redifood ©{new Date().getFullYear()} Created by Ghislain Genay
+    </Footer>
+  );
 };
 
 export { RediHeader, RediFooter };
