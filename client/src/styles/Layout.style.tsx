@@ -18,6 +18,7 @@ export const RedisMenu = styled(Menu)`
   font-family: "Bebas Neue", cursive;
   font-size: 1.125rem;
 `;
+
 // $primary: #D9534F;
 // $secondary: #FFAD60;
 // $info: Gray;

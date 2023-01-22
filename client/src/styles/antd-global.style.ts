@@ -3,13 +3,15 @@ export const tokenProvider = {
   borderRadius: 6,
   colorBgBase: "#fff",
   colorError: "#ff4d4f",
-  colorPrimary: "#1890ff",
+  // colorPrimary: "#1890ff",
+  colorPrimary: "#ffad60",
   colorInfo: "#1677ff",
   colorSuccess: "#52c41a",
   colorWarning: "#faad14",
   colorTextBase: "#000",
   controlHeight: 32, // height of basics controls such as buttons and input boxes
   fontFamily: 'Roboto, "Helvetica Neue", Arial, sans-serif',
+  // fontFamily: 'Roboto, "Helvetica Neue", Arial, sans-serif',
   fontSize: 14,
   // MapToken
   borderRadiusLG: 8,
