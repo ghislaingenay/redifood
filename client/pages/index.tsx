@@ -1,7 +1,8 @@
-import { Button, Card, Table, Typography } from "antd";
+import { Button, Col, Row, Typography } from "antd";
 import Head from "next/head";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import OrderCard from "src/components/OrderCard";
 import { RediSelect } from "src/components/RediSelect";
 import { allDataOrders, getListUnpaidOrders } from "../test/mocks/mockOrdersData";
 
@@ -15,65 +16,27 @@ export const getOptions = (array: string[]) => {
   return newArray;
 };
 
+const currency = "$";
+
 const AllOrdersPage = ({ allOrders, getList, status }) => {
   const router = useRouter();
+  const [listAllOrders] = useState(allOrders);
   const [selectedOption, setSelectedOption] = useState("ALL");
   const [filteredOrders, setFilteredOrders] = useState(allOrders);
   const { Title } = Typography;
 
-  // const [completeOrders, setCompleteOrders] = useState(allOrders);
+  const showProperData = (option) => {
+    // replace later by axios get
+    setSelectedOption(option);
+    if (option === "ALL") {
+      return setFilteredOrders(listAllOrders);
+    }
+    const newList = listAllOrders.filter((order) => order.orderId === option);
+    if (newList) {
+      return setFilteredOrders(newList);
+    }
+  };
 
-  // if (status === "error") {
-  //
-  // }
-  const columns = [
-    {
-      title: "Name",
-      dataIndex: "itemName",
-      key: "itemName",
-    },
-    {
-      title: "Section",
-      dataIndex: "itemSection",
-      key: "itemSection",
-    },
-    {
-      title: "Quantity",
-      dataIndex: "itemQuantity",
-      key: "itemQuantity",
-    },
-    {
-      title: "Price",
-      dataIndex: "itemPrice",
-      key: "itemPrice",
-    },
-  ];
-
-  // const loadData = async () => {
-  //   await axios
-  //     .get("/api/orders", { params: { selectedOption } })
-  //     .then((res) => {
-  //       setFilteredOrders(res.data);
-  //     })
-  //     .catch(() => {
-  //       console.log("filled");
-  //     });
-  // };
-
-  // useEffect(() => {
-  //   if (status === "error") {
-  //     NotificationRes.onFailure({
-  //       title: "Error",
-  //       placement: "topRight",
-  //       description: "The page will refresh automatically in 5 seconds",
-  //     });
-  // setTimeout(() => {
-  //   window.location.reload();
-  // }, 5000);
-  // }
-  // loadData();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [selectedOption]);
   return (
     <>
       <Head>
@@ -82,21 +45,28 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Title level={2}>List of all orders</Title>
-      <Button onClick={() => router.push("/orders/create")}>Create Order</Button>
-      <RediSelect value={selectedOption} onChange={(e: string) => setSelectedOption(e)} options={getOptions(getList)} />
+      <Row justify="space-between" align="middle" gutter={10} className="mb-5">
+        <Col>
+          <RediSelect
+            style={{ width: "8rem" }}
+            value={selectedOption}
+            onChange={(e: string) => showProperData(e)}
+            options={getOptions(getList)}
+          />
+        </Col>
+        <Col className="text-right" lg={4}>
+          <Button
+            type="primary"
+            style={{ borderRadius: 0 }}
+            shape="default"
+            onClick={() => router.push("/orders/create")}
+          >
+            Create Order
+          </Button>
+        </Col>
+      </Row>
       {filteredOrders.map((order) => {
-        return (
-          <Card key={order.orderId} role="card">
-            <p>Order ID: {order.orderId}</p>
-            <p>Order Total: {order.orderTotal}</p>
-            <p>Order Status: {order.orderStatus}</p>
-            <p>Table Number: {order.tableNumber}</p>
-            <Button>Edit</Button>
-            <Button>Pay</Button>
-            <Title>Menu</Title>
-            <Table dataSource={order.orderItems} rowKey="itemId" columns={columns} />
-          </Card>
-        );
+        return <OrderCard order={order} key={order.orderId} />;
       })}
     </>
   );
