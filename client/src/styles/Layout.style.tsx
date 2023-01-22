@@ -9,7 +9,8 @@ export const RediContent = styled(Content)`
   height: 80vh;
   background-color: white;
   border-radius: 1rem;
-  overflow: scroll;
+  overflow-y: scroll;
+  scrollbar-color: gray rgb(105, 105, 105);
   shadow: 0 0 0.5rem 0.5rem rgba(0, 0, 0, 0.5);
 `;
 
