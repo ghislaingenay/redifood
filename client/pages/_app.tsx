@@ -3,8 +3,9 @@ import { ConfigProvider, Layout, Spin } from "antd";
 import { useEffect, useState } from "react";
 import { Else, If, Then } from "react-if";
 import Auth from "src/components/Auth";
-import { RediFooter, RediHeader } from "src/components/Page";
+import { RediHeader } from "src/components/Page";
 import "../src/styles/globals.css";
+const { Footer } = Layout;
 // import buildClient from "./api/build-client";
 
 const AppComponent = ({ Component, pageProps, currentUser, loading }) => {
@@ -22,12 +23,22 @@ const AppComponent = ({ Component, pageProps, currentUser, loading }) => {
     <ConfigProvider theme={{ token: tokenProvider, inherit: false }}>
       <If condition={currentUser}>
         <Then>
-          <Layout className="layout">
+          <Layout className="layout bg-amber-100 mb-0">
             <RediHeader />
             <RediContent>
               <Component {...pageProps} />
             </RediContent>
-            <RediFooter />
+            <Footer
+              style={{
+                textAlign: "center",
+                fontWeight: "bold",
+                backgroundColor: "transparent",
+                margin: "0 0 0.4rem 0",
+                padding: "0",
+              }}
+            >
+              <em>Redifood ©{new Date().getFullYear()} Created by Ghislain Genay</em>
+            </Footer>
           </Layout>
         </Then>
         <Else>
