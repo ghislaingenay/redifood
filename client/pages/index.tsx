@@ -1,7 +1,7 @@
 import { Button, Col, Row, Typography } from "antd";
 import Head from "next/head";
 import { useRouter } from "next/navigation";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import OrderCard from "src/components/OrderCard";
 import { RediSelect } from "src/components/RediSelect";
 import AppContext from "src/contexts/app.context";
@@ -37,6 +37,11 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
       return setFilteredOrders(newList);
     }
   };
+
+  useEffect(() => {
+    appValue.setStatus(status);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status, appValue]);
 
   return (
     <>
@@ -76,7 +81,7 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
 export default AllOrdersPage;
 
 export async function getServerSideProps() {
-  return { props: { allOrders: allDataOrders, getList: getListUnpaidOrders, status: "success" } };
+  return { props: { allOrders: allDataOrders, getList: getListUnpaidOrders, status: "error" } };
   // const url = "/api/orders";
   // await axios
   //   .get(url, { params: { selectedOption: "ALL" } })

@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { NotificationRes } from "src/definitions/notification.class";
 
 // @ts-ignore
@@ -13,13 +13,17 @@ export default AppContext;
 
 export const AppProvider = ({ children }) => {
   const [status, setStatus] = useState<"error" | "success">("success");
-  if (status === "error") {
-    NotificationRes.onFailure({
-      title: "An error occured",
-      description: "Please resfresh the page",
-      placement: "topRight",
-    });
-  }
+
+  useEffect(() => {
+    if (status === "error") {
+      NotificationRes.onFailure({
+        title: "An error occured",
+        description: "Please resfresh the page",
+        placement: "topRight",
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status]);
 
   return (
     <AppContext.Provider
