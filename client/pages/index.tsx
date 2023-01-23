@@ -1,8 +1,9 @@
-import { Button, Col, Row, Typography } from "antd";
+import { Col, Row, Typography } from "antd";
 import Head from "next/head";
 import { useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import OrderCard from "src/components/OrderCard";
+import { RediButton } from "src/components/RediButton";
 import { RediSelect } from "src/components/RediSelect";
 import AppContext from "src/contexts/app.context";
 import { allDataOrders, getListUnpaidOrders } from "../test/mocks/mockOrdersData";
@@ -61,14 +62,13 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
           />
         </Col>
         <Col className="text-right" lg={4}>
-          <Button
-            type="primary"
-            style={{ borderRadius: 0 }}
-            shape="default"
+          <RediButton
+            typeButton="create"
             onClick={() => router.push("/orders/create")}
-          >
-            Create Order
-          </Button>
+            title="Create Order"
+            haveIcon={true}
+            shape="round"
+          />
         </Col>
       </Row>
       {filteredOrders.map((order) => {
