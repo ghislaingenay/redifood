@@ -1,9 +1,10 @@
 import { Button, Col, Row, Typography } from "antd";
 import Head from "next/head";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import OrderCard from "src/components/OrderCard";
 import { RediSelect } from "src/components/RediSelect";
+import AppContext from "src/contexts/app.context";
 import { allDataOrders, getListUnpaidOrders } from "../test/mocks/mockOrdersData";
 
 export const getOptions = (array: string[]) => {
@@ -16,9 +17,9 @@ export const getOptions = (array: string[]) => {
   return newArray;
 };
 
-const currency = "$";
-
 const AllOrdersPage = ({ allOrders, getList, status }) => {
+  const appValue = useContext(AppContext);
+  appValue.setStatus(status);
   const router = useRouter();
   const [listAllOrders] = useState(allOrders);
   const [selectedOption, setSelectedOption] = useState("ALL");
@@ -75,7 +76,7 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
 export default AllOrdersPage;
 
 export async function getServerSideProps() {
-  return { props: { allOrders: allDataOrders, getList: getListUnpaidOrders, status: "error" } };
+  return { props: { allOrders: allDataOrders, getList: getListUnpaidOrders, status: "success" } };
   // const url = "/api/orders";
   // await axios
   //   .get(url, { params: { selectedOption: "ALL" } })

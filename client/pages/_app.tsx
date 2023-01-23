@@ -4,13 +4,14 @@ import { useEffect, useState } from "react";
 import { Else, If, Then } from "react-if";
 import Auth from "src/components/Auth";
 import { RediHeader } from "src/components/Page";
+import { AppProvider } from "src/contexts/app.context";
 import "../src/styles/globals.css";
 const { Footer } = Layout;
 // import buildClient from "./api/build-client";
 
 const AppComponent = ({ Component, pageProps, currentUser, loading }) => {
   const [loadingSpin, setLoadingSpin] = useState<boolean>(loading || true);
-
+  // const [status, setStatus] = useState<"error" | "success">("success");
   useEffect(() => {
     setLoadingSpin(loading);
   }, [loading]);
@@ -18,35 +19,36 @@ const AppComponent = ({ Component, pageProps, currentUser, loading }) => {
   if (loadingSpin) {
     return <Spin />;
   }
+
   return (
-    // <AuthContext.Provider value={{ authorization: currentUser }}>
-    <ConfigProvider theme={{ token: tokenProvider, inherit: false }}>
-      <If condition={currentUser}>
-        <Then>
-          <Layout className="layout bg-amber-100 mb-0">
-            <RediHeader />
-            <RediContent>
-              <Component {...pageProps} />
-            </RediContent>
-            <Footer
-              style={{
-                textAlign: "center",
-                fontWeight: "bold",
-                backgroundColor: "transparent",
-                margin: "0 0 0.4rem 0",
-                padding: "0",
-              }}
-            >
-              <em>Redifood ©{new Date().getFullYear()} Created by Ghislain Genay</em>
-            </Footer>
-          </Layout>
-        </Then>
-        <Else>
-          <Auth />
-        </Else>
-      </If>
-    </ConfigProvider>
-    // </AuthContext.Provider>
+    <AppProvider>
+      <ConfigProvider theme={{ token: tokenProvider, inherit: false }}>
+        <If condition={currentUser}>
+          <Then>
+            <Layout className="layout bg-amber-100 mb-0">
+              <RediHeader />
+              <RediContent>
+                <Component {...pageProps} />
+              </RediContent>
+              <Footer
+                style={{
+                  textAlign: "center",
+                  fontWeight: "bold",
+                  backgroundColor: "transparent",
+                  margin: "0 0 0.4rem 0",
+                  padding: "0",
+                }}
+              >
+                <em>Redifood ©{new Date().getFullYear()} Created by Ghislain Genay</em>
+              </Footer>
+            </Layout>
+          </Then>
+          <Else>
+            <Auth />
+          </Else>
+        </If>
+      </ConfigProvider>
+    </AppProvider>
   );
 };
 
