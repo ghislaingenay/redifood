@@ -28,7 +28,7 @@ const OrderCard = ({ order }) => {
   ];
 
   return (
-    <Card className="mb-3" role="card">
+    <Card style={{ marginBottom: "1rem" }} role="card">
       <Row justify="space-between" align="middle">
         <Col md={6}>
           <Title className="mt-0" level={5}>
