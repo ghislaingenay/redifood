@@ -21,10 +21,12 @@ export const AuthRadioButton = styled(Radio.Button)`
 
 export const EditButton = styled(Button)`
   background-color: ${EDIT_COLOR};
+  color: white;
 `;
 
 export const CreateButton = styled(Button)`
   background-color: ${CREATE_COLOR};
+  color: white;
 `;
 export const ErrorButton = styled(Button)`
   background-color: ${ERROR_COLOR};

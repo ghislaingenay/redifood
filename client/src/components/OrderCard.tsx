@@ -1,4 +1,5 @@
-import { Button, Card, Col, Divider, Row, Space, Table, Typography } from "antd";
+import { Card, Col, Divider, Row, Space, Table, Typography } from "antd";
+import { RediButton } from "./RediButton";
 const { Title } = Typography;
 
 const OrderCard = ({ order }) => {
@@ -50,12 +51,8 @@ const OrderCard = ({ order }) => {
         </Col>
         <Col md={6}>
           <Space size="middle">
-            <Button type="primary" color="primary">
-              Edit
-            </Button>
-            <Button type="primary" color="success">
-              Pay
-            </Button>
+            <RediButton typeButton="edit" haveIcon={true} title="EDIT" />
+            <RediButton typeButton="success" haveIcon={true} title="PAY" />
           </Space>
         </Col>
       </Row>
