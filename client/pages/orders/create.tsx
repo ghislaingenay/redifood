@@ -1,5 +1,6 @@
 import { LIGHT_GREY_COLOR } from "@constants/colors.const";
 import { Button, Card, Col, InputNumber, Row, Typography } from "antd";
+import Image from "next/image";
 import { useContext, useState } from "react";
 import ButtonLayout from "src/components/food/ButtonLayout";
 import AppContext from "src/contexts/app.context";
@@ -42,13 +43,32 @@ const CreateOrder = ({ foodList, foodSection, status }) => {
             setSelectedSection={setSelectedSection}
             selectedSection={selectedSection}
           />
-          <Row gutter={20}>
+          <Row gutter={[5, 10]}>
             {/* <If condition={selectedSection === "all"}>
               <Then> */}
             {sortedFoods.map((food, index) => (
-              <Col key={index} lg={4}>
-                <Card role="card">
-                  <Button>{food.itemName}</Button>
+              <Col key={index} lg={6}>
+                <Card
+                  style={{
+                    textAlign: "center",
+                    backgroundColor: LIGHT_GREY_COLOR,
+                    boxShadow: "0 0 10px 0 rgba(0,0,0,0.2)",
+                  }}
+                  onClick={() => {
+                    console.log("tested");
+                  }}
+                  role="card"
+                >
+                  <Image
+                    style={{ textAlign: "center", marginBottom: "0.5rem" }}
+                    alt={`Food ${food.itemName}`}
+                    src={food.itemPhoto}
+                    width={150}
+                    height={150}
+                  />
+                  <div style={{ fontWeight: "bold", alignContent: "center", justifyContent: "center" }}>
+                    {food.itemName}
+                  </div>
                 </Card>
               </Col>
             ))}
