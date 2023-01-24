@@ -7,33 +7,33 @@ import {
   WarningOutlined,
 } from "@ant-design/icons";
 import { CreateButton, DisplayButton, EditButton, ErrorButton, InfoButton, SuccessButton } from "@styles";
-import { Button, ButtonProps } from "antd";
+import { Button } from "antd";
 
 type ButtonType = "warning" | "error" | "success" | "info" | "edit" | "create" | "display";
-interface IButtonProps extends ButtonProps {
+interface IButtonProps {
   typeButton: ButtonType;
   title: string;
   haveIcon: boolean;
 }
 
 interface IButtonChoice {
-  type: ButtonType;
+  typeButton: ButtonType;
   icon: JSX.Element;
 }
 
 const buttonChoice: IButtonChoice[] = [
-  { type: "warning", icon: <WarningOutlined /> },
-  { type: "success", icon: <CheckOutlined /> },
-  { type: "create", icon: <PlusCircleOutlined /> },
-  { type: "error", icon: <CloseCircleOutlined /> },
-  { type: "edit", icon: <FormOutlined /> },
-  { type: "info", icon: <InfoOutlined /> },
+  { typeButton: "warning", icon: <WarningOutlined /> },
+  { typeButton: "success", icon: <CheckOutlined /> },
+  { typeButton: "create", icon: <PlusCircleOutlined /> },
+  { typeButton: "error", icon: <CloseCircleOutlined /> },
+  { typeButton: "edit", icon: <FormOutlined /> },
+  { typeButton: "info", icon: <InfoOutlined /> },
 ];
 
-export const RediButton: IButtonProps = ({ typeButton, title, haveIcon, ...props }): JSX.Element => {
-  const button = buttonChoice.find((button) => button.type === typeButton);
+export const RediButton = ({ typeButton, title, haveIcon, ...props }): JSX.Element => {
+  const button = buttonChoice.find((button) => button.typeButton === typeButton);
   const showIcon = { icon: haveIcon ? button.icon : null };
-  switch (button.type) {
+  switch (typeButton) {
     case "success": {
       return (
         <SuccessButton {...props} {...showIcon}>
@@ -43,49 +43,49 @@ export const RediButton: IButtonProps = ({ typeButton, title, haveIcon, ...props
     }
     case "warning": {
       return (
-        <Button {...props} icon={haveIcon ? button.icon : null}>
+        <Button {...props} {...showIcon}>
           {title}
         </Button>
       );
     }
     case "error": {
       return (
-        <ErrorButton {...props} icon={haveIcon ? button.icon : null}>
+        <ErrorButton {...props} {...showIcon}>
           {title}
         </ErrorButton>
       );
     }
     case "create": {
       return (
-        <CreateButton {...props} icon={haveIcon ? button.icon : null}>
+        <CreateButton {...props} {...showIcon}>
           {title}
         </CreateButton>
       );
     }
     case "edit": {
       return (
-        <EditButton {...props} icon={haveIcon ? button.icon : null}>
+        <EditButton {...props} {...showIcon}>
           {title}
         </EditButton>
       );
     }
     case "info": {
       return (
-        <InfoButton {...props} icon={haveIcon ? button.icon : null}>
+        <InfoButton {...props} {...showIcon}>
           {title}
         </InfoButton>
       );
     }
     case "display": {
       return (
-        <DisplayButton {...props} icon={haveIcon ? button.icon : null}>
+        <DisplayButton {...props} {...showIcon}>
           {title}
         </DisplayButton>
       );
     }
     default: {
       return (
-        <Button {...props} icon={haveIcon ? button.icon : null}>
+        <Button {...props} {...showIcon}>
           {title}
         </Button>
       );
