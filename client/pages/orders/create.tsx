@@ -22,7 +22,7 @@ const CreateOrder = ({ foodList, foodSection, status }) => {
     if (sectionName === "all") {
       return setSortedFoods(foodList);
     }
-    let filteredfoods = foodList?.filter((food) => food.section === sectionName);
+    let filteredfoods = foodList?.filter((food) => food.itemSection === sectionName);
     setSortedFoods(filteredfoods);
   };
 
