@@ -1,9 +1,9 @@
-import { DeleteOutlined, MinusSquareOutlined, PlusSquareOutlined } from "@ant-design/icons";
 import { LIGHT_GREY_COLOR, LIGHT_PRIMARY_COLOR } from "@constants/colors.const";
 import { Card, Col, Divider, InputNumber, Row, Typography } from "antd";
 import Image from "next/image";
 import { useContext, useState } from "react";
 import ButtonLayout from "src/components/food/ButtonLayout";
+import FoodOrderCard from "src/components/food/FoodOrderCard";
 import { RediButton } from "src/components/RediButton";
 import AppContext from "src/contexts/app.context";
 import { foodSectionArray, mockedFoodData } from "../../test/mocks/mockFoodData";
@@ -161,66 +161,7 @@ const CreateOrder = ({ foodList, foodSection, status }) => {
               Order List
             </Title>
             {foodOrder?.map((food) => (
-              <Card
-                key={food.itemId}
-                role="card"
-                className=" px-2"
-                style={{ marginBottom: "1rem", boxShadow: "0 0 0.2rem rgba(0,0,0, 0.1)" }}
-              >
-                <Row justify="space-between" gutter={10}>
-                  <Col lg={15}>
-                    <Title level={5} className="pt-0 m-0 pb-1">
-                      <b>{food.itemName}</b>
-                    </Title>
-                  </Col>
-                  <Col lg={8}>
-                    <Title level={5} className="pt-0 m-0 pb-1">
-                      Price: {food.itemPrice} $
-                    </Title>
-                  </Col>
-                </Row>
-                <Row justify="space-between" align="middle">
-                  <Col lg={5}>
-                    <RediButton
-                      name={`Delete-${food.itemName}`}
-                      typeButton="error"
-                      shape="round"
-                      title={<DeleteOutlined />}
-                      size="large"
-                      haveIcon={false}
-                      onClick={() => handleDeleteFood(food.itemId)}
-                    />
-                  </Col>
-                  <Col lg={5}>
-                    <Title level={4} className="text-center justify-center align-middle mt-0 pt-2">
-                      {food.itemQuantity}
-                    </Title>
-                  </Col>
-                  <Col lg={5}>
-                    <RediButton
-                      name={`Minus-${food.itemName}`}
-                      typeButton="display"
-                      size="large"
-                      shape="circle"
-                      disabled={food.itemQuantity === 1 ? true : false}
-                      title={<MinusSquareOutlined />}
-                      onClick={() => handleQty(food.itemId, "remove")}
-                      haveIcon={false}
-                    />
-                  </Col>
-                  <Col lg={5}>
-                    <RediButton
-                      name={`Plus-${food.itemName}`}
-                      typeButton="success"
-                      size="large"
-                      shape="circle"
-                      onClick={() => handleQty(food.itemId, "add")}
-                      title={<PlusSquareOutlined />}
-                      haveIcon={false}
-                    />
-                  </Col>
-                </Row>
-              </Card>
+              <FoodOrderCard key={food.itemId} handleDeleteFood={handleDeleteFood} handleQty={handleQty} food={food} />
             ))}
 
             <RediButton
