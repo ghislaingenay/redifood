@@ -1,8 +1,9 @@
-import { LIGHT_GREY_COLOR } from "@constants/colors.const";
-import { Button, Card, Col, InputNumber, Row, Typography } from "antd";
+import { LIGHT_GREY_COLOR, LIGHT_PRIMARY_COLOR } from "@constants/colors.const";
+import { Button, Card, Col, Divider, InputNumber, Row, Typography } from "antd";
 import Image from "next/image";
 import { useContext, useState } from "react";
 import ButtonLayout from "src/components/food/ButtonLayout";
+import { RediButton } from "src/components/RediButton";
 import AppContext from "src/contexts/app.context";
 import { foodSectionArray, mockedFoodData } from "../../test/mocks/mockFoodData";
 
@@ -25,6 +26,26 @@ const CreateOrder = ({ foodList, foodSection, status }) => {
     }
     let filteredfoods = foodList?.filter((food) => food.itemSection === sectionName);
     setSortedFoods(filteredfoods);
+  };
+
+  const addFoodToCart = (foodId: string) => {
+    const foundFound = foodOrder.find((food) => food.itemId === foodId);
+    if (foundFound) {
+      let currentOrder = [...foodOrder];
+      for (let i = 0; i < currentOrder.length; i++) {
+        if (currentOrder[i].itemId === foundFound.itemId) {
+          currentOrder[i].itemQuantity += 1;
+        }
+      }
+      setFoodOrder(currentOrder);
+    } else {
+      let newFood = foodList.find((food) => food.itemId === foodId);
+      newFood.itemQuantity = 1;
+      console.log("newFood", newFood);
+      const currentOrder: any = [...foodOrder];
+      currentOrder.push(newFood);
+      setFoodOrder(currentOrder);
+    }
   };
 
   return (
@@ -55,7 +76,7 @@ const CreateOrder = ({ foodList, foodSection, status }) => {
                     boxShadow: "0 0 10px 0 rgba(0,0,0,0.2)",
                   }}
                   onClick={() => {
-                    console.log("tested");
+                    addFoodToCart(food.itemId);
                   }}
                   role="card"
                 >
@@ -98,13 +119,26 @@ const CreateOrder = ({ foodList, foodSection, status }) => {
             </If> */}
           </Row>
         </Col>
-        <Col lg={7}>
-          <Card style={{ backgroundColor: LIGHT_GREY_COLOR }}>
-            <Title level={5}>Table Number:</Title>
-            <InputNumber name="tableNumber" aria-label="tableNumber" placeholder="Select a table number" />
-            <Title level={5}>Order List:</Title>
+        <Col lg={8}>
+          <Card style={{ backgroundColor: LIGHT_GREY_COLOR, boxShadow: "0 0 1rem rgba(0,0,0,0.3)", height: "100vh" }}>
+            <Row justify="center">
+              <Title level={5} className="mr-4 mt-0 pt-1">
+                Table Number:
+              </Title>
+              <InputNumber
+                name="tableNumber"
+                min={0}
+                aria-label="tableNumber"
+                className="h-1/2"
+                placeholder="Select a table number"
+              />
+            </Row>
+            <Divider style={{ border: `0.125rem solid ${LIGHT_PRIMARY_COLOR}` }} />
+            <Title level={5} className="text-center">
+              Order List
+            </Title>
             {foodOrder?.map((food) => (
-              <Card key={food.itemId} role="card">
+              <Card key={food.itemId} role="card" className="mb-2">
                 {food.itemName}
                 <Button>Remove</Button>
                 {food.itemQuantity}
@@ -113,7 +147,7 @@ const CreateOrder = ({ foodList, foodSection, status }) => {
               </Card>
             ))}
 
-            <Button disabled={isDisabled}>Validate</Button>
+            <RediButton typeButton="success" shape="round" disabled={isDisabled} title="Validate" haveIcon={false} />
           </Card>
         </Col>
       </Row>

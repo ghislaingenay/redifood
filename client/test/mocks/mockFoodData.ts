@@ -9,6 +9,7 @@ export const mockedFoodData = [
     itemDescription: "Soo good",
     itemSection: "pizza",
     itemExtra: "tomato",
+    itemQuantity: 0,
   },
   {
     itemId: "2",
@@ -19,6 +20,7 @@ export const mockedFoodData = [
     itemDescription: "Gorgonzola, gouda, mozzarella, blue cheese",
     itemSection: "pizza",
     itemExtra: "cream",
+    itemQuantity: 0,
   },
   {
     itemId: "3",
@@ -29,6 +31,7 @@ export const mockedFoodData = [
     itemDescription: "The traditional French Millefeuille",
     itemSection: "dessert",
     itemExtra: "pastry",
+    itemQuantity: 0,
   },
   {
     itemId: "4",
@@ -39,6 +42,7 @@ export const mockedFoodData = [
     itemDescription: "Improve version of cream puff",
     itemSection: "dessert",
     itemExtra: "pastry",
+    itemQuantity: 0,
   },
   {
     itemId: "5",
@@ -49,6 +53,7 @@ export const mockedFoodData = [
     itemDescription: "Ingredient A and B",
     itemSection: "dessert",
     itemExtra: "cake",
+    itemQuantity: 0,
   },
   {
     itemId: "6",
@@ -59,6 +64,7 @@ export const mockedFoodData = [
     itemDescription: "Hard and strong with the perfect beans",
     itemSection: "drink",
     itemExtra: "hot drink",
+    itemQuantity: 0,
   },
   {
     itemId: "7",
@@ -69,6 +75,7 @@ export const mockedFoodData = [
     itemDescription: "Sprite can of 330 mL",
     itemSection: "drink",
     itemExtra: "soda",
+    itemQuantity: 0,
   },
   {
     itemId: "8",
@@ -79,6 +86,7 @@ export const mockedFoodData = [
     itemDescription: "Sprite can of 500 mL",
     itemSection: "drink",
     itemExtra: "soda",
+    itemQuantity: 0,
   },
   {
     itemId: "9",
@@ -89,5 +97,11 @@ export const mockedFoodData = [
     itemDescription: "Singha with 330 mL format",
     itemSection: "drink",
     itemExtra: "beer",
+    itemQuantity: 0,
   },
 ];
+
+export const foodSectionArray = ["pizza", "dessert", "drink"];
+
+export const createErrorProps = { foodList: [], foodSection: [], status: "error" };
+export const createSuccessProps = { foodList: mockedFoodData, foodSection: foodSectionArray, status: "error" };
