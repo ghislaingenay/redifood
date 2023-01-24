@@ -1,8 +1,7 @@
 import { LIGHT_GREY_COLOR } from "@constants/colors.const";
-import { Button, Card, Col, Divider, InputNumber, Row, Typography } from "antd";
+import { Button, Card, Col, InputNumber, Row, Typography } from "antd";
 import { useContext, useState } from "react";
-import { Else, If, Then } from "react-if";
-import { RediButton } from "src/components/RediButton";
+import ButtonLayout from "src/components/food/ButtonLayout";
 import AppContext from "src/contexts/app.context";
 import { foodSectionArray, mockedFoodData } from "../../test/mocks/mockFoodData";
 
@@ -11,7 +10,6 @@ const { Title } = Typography;
 const CreateOrder = ({ foodList, foodSection, status }) => {
   const appValue = useContext(AppContext);
   appValue.setStatus(status);
-
   const [sortedFoods, setSortedFoods] = useState(foodList);
   const [selectedSection, setSelectedSection] = useState("all");
   const [foodOrder, setFoodOrder] = useState([]);
@@ -19,20 +17,13 @@ const CreateOrder = ({ foodList, foodSection, status }) => {
   const isDisabled = foodOrder.length === 0 ? true : false;
   const canCancel = foodOrder.length === 0 ? false : true;
 
-  const changeActiveButton = (e, sectionList: any, foods) => {
-    for (let i = 0; i < sectionList.length; i++) {
-      if (sectionList[i].name === e) {
-        let foodSection = foods?.filter((food) => food.section === e);
-        // Creation of a new state allowing to display the data properly
-        let sorted = [];
-        // From the section[i] => loop inside the extra
-        for (let j = 0; j < sectionList[i].extra.length; j++) {
-          let newArr = foodSection.filter((food) => food.extra === sectionList[i].extra[j]);
-          sorted.push({ extra: sectionList[i].extra[j], foods: newArr });
-        }
-        return setSortedFoods(sorted);
-      }
+  const changeActiveButton = (sectionName: string) => {
+    console.log("section", sectionName);
+    if (sectionName === "all") {
+      return setSortedFoods(foodList);
     }
+    let filteredfoods = foodList?.filter((food) => food.section === sectionName);
+    setSortedFoods(filteredfoods);
   };
 
   return (
@@ -45,44 +36,23 @@ const CreateOrder = ({ foodList, foodSection, status }) => {
               Food List
             </Title>
           </Row>
-
-          <Row justify="space-between" className="mb-2">
-            <Col lg={4}>
-              <RediButton
-                name="all"
-                haveIcon={false}
-                typeButton="display"
-                title="ALL"
-                onClick={(e) => {
-                  setSelectedSection(e.target.value);
-                }}
-              />
-            </Col>
-            {foodSection.map((section, index) => (
+          <ButtonLayout
+            changeActiveButton={changeActiveButton}
+            foodSection={foodSection}
+            setSelectedSection={setSelectedSection}
+            selectedSection={selectedSection}
+          />
+          <Row gutter={20}>
+            {/* <If condition={selectedSection === "all"}>
+              <Then> */}
+            {sortedFoods.map((food, index) => (
               <Col key={index} lg={4}>
-                <RediButton
-                  name={section}
-                  haveIcon={false}
-                  typeButton="display"
-                  title={`${section.toUpperCase()}`}
-                  onClick={(e) => {
-                    setSelectedSection(e.target.value);
-                  }}
-                />
+                <Card role="card">
+                  <Button>{food.itemName}</Button>
+                </Card>
               </Col>
             ))}
-          </Row>
-          <Row gutter={20}>
-            <If condition={selectedSection === "all"}>
-              <Then>
-                {sortedFoods.map((food, index) => (
-                  <Col key={index} lg={4}>
-                    <Card role="card">
-                      <Button>{food.itemName}</Button>
-                    </Card>
-                  </Col>
-                ))}
-              </Then>
+            {/* </Then>
               <Else>
                 {sortedFoods?.map((onetype) => {
                   // key: name of the extra
@@ -105,7 +75,7 @@ const CreateOrder = ({ foodList, foodSection, status }) => {
                   );
                 })}
               </Else>
-            </If>
+            </If> */}
           </Row>
         </Col>
         <Col lg={7}>

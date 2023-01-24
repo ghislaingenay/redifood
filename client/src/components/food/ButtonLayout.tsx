@@ -13,9 +13,9 @@ const ButtonLayout = ({
   foodSection,
   changeActiveButton,
 }: IButtonLayout): JSX.Element => {
-  const styleGround = {
-    color: "white",
-  };
+  // const styleGround = {
+  //   color: "white",
+  // };
 
   return (
     <Row justify="space-between" style={{ marginBottom: "1rem" }}>
