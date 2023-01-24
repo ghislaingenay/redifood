@@ -12,5 +12,5 @@ export interface IFood {
   itemCurrency: ECurrency;
 }
 
-export type IFoodSection = string[];
-export type IFoodOrder = IFood[];
+export type TFoodSection = string[];
+export type TFoodOrder = IFood[];
