@@ -1,4 +1,4 @@
-import { LIGHT_GREY_COLOR, LIGHT_PRIMARY_COLOR } from "@constants/colors.const";
+import { ERROR_COLOR, LIGHT_GREY_COLOR, LIGHT_PRIMARY_COLOR } from "@constants/colors.const";
 import { Card, Col, Divider, InputNumber, Row, Typography } from "antd";
 import Image from "next/image";
 import { useContext, useState } from "react";
@@ -65,6 +65,12 @@ const CreateOrder = ({ foodList, foodSection, status }) => {
     setFoodOrder(currentOrder);
   };
 
+  const calculateTotal = (foodOrder) => {
+    if (foodOrder.length === 0) {
+      return 0;
+    }
+    return [...foodOrder].map((food) => food.itemQuantity * food.itemPrice).reduce((t, e) => t + e);
+  };
   const handleOrderCreate = () => {
     // Recover info
     // Add missing data
@@ -163,7 +169,11 @@ const CreateOrder = ({ foodList, foodSection, status }) => {
             {foodOrder?.map((food) => (
               <FoodOrderCard key={food.itemId} handleDeleteFood={handleDeleteFood} handleQty={handleQty} food={food} />
             ))}
-
+            {foodOrder.length > 0 && (
+              <Title level={5} className="text-center" style={{ color: ERROR_COLOR }}>
+                Total: {calculateTotal(foodOrder).toFixed(2)} $
+              </Title>
+            )}
             <RediButton
               typeButton="success"
               shape="round"
@@ -183,7 +193,7 @@ export default CreateOrder;
 
 export async function getServerSideProps() {
   return {
-    props: { foodList: mockedFoodData, foodSection: foodSectionArray, status: "error" },
+    props: { foodList: mockedFoodData, foodSection: foodSectionArray, status: "success" },
   };
   // await axios
   //   .get("/api/foods", { params: { selectedSection: "all" } })
