@@ -1,5 +1,6 @@
+import { DeleteOutlined, MinusSquareOutlined, PlusSquareOutlined } from "@ant-design/icons";
 import { LIGHT_GREY_COLOR, LIGHT_PRIMARY_COLOR } from "@constants/colors.const";
-import { Button, Card, Col, Divider, InputNumber, Row, Typography } from "antd";
+import { Card, Col, Divider, InputNumber, Row, Typography } from "antd";
 import Image from "next/image";
 import { useContext, useState } from "react";
 import ButtonLayout from "src/components/food/ButtonLayout";
@@ -46,6 +47,28 @@ const CreateOrder = ({ foodList, foodSection, status }) => {
       currentOrder.push(newFood);
       setFoodOrder(currentOrder);
     }
+  };
+
+  const handleDeleteFood = (foodId) => {
+    const updatedOrder = [...foodOrder].filter((food) => food.itemId !== foodId);
+    setFoodOrder(updatedOrder);
+  };
+
+  const handleQty = (foodId, type: "add" | "remove") => {
+    const currentOrder = [...foodOrder];
+    for (let i = 0; i < currentOrder.length; i++) {
+      if (currentOrder[i].itemId === foodId) {
+        let currentFood = currentOrder[i];
+        type === "remove" ? (currentFood.itemQuantity -= 1) : (currentFood.itemQuantity += 1);
+      }
+    }
+    setFoodOrder(currentOrder);
+  };
+
+  const handleOrderCreate = () => {
+    // Recover info
+    // Add missing data
+    // axios
   };
 
   return (
@@ -138,16 +161,76 @@ const CreateOrder = ({ foodList, foodSection, status }) => {
               Order List
             </Title>
             {foodOrder?.map((food) => (
-              <Card key={food.itemId} role="card" className="mb-2">
-                {food.itemName}
-                <Button>Remove</Button>
-                {food.itemQuantity}
-                <Button>Add</Button>
-                <Button>Delete</Button>
+              <Card
+                key={food.itemId}
+                role="card"
+                className=" px-2"
+                style={{ marginBottom: "1rem", boxShadow: "0 0 0.2rem rgba(0,0,0, 0.1)" }}
+              >
+                <Row justify="space-between" gutter={10}>
+                  <Col lg={15}>
+                    <Title level={5} className="pt-0 m-0 pb-1">
+                      <b>{food.itemName}</b>
+                    </Title>
+                  </Col>
+                  <Col lg={8}>
+                    <Title level={5} className="pt-0 m-0 pb-1">
+                      Price: {food.itemPrice} $
+                    </Title>
+                  </Col>
+                </Row>
+                <Row justify="space-between" align="middle">
+                  <Col lg={5}>
+                    <RediButton
+                      name={`Delete-${food.itemName}`}
+                      typeButton="error"
+                      shape="round"
+                      title={<DeleteOutlined />}
+                      size="large"
+                      haveIcon={false}
+                      onClick={() => handleDeleteFood(food.itemId)}
+                    />
+                  </Col>
+                  <Col lg={5}>
+                    <Title level={4} className="text-center justify-center align-middle mt-0 pt-2">
+                      {food.itemQuantity}
+                    </Title>
+                  </Col>
+                  <Col lg={5}>
+                    <RediButton
+                      name={`Minus-${food.itemName}`}
+                      typeButton="display"
+                      size="large"
+                      shape="circle"
+                      disabled={food.itemQuantity === 1 ? true : false}
+                      title={<MinusSquareOutlined />}
+                      onClick={() => handleQty(food.itemId, "remove")}
+                      haveIcon={false}
+                    />
+                  </Col>
+                  <Col lg={5}>
+                    <RediButton
+                      name={`Plus-${food.itemName}`}
+                      typeButton="success"
+                      size="large"
+                      shape="circle"
+                      onClick={() => handleQty(food.itemId, "add")}
+                      title={<PlusSquareOutlined />}
+                      haveIcon={false}
+                    />
+                  </Col>
+                </Row>
               </Card>
             ))}
 
-            <RediButton typeButton="success" shape="round" disabled={isDisabled} title="Validate" haveIcon={false} />
+            <RediButton
+              typeButton="success"
+              shape="round"
+              disabled={isDisabled}
+              title={<b>Validate</b>}
+              haveIcon={false}
+              onClick={handleOrderCreate}
+            />
           </Card>
         </Col>
       </Row>
