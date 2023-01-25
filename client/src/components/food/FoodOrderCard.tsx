@@ -1,6 +1,7 @@
 import { DeleteOutlined, MinusSquareOutlined, PlusSquareOutlined } from "@ant-design/icons";
 import { IFood } from "@interfaces/food.interface";
-import { Card, Col, Row, Typography } from "antd";
+import { Col, Row, Typography } from "antd";
+import { OrderCardStyled } from "src/styles/styledComponents/div.styled";
 import { RediButton } from "../RediButton";
 const { Title } = Typography;
 
@@ -11,26 +12,21 @@ interface IFoodOrderCard {
 }
 const FoodOrderCard = ({ food, handleDeleteFood, handleQty }: IFoodOrderCard) => {
   return (
-    <Card
-      key={food.itemId}
-      role="card"
-      className=" px-2"
-      style={{ marginBottom: "1rem", boxShadow: "0 0 0.2rem rgba(0,0,0, 0.1)" }}
-    >
-      <Row justify="space-between" gutter={10}>
-        <Col lg={15}>
-          <Title level={5} className="pt-0 m-0 pb-1">
+    <OrderCardStyled key={food.itemId} role="card">
+      <Row justify="space-between" gutter={10} style={{ marginBottom: "0.5rem" }}>
+        <Col lg={14}>
+          <Title level={5} style={{ margin: 0, padding: "0 auto 1rem" }}>
             <b>{food.itemName}</b>
           </Title>
         </Col>
-        <Col lg={8}>
-          <Title level={5} className="pt-0 m-0 pb-1">
+        <Col lg={9}>
+          <Title level={5} style={{ margin: 0, padding: "0 auto 1rem" }}>
             Price: {food.itemPrice} $
           </Title>
         </Col>
       </Row>
       <Row justify="space-between" align="middle">
-        <Col lg={5}>
+        <Col lg={5} style={{ textAlign: "center" }}>
           <RediButton
             name={`Delete-${food.itemName}`}
             typeButton="error"
@@ -41,12 +37,12 @@ const FoodOrderCard = ({ food, handleDeleteFood, handleQty }: IFoodOrderCard) =>
             onClick={() => handleDeleteFood(food.itemId)}
           />
         </Col>
-        <Col lg={5}>
-          <Title level={4} className="text-center justify-center align-middle mt-0 pt-2">
+        <Col lg={5} style={{ textAlign: "center" }}>
+          <Title level={4} style={{ marginTop: 0, paddingTop: "0.5rem" }}>
             {food.itemQuantity}
           </Title>
         </Col>
-        <Col lg={5}>
+        <Col lg={5} style={{ textAlign: "center" }}>
           <RediButton
             name={`Minus-${food.itemName}`}
             typeButton="display"
@@ -58,7 +54,7 @@ const FoodOrderCard = ({ food, handleDeleteFood, handleQty }: IFoodOrderCard) =>
             haveIcon={false}
           />
         </Col>
-        <Col lg={5}>
+        <Col lg={5} style={{ textAlign: "center" }}>
           <RediButton
             name={`Plus-${food.itemName}`}
             typeButton="success"
@@ -70,7 +66,7 @@ const FoodOrderCard = ({ food, handleDeleteFood, handleQty }: IFoodOrderCard) =>
           />
         </Col>
       </Row>
-    </Card>
+    </OrderCardStyled>
   );
 };
 

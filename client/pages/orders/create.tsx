@@ -1,17 +1,15 @@
-import { EFoodMode } from "@interfaces/food.interface";
-import { Typography } from "antd";
+import { EFoodMode, IFood } from "@interfaces/food.interface";
 import { useContext } from "react";
 import FoodLayout from "src/components/food/FoodLayout";
 import AppContext from "src/contexts/app.context";
 import { foodSectionArray, mockedFoodData } from "../../test/mocks/mockFoodData";
 
-const { Title } = Typography;
-
 const CreateOrder = ({ foodList, foodSection, status }) => {
   const appValue = useContext(AppContext);
   appValue.setStatus(status);
 
-  const handleOrderCreate = () => {
+  const handleOrderCreate = (foodOrder: IFood[]) => {
+    console.log("order created", foodOrder);
     // Recover info
     // Add missing data
     // axios

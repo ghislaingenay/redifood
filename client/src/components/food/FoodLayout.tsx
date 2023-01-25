@@ -19,7 +19,14 @@ interface IFoodLayoutProps {
   mainTitle: string;
 }
 
-const FoodLayout = ({ foodOrder: orderList, foodList, mode, foodSection, mainTitle }: IFoodLayoutProps) => {
+const FoodLayout = ({
+  foodOrder: orderList,
+  foodList,
+  mode,
+  foodSection,
+  mainTitle,
+  handleOrderCreate,
+}: IFoodLayoutProps) => {
   const [sortedFoods, setSortedFoods] = useState(foodList);
   const [selectedSection, setSelectedSection] = useState("all");
   const [foodOrder, setFoodOrder] = useState([]);
@@ -78,9 +85,13 @@ const FoodLayout = ({ foodOrder: orderList, foodList, mode, foodSection, mainTit
     return [...foodOrder].map((food) => food.itemQuantity * food.itemPrice).reduce((t, e) => t + e);
   };
   const handleSubmit = (foodOrder: IFood[]) => {
-    // Recover info
-    // Add missing data
-    // axios
+    switch (mode) {
+      case EFoodMode.CREATE: {
+        handleOrderCreate(foodOrder);
+      }
+      default: {
+      }
+    }
   };
 
   const loadData = async () => {
@@ -88,7 +99,8 @@ const FoodLayout = ({ foodOrder: orderList, foodList, mode, foodSection, mainTit
   };
   useEffect(() => {
     loadData();
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
@@ -165,7 +177,7 @@ const FoodLayout = ({ foodOrder: orderList, foodList, mode, foodSection, mainTit
               disabled={isDisabled}
               title={<b>Validate</b>}
               haveIcon={false}
-              onClick={handleSubmit}
+              onClick={() => handleSubmit(foodOrder)}
             />
           </Card>
         </Col>
