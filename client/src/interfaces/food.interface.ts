@@ -14,3 +14,9 @@ export interface IFood {
 
 export type TFoodSection = string[];
 export type TFoodOrder = IFood[];
+
+export enum EFoodMode {
+  CREATE = "create",
+  EDIT = "edit",
+  ALTER = "alter",
+}
