@@ -137,15 +137,13 @@ const FoodLayout = ({ foodOrder: orderList, foodList, mode, foodSection, mainTit
         </Col>
         <Col lg={8}>
           <Card style={{ backgroundColor: LIGHT_GREY_COLOR, boxShadow: "0 0 1rem rgba(0,0,0,0.3)", height: "100vh" }}>
-            <Row justify="center">
-              <Title level={5} className="mr-4 mt-0 pt-1">
-                Table Number:
-              </Title>
+            <Row justify="center" align="middle">
+              <Title level={5}>Table Number:</Title>
               <InputNumber
                 name="tableNumber"
                 min={0}
                 aria-label="tableNumber"
-                className="h-1/2"
+                style={{ height: "50%", top: "0.5rem", marginLeft: "1rem" }}
                 placeholder="Select a table number"
               />
             </Row>

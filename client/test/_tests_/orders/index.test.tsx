@@ -40,7 +40,7 @@ jest.setTimeout(30000);
 
 describe("get Server Side Props - Index", () => {
   it("should send an error message if the API is not working or doesn't send the data in server side", async () => {
-    server.resetHandlers(rest.get("/api/orders", (req, res, ctx) => res(ctx.status(400), ctx.json("Error"))));
+    server.resetHandlers(rest.get("/api/orders", (req, res, ctx) => res(ctx.status(400), ctx.json("Error data"))));
     const response = await getServerSideProps();
     expect(response).toEqual(
       expect.objectContaining({
