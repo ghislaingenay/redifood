@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Else, If, Then } from "react-if";
 import { AxiosFunction } from "../../pages/api/axios-request";
 import { EAuthChoice } from "../../src/interfaces/auth.interface";
-import { AuthRadioButton } from "../styles/button.style";
+import { AuthRadioButton } from "../styles/styledComponents/button.styled";
 const { Title } = Typography;
 const Auth = () => {
   // ------------ CONSTANTS ---------

@@ -7,7 +7,7 @@ import {
   MIDDLE_GREY_COLOR,
   PRIMARY_COLOR,
   SUCCESS_COLOR,
-} from "../constants/colors.const";
+} from "../../constants/colors.const";
 
 export const AuthRadioButton = styled(Radio.Button)`
   text-align: center;
