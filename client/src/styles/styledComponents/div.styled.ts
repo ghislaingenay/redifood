@@ -1,5 +1,5 @@
-import { DARK_GREY_COLOR } from "@constants/colors.const";
 import styled from "styled-components";
+import { DARK_GREY_COLOR } from "../../../src/constants/colors.const";
 
 export const OrderCardStyled = styled.div`
   margin-bottom: 0.5rem;

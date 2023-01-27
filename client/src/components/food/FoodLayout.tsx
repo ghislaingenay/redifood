@@ -1,14 +1,17 @@
-import { ERROR_COLOR, LIGHT_GREY_COLOR, LIGHT_PRIMARY_COLOR } from "@constants/colors.const";
-import { EFoodMode, IFood } from "@interfaces/food.interface";
 import { Card, Col, Divider, InputNumber, Row, Typography } from "antd";
 import Image from "next/image";
-import { useEffect, useState } from "react";
-import ButtonLayout from "src/components/food/ButtonLayout";
-import FoodOrderCard from "src/components/food/FoodOrderCard";
-import { RediButton } from "src/components/RediButton";
+import { useContext, useEffect, useState } from "react";
+import ButtonLayout from "../../../src/components/food/ButtonLayout";
+import FoodOrderCard from "../../../src/components/food/FoodOrderCard";
+import { RediButton } from "../../../src/components/RediButton";
+import { ERROR_COLOR, LIGHT_GREY_COLOR, LIGHT_PRIMARY_COLOR } from "../../../src/constants/colors.const";
+import { EFoodMode, IFood } from "../../../src/interfaces/food.interface";
+import AppContext from "../../contexts/app.context";
+import { TStatusProps } from "../../interfaces";
 
 const { Title } = Typography;
 interface IFoodLayoutProps {
+  status: TStatusProps;
   foodOrder: IFood[];
   foodList: IFood[];
   mode: EFoodMode;
@@ -26,7 +29,10 @@ const FoodLayout = ({
   foodSection,
   mainTitle,
   handleOrderCreate,
+  status,
 }: IFoodLayoutProps) => {
+  const { setStatus } = useContext(AppContext);
+
   const [sortedFoods, setSortedFoods] = useState(foodList);
   const [selectedSection, setSelectedSection] = useState("all");
   const [foodOrder, setFoodOrder] = useState([]);
@@ -95,6 +101,7 @@ const FoodLayout = ({
   };
 
   const loadData = async () => {
+    setStatus(status);
     setFoodOrder(orderList);
   };
   useEffect(() => {

@@ -6,8 +6,8 @@ import {
   PlusCircleOutlined,
   WarningOutlined,
 } from "@ant-design/icons";
-import { CreateButton, DisplayButton, EditButton, ErrorButton, InfoButton, SuccessButton } from "@styles";
 import { Button } from "antd";
+import { CreateButton, DisplayButton, EditButton, ErrorButton, InfoButton, SuccessButton } from "../styles/index";
 
 type ButtonType = "warning" | "error" | "success" | "info" | "edit" | "create" | "display";
 interface IButtonProps {
