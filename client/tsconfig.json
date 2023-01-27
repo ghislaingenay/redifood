@@ -16,21 +16,7 @@
     "isolatedModules": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "jsx": "preserve",
-    "baseUrl": ".",
-    "paths": {
-      "@components/*": ["src/components/auth/*"],
-      "@components": ["src/components"],
-      "@public/*": ["public/*"],
-      "@constants/*": ["src/constants/*"],
-      "@constants": ["src/constants"],
-      "@interfaces": ["src/interfaces/index"],
-      "@styles/*": ["src/styles/*"],
-      "@styles": ["src/styles/index"],
-      "@functions/*": ["src/functions/*"],
-      "@test/*": ["test/*"],
-      "@test": ["test"]
-    }
+    "jsx": "preserve"
   },
   "include": [
     "next-env.d.ts",

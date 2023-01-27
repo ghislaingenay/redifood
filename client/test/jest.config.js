@@ -23,21 +23,7 @@ const customJestConfig = {
     "^.+\\.(js|jsx|mjs)$": "<rootDir>/node_modules/babel-jest",
     "^.+\\.tsx?$": "ts-jest",
   },
-  moduleNameMapper: {
-    "^@components/(.*)$": "<rootDir>/src/components/auth/$1",
-    "^@components": "<rootDir>/src/components/index",
-    "^@public/(.*)$": "<rootDir>/public/$1",
-    "^@public": "<rootDir>/public",
-    "^@constants/(.*)$": "<rootDir>/src/constants/$1",
-    "^@constants": "<rootDir>src/constants/index",
-    "^@interfaces": "<rootDir>src/interfaces/index",
-    "^@styles/(.*)$": "<rootDir>src/styles/$1",
-    "^@styles": "<rootDir>src/styles/index",
-    "^@functions/(.*)$": "<rootDir>/src/functions/$1",
-    "^@test/(.*)$": "<rootDir>/test/$1",
-    "^@test": "<rootDir>/test/index",
-    "^@pages/(.*)$": "<rootDir>/pages/$1",
-  },
+  
 };
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
