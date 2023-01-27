@@ -1,7 +1,8 @@
 import { render as baseRender, RenderOptions, RenderResult } from "@testing-library/react";
-import { ComponentType, ReactElement } from "react";
+import { ComponentType, ReactElement, useContext } from "react";
+import AppContext from "../src/contexts/app.context";
 
-import { AuthContext } from "src/contexts/auth.context";
+import { AuthContext } from "../src/contexts/auth.context";
 
 /**
  * Custom renderer example with @testing-library/react
@@ -18,9 +19,19 @@ export const AllTheProviders = ({ children }: { children: any }) => {
       email: "",
     },
   };
+  const { setStatus } = useContext(AppContext);
   return (
     <>
-      <AuthContext.Provider value={userValue}>{children}</AuthContext.Provider>
+      <AppContext.Provider
+        value={{
+          setStatus: setStatus,
+          state: {
+            status: "success",
+          },
+        }}
+      >
+        <AuthContext.Provider value={userValue}>{children}</AuthContext.Provider>
+      </AppContext.Provider>
     </>
   );
 };

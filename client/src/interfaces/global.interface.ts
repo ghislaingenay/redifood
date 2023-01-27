@@ -1,4 +1,4 @@
-type TStatusProps = "error" | "success";
+export type TStatusProps = "error" | "success";
 
 export interface IGetServerSideProps {
   props: {

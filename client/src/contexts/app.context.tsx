@@ -1,5 +1,6 @@
 import { createContext, useEffect, useState } from "react";
-import { NotificationRes } from "src/definitions/notification.class";
+import { NotificationRes } from "../../src/definitions/notification.class";
+import { TStatusProps } from "../interfaces/global.interface";
 
 // @ts-ignore
 const AppContext = createContext({} as IAppContext);
@@ -7,12 +8,12 @@ interface IAppContext {
   state: {
     status: "error" | "success";
   };
-  setStatus: React.Dispatch<React.SetStateAction<"error" | "success">>;
+  setStatus: (status: TStatusProps) => void;
 }
 export default AppContext;
 
 export const AppProvider = ({ children }) => {
-  const [status, setStatus] = useState<"error" | "success">("success");
+  const [status, setStatus] = useState<TStatusProps>("success");
 
   useEffect(() => {
     if (status === "error") {

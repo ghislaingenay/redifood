@@ -1,11 +1,11 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { rest } from "msw";
 import CreateOrder, { getServerSideProps } from "../../../pages/orders/create";
 import { convertApiDataToDbData } from "../../../src/functions/db.fn";
 import { createErrorProps, createSuccessProps, mockedFoodData } from "../../../test/mocks/mockFoodData";
 import { server } from "../../../test/mocks/server";
-
+import { render } from "../../index";
 describe("Create Order - Server Side Props", () => {
   it.skip("should return food data if API call is successful", async () => {
     const response = await getServerSideProps();
