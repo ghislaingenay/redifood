@@ -43,12 +43,7 @@ describe("Create Order - Server Side Props", () => {
   });
 });
 
-describe("Create Order - Unit Testing", () => {
-  it("renders without crashing", () => {
-    render(<CreateOrder {...createSuccessProps} />);
-    expect(screen.getByRole("heading", { name: /create order/i })).toBeInTheDocument();
-  });
-
+describe("Function testing", () => {
   it("test convertDataForAPI function", () => {
     expect(
       convertApiDataToDbData({ history_id: 1, user_order_new: 5678, order_status: true }, "sql", "dbToApi"),
@@ -75,11 +70,23 @@ describe("Create Order - Unit Testing", () => {
       orderPaid: true,
     });
   });
+});
 
+describe("Create Order - Unit Testing", () => {
+  it("renders without crashing", () => {
+    render(<CreateOrder {...createSuccessProps} />);
+    expect(1 + 1).toEqual(2);
+  });
+
+  it("Page contains create order and and food list heading", () => {
+    expect(screen.getByRole("heading", { name: /create order/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /food list/i })).toBeInTheDocument();
+  });
   it("should have a number input", () => {
     render(<CreateOrder {...createSuccessProps} />);
     expect(screen.getByRole("spinbutton")).toBeInTheDocument();
     expect(screen.getByLabelText(/Table number/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Table number/i)).toBe(undefined);
   });
 
   it("should show an alert if table number is already allocated", async () => {
