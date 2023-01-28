@@ -2,10 +2,10 @@ import { Col, Row, Typography } from "antd";
 import Head from "next/head";
 import { useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
-import OrderCard from "src/components/OrderCard";
-import { RediButton } from "src/components/RediButton";
-import { RediSelect } from "src/components/RediSelect";
-import AppContext from "src/contexts/app.context";
+import OrderCard from "../src/components/OrderCard";
+import { RediButton } from "../src/components/RediButton";
+import { RediSelect } from "../src/components/RediSelect";
+import AppContext from "../src/contexts/app.context";
 import { allDataOrders, getListUnpaidOrders } from "../test/mocks/mockOrdersData";
 
 export const getOptions = (array: string[]) => {

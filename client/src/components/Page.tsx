@@ -1,9 +1,9 @@
-import { MIDDLE_GREY_COLOR } from "@constants/colors.const";
-import { navRoutes } from "@constants/routes.const";
-import { ENavList } from "@interfaces/nav.interface";
-import { RedisMenu } from "@styles";
 import { Layout } from "antd";
 import { useRouter } from "next/router";
+import { MIDDLE_GREY_COLOR } from "../../src/constants/colors.const";
+import { navRoutes } from "../../src/constants/routes.const";
+import { ENavList } from "../../src/interfaces/nav.interface";
+import { RedisMenu } from "../../src/styles";
 
 const { Header } = Layout;
 const RediHeader = () => {

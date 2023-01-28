@@ -1,7 +1,7 @@
 import { DeleteOutlined, MinusSquareOutlined, PlusSquareOutlined } from "@ant-design/icons";
-import { IFood } from "@interfaces/food.interface";
+import { IFood } from "../../../src/interfaces/food.interface";
 import { Col, Row, Typography } from "antd";
-import { OrderCardStyled } from "src/styles/styledComponents/div.styled";
+import { OrderCardStyled } from "../../../src/styles/styledComponents/div.styled";
 import { RediButton } from "../RediButton";
 const { Title } = Typography;
 
