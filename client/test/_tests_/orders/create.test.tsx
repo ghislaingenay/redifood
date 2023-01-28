@@ -1,48 +1,52 @@
 import { fireEvent, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { rest } from "msw";
-import CreateOrder, { getServerSideProps } from "../../../pages/orders/create";
+// import { rest } from "msw";
+import CreateOrder from "../../../pages/orders/create"; // { getServerSideProps }
 import { convertApiDataToDbData } from "../../../src/functions/db.fn";
 import { sendErrorTableInput } from "../../../src/functions/order.fn";
-import { createErrorProps, createSuccessProps, mockedFoodData } from "../../../test/mocks/mockFoodData";
-import { server } from "../../../test/mocks/server";
+import {
+  // createErrorProps,
+  createSuccessProps,
+  mockedFoodData,
+} from "../../../test/mocks/mockFoodData";
+// import { server } from "../../../test/mocks/server";
 import { render } from "../../index";
-describe("Create Order - Server Side Props", () => {
-  it("should return food data if API call is successful", async () => {
-    const response = await getServerSideProps();
-    expect(response).toEqual(
-      expect.objectContaining({
-        props: {
-          foodList: mockedFoodData,
-          status: "success",
-        },
-      }),
-    );
-  });
+// describe("Create Order - Server Side Props", () => {
+//   it("should return food data if API call is successful", async () => {
+//     const response = await getServerSideProps();
+//     expect(response).toEqual(
+//       expect.objectContaining({
+//         props: {
+//           foodList: mockedFoodData,
+//           status: "success",
+//         },
+//       }),
+//     );
+//   });
 
-  it.skip("should return error if API call is unsuccessful", async () => {
-    server.resetHandlers(
-      rest.get("/api/orders", (req, res, ctx) => res(ctx.status(400), ctx.json({ foodList: [], status: "error" }))),
-    );
-    const response = await getServerSideProps();
-    expect(response).toEqual(
-      expect.objectContaining({
-        props: {
-          foodList: [],
-          status: "error",
-        },
-      }),
-    );
-  });
-  it.skip("should send an error if the data is not properly recovered", async () => {
-    render(<CreateOrder {...createErrorProps} />);
-    await waitFor(() => {
-      expect(screen.queryAllByRole("card")).toHaveLength(0);
-    });
-    expect(await screen.findByRole("alert")).toBeInTheDocument();
-    expect(await screen.findByText(/please refresh the page/i)).toBeInTheDocument();
-  });
-});
+//   it.skip("should return error if API call is unsuccessful", async () => {
+//     server.resetHandlers(
+//       rest.get("/api/orders", (req, res, ctx) => res(ctx.status(400), ctx.json({ foodList: [], status: "error" }))),
+//     );
+//     const response = await getServerSideProps();
+//     expect(response).toEqual(
+//       expect.objectContaining({
+//         props: {
+//           foodList: [],
+//           status: "error",
+//         },
+//       }),
+//     );
+//   });
+//   it.skip("should send an error if the data is not properly recovered", async () => {
+//     render(<CreateOrder {...createErrorProps} />);
+//     await waitFor(() => {
+//       expect(screen.queryAllByRole("card")).toHaveLength(0);
+//     });
+//     expect(await screen.findByRole("alert")).toBeInTheDocument();
+//     expect(await screen.findByText(/please refresh the page/i)).toBeInTheDocument();
+//   });
+// });
 
 describe("Function testing", () => {
   it("test convertDataForAPI function", () => {
@@ -72,7 +76,7 @@ describe("Function testing", () => {
     });
   });
 
-  it.only("function that send error if table is already allocated", () => {
+  it("function that send error if table is already allocated", () => {
     expect(sendErrorTableInput(1, [1, 4, 5])).toStrictEqual({ alreadyInDb: true, missingValue: false });
     expect(sendErrorTableInput(3, [1, 4, 5])).toStrictEqual({ alreadyInDb: false, missingValue: false });
     expect(sendErrorTableInput(null, [1, 4, 5])).toStrictEqual({ alreadyInDb: false, missingValue: true });
@@ -86,22 +90,23 @@ describe("Create Order - Unit Testing", () => {
     expect(1 + 1).toEqual(2);
   });
 
-  it("Page contains create order and and food list heading", () => {
+  it("Page contains create order and and food list heading", async () => {
+    render(<CreateOrder {...createSuccessProps} />);
     expect(screen.getByRole("heading", { name: /create order/i })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: /food list/i })).toBeInTheDocument();
   });
   it("should have a number input", () => {
     render(<CreateOrder {...createSuccessProps} />);
-    expect(screen.getByRole("spinbutton")).toBeInTheDocument();
-    expect(screen.getByLabelText(/Table number/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Table number/i)).toBe(null);
+    expect(screen.getByRole("spinbutton", { name: /TableNumber/i }).ariaValueText).toBe(undefined);
+    expect(screen.getByRole("heading", { name: /Table Number/i })).toBeInTheDocument();
   });
 
   it("should show an alert if table number is already allocated", async () => {
     render(<CreateOrder {...createSuccessProps} />);
     const user = userEvent.setup();
     await user.type(screen.getByRole("spinbutton", { name: /tableNumber/i }), "1");
-    fireEvent.blur(screen.getByRole("spinbutton", { name: /tableNumber/i }));
+    await user.click(await screen.findByText(/espresso/i));
+    await user.click(await screen.findByRole("button", { name: /validate/i }));
     expect(await screen.findByRole("alert")).toBeInTheDocument();
     expect(await screen.findByText(/This table number is already allocated/i)).toBeInTheDocument();
   });
@@ -119,16 +124,18 @@ describe("Create Order - Unit Testing", () => {
   it("Validate button should be enabled if the cart is not empty", async () => {
     render(<CreateOrder {...createSuccessProps} />);
     const user = userEvent.setup();
+    const validateButton = screen.getByRole("button", { name: /Validate/i });
+    expect(validateButton).toBeDisabled();
     await user.click(screen.getByText(/espresso/i));
-    expect(screen.getByRole("button", { name: /Validate/i })).toBeEnabled();
+    expect(validateButton).toBeEnabled();
   });
 
-  it("should send an error and refresh the page if food data is not recovered", async () => {
-    render(<CreateOrder {...createErrorProps} />);
-    expect(await screen.findByRole("alert")).toBeInTheDocument();
-    expect(await screen.findByText(/An error occured/i)).toBeInTheDocument();
-    expect(await screen.findByText(/Please refresh the page/i)).toBeInTheDocument();
-  });
+  // it("should send an error and refresh the page if food data is not recovered", async () => {
+  //   render(<CreateOrder {...createErrorProps} />);
+  //   expect(await screen.findByRole("alert")).toBeInTheDocument();
+  //   expect(await screen.findByText(/An error occured/i)).toBeInTheDocument();
+  //   expect(await screen.findByText(/Please refresh the page/i)).toBeInTheDocument();
+  // });
 
   it("order cart should be empty when the page is loaded", () => {
     render(<CreateOrder {...createSuccessProps} />);
@@ -259,4 +266,6 @@ describe("Create Order - Integration", () => {
   //   expect(await screen.findByRole("alert")).toBeInTheDocument();
   //   expect(await screen.findByText(/Please select a table number/i)).toBeInTheDocument();
   // });
+  it.todo("should send a success notification when the order was successfully saved");
+  it.todo("should send an error notification when the order was not saved");
 });

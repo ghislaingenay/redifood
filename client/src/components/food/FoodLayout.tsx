@@ -6,7 +6,9 @@ import FoodOrderCard from "../../../src/components/food/FoodOrderCard";
 import { RediButton } from "../../../src/components/RediButton";
 import { ERROR_COLOR, LIGHT_GREY_COLOR, LIGHT_PRIMARY_COLOR } from "../../../src/constants/colors.const";
 import { EFoodMode, IFood } from "../../../src/interfaces/food.interface";
+import { noErrorInTable } from "../../constants";
 import AppContext from "../../contexts/app.context";
+import { sendErrorTableInput } from "../../functions/order.fn";
 import { IErrorTableInput, TStatusProps } from "../../interfaces";
 
 const { Title } = Typography;
@@ -97,15 +99,11 @@ const FoodLayout = ({
   const handleSubmit = (foodOrder: IFood[]) => {
     switch (mode) {
       case EFoodMode.CREATE: {
-        if (!errorTable.alredyInDb && (tableNumberValue !== null || tableNumberValue !== 0)) {
-          setErrorTable((prevValue) => {
-            return { ...prevValue, missingValue: false };
-          });
+        const result = sendErrorTableInput(tableNumberValue, tableTaken);
+        if (result === noErrorInTable) {
           handleOrderCreate(foodOrder);
         } else {
-          setErrorTable((prevValue) => {
-            return { ...prevValue, missingValue: true };
-          });
+          setErrorTable(result);
         }
       }
       default: {
@@ -128,9 +126,7 @@ const FoodLayout = ({
       <Row gutter={[0, 40]} justify="space-between">
         <Col lg={15}>
           <Row>
-            <Title level={5} className="mt-0">
-              Food List
-            </Title>
+            <Title level={5}>Food List</Title>
           </Row>
           <ButtonLayout
             changeActiveButton={changeActiveButton}
@@ -187,7 +183,7 @@ const FoodLayout = ({
                 style={{ height: "50%", top: "0.5rem", marginLeft: "1rem" }}
                 placeholder="Select a table number"
               />
-              {errorTable.alredyInDb && <Alert type="error" message="This table number is already allocated" />}
+              {errorTable.alreadyInDb && <Alert type="error" message="This table number is already allocated" />}
               {errorTable.missingValue && <Alert type="error" message="Please select a table number" />}
             </Row>
             <Divider style={{ border: `0.125rem solid ${LIGHT_PRIMARY_COLOR}` }} />
