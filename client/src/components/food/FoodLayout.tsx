@@ -1,4 +1,4 @@
-import { Card, Col, Divider, InputNumber, Row, Typography } from "antd";
+import { Alert, Card, Col, Divider, InputNumber, Row, Typography } from "antd";
 import Image from "next/image";
 import { useContext, useEffect, useState } from "react";
 import ButtonLayout from "../../../src/components/food/ButtonLayout";
@@ -7,8 +7,7 @@ import { RediButton } from "../../../src/components/RediButton";
 import { ERROR_COLOR, LIGHT_GREY_COLOR, LIGHT_PRIMARY_COLOR } from "../../../src/constants/colors.const";
 import { EFoodMode, IFood } from "../../../src/interfaces/food.interface";
 import AppContext from "../../contexts/app.context";
-import { sendErrorIfTableTaken } from "../../functions/order.fn";
-import { TStatusProps } from "../../interfaces";
+import { IErrorTableInput, TStatusProps } from "../../interfaces";
 
 const { Title } = Typography;
 interface IFoodLayoutProps {
@@ -41,7 +40,7 @@ const FoodLayout = ({
   const [foodOrder, setFoodOrder] = useState([]);
 
   const [tableNumberValue, setTableNumberValue] = useState<null | number>(null);
-  const [errorTable, setErrorTable] = useState({ alredyInDb: false, missingValue: false });
+  const [errorTable, setErrorTable] = useState<IErrorTableInput>({ alreadyInDb: false, missingValue: false });
   const isDisabled = foodOrder.length === 0 ? true : false;
 
   const changeActiveButton = (sectionName: string) => {
@@ -114,18 +113,6 @@ const FoodLayout = ({
     }
   };
 
-  const handleOnBlur = () => {
-    if (sendErrorIfTableTaken(tableNumberValue, tableTaken)) {
-      setErrorTable((prevValue) => {
-        return { ...prevValue, alreadyInDb: true };
-      });
-    } else {
-      setErrorTable((prevValue) => {
-        return { ...prevValue, alreadyInDb: false };
-      });
-    }
-  };
-
   const loadData = async () => {
     setStatus(status);
     setFoodOrder(orderList);
@@ -185,18 +172,23 @@ const FoodLayout = ({
             <Row justify="center" align="middle">
               <Title level={5}>Table Number:</Title>
               <InputNumber
+                type="number"
                 value={tableNumberValue}
                 onChange={(e) => {
-                  setTableNumberValue(e);
+                  if (typeof e === "number") {
+                    setTableNumberValue(Number(e));
+                  } else {
+                    setTableNumberValue(null);
+                  }
                 }}
-                onBlur={handleOnBlur}
                 name="tableNumber"
                 min={0}
                 aria-label="tableNumber"
                 style={{ height: "50%", top: "0.5rem", marginLeft: "1rem" }}
                 placeholder="Select a table number"
               />
-              {errorTable.alredyInDb && <p>This table number is already allocated</p>}
+              {errorTable.alredyInDb && <Alert type="error" message="This table number is already allocated" />}
+              {errorTable.missingValue && <Alert type="error" message="Please select a table number" />}
             </Row>
             <Divider style={{ border: `0.125rem solid ${LIGHT_PRIMARY_COLOR}` }} />
             <Title level={5} className="text-center">
