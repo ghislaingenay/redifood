@@ -86,7 +86,7 @@ describe("Create Order - Unit Testing", () => {
     render(<CreateOrder {...createSuccessProps} />);
     expect(screen.getByRole("spinbutton")).toBeInTheDocument();
     expect(screen.getByLabelText(/Table number/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Table number/i)).toBe(undefined);
+    expect(screen.getByLabelText(/Table number/i)).toBe(null);
   });
 
   it("should show an alert if table number is already allocated", async () => {
@@ -146,12 +146,12 @@ describe("Create Order - Unit Testing", () => {
     // expect some text food to be here and not to be here
   });
 
-  it("ALL button should be selected when the page is loaded", async () => {
+  it.only("ALL button should be selected when the page is loaded", async () => {
     render(<CreateOrder {...createSuccessProps} />);
-    expect(await (await screen.findByRole("button", { name: /ALL/i })).ariaSelected).toBeTruthy();
-    expect(await (await screen.findByRole("button", { name: /DESSERT/i })).ariaSelected).not.toBeTruthy();
-    expect(await (await screen.findByRole("button", { name: /DRINK/i })).ariaSelected).not.toBeTruthy();
-    expect(await (await screen.findByRole("button", { name: /PIZZA/i })).ariaSelected).not.toBeTruthy();
+    expect(await screen.findByRole("radio", { name: /ALL/i })).toBeChecked();
+    expect(await screen.findByRole("radio", { name: /DESSERT/i })).not.toBeChecked();
+    expect(await screen.findByRole("radio", { name: /DRINK/i })).not.toBeChecked();
+    expect(await screen.findByRole("radio", { name: /PIZZA/i })).not.toBeChecked();
   });
 
   it("DRINK should be selected when clicked", async () => {

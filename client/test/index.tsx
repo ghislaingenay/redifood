@@ -1,8 +1,9 @@
 import { render as baseRender, RenderOptions, RenderResult } from "@testing-library/react";
-import { ComponentType, ReactElement, useContext } from "react";
+import { ComponentType, ReactElement, useState } from "react";
 import AppContext from "../src/contexts/app.context";
 
 import { AuthContext } from "../src/contexts/auth.context";
+import { TStatusProps } from "../src/interfaces";
 
 /**
  * Custom renderer example with @testing-library/react
@@ -19,14 +20,14 @@ export const AllTheProviders = ({ children }: { children: any }) => {
       email: "",
     },
   };
-  const { setStatus } = useContext(AppContext);
+  const [status, setStatus] = useState<TStatusProps>("success");
   return (
     <>
       <AppContext.Provider
         value={{
           setStatus: setStatus,
           state: {
-            status: "success",
+            status: status,
           },
         }}
       >
