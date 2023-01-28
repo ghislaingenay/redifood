@@ -6,7 +6,7 @@ import {
   PauseOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
-import { ENavList } from "@interfaces/nav.interface";
+import { ENavList } from "../../src/interfaces/nav.interface";
 
 const fontSizeIcons = { fontSize: "1rem" };
 export const navRoutes = [

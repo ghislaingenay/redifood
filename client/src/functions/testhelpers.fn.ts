@@ -1,5 +1,5 @@
-import { IFormAuthFields, ITestUserAuth } from "@interfaces/test.interface";
 import { screen } from "@testing-library/react";
+import { IFormAuthFields, ITestUserAuth } from "../../src/interfaces/test.interface";
 
 export const typeIntoFormAuth = async (
   user,
