@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import Auth from "src/components/Auth";
-import { clickButton, typeIntoFormAuth } from "src/functions/testhelpers.fn";
+import Auth from "../../../src/components/Auth";
+import { clickButton, typeIntoFormAuth } from "../../../src/functions/testhelpers.fn";
 jest.mock("next/navigation", () => require("next-router-mock"));
 jest.setTimeout(10000);
 

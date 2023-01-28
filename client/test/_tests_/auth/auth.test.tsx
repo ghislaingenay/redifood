@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import Auth from "src/components/Auth";
+import Auth from "../../../src/components/Auth";
 
 jest.mock("next/navigation", () => require("next-router-mock"));
 describe("Auth", () => {
