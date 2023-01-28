@@ -7,6 +7,7 @@ import { RediButton } from "../../../src/components/RediButton";
 import { ERROR_COLOR, LIGHT_GREY_COLOR, LIGHT_PRIMARY_COLOR } from "../../../src/constants/colors.const";
 import { EFoodMode, IFood } from "../../../src/interfaces/food.interface";
 import AppContext from "../../contexts/app.context";
+import { sendErrorIfTableTaken } from "../../functions/order.fn";
 import { TStatusProps } from "../../interfaces";
 
 const { Title } = Typography;
@@ -31,12 +32,16 @@ const FoodLayout = ({
   handleOrderCreate,
   status,
 }: IFoodLayoutProps) => {
+  const tableTaken = [1, 4, 5];
+
   const { setStatus } = useContext(AppContext);
 
   const [sortedFoods, setSortedFoods] = useState(foodList);
   const [selectedSection, setSelectedSection] = useState("all");
   const [foodOrder, setFoodOrder] = useState([]);
 
+  const [tableNumberValue, setTableNumberValue] = useState<null | number>(null);
+  const [errorTable, setErrorTable] = useState({ alredyInDb: false, missingValue: false });
   const isDisabled = foodOrder.length === 0 ? true : false;
 
   const changeActiveButton = (sectionName: string) => {
@@ -93,10 +98,31 @@ const FoodLayout = ({
   const handleSubmit = (foodOrder: IFood[]) => {
     switch (mode) {
       case EFoodMode.CREATE: {
-        handleOrderCreate(foodOrder);
+        if (!errorTable.alredyInDb && (tableNumberValue !== null || tableNumberValue !== 0)) {
+          setErrorTable((prevValue) => {
+            return { ...prevValue, missingValue: false };
+          });
+          handleOrderCreate(foodOrder);
+        } else {
+          setErrorTable((prevValue) => {
+            return { ...prevValue, missingValue: true };
+          });
+        }
       }
       default: {
       }
+    }
+  };
+
+  const handleOnBlur = () => {
+    if (sendErrorIfTableTaken(tableNumberValue, tableTaken)) {
+      setErrorTable((prevValue) => {
+        return { ...prevValue, alreadyInDb: true };
+      });
+    } else {
+      setErrorTable((prevValue) => {
+        return { ...prevValue, alreadyInDb: false };
+      });
     }
   };
 
@@ -159,12 +185,18 @@ const FoodLayout = ({
             <Row justify="center" align="middle">
               <Title level={5}>Table Number:</Title>
               <InputNumber
+                value={tableNumberValue}
+                onChange={(e) => {
+                  setTableNumberValue(e);
+                }}
+                onBlur={handleOnBlur}
                 name="tableNumber"
                 min={0}
                 aria-label="tableNumber"
                 style={{ height: "50%", top: "0.5rem", marginLeft: "1rem" }}
                 placeholder="Select a table number"
               />
+              {errorTable.alredyInDb && <p>This table number is already allocated</p>}
             </Row>
             <Divider style={{ border: `0.125rem solid ${LIGHT_PRIMARY_COLOR}` }} />
             <Title level={5} className="text-center">
