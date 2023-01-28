@@ -1,11 +1,11 @@
-import { RediContent, tokenProvider } from "@styles";
 import { ConfigProvider, Layout, Spin } from "antd";
 import { useEffect, useState } from "react";
 import { Else, If, Then } from "react-if";
-import Auth from "src/components/Auth";
-import { RediHeader } from "src/components/Page";
-import { AppProvider } from "src/contexts/app.context";
+import Auth from "../src/components/Auth";
+import { RediHeader } from "../src/components/Page";
+import { AppProvider } from "../src/contexts/app.context";
 import "../src/styles/globals.css";
+import { RediContent, tokenProvider } from "../src/styles/index";
 const { Footer } = Layout;
 // import buildClient from "./api/build-client";
 
