@@ -10,7 +10,9 @@ interface IFoodOrderCard {
   handleDeleteFood: (foodId: IFood["itemId"]) => void;
   handleQty: (foodId: IFood["itemId"], type: "add" | "remove") => void;
 }
+
 const FoodOrderCard = ({ food, handleDeleteFood, handleQty }: IFoodOrderCard) => {
+  const isDisabled = food.itemQuantity === 1 ? true : false;
   return (
     <OrderCardStyled key={food.itemId} role="card">
       <Row justify="space-between" gutter={10} style={{ marginBottom: "0.5rem" }}>
@@ -44,24 +46,22 @@ const FoodOrderCard = ({ food, handleDeleteFood, handleQty }: IFoodOrderCard) =>
         </Col>
         <Col lg={5} style={{ textAlign: "center" }}>
           <RediButton
-            name={`Add ${food.itemName}`}
             typeButton="display"
             size="large"
             shape="circle"
-            disabled={food.itemQuantity === 1 ? true : false}
-            title={<MinusSquareOutlined />}
+            disabled={isDisabled}
+            title={<MinusSquareOutlined aria-label={`remove ${food.itemName}`} />}
             onClick={() => handleQty(food.itemId, "remove")}
             haveIcon={false}
           />
         </Col>
         <Col lg={5} style={{ textAlign: "center" }}>
           <RediButton
-            name={`Remove ${food.itemName}`}
             typeButton="success"
             size="large"
             shape="circle"
             onClick={() => handleQty(food.itemId, "add")}
-            title={<PlusSquareOutlined />}
+            title={<PlusSquareOutlined aria-label={`add ${food.itemName}`} />}
             haveIcon={false}
           />
         </Col>

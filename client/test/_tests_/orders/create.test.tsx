@@ -84,7 +84,7 @@ describe("Function testing", () => {
   });
 });
 
-describe("Create Order - Unit Testing", () => {
+describe("Create Order - Food List", () => {
   it("renders without crashing", () => {
     render(<CreateOrder {...createSuccessProps} />);
     expect(1 + 1).toEqual(2);
@@ -239,16 +239,58 @@ describe("Create Order - Unit Testing", () => {
 
 describe("Create Order - Integration", () => {
   it("should add food to the cart when clicking on the food card", async () => {
-    // render(<CreateOrder {...createSuccessProps} />);
-    // const user = userEvent.setup();
-    // await user.click(screen.getByText(/espresso/i));
-    // expect(await screen.findAllByText(/espresso/i)).toHaveLength(2);
-    // await user.click(screen.getByRole("button", { name: /Validate/i }));
-    // expect(await screen.findByRole("alert")).toBeInTheDocument();
-    // expect(await screen.findByText(/Please select a table number/i)).toBeInTheDocument();
+    render(<CreateOrder {...createSuccessProps} />);
+    const user = userEvent.setup();
+    expect(await screen.findAllByText(/espresso/i)).toHaveLength(1);
+    await user.click(screen.getByText(/espresso/i));
+    expect(await screen.findAllByText(/espresso/i)).toHaveLength(2);
+    expect(await screen.findByText(1)).toBeInTheDocument();
   });
-  it.todo("should add one quantity to the food if already in the cart");
-  it.todo("should be able to add one food quantity inside the order when clicking on the food card");
+  it("should add one quantity to the food if already in the cart via food list", async () => {
+    render(<CreateOrder {...createSuccessProps} />);
+    const user = userEvent.setup();
+    const findProfiteroles = await screen.findByAltText(/Food profiteroles/i);
+    expect(screen.queryByText(/Total:/i)).toBe(null);
+    expect(await screen.findAllByAltText(/Food profiteroles/i)).toHaveLength(1);
+    await user.click(findProfiteroles);
+    expect(await screen.findByText(/Total: 3.75/i)).toBeInTheDocument();
+    await user.click(findProfiteroles);
+    expect(await screen.findByText(/Total: 7.50/i)).toBeInTheDocument();
+  });
+
+  it.only("should add one quantity to the food if already in the cart via order cart list", async () => {
+    render(<CreateOrder {...createSuccessProps} />);
+    const user = userEvent.setup();
+    const findProfiteroles = await screen.findByAltText(/Food profiteroles/i);
+    expect(await screen.findAllByAltText(/Food profiteroles/i)).toHaveLength(1);
+    await user.click(findProfiteroles);
+    expect(await screen.findByText(/Total: 3.75/i)).toBeInTheDocument();
+    await user.click(await screen.findByRole("img", { name: /add profiteroles/i }));
+    expect(await screen.findByText(/Total: 7.50/i)).toBeInTheDocument();
+  });
+
+  it.only("button remove button is deactivated when quantity is 1", async () => {
+    render(<CreateOrder {...createSuccessProps} />);
+    const user = userEvent.setup();
+    const findProfiteroles = await screen.findByAltText(/Food profiteroles/i);
+    expect(await screen.findAllByAltText(/Food profiteroles/i)).toHaveLength(1);
+    await user.click(findProfiteroles);
+    expect(await screen.findByText(/Total: 3.75/i)).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: /remove profiteroles/i })).toBeDisabled();
+  });
+
+  it.only("should the button remove should be activated when quantity is 2", async () => {
+    render(<CreateOrder {...createSuccessProps} />);
+    const user = userEvent.setup();
+    const findProfiteroles = await screen.findByAltText(/Food profiteroles/i);
+    expect(await screen.findAllByAltText(/Food profiteroles/i)).toHaveLength(1);
+    await user.click(findProfiteroles);
+    expect(await screen.findByRole("button", { name: /remove profiteroles/i })).toBeDisabled();
+    await user.click(findProfiteroles);
+    expect(await screen.findByText(/Total: 7.50/i)).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: /remove profiteroles/i })).toBeEnabled();
+  });
+
   it.todo("should be able to remove one food quantity inside the order when clicking on the food card");
   it.todo("should be able to delete one food inside the order when clicking on the food card");
   it.todo("should show confirm to user that the order has been created");
