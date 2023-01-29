@@ -1,5 +1,6 @@
-import { Alert, Card, Col, Divider, InputNumber, Row, Typography } from "antd";
+import { Alert, Card, Col, Divider, InputNumber, Modal, Row, Typography } from "antd";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import ButtonLayout from "../../../src/components/food/ButtonLayout";
 import FoodOrderCard from "../../../src/components/food/FoodOrderCard";
@@ -33,6 +34,7 @@ const FoodLayout = ({
   handleOrderCreate,
   status,
 }: IFoodLayoutProps) => {
+  const router = useRouter();
   const tableTaken = [1, 4, 5];
 
   const { setStatus } = useContext(AppContext);
@@ -44,6 +46,9 @@ const FoodLayout = ({
   const [tableNumberValue, setTableNumberValue] = useState<null | number>(null);
   const [errorTable, setErrorTable] = useState<IErrorTableInput>({ alreadyInDb: false, missingValue: false });
   const isDisabled = foodOrder.length === 0 ? true : false;
+
+  const [currentOrder, setCurrentOrder] = useState<IFood[]>([]);
+  const [cancelOrderModal, setCancelOrderModal] = useState(false);
 
   const changeActiveButton = (sectionName: string) => {
     console.log("section", sectionName);
@@ -67,7 +72,6 @@ const FoodLayout = ({
     } else {
       let newFood = foodList.find((food) => food.itemId === foodId);
       newFood.itemQuantity = 1;
-      console.log("newFood", newFood);
       const currentOrder: any = [...foodOrder];
       currentOrder.push(newFood);
       setFoodOrder(currentOrder);
@@ -111,9 +115,17 @@ const FoodLayout = ({
     }
   };
 
+  const handleCancel = (link: string) => {
+    if (foodOrder !== currentOrder) {
+      return setCancelOrderModal(true);
+    }
+    router.push(link);
+    return setCancelOrderModal(false);
+  };
+
   const loadData = async () => {
     setStatus(status);
-    setFoodOrder(orderList);
+    setCurrentOrder(orderList);
   };
   useEffect(() => {
     loadData();
@@ -206,7 +218,15 @@ const FoodLayout = ({
               haveIcon={false}
               onClick={() => handleSubmit(foodOrder)}
             />
+
+            <RediButton typeButton="error" shape="round" title={<b>Cancel</b>} haveIcon={true} onClick={handleCancel} />
           </Card>
+          <Modal
+            title="Are u sure you want to cancel?"
+            open={cancelOrderModal}
+            onOk={() => router.push("/")}
+            onCancel={() => setCancelOrderModal(!cancelOrderModal)}
+          />
         </Col>
       </Row>
     </>
