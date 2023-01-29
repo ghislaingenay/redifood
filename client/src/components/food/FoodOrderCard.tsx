@@ -1,6 +1,6 @@
 import { DeleteOutlined, MinusSquareOutlined, PlusSquareOutlined } from "@ant-design/icons";
-import { IFood } from "../../../src/interfaces/food.interface";
 import { Col, Row, Typography } from "antd";
+import { IFood } from "../../../src/interfaces/food.interface";
 import { OrderCardStyled } from "../../../src/styles/styledComponents/div.styled";
 import { RediButton } from "../RediButton";
 const { Title } = Typography;
@@ -28,7 +28,7 @@ const FoodOrderCard = ({ food, handleDeleteFood, handleQty }: IFoodOrderCard) =>
       <Row justify="space-between" align="middle">
         <Col lg={5} style={{ textAlign: "center" }}>
           <RediButton
-            name={`Delete-${food.itemName}`}
+            name={`Delete ${food.itemName}`}
             typeButton="error"
             shape="round"
             title={<DeleteOutlined />}
@@ -44,7 +44,7 @@ const FoodOrderCard = ({ food, handleDeleteFood, handleQty }: IFoodOrderCard) =>
         </Col>
         <Col lg={5} style={{ textAlign: "center" }}>
           <RediButton
-            name={`Minus-${food.itemName}`}
+            name={`Add ${food.itemName}`}
             typeButton="display"
             size="large"
             shape="circle"
@@ -56,7 +56,7 @@ const FoodOrderCard = ({ food, handleDeleteFood, handleQty }: IFoodOrderCard) =>
         </Col>
         <Col lg={5} style={{ textAlign: "center" }}>
           <RediButton
-            name={`Plus-${food.itemName}`}
+            name={`Remove ${food.itemName}`}
             typeButton="success"
             size="large"
             shape="circle"
