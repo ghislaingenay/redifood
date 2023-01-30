@@ -8,6 +8,12 @@ import "../src/styles/globals.css";
 import { RediContent, tokenProvider } from "../src/styles/index";
 const { Footer } = Layout;
 // import buildClient from "./api/build-client";
+import "@fortawesome/fontawesome-svg-core/styles.css";
+
+import { config } from "@fortawesome/fontawesome-svg-core";
+// Tell Font Awesome to skip adding the CSS automatically
+// since it's already imported above
+config.autoAddCss = false;
 
 const AppComponent = ({ Component, pageProps, currentUser, loading }) => {
   const [loadingSpin, setLoadingSpin] = useState<boolean>(loading || true);
@@ -21,34 +27,36 @@ const AppComponent = ({ Component, pageProps, currentUser, loading }) => {
   }
 
   return (
-    <AppProvider>
-      <ConfigProvider theme={{ token: tokenProvider, inherit: false }}>
-        <If condition={currentUser}>
-          <Then>
-            <Layout className="layout bg-amber-100 mb-0">
-              <RediHeader />
-              <RediContent>
-                <Component {...pageProps} />
-              </RediContent>
-              <Footer
-                style={{
-                  textAlign: "center",
-                  fontWeight: "bold",
-                  backgroundColor: "transparent",
-                  margin: "0 0 0.4rem 0",
-                  padding: "0",
-                }}
-              >
-                <em>Redifood ©{new Date().getFullYear()} Created by Ghislain Genay</em>
-              </Footer>
-            </Layout>
-          </Then>
-          <Else>
-            <Auth />
-          </Else>
-        </If>
-      </ConfigProvider>
-    </AppProvider>
+    <>
+      <AppProvider>
+        <ConfigProvider theme={{ token: tokenProvider, inherit: false }}>
+          <If condition={currentUser}>
+            <Then>
+              <Layout className="layout bg-amber-100 mb-0">
+                <RediHeader />
+                <RediContent>
+                  <Component {...pageProps} />
+                </RediContent>
+                <Footer
+                  style={{
+                    textAlign: "center",
+                    fontWeight: "bold",
+                    backgroundColor: "transparent",
+                    margin: "0 0 0.4rem 0",
+                    padding: "0",
+                  }}
+                >
+                  <em>Redifood ©{new Date().getFullYear()} Created by Ghislain Genay</em>
+                </Footer>
+              </Layout>
+            </Then>
+            <Else>
+              <Auth />
+            </Else>
+          </If>
+        </ConfigProvider>
+      </AppProvider>
+    </>
   );
 };
 
