@@ -33,7 +33,7 @@ const FoodOrderCard = ({ food, handleDeleteFood, handleQty }: IFoodOrderCard) =>
             name={`Delete ${food.itemName}`}
             typeButton="error"
             shape="round"
-            title={<DeleteOutlined />}
+            title={<DeleteOutlined aria-label={`delete ${food.itemName}`} />}
             size="large"
             haveIcon={false}
             onClick={() => handleDeleteFood(food.itemId)}
