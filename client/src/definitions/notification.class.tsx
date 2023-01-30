@@ -1,5 +1,5 @@
-import { INotificationParams, TNotificationApi, TPlacementNotification } from "@interfaces/class.interface";
 import { notification } from "antd";
+import { INotificationParams, TNotificationApi, TPlacementNotification } from "../interfaces/class.interface";
 
 export class NotificationRes {
   static onSuccess(data: INotificationParams) {
