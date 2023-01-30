@@ -11,6 +11,8 @@ import {
 } from "../../../test/mocks/mockFoodData";
 // import { server } from "../../../test/mocks/server";
 import { render } from "../../index";
+jest.mock("next/navigation", () => require("next-router-mock"));
+jest.setTimeout(10000);
 // describe("Create Order - Server Side Props", () => {
 //   it("should return food data if API call is successful", async () => {
 //     const response = await getServerSideProps();
@@ -238,6 +240,10 @@ describe("Create Order - Food List", () => {
 });
 
 describe("Create Order - Integration", () => {
+  it("should show a cancel button", async () => {
+    render(<CreateOrder {...createSuccessProps} />);
+    expect(await screen.findByRole("button", { name: /Cancel order/i })).toBeInTheDocument();
+  });
   it("should add food to the cart when clicking on the food card", async () => {
     render(<CreateOrder {...createSuccessProps} />);
     const user = userEvent.setup();
@@ -258,7 +264,7 @@ describe("Create Order - Integration", () => {
     expect(await screen.findByText(/Total: 7.50/i)).toBeInTheDocument();
   });
 
-  it.only("should add one quantity to the food if already in the cart via order cart list", async () => {
+  it("should add one quantity to the food if already in the cart via order cart list", async () => {
     render(<CreateOrder {...createSuccessProps} />);
     const user = userEvent.setup();
     const findProfiteroles = await screen.findByAltText(/Food profiteroles/i);
@@ -269,7 +275,7 @@ describe("Create Order - Integration", () => {
     expect(await screen.findByText(/Total: 7.50/i)).toBeInTheDocument();
   });
 
-  it.only("button remove button is deactivated when quantity is 1", async () => {
+  it("button remove button is deactivated when quantity is 1", async () => {
     render(<CreateOrder {...createSuccessProps} />);
     const user = userEvent.setup();
     const findProfiteroles = await screen.findByAltText(/Food profiteroles/i);
@@ -279,7 +285,7 @@ describe("Create Order - Integration", () => {
     expect(await screen.findByRole("button", { name: /remove profiteroles/i })).toBeDisabled();
   });
 
-  it.only("should the button remove should be activated when quantity is 2", async () => {
+  it("should the button remove should be activated when quantity is 2", async () => {
     render(<CreateOrder {...createSuccessProps} />);
     const user = userEvent.setup();
     const findProfiteroles = await screen.findByAltText(/Food profiteroles/i);
@@ -291,23 +297,107 @@ describe("Create Order - Integration", () => {
     expect(await screen.findByRole("button", { name: /remove profiteroles/i })).toBeEnabled();
   });
 
-  it.todo("should be able to remove one food quantity inside the order when clicking on the food card");
-  it.todo("should be able to delete one food inside the order when clicking on the food card");
-  it.todo("should show confirm to user that the order has been created");
-  it.todo("should show error to user if the order failed to be created");
-  it.todo("should show a cancel confirmation button to user if orer cart is empty");
-  it.todo("should be able to cancel the order when clicking on the cancel button if cart is empty");
-  it.todo("should show a cancel confirmation button to user if orer cart is not empty");
+  it("should be able to remove one food quantity inside the order when clicking on the food card", async () => {
+    render(<CreateOrder {...createSuccessProps} />);
+    const user = userEvent.setup();
+    await user.click(await screen.findByAltText(/Food profiteroles/i));
+    expect(await screen.findByText(/Total: 3.75/i)).toBeInTheDocument();
+    await user.click(await screen.findByAltText(/Food millefeuille/i));
+    expect(await screen.findByText(/Total: 8.00/i)).toBeInTheDocument();
+    await user.click(await screen.findByRole("button", { name: /delete profiteroles/i }));
+    expect(await screen.findByText(/Total: 4.25/i)).toBeInTheDocument();
+  });
+
+  it("should be able to cancel the order when clicking on the cancel button if cart is empty", async () => {
+    render(<CreateOrder {...createSuccessProps} />);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole("button", { name: /Cancel order/i }));
+    await waitFor(() => {
+      expect(screen.queryByText(/Are u sure you want to cancel?/i)).toBe(null);
+    });
+  });
+
+  it("should show a cancel confirmation button to user if orer cart is not empty", async () => {
+    render(<CreateOrder {...createSuccessProps} />);
+    const user = userEvent.setup();
+    expect(screen.queryByText(/Are u sure you want to cancel/i)).toBe(null);
+    await user.click(screen.getByText(/espresso/i));
+    await user.click(screen.getByRole("button", { name: /Cancel order/i }));
+    expect(await screen.findByText(/Are u sure you want to cancel/i)).toBeInTheDocument();
+  });
+
+  // This element will be tested in e2e testing
   it.todo("show ask to cancel order if order is not empty and user click outside the foodlayout");
-  // it("should show an alert if table number is not selected", async () => {
-  //   render(<CreateOrder {...createSuccessProps} />);
-  //   const user = userEvent.setup();
-  //   await user.click(screen.getByText(/espresso/i));
-  //   expect()
-  //   await user.click(screen.getByRole("button", { name: /Validate/i }));
-  //   expect(await screen.findByRole("alert")).toBeInTheDocument();
-  //   expect(await screen.findByText(/Please select a table number/i)).toBeInTheDocument();
-  // });
+  //
+
   it.todo("should send a success notification when the order was successfully saved");
   it.todo("should send an error notification when the order was not saved");
+});
+
+describe("Create Order - Integration Testing", () => {
+  it("User order multiple products and click on the cancel button", async () => {
+    render(<CreateOrder {...createSuccessProps} />);
+    const user = userEvent.setup();
+    await user.click(await screen.findByAltText(/food millefeuille/i));
+    expect(await screen.findByText(/Total: 4.25/i)).toBeInTheDocument();
+    fireEvent.click(screen.getByLabelText(/PIZZA/i));
+    expect(await screen.findAllByRole("card")).toHaveLength(3); // 2 pizza + & order card
+    await user.click(await screen.findByAltText(/food pizza cheesy/i));
+    await user.click(await screen.findByAltText(/food pizza cheesy/i));
+    expect(await screen.findByText(/Total: 32.23/i)).toBeInTheDocument();
+    fireEvent.click(screen.getByLabelText(/DRINK/i));
+    await user.click(await screen.findByAltText(/330 mL/i));
+    expect(await screen.findByText(/Total: 33.43/i)).toBeInTheDocument();
+    await user.click(await screen.findByRole("button", { name: /add Sprite can - 330 mL/i }));
+    await user.click(await screen.findByRole("button", { name: /add Sprite can - 330 mL/i }));
+    expect(await screen.findByText(/Total: 35.83/i)).toBeInTheDocument();
+    await user.click(await screen.findByRole("button", { name: /remove Sprite can - 330 mL/i }));
+    expect(await screen.findByText(/Total: 34.63/i)).toBeInTheDocument();
+    await user.click(await screen.findByRole("button", { name: /delete pizza cheesy/i }));
+    expect(await screen.findByText(/Total: 6.65/i)).toBeInTheDocument();
+    await user.type(screen.getByRole("spinbutton", { name: /tableNumber/i }), "2");
+    await user.click(screen.getByRole("button", { name: /Cancel order/i }));
+    expect(await screen.findByText(/Are u sure you want to cancel?/i));
+    expect(await screen.findByRole("button", { name: /OK/i })).toBeEnabled();
+  });
+
+  it("User order multiple products but remove all of them, can't validate order, so cancel it", async () => {
+    render(<CreateOrder {...createSuccessProps} />);
+    const user = userEvent.setup();
+    fireEvent.click(screen.getByLabelText(/DESSERT/i));
+    expect(await screen.findAllByRole("card")).toHaveLength(3);
+    await user.click(await screen.findByAltText(/food carrot cake/i));
+    expect(await screen.findByText(/Total: 5.20/i)).toBeInTheDocument();
+    await user.click(await screen.findByRole("button", { name: /add carrot cake/i }));
+    await user.click(await screen.findByRole("button", { name: /add carrot cake/i }));
+    await user.click(await screen.findByRole("button", { name: /add carrot cake/i }));
+    await user.click(await screen.findByRole("button", { name: /add carrot cake/i }));
+    expect(await screen.findByText(/Total: 26.00/i)).toBeInTheDocument();
+    fireEvent.click(screen.getByLabelText(/PIZZA/i));
+    await user.click(await screen.findByAltText(/pizza mediterranean/i));
+    await user.click(await screen.findByRole("button", { name: /add pizza mediterranean/i }));
+    await user.click(await screen.findByRole("button", { name: /add pizza mediterranean/i }));
+    expect(await screen.findByText(/Total: 63.50/i)).toBeInTheDocument();
+    await user.click(await screen.findByRole("button", { name: /remove pizza mediterranean/i }));
+    expect(await screen.findByText(/Total: 51.00/i)).toBeInTheDocument();
+    fireEvent.click(screen.getByLabelText(/DRINK/i));
+    await user.click(await screen.findByAltText(/espresso/i));
+    expect(await screen.findByText(/Total: 52.00/i)).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: /remove espresso/i })).toBeDisabled();
+    await user.click(await screen.findByRole("button", { name: /delete espresso/i }));
+    expect(await screen.findByText(/Total: 51.00/i)).toBeInTheDocument();
+    await user.click(await screen.findByRole("button", { name: /delete pizza mediterranean/i }));
+    expect(await screen.findByRole("button", { name: /Validate/i })).toBeEnabled();
+    await user.click(await screen.findByRole("button", { name: /delete carrot cake/i }));
+    expect(await screen.findByRole("button", { name: /Validate/i })).toBeDisabled();
+    await user.click(screen.getByRole("button", { name: /Cancel order/i }));
+    await waitFor(() => {
+      expect(screen.queryByText(/Are u sure you want to cancel?/i)).toBe(null);
+    });
+  });
+
+  // These two test will be the same the outcome will be different (show 2 differents notificqtions)
+  // Write the code directly
+  it.todo("User order multiple products and click on the validate button - succesfully saved");
+  it.todo("User order multiple products and click on the validate button - failed to save it");
 });
