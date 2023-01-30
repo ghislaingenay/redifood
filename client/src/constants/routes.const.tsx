@@ -1,19 +1,13 @@
-import {
-  AppleOutlined,
-  AreaChartOutlined,
-  HomeOutlined,
-  LogoutOutlined,
-  PauseOutlined,
-  SettingOutlined,
-} from "@ant-design/icons";
-import { ENavList } from "../../src/interfaces/nav.interface";
-
+import { AreaChartOutlined, HomeOutlined, LogoutOutlined, SettingOutlined } from "@ant-design/icons";
+import { faAddressCard, faHamburger } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 const fontSizeIcons = { fontSize: "1rem" };
 export const navRoutes = [
-  { key: ENavList.HOME, icon: <HomeOutlined style={fontSizeIcons} />, label: ENavList.HOME_LABEL },
-  { key: ENavList.FOOD, icon: <AppleOutlined style={fontSizeIcons} />, label: ENavList.FOOD_LABEL },
-  { key: ENavList.ANALYTICS, icon: <AreaChartOutlined style={fontSizeIcons} />, label: ENavList.ANALYTICS_LABEL },
-  { key: ENavList.SETTINGS, icon: <SettingOutlined style={fontSizeIcons} />, label: ENavList.SETTINGS_LABEL },
-  { key: ENavList.ABOUT_US, icon: <PauseOutlined style={fontSizeIcons} />, label: ENavList.ABOUT_US_LABEL },
-  { key: ENavList.SIGNOUT, icon: <LogoutOutlined style={fontSizeIcons} />, label: ENavList.SIGNOUT_LABEL },
+  // key === link
+  { key: "/", icon: <HomeOutlined style={fontSizeIcons} />, label: "HOME" },
+  { key: "/food", icon: <FontAwesomeIcon icon={faHamburger} style={fontSizeIcons} />, label: "FOOD" },
+  { key: "/history", icon: <AreaChartOutlined style={fontSizeIcons} />, label: "HISTORY" },
+  { key: "/settings", icon: <SettingOutlined style={fontSizeIcons} />, label: "SETTINGS" },
+  { key: "/about-us", icon: <FontAwesomeIcon icon={faAddressCard} style={fontSizeIcons} />, label: "ABOUT US" },
+  { key: "/signout", icon: <LogoutOutlined style={fontSizeIcons} />, label: "SIGNOUT" },
 ];
