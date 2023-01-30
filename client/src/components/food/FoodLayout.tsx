@@ -114,9 +114,21 @@ const FoodLayout = ({
       }
     }
   };
+  // function that check if two array are the same
 
+  const checkIfArrayAreTheSame = (array1: IFood[], array2: IFood[]) => {
+    if (array1.length !== array2.length) {
+      return false;
+    }
+    for (let i = 0; i < array1.length; i++) {
+      if (array1[i].itemId !== array2[i].itemId) {
+        return false;
+      }
+    }
+    return true;
+  };
   const handleCancel = (link: string) => {
-    if (foodOrder !== currentOrder) {
+    if (!checkIfArrayAreTheSame(foodOrder, currentOrder)) {
       return setCancelOrderModal(true);
     }
     router.push(link);
@@ -219,7 +231,13 @@ const FoodLayout = ({
               onClick={() => handleSubmit(foodOrder)}
             />
 
-            <RediButton typeButton="error" shape="round" title={<b>Cancel</b>} haveIcon={true} onClick={handleCancel} />
+            <RediButton
+              typeButton="error"
+              shape="round"
+              title={<b>Cancel order</b>}
+              haveIcon={true}
+              onClick={() => handleCancel("/")}
+            />
           </Card>
           <Modal
             title="Are u sure you want to cancel?"
