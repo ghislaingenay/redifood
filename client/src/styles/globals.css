@@ -30,3 +30,32 @@ a {
     background: black;
   }
 }
+
+.background-auth {
+  overflow: hidden;
+  background: url("/auth-img-bg.jpg");
+  background-size: 100% 120%;
+  object-fit: contain;
+  background-repeat: no-repeat;
+  width: 100vw;
+  height: 100vh;
+}
+
+.center-element-middle {
+  position: absolute;
+  top: 33%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.center-element-top33 {
+  position: absolute;
+  top: 33%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.center-element-bottom33 {
+  position: absolute;
+  top: 66%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}

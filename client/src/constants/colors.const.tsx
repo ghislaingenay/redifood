@@ -1,5 +1,6 @@
 export const GREEN_A = "#1A936F";
 export const GREEN_B = "#0A8754";
+export const GREY = "#aaaaaa";
 export const LIGHT_GREY = "#e8e6e6";
 export const ORANGE = "#ffad60";
 export const ORANGE_LIGHT = "#fad1a0";

@@ -1,10 +1,12 @@
+import { ORANGE_DARK } from "../constants";
+
 export const tokenProvider = {
   // SeedToken
   borderRadius: 6,
   colorBgBase: "#fff",
   colorError: "#ff4d4f",
   // colorPrimary: "#1890ff",
-  colorPrimary: "#ffad60",
+  colorPrimary: ORANGE_DARK,
   colorInfo: "#1677ff",
   colorSuccess: "#52c41a",
   colorWarning: "#faad14",
