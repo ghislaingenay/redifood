@@ -1,16 +1,16 @@
-import { IAuthContext } from "@interfaces/auth.interface";
 import axios from "axios";
+import { IAuthContext } from "../../src/interfaces/auth.interface";
 
 interface IAxiosRequest {
   authToken?: IAuthContext;
   body: any;
-  paramsInfo: any;
+  queryParams: any;
   method: "get" | "post" | "put" | "delete";
   url: string;
 }
 
 const returnAxiosCall = (data: IAxiosRequest) => {
-  const { authToken, body, paramsInfo, method, url } = data;
+  const { authToken, body, queryParams, method, url } = data;
   const userValue = authToken?.authorization;
 
   const headers = {
@@ -22,7 +22,7 @@ const returnAxiosCall = (data: IAxiosRequest) => {
       return axios.get(url, {
         withCredentials: true,
         headers,
-        params: { paramsInfo },
+        params: { queryParams },
       });
     case "post":
       return axios.post(url, body, {
