@@ -1,17 +1,21 @@
 import { Layout } from "antd";
 import { useRouter } from "next/router";
-import { MIDDLE_GREY_COLOR } from "../../src/constants/colors.const";
 import { navRoutes } from "../../src/constants/routes.const";
 import { RedisMenu } from "../../src/styles";
+import { LIGHT_GREY } from "../constants";
 
 const { Header } = Layout;
-const RediHeader = () => {
+
+interface IRediHeaderProps {
+  bgColor: string;
+}
+const RediHeader = ({ bgColor }: IRediHeaderProps) => {
   const router = useRouter();
   return (
-    <Header style={{ backgroundColor: MIDDLE_GREY_COLOR }}>
+    <Header style={{ backgroundColor: bgColor, padding: "0.1rem 5%", display: "flex" }}>
       <div className="logo" />
       <RedisMenu
-        style={{ backgroundColor: MIDDLE_GREY_COLOR }}
+        style={{ backgroundColor: bgColor, color: LIGHT_GREY }}
         mode="horizontal"
         onClick={(e) => {
           router.push(e.key);

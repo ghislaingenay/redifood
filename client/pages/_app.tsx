@@ -5,12 +5,13 @@ import Auth from "../src/components/Auth";
 import { RediHeader } from "../src/components/Page";
 import { AppProvider } from "../src/contexts/app.context";
 import "../src/styles/globals.css";
-import { RediContent, tokenProvider } from "../src/styles/index";
+import { tokenProvider } from "../src/styles/index";
 const { Footer } = Layout;
 // import buildClient from "./api/build-client";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 
 import { config } from "@fortawesome/fontawesome-svg-core";
+import { BACKGROUND_COLOR, ORANGE_LIGHT } from "../src/constants";
 // Tell Font Awesome to skip adding the CSS automatically
 // since it's already imported above
 config.autoAddCss = false;
@@ -32,11 +33,11 @@ const AppComponent = ({ Component, pageProps, currentUser, loading }) => {
         <ConfigProvider theme={{ token: tokenProvider, inherit: false }}>
           <If condition={currentUser}>
             <Then>
-              <Layout className="layout bg-amber-100 mb-0">
-                <RediHeader />
-                <RediContent>
-                  <Component {...pageProps} />
-                </RediContent>
+              <RediHeader bgColor={BACKGROUND_COLOR} />
+              <Layout className="layout" style={{ backgroundColor: ORANGE_LIGHT, padding: "1rem 2.5%" }}>
+                {/* <RediContent> */}
+                <Component {...pageProps} />
+                {/* </RediContent> */}
                 <Footer
                   style={{
                     textAlign: "center",
@@ -62,7 +63,8 @@ const AppComponent = ({ Component, pageProps, currentUser, loading }) => {
 
 AppComponent.getInitialProps = async (appContext) => {
   return {
-    currentUser: { username: "pit" },
+    currentUser: null,
+    // currentUser: { username: "pit" },
     loading: false,
   };
   // console.log("appContext", appContext.Component);
