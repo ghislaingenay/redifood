@@ -1,10 +1,13 @@
+import { faRegistered, faSign } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Radio, Typography } from "antd";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 // import { Else, If, Then } from "react-if";
 import { AxiosFunction } from "../../pages/api/axios-request";
 import { EAuthChoice } from "../../src/interfaces/auth.interface";
-import { AuthRadioButton } from "../styles/styledComponents/button.styled";
+import { RediRadioButton } from "../styles/styledComponents/button.styled";
+import { SpanBlock } from "../styles/styledComponents/typography.styled";
 const { Title } = Typography;
 const Auth = () => {
   // ------------ CONSTANTS ---------
@@ -77,20 +80,23 @@ const Auth = () => {
   return (
     <div className="background-auth">
       <Radio.Group
-        className="center-element-top33"
+        className="center-element-top25"
         onChange={handleAuthChoice}
         value={authChoice}
         disabled={isDisabled}
       >
-        <AuthRadioButton type="primary" value={EAuthChoice.SIGNIN}>
-          Sign In
-        </AuthRadioButton>
-        <Radio type="primary" style={{ visibility: "hidden" }}>
-          heyyy
-        </Radio>
-        <AuthRadioButton type="primary" value={EAuthChoice.REGISTER}>
-          Register
-        </AuthRadioButton>
+        <RediRadioButton value={EAuthChoice.SIGNIN}>
+          <SpanBlock>
+            <FontAwesomeIcon icon={faSign} />
+          </SpanBlock>
+          SIGN IN
+        </RediRadioButton>
+        <RediRadioButton style={{ visibility: "hidden" }}></RediRadioButton>
+        <RediRadioButton value={EAuthChoice.REGISTER}>
+          <SpanBlock>
+            <FontAwesomeIcon icon={faRegistered} /> REGISTER
+          </SpanBlock>
+        </RediRadioButton>
       </Radio.Group>
       {/* <If condition={authChoice === EAuthChoice.SIGNIN}>
         <Then>
