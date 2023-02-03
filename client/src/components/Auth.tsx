@@ -1,3 +1,5 @@
+import { faRegistered, faSign } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Typography } from "antd";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -72,14 +74,26 @@ const Auth = () => {
       });
   };
 
+  const options = [
+    { value: EAuthChoice.SIGNIN, label: "SIGN IN", icon: <FontAwesomeIcon icon={faSign} /> },
+    { value: EAuthChoice.REGISTER, label: "REGISTER", icon: <FontAwesomeIcon icon={faRegistered} /> },
+  ];
+  const [selectedOption, setSelectedOption] = useState(options[0].value);
+
   // ------------ RENDER ---------
-  const [select, setSelect] = useState("ptt");
+
   return (
     <div
       style={{ height: "100%", width: "100" }}
       //  className="background-auth"
     >
-      <RediRadioButton />
+      <RediRadioButton
+        options={options}
+        radioGroupName="auth"
+        haveIcon={true}
+        selectedButton={selectedOption}
+        setSelectedButton={setSelectedOption}
+      />
 
       {/* <Radio.Group
         className="center-element-top25"

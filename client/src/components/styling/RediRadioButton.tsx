@@ -1,34 +1,29 @@
-import { faRegistered, faSign } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Space } from "antd";
-import { useState } from "react";
+import { Dispatch, SetStateAction } from "react";
 import { BACKGROUND_COLOR, LIGHT_GREY, ORANGE_DARK, ORANGE_LIGHT } from "../../constants";
 import { hexToRgba } from "../../functions/global.fn";
+import { EAuthChoice } from "../../interfaces";
 import { RadioButton } from "../../styles";
 import { SpanBlockM02Y } from "../../styles/styledComponents/typography.styled";
 
-interface IRediRadioIcon extends IRediRadioNoIcon {
-  icon: JSX.Element;
-}
-
-interface IRediRadioNoIcon {
-  name: string;
+interface IRediRadio {
   value: string;
+  label: string;
+  icon?: JSX.Element;
 }
 
 interface IRediRadioButtonProps<T extends boolean, K = string> {
-  options: T extends true ? IRediRadioIcon[] : IRediRadioNoIcon[];
+  sizeSpace?: "small" | "middle" | "large" | number;
+  radioGroupName: string;
+  options: IRediRadio[];
   haveIcon: T;
-  selected: K;
-  defaultValue: K;
-  mainColor: K;
-  secondColor: K;
+  selectedButton: K;
+  setSelectedButton: Dispatch<SetStateAction<EAuthChoice>>;
 }
 
 const RediRadioButton = (props: IRediRadioButtonProps<boolean, string>) => {
-  const { options, haveIcon, defaultValue, mainColor, secondColor } = props;
-  // props: options, selected, defaultValue, main and second color, grey
-  const [selectedButton, setSelectedButton] = useState("SIGN IN");
+  const { options, haveIcon, selectedButton, setSelectedButton, radioGroupName, sizeSpace } = props;
+
   const isSelected = (radioValue: string) => {
     return selectedButton === radioValue;
   };
@@ -47,47 +42,26 @@ const RediRadioButton = (props: IRediRadioButtonProps<boolean, string>) => {
 
   return (
     <>
-      <Space size="small">
-        <RadioButton
-          style={{ ...colorStyle("SIGN IN") }}
-          role="radio"
-          aria-label="SIGN IN"
-          name="auth"
-          value="SIGN IN"
-          aria-checked={isSelected("SIGN IN")}
-          onClick={(e) => {
-            const target = e.target as HTMLButtonElement;
-            console.log("selcted button", selectedButton);
-            return setSelectedButton(() => target.value);
-          }}
-        >
-          {haveIcon && (
-            <SpanBlockM02Y>
-              <FontAwesomeIcon icon={faSign} />
-            </SpanBlockM02Y>
-          )}
-          SIGN IN
-        </RadioButton>
-        <RadioButton
-          style={{ ...colorStyle("REGISTER") }}
-          role="radio"
-          aria-label="REGISTER"
-          name="auth"
-          value="REGISTER"
-          aria-checked={isSelected("REGISTER")}
-          onClick={(e) => {
-            const target = e.target as HTMLButtonElement;
-            console.log("selcted button", selectedButton);
-            return setSelectedButton(() => target.value);
-          }}
-        >
-          {haveIcon && (
-            <SpanBlockM02Y>
-              <FontAwesomeIcon icon={faRegistered} />
-            </SpanBlockM02Y>
-          )}
-          REGISTER
-        </RadioButton>
+      <Space size={sizeSpace || "small"}>
+        {options.map(({ label, value, icon }: IRediRadio) => (
+          <>
+            <RadioButton
+              style={{ ...colorStyle(value) }}
+              role="radio"
+              aria-label={label}
+              name={radioGroupName}
+              value={value}
+              aria-checked={isSelected(value)}
+              onClick={(e) => {
+                const target = e.target as HTMLButtonElement;
+                return setSelectedButton((prevState: EAuthChoice) => target.value as EAuthChoice);
+              }}
+            >
+              {haveIcon && <SpanBlockM02Y>{icon}</SpanBlockM02Y>}
+              {label}
+            </RadioButton>
+          </>
+        ))}
       </Space>
     </>
   );
