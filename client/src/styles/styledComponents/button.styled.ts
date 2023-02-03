@@ -1,27 +1,17 @@
-import { Radio } from "antd";
 import styled from "styled-components";
-import { BACKGROUND_COLOR } from "../../constants";
-
-export const RediRadioButton = styled(Radio.Button)`
-  text-align: center;
-  justify-content: center;
-  align-items: center;
-  font-size: 1.5rem;
-  color: white;
-  box-shadow: none;
-  background-color: ${BACKGROUND_COLOR};
-  border-radius: 0.35rem;
-  width: 15vw;
-  font-weight: 500;
-  font-family: "Roboto", sans-serif;
-`;
-
+import { LIGHT_GREY } from "../../constants";
 // export const EditButton = styled(Button)`
 //   background-color: ${EDIT_COLOR};
 //   color: white;
-// `;
 
-// export const CreateButton = styled(Button)`
+// `;
+export const RadioButton = styled.button`
+  fontsize: 2rem;
+  border-radius: 0.5rem;
+  padding: 1rem 3rem;
+  margin: 0.5rem;
+  border: 0.02rem solid ${LIGHT_GREY};
+`;
 //   background-color: ${CREATE_COLOR};
 //   color: white;
 // `;

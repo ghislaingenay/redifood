@@ -1,13 +1,10 @@
-import { faRegistered, faSign } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Radio, Typography } from "antd";
+import { Typography } from "antd";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 // import { Else, If, Then } from "react-if";
 import { AxiosFunction } from "../../pages/api/axios-request";
 import { EAuthChoice } from "../../src/interfaces/auth.interface";
-import { RediRadioButton } from "../styles/styledComponents/button.styled";
-import { SpanBlock } from "../styles/styledComponents/typography.styled";
+import RediRadioButton from "./styling/RediRadioButton";
 const { Title } = Typography;
 const Auth = () => {
   // ------------ CONSTANTS ---------
@@ -76,10 +73,15 @@ const Auth = () => {
   };
 
   // ------------ RENDER ---------
-
+  const [select, setSelect] = useState("ptt");
   return (
-    <div className="background-auth">
-      <Radio.Group
+    <div
+      style={{ height: "100%", width: "100" }}
+      //  className="background-auth"
+    >
+      <RediRadioButton />
+
+      {/* <Radio.Group
         className="center-element-top25"
         onChange={handleAuthChoice}
         value={authChoice}
@@ -97,7 +99,7 @@ const Auth = () => {
             <FontAwesomeIcon icon={faRegistered} /> REGISTER
           </SpanBlock>
         </RediRadioButton>
-      </Radio.Group>
+      </Radio.Group> */}
       {/* <If condition={authChoice === EAuthChoice.SIGNIN}>
         <Then>
           <Divider />
@@ -265,11 +267,11 @@ const Auth = () => {
           </Form>
         </Else>
       </If> */}
-      {response && (
-        <Title level={5} className="text-center" style={{ color: textColor }}>
-          {response}
-        </Title>
-      )}
+      {/* // {response && ( */}
+      {/* //   <Title level={5} className="text-center" style={{ color: textColor }}>
+      //     {response}
+      //   </Title> */}
+      {/* // )} */}
     </div>
   );
 };
