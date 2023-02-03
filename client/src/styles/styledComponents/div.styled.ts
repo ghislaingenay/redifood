@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { GREY } from "../../../src/constants/colors.const";
+import { GREY, ORANGE_DARK, RED } from "../../../src/constants/colors.const";
 
 export const OrderCardStyled = styled.div`
   margin-bottom: 0.5rem;
@@ -8,3 +8,36 @@ export const OrderCardStyled = styled.div`
   border: 0.02rem solid ${GREY};
   box-shadow: 0 0 0.2rem rgba(0, 0, 0, 0.1);
 `;
+
+export const RediRadio = styled.input`
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+  color: white;
+  box-shadow: none;
+  border-radius: 0.35rem;
+  width: 15vw;
+  font-weight: 500;
+  font-family: "Roboto", sans-serif;
+  &:hover {
+    color: red;
+    background-color: ${RED};
+  }
+  &:active {
+    background-color: ${ORANGE_DARK};
+    border: none;
+    box-shadow: none;
+`;
+// export const RediRadio = styled.div`
+//   text-align: center;
+//   justify-content: center;
+//   align-items: center;
+//   font-size: 1.5rem;
+//   color: white;
+//   box-shadow: none;
+//   border-radius: 0.35rem;
+//   width: 15vw;
+//   font-weight: 500;
+//   font-family: "Roboto", sans-serif;
+// `;

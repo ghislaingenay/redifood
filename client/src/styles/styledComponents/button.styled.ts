@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import { LIGHT_GREY } from "../../constants";
 // export const EditButton = styled(Button)`
 //   background-color: ${EDIT_COLOR};
 //   color: white;
@@ -10,7 +9,8 @@ export const RadioButton = styled.button`
   border-radius: 0.5rem;
   padding: 1rem 3rem;
   margin: 0.5rem;
-  border: 0.02rem solid ${LIGHT_GREY};
+  &:hover {
+    box-shadow: none;
 `;
 //   background-color: ${CREATE_COLOR};
 //   color: white;
