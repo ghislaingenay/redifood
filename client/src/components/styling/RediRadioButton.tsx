@@ -3,32 +3,36 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Space } from "antd";
 import { useState } from "react";
 import { BACKGROUND_COLOR, LIGHT_GREY, ORANGE_DARK, ORANGE_LIGHT } from "../../constants";
+import { hexToRgba } from "../../functions/global.fn";
 import { RadioButton } from "../../styles";
 import { SpanBlockM02Y } from "../../styles/styledComponents/typography.styled";
 
-const RediRadioButton = () => {
+interface IRediRadioIcon extends IRediRadioNoIcon {
+  icon: JSX.Element;
+}
+
+interface IRediRadioNoIcon {
+  name: string;
+  value: string;
+}
+
+interface IRediRadioButtonProps<T extends boolean, K = string> {
+  options: T extends true ? IRediRadioIcon[] : IRediRadioNoIcon[];
+  haveIcon: T;
+  selected: K;
+  defaultValue: K;
+  mainColor: K;
+  secondColor: K;
+}
+
+const RediRadioButton = (props: IRediRadioButtonProps<boolean, string>) => {
+  const { options, haveIcon, defaultValue, mainColor, secondColor } = props;
   // props: options, selected, defaultValue, main and second color, grey
   const [selectedButton, setSelectedButton] = useState("SIGN IN");
-  const [hasIcon, setHasIcon] = useState(true);
-  const haveIcon = hasIcon;
   const isSelected = (radioValue: string) => {
     return selectedButton === radioValue;
   };
-  // function that convert hex to rgb
-  const hexToRgb = (hex: string) => {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result
-      ? {
-          r: parseInt(result[1], 16),
-          g: parseInt(result[2], 16),
-          b: parseInt(result[3], 16),
-        }
-      : null;
-  };
 
-  const rgbToRgba = (rgb: { r: number; g: number; b: number }, opacity: number) => {
-    return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${opacity})`;
-  };
   const colorStyle = (currentButton: string) => {
     return {
       backgroundColor: isSelected(currentButton) ? BACKGROUND_COLOR : LIGHT_GREY,
@@ -36,8 +40,8 @@ const RediRadioButton = () => {
       color: isSelected(currentButton) ? ORANGE_LIGHT : BACKGROUND_COLOR,
       border: isSelected(currentButton) ? `solid 1px ${ORANGE_DARK}` : "none",
       boxShadow: isSelected(currentButton)
-        ? `0px 0px 10px ${rgbToRgba(hexToRgb(ORANGE_LIGHT), 0.25)}`
-        : `inset 0 0 10px  ${rgbToRgba(hexToRgb(BACKGROUND_COLOR), 0.2)}`,
+        ? `0px 0px 10px ${hexToRgba(ORANGE_LIGHT, 0.25)}`
+        : `inset 0 0 10px  ${hexToRgba(BACKGROUND_COLOR, 0.2)}`,
     };
   };
 
