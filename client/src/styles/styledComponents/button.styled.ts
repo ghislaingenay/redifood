@@ -4,10 +4,10 @@ import styled from "styled-components";
 //   color: white;
 
 // `;
+// padding: 1rem 3rem; <= for RadioButton
+// fontsize: 2rem;
 export const RadioButton = styled.button`
-  fontsize: 2rem;
   border-radius: 0.5rem;
-  padding: 1rem 3rem;
   margin: 0.5rem;
   &:hover {
     box-shadow: none;

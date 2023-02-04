@@ -13,6 +13,7 @@ interface IRediRadio {
 }
 
 interface IRediRadioButtonProps<T extends boolean, K = string> {
+  radioSize: "small" | "middle" | "large";
   sizeSpace?: "small" | "middle" | "large" | number;
   radioGroupName: string;
   options: IRediRadio[];
@@ -22,14 +23,19 @@ interface IRediRadioButtonProps<T extends boolean, K = string> {
 }
 
 const RediRadioButton = (props: IRediRadioButtonProps<boolean, string>) => {
-  const { options, haveIcon, selectedButton, setSelectedButton, radioGroupName, sizeSpace } = props;
+  const { options, haveIcon, selectedButton, setSelectedButton, radioGroupName, sizeSpace, radioSize } = props;
 
   const isSelected = (radioValue: string) => {
     return selectedButton === radioValue;
   };
 
+  const fontStyling = radioSize === "small" ? "1rem" : radioSize === "middle" ? "2rem" : "3rem";
+  const paddingStyling = radioSize === "small" ? "0.5rem 1.5rem" : radioSize === "middle" ? "1rem 3rem" : "2rem 6rem";
+
   const colorStyle = (currentButton: string) => {
     return {
+      fontSize: fontStyling,
+      padding: paddingStyling,
       backgroundColor: isSelected(currentButton) ? BACKGROUND_COLOR : LIGHT_GREY,
       fontWeight: isSelected(currentButton) ? "bold" : "normal",
       color: isSelected(currentButton) ? ORANGE_LIGHT : BACKGROUND_COLOR,
