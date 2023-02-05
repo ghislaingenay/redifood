@@ -8,7 +8,7 @@ import styled from "styled-components";
 // font-size: 2rem;
 export const RadioButton = styled.button`
   padding: 1rem 3rem;
-  font-size: 2rem;
+  font-size: 1.5rem;
   border-radius: 0.5rem;
   margin: 0.5rem;
   &:hover {

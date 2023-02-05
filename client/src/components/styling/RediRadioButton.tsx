@@ -1,4 +1,4 @@
-import { Space } from "antd";
+import { ButtonProps, Space } from "antd";
 import { Dispatch, SetStateAction } from "react";
 import { BACKGROUND_COLOR, LIGHT_GREY, ORANGE_DARK, ORANGE_LIGHT } from "../../constants";
 import { hexToRgba } from "../../functions/global.fn";
@@ -9,20 +9,25 @@ import { SpanBlockM02Y } from "../../styles/styledComponents/typography.styled";
 interface IRediRadio {
   value: string;
   label: string;
-  icon?: JSX.Element;
 }
+interface IRediRadioWithIcon extends IRediRadio {
+  value: string;
+  label: string;
+  icon: JSX.Element;
+}
+type ThaveIcon = "yes" | "no";
 
-interface IRediRadioButtonProps<T extends boolean, K = string> {
+interface IRediRadioButtonProps<T extends ThaveIcon> extends ButtonProps {
   // radioSize: "small" | "middle" | "large";
   sizeSpace?: "small" | "middle" | "large" | number;
   radioGroupName: string;
-  options: IRediRadio[];
+  options: T extends "yes" ? IRediRadioWithIcon[] : IRediRadio[];
   haveIcon: T;
-  selectedButton: K;
+  selectedButton: string;
   setSelectedButton: Dispatch<SetStateAction<EAuthChoice>>;
 }
 
-const RediRadioButton = (props: IRediRadioButtonProps<boolean, string>) => {
+const RediRadioButton = (props: IRediRadioButtonProps<ThaveIcon>) => {
   const {
     options,
     haveIcon,
@@ -57,7 +62,7 @@ const RediRadioButton = (props: IRediRadioButtonProps<boolean, string>) => {
   return (
     <>
       <Space size={sizeSpace || "small"}>
-        {options.map(({ label, value, icon }: IRediRadio) => (
+        {options.map(({ label, value, icon }: any) => (
           <>
             <RadioButton
               style={{ ...colorStyle(value) }}

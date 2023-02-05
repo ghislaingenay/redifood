@@ -32,8 +32,8 @@ a {
 }
 
 .background-auth {
-  overflow: hidden;
-  background: url("/auth-img-bg.jpg");
+  /* overflow: hidden; */
+  background: url("/bg-image-auth.jpg");
   background-size: 100% 120%;
   object-fit: contain;
   background-repeat: no-repeat;

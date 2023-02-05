@@ -1,19 +1,23 @@
+import { EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
 import { faRegistered, faSign } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Typography } from "antd";
+import { Button, Divider, Form, Input, Typography } from "antd";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-// import { Else, If, Then } from "react-if";
+import { Else, If, Then } from "react-if";
 import { AxiosFunction } from "../../pages/api/axios-request";
+import whiteLogo from "../../public/redifood-logo-white.png";
 import { EAuthChoice } from "../../src/interfaces/auth.interface";
+import { RoundedInput } from "../styles/styledComponents/typography.styled";
+import { RowCenter } from "./styling/grid.styled";
 import RediRadioButton from "./styling/RediRadioButton";
 const { Title } = Typography;
 const Auth = () => {
   // ------------ CONSTANTS ---------
+  const [formLogin] = Form.useForm();
+  const [formSignUp] = Form.useForm();
   const router = useRouter();
-  // const [formLogin] = Form.useForm();
-  // const [formSignUp] = Form.useForm();
-  // const router = useRouter();
   // ------------ STATE ---------
   const [authChoice, setAuthChoice] = useState<EAuthChoice>(EAuthChoice.SIGNIN);
   const [buttonWasClicked, setButtonWasClicked] = useState<boolean>(false);
@@ -22,6 +26,8 @@ const Auth = () => {
 
   const [response, setResponse] = useState("");
   const [isError, setIsError] = useState(false);
+
+  const [passwordVisible, setPasswordVisible] = useState(false);
 
   const textColor = isError ? "red" : "green";
 
@@ -83,38 +89,20 @@ const Auth = () => {
   // ------------ RENDER ---------
 
   return (
-    <div
-      style={{ height: "100%", width: "100" }}
-      //  className="background-auth"
-    >
-      <RediRadioButton
-        options={options}
-        radioGroupName="auth"
-        haveIcon={true}
-        selectedButton={selectedOption}
-        setSelectedButton={setSelectedOption}
-      />
-
-      {/* <Radio.Group
-        className="center-element-top25"
-        onChange={handleAuthChoice}
-        value={authChoice}
-        disabled={isDisabled}
-      >
-        <RediRadioButton value={EAuthChoice.SIGNIN}>
-          <SpanBlock>
-            <FontAwesomeIcon icon={faSign} />
-          </SpanBlock>
-          SIGN IN
-        </RediRadioButton>
-        <RediRadioButton style={{ visibility: "hidden" }}></RediRadioButton>
-        <RediRadioButton value={EAuthChoice.REGISTER}>
-          <SpanBlock>
-            <FontAwesomeIcon icon={faRegistered} /> REGISTER
-          </SpanBlock>
-        </RediRadioButton>
-      </Radio.Group> */}
-      {/* <If condition={authChoice === EAuthChoice.SIGNIN}>
+    <div className="background-auth">
+      <RowCenter style={{ paddingTop: "3rem" }}>
+        <Image src={whiteLogo} alt="Redifood logo white" width={200} height={200} />
+      </RowCenter>
+      <RowCenter style={{ paddingTop: "2rem" }}>
+        <RediRadioButton
+          options={options}
+          radioGroupName="auth"
+          haveIcon="yes"
+          selectedButton={selectedOption}
+          setSelectedButton={setSelectedOption}
+        />
+      </RowCenter>
+      <If condition={authChoice === EAuthChoice.SIGNIN}>
         <Then>
           <Divider />
           <Title className="text-center py-2" level={4}>
@@ -141,7 +129,7 @@ const Auth = () => {
                 },
               ]}
             >
-              <Input type="text" />
+              <RoundedInput type="text" />
             </Form.Item>
             <Form.Item
               label="Password"
@@ -153,7 +141,11 @@ const Auth = () => {
                 },
               ]}
             >
-              <Input type="password" />
+              <Input.Password
+                style={{ borderRadius: "2rem" }}
+                placeholder="input password"
+                iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+              />
             </Form.Item>
             <Button onClick={() => formLogin.submit()}>Submit</Button>
           </Form>
@@ -280,12 +272,12 @@ const Auth = () => {
             <Button onClick={() => formSignUp.submit()}>Submit</Button>
           </Form>
         </Else>
-      </If> */}
-      {/* // {response && ( */}
-      {/* //   <Title level={5} className="text-center" style={{ color: textColor }}>
-      //     {response}
-      //   </Title> */}
-      {/* // )} */}
+      </If>
+      {response && (
+        <Title level={5} className="text-center" style={{ color: textColor }}>
+          {response}
+        </Title>
+      )}
     </div>
   );
 };
