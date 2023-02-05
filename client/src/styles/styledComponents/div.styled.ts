@@ -29,15 +29,13 @@ export const RediRadio = styled.input`
     border: none;
     box-shadow: none;
 `;
-// export const RediRadio = styled.div`
-//   text-align: center;
-//   justify-content: center;
-//   align-items: center;
-//   font-size: 1.5rem;
-//   color: white;
-//   box-shadow: none;
-//   border-radius: 0.35rem;
-//   width: 15vw;
-//   font-weight: 500;
-//   font-family: "Roboto", sans-serif;
-// `;
+
+export const SpacingDiv10X = styled.div`
+  padding: 0 10%;
+`;
+export const SpacingDiv25X = styled.div`
+  padding: 0 25%;
+`;
+export const SpacingDiv5X = styled.div`
+  padding: 0 5%;
+`;
