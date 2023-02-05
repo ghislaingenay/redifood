@@ -32,7 +32,7 @@ a {
 }
 
 .background-auth {
-  /* overflow: hidden; */
+  overflow: hidden;
   background: url("/bg-image-auth.jpg");
   background-size: 100% 120%;
   object-fit: contain;
