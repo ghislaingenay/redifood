@@ -9,7 +9,9 @@ import { Else, If, Then } from "react-if";
 import { AxiosFunction } from "../../pages/api/axios-request";
 import whiteLogo from "../../public/redifood-logo-white.png";
 import { EAuthChoice } from "../../src/interfaces/auth.interface";
-import { RoundedInput } from "../styles/styledComponents/typography.styled";
+import { SpacingDiv25X } from "../styles/styledComponents/div.styled";
+import { RedSpan } from "../styles/styledComponents/span.styled";
+import { LabelFormWhite, RoundedInput } from "../styles/styledComponents/typography.styled";
 import { RowCenter } from "./styling/grid.styled";
 import RediRadioButton from "./styling/RediRadioButton";
 const { Title } = Typography;
@@ -93,191 +95,208 @@ const Auth = () => {
       <RowCenter style={{ paddingTop: "3rem" }}>
         <Image src={whiteLogo} alt="Redifood logo white" width={200} height={200} />
       </RowCenter>
-      <RowCenter style={{ paddingTop: "2rem" }}>
-        <RediRadioButton
-          options={options}
-          radioGroupName="auth"
-          haveIcon="yes"
-          selectedButton={selectedOption}
-          setSelectedButton={setSelectedOption}
-        />
-      </RowCenter>
-      <If condition={authChoice === EAuthChoice.SIGNIN}>
-        <Then>
-          <Divider />
-          <Title className="text-center py-2" level={4}>
-            LOGIN
-          </Title>
-          <Divider />
-          <Form
-            form={formLogin}
-            layout="vertical"
-            onFinish={handleLogin}
-            style={{ backgroundColor: "transparent" }}
-            // onValuesChange={(e, all) => {
-            //   console.log(e);
-            //   console.log(all);
-            // }}
-          >
-            <Form.Item
-              label="Username"
-              name="username"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input your username!",
-                },
-              ]}
+      <SpacingDiv25X>
+        <RowCenter style={{ paddingTop: "2rem" }}>
+          <RediRadioButton
+            options={options}
+            radioGroupName="auth"
+            haveIcon="yes"
+            selectedButton={selectedOption}
+            setSelectedButton={setSelectedOption}
+          />
+        </RowCenter>
+        <Divider style={{ border: "1px solid white" }} />
+        <If condition={authChoice === EAuthChoice.SIGNIN}>
+          <Then>
+            <Divider />
+            <Form
+              form={formLogin}
+              layout="vertical"
+              onFinish={handleLogin}
+              style={{ backgroundColor: "transparent" }}
+              // onValuesChange={(e, all) => {
+              //   console.log(e);
+              //   console.log(all);
+              // }}
             >
-              <RoundedInput type="text" />
-            </Form.Item>
-            <Form.Item
-              label="Password"
-              name="password"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input your password!",
-                },
-              ]}
-            >
-              <Input.Password
-                style={{ borderRadius: "2rem" }}
-                placeholder="input password"
-                iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
-              />
-            </Form.Item>
-            <Button onClick={() => formLogin.submit()}>Submit</Button>
-          </Form>
-        </Then>
-        <Else>
-          <Divider />
-          <Title className="text-center" level={4}>
-            SIGN UP
-          </Title>
-          <Divider />
-          <Form
-            form={formSignUp}
-            layout="vertical"
-            onFinish={handleSignUp}
-            // onValuesChange={(e, all) => {
-            //   console.log(e);
-            //   console.log(all);
-            // }}
-          >
-            <Form.Item
-              label="Username"
-              name="username"
-              rules={[
-                { required: true, message: "Please input your username!" },
-                { min: 4, message: "username should contains between 4 to 12 characters" },
-                { max: 12, message: "username should contains between 4 to 12 characters" },
-                () => ({
-                  validator(_, value) {
-                    // regex only . _ - are allowed
-                    if (/^[a-zA-Z0-9._-]*$/.test(value)) {
-                      return Promise.resolve();
-                    }
-                    return Promise.reject(
-                      new Error("username can only contain letters, numbers, dot, hyphens and underscore"),
-                    );
+              <LabelFormWhite>
+                Email <RedSpan>*</RedSpan>
+              </LabelFormWhite>
+              <Form.Item
+                label="Username"
+                name="username"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input your email!",
                   },
-                }),
-              ]}
-            >
-              <Input type="text" />
-            </Form.Item>
-            <Form.Item
-              label="Password"
-              name="password"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input your password!",
-                },
-                () => ({
-                  validator(_, value) {
-                    if (/\d/.test(value)) {
-                      return Promise.resolve();
-                    } else {
-                      return Promise.reject(new Error("password must contain at least one number"));
-                    }
+                  {
+                    pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+                    message: "Please input a valid email address",
                   },
-                }),
-                () => ({
-                  validator(_, value) {
-                    if (value.length >= 8 && value.length <= 20) {
-                      return Promise.resolve();
-                    } else {
-                      return Promise.reject(new Error("password should contains between 8 to 20 characters"));
-                    }
+                ]}
+              >
+                <RoundedInput type="text" />
+              </Form.Item>
+              <Form.Item
+                label="Password"
+                name="password"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input your password!",
                   },
-                }),
-                () => ({
-                  validator(_, value) {
-                    if (/[a-z]/.test(value)) {
-                      return Promise.resolve();
-                    } else {
-                      return Promise.reject(new Error("password must contain at least one lowercase letter"));
-                    }
-                  },
-                }),
-                () => ({
-                  validator(_, value) {
-                    if (/[A-Z]/.test(value)) {
-                      return Promise.resolve();
-                    } else {
-                      return Promise.reject(new Error("password must contain at least one uppercase letter"));
-                    }
-                  },
-                }),
-                () => ({
-                  validator(_, value) {
-                    // regex special character
-                    if (/[!@#$%^()&*_]/.test(value)) {
-                      return Promise.resolve();
-                    } else {
+                  () => ({
+                    validator(_, value) {
+                      // regex only . _ - are allowed
+                      if (/^[a-zA-Z0-9._-]*$/.test(value)) {
+                        return Promise.resolve();
+                      }
                       return Promise.reject(
-                        new Error("password must contain at least one special character (!@#$%^&()*_)"),
+                        new Error("username can only contain letters, numbers, dot, hyphens and underscore"),
                       );
-                    }
-                  },
-                }),
-              ]}
+                    },
+                  }),
+                ]}
+              >
+                <Input.Password
+                  style={{ borderRadius: "2rem" }}
+                  placeholder="input password"
+                  iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+                />
+              </Form.Item>
+              <Button onClick={() => formLogin.submit()}>Submit</Button>
+            </Form>
+          </Then>
+          <Else>
+            <Divider />
+            <Title className="text-center" level={4}>
+              SIGN UP
+            </Title>
+            <Divider />
+            <Form
+              form={formSignUp}
+              layout="vertical"
+              onFinish={handleSignUp}
+              // onValuesChange={(e, all) => {
+              //   console.log(e);
+              //   console.log(all);
+              // }}
             >
-              <Input type="password" />
-            </Form.Item>
-
-            <Form.Item
-              label="Confirm Password"
-              name="confirmPassword"
-              rules={[
-                {
-                  required: true,
-                  message: "Please confirm your password!",
-                },
-                () => ({
-                  validator(_, value) {
-                    if (value === formSignUp.getFieldValue("password")) {
-                      return Promise.resolve();
-                    }
-                    return Promise.reject(new Error("passwords do not match"));
+              <Form.Item
+                label="Username"
+                name="username"
+                rules={[
+                  { required: true, message: "Please input your username!" },
+                  { min: 4, message: "username should contains between 4 to 12 characters" },
+                  { max: 12, message: "username should contains between 4 to 12 characters" },
+                  () => ({
+                    validator(_, value) {
+                      // regex only . _ - are allowed
+                      if (/^[a-zA-Z0-9._-]*$/.test(value)) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject(
+                        new Error("username can only contain letters, numbers, dot, hyphens and underscore"),
+                      );
+                    },
+                  }),
+                ]}
+              >
+                <Input type="text" />
+              </Form.Item>
+              <Form.Item
+                label="Password"
+                name="password"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input your password!",
                   },
-                }),
-              ]}
-            >
-              <Input type="password" />
-            </Form.Item>
+                  () => ({
+                    validator(_, value) {
+                      if (/\d/.test(value)) {
+                        return Promise.resolve();
+                      } else {
+                        return Promise.reject(new Error("password must contain at least one number"));
+                      }
+                    },
+                  }),
+                  () => ({
+                    validator(_, value) {
+                      if (value.length >= 8 && value.length <= 20) {
+                        return Promise.resolve();
+                      } else {
+                        return Promise.reject(new Error("password should contains between 8 to 20 characters"));
+                      }
+                    },
+                  }),
+                  () => ({
+                    validator(_, value) {
+                      if (/[a-z]/.test(value)) {
+                        return Promise.resolve();
+                      } else {
+                        return Promise.reject(new Error("password must contain at least one lowercase letter"));
+                      }
+                    },
+                  }),
+                  () => ({
+                    validator(_, value) {
+                      if (/[A-Z]/.test(value)) {
+                        return Promise.resolve();
+                      } else {
+                        return Promise.reject(new Error("password must contain at least one uppercase letter"));
+                      }
+                    },
+                  }),
+                  () => ({
+                    validator(_, value) {
+                      // regex special character
+                      if (/[!@#$%^()&*_]/.test(value)) {
+                        return Promise.resolve();
+                      } else {
+                        return Promise.reject(
+                          new Error("password must contain at least one special character (!@#$%^&()*_)"),
+                        );
+                      }
+                    },
+                  }),
+                ]}
+              >
+                <Input type="password" />
+              </Form.Item>
 
-            <Button onClick={() => formSignUp.submit()}>Submit</Button>
-          </Form>
-        </Else>
-      </If>
-      {response && (
-        <Title level={5} className="text-center" style={{ color: textColor }}>
-          {response}
-        </Title>
-      )}
+              <Form.Item
+                label="Confirm Password"
+                name="confirmPassword"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please confirm your password!",
+                  },
+                  () => ({
+                    validator(_, value) {
+                      if (value === formSignUp.getFieldValue("password")) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject(new Error("passwords do not match"));
+                    },
+                  }),
+                ]}
+              >
+                <Input type="password" />
+              </Form.Item>
+
+              <Button onClick={() => formSignUp.submit()}>Submit</Button>
+            </Form>
+          </Else>
+        </If>
+        {response && (
+          <Title level={5} className="text-center" style={{ color: textColor }}>
+            {response}
+          </Title>
+        )}
+      </SpacingDiv25X>
     </div>
   );
 };
