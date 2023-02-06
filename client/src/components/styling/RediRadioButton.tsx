@@ -26,10 +26,12 @@ interface IRediRadioButtonProps<T extends ThaveIcon> extends ButtonProps {
   haveIcon: T;
   selectedButton: string;
   setSelectedButton: Dispatch<SetStateAction<EAuthChoice>>;
+  disabled?: boolean;
 }
 
 const RediRadioButton = (props: IRediRadioButtonProps<ThaveIcon>) => {
   const {
+    disabled,
     options,
     haveIcon,
     selectedButton,
@@ -72,7 +74,7 @@ const RediRadioButton = (props: IRediRadioButtonProps<ThaveIcon>) => {
       color: isSelected(currentButton) ? ORANGE_LIGHT : BACKGROUND_COLOR,
       border: isSelected(currentButton) ? `solid 1px ${ORANGE_DARK}` : "none",
       boxShadow: isSelected(currentButton)
-        ? `0px 0px 5px 10px ${hexToRgba(ORANGE_LIGHT, 0.25)}`
+        ? `0px 0px 10px 2px ${hexToRgba(ORANGE_LIGHT, 0.25)}`
         : `inset 0 0 10px  ${hexToRgba(BACKGROUND_COLOR, 0.2)}`,
     };
   };
@@ -94,7 +96,7 @@ const RediRadioButton = (props: IRediRadioButtonProps<ThaveIcon>) => {
                   const target = e.target as HTMLButtonElement;
                   console.log("target.value", target.value);
                   // @ts-ignore
-                  return setSelectedButton((prevState: EAuthChoice) => target.value as EAuthChoice);
+                  if (!disabled) return setSelectedButton((prevState: EAuthChoice) => target.value as EAuthChoice);
                 }}
               >
                 {haveIcon && <SpanBlockM02Y>{icon}</SpanBlockM02Y>}

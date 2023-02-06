@@ -20,9 +20,6 @@ const Auth = () => {
   const [formSignUp] = Form.useForm();
   const router = useRouter();
   // ------------ STATE ---------
-  const [buttonWasClicked, setButtonWasClicked] = useState<boolean>(false);
-
-  const isDisabled = buttonWasClicked ? true : false;
 
   const [response, setResponse] = useState("");
   const [isError, setIsError] = useState(false);
@@ -34,6 +31,9 @@ const Auth = () => {
     { value: EAuthChoice.REGISTER, label: "REGISTER", icon: <FontAwesomeIcon icon={faRegistered} /> },
   ];
   const [selectedOption, setSelectedOption] = useState(options[0].value);
+
+  const [buttonWasClicked, setButtonWasClicked] = useState(true);
+  const isDisabled = buttonWasClicked ? true : false;
 
   // ------------ HANDLERS ---------
 
@@ -186,7 +186,9 @@ const Auth = () => {
               </Form.Item>
               <RowSpaceBetween>
                 <Col span={6}>
-                  <Button onClick={() => formLogin.submit()}>Submit</Button>
+                  <Button onClick={() => formLogin.submit()} loading={buttonWasClicked}>
+                    Submit
+                  </Button>
                 </Col>
                 <Col span={6}>
                   <Button type="link">Forgot password</Button>
@@ -249,7 +251,9 @@ const Auth = () => {
                   </Form.Item>
                 </Col>
               </RowSpaceBetween>
-              <Button onClick={() => formSignUp.submit()}>Submit</Button>
+              <Button onClick={() => formSignUp.submit()} loading={buttonWasClicked}>
+                Submit
+              </Button>
             </Form>
           </Else>
         </If>
