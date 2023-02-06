@@ -1,18 +1,16 @@
 import { EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
 import { faRegistered, faSign } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Button, Divider, Form, Input, Typography } from "antd";
+import { Button, Col, Divider, Form, Input, Typography } from "antd";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Else, If, Then } from "react-if";
-import { AxiosFunction } from "../../pages/api/axios-request";
 import whiteLogo from "../../public/redifood-logo-white.png";
 import { EAuthChoice } from "../../src/interfaces/auth.interface";
 import { SpacingDiv25X } from "../styles/styledComponents/div.styled";
 import { RedSpan } from "../styles/styledComponents/span.styled";
 import { LabelFormWhite, RoundedInput } from "../styles/styledComponents/typography.styled";
-import { RowCenter } from "./styling/grid.styled";
+import { RowCenter, RowSpaceBetween } from "./styling/grid.styled";
 import RediRadioButton from "./styling/RediRadioButton";
 const { Title } = Typography;
 const Auth = () => {
@@ -21,7 +19,6 @@ const Auth = () => {
   const [formSignUp] = Form.useForm();
   const router = useRouter();
   // ------------ STATE ---------
-  const [authChoice, setAuthChoice] = useState<EAuthChoice>(EAuthChoice.SIGNIN);
   const [buttonWasClicked, setButtonWasClicked] = useState<boolean>(false);
 
   const isDisabled = buttonWasClicked ? true : false;
@@ -29,64 +26,72 @@ const Auth = () => {
   const [response, setResponse] = useState("");
   const [isError, setIsError] = useState(false);
 
-  const [passwordVisible, setPasswordVisible] = useState(false);
-
   const textColor = isError ? "red" : "green";
-
-  // ------------ HANDLERS ---------
-  const handleAuthChoice = (e: any) => {
-    setAuthChoice(e.target.value);
-  };
-
-  const handleLogin = async (values: any) => {
-    setResponse(null);
-    setIsError(false);
-    await AxiosFunction({
-      queryParams: {},
-      url: "/api/auth/login",
-      method: "post",
-      body: values,
-    })
-      .then(() => {
-        setResponse("Successfully logged in");
-        setTimeout(() => {
-          router.push("/");
-        }, 2000);
-      })
-      .catch(() => {
-        setIsError(true);
-        return setResponse("Invalid credentials");
-        // console.log(err);
-      });
-  };
-
-  const handleSignUp = async (values: any) => {
-    setButtonWasClicked(true);
-    setResponse(null);
-    setIsError(false);
-    await AxiosFunction({
-      queryParams: {},
-      url: "/api/auth/signup",
-      method: "post",
-      body: values,
-    })
-      .then(() => {
-        setResponse("Account succesfully created");
-        setTimeout(() => {
-          router.push("/");
-        }, 2000);
-      })
-      .catch(() => {
-        setIsError(true);
-        return setResponse("Invalid credentials");
-      });
-  };
 
   const options = [
     { value: EAuthChoice.SIGNIN, label: "SIGN IN", icon: <FontAwesomeIcon icon={faSign} /> },
     { value: EAuthChoice.REGISTER, label: "REGISTER", icon: <FontAwesomeIcon icon={faRegistered} /> },
   ];
   const [selectedOption, setSelectedOption] = useState(options[0].value);
+
+  // ------------ HANDLERS ---------
+
+  const handleLogin = async (values: any) => {
+    console.log("clicked login", values);
+    // setResponse(null);
+    // setIsError(false);
+    // await AxiosFunction({
+    //   queryParams: {},
+    //   url: "/api/auth/login",
+    //   method: "post",
+    //   body: values,
+    // })
+    //   .then(() => {
+    //     setResponse("Successfully logged in");
+    //     setTimeout(() => {
+    //       router.push("/");
+    //     }, 2000);
+    //   })
+    //   .catch(() => {
+    //     setIsError(true);
+    //     return setResponse("Invalid credentials");
+    //     // console.log(err);
+    //   });
+  };
+
+  const handleSignUp = async (values: any) => {
+    console.log("clicked signup", values);
+    // setButtonWasClicked(true);
+    // setResponse(null);
+    // setIsError(false);
+    // await AxiosFunction({
+    //   queryParams: {},
+    //   url: "/api/auth/signup",
+    //   method: "post",
+    //   body: values,
+    // })
+    //   .then(() => {
+    //     setResponse("Account succesfully created");
+    //     setTimeout(() => {
+    //       router.push("/");
+    //     }, 2000);
+    //   })
+    //   .catch(() => {
+    //     setIsError(true);
+    //     return setResponse("Invalid credentials");
+    //   });
+  };
+  const handleData = async (values: any) => {
+    switch (selectedOption) {
+      case EAuthChoice.SIGNIN: {
+        return handleLogin(values);
+      }
+
+      case EAuthChoice.REGISTER: {
+        return handleSignUp(values);
+      }
+    }
+  };
 
   // ------------ RENDER ---------
 
@@ -106,107 +111,40 @@ const Auth = () => {
           />
         </RowCenter>
         <Divider style={{ border: "1px solid white" }} />
-        <If condition={authChoice === EAuthChoice.SIGNIN}>
-          <Then>
-            <Divider />
-            <Form
-              form={formLogin}
-              layout="vertical"
-              onFinish={handleLogin}
-              style={{ backgroundColor: "transparent" }}
-              // onValuesChange={(e, all) => {
-              //   console.log(e);
-              //   console.log(all);
-              // }}
-            >
+        <Form
+          form={selectedOption === EAuthChoice.SIGNIN ? formLogin : formSignUp}
+          layout="vertical"
+          onFinish={handleData}
+          style={{ backgroundColor: "transparent" }}
+          // onValuesChange={(e, all) => {
+          //   console.log(e);
+          //   console.log(all);
+          // }}
+        >
+          <LabelFormWhite>
+            Email <RedSpan>*</RedSpan>
+          </LabelFormWhite>
+          <Form.Item
+            name="email"
+            rules={[
+              {
+                required: true,
+                message: "Please input your email!",
+              },
+              {
+                pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+                message: "Please input a valid email address",
+              },
+            ]}
+          >
+            <RoundedInput type="text" />
+          </Form.Item>
+          <RowSpaceBetween>
+            <Col md={selectedOption === EAuthChoice.SIGNIN ? 24 : 11}>
               <LabelFormWhite>
-                Email <RedSpan>*</RedSpan>
+                Password <RedSpan>*</RedSpan>
               </LabelFormWhite>
               <Form.Item
-                label="Username"
-                name="username"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your email!",
-                  },
-                  {
-                    pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
-                    message: "Please input a valid email address",
-                  },
-                ]}
-              >
-                <RoundedInput type="text" />
-              </Form.Item>
-              <Form.Item
-                label="Password"
-                name="password"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your password!",
-                  },
-                  () => ({
-                    validator(_, value) {
-                      // regex only . _ - are allowed
-                      if (/^[a-zA-Z0-9._-]*$/.test(value)) {
-                        return Promise.resolve();
-                      }
-                      return Promise.reject(
-                        new Error("username can only contain letters, numbers, dot, hyphens and underscore"),
-                      );
-                    },
-                  }),
-                ]}
-              >
-                <Input.Password
-                  style={{ borderRadius: "2rem" }}
-                  placeholder="input password"
-                  iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
-                />
-              </Form.Item>
-              <Button onClick={() => formLogin.submit()}>Submit</Button>
-            </Form>
-          </Then>
-          <Else>
-            <Divider />
-            <Title className="text-center" level={4}>
-              SIGN UP
-            </Title>
-            <Divider />
-            <Form
-              form={formSignUp}
-              layout="vertical"
-              onFinish={handleSignUp}
-              // onValuesChange={(e, all) => {
-              //   console.log(e);
-              //   console.log(all);
-              // }}
-            >
-              <Form.Item
-                label="Username"
-                name="username"
-                rules={[
-                  { required: true, message: "Please input your username!" },
-                  { min: 4, message: "username should contains between 4 to 12 characters" },
-                  { max: 12, message: "username should contains between 4 to 12 characters" },
-                  () => ({
-                    validator(_, value) {
-                      // regex only . _ - are allowed
-                      if (/^[a-zA-Z0-9._-]*$/.test(value)) {
-                        return Promise.resolve();
-                      }
-                      return Promise.reject(
-                        new Error("username can only contain letters, numbers, dot, hyphens and underscore"),
-                      );
-                    },
-                  }),
-                ]}
-              >
-                <Input type="text" />
-              </Form.Item>
-              <Form.Item
-                label="Password"
                 name="password"
                 rules={[
                   {
@@ -263,34 +201,49 @@ const Auth = () => {
                   }),
                 ]}
               >
-                <Input type="password" />
+                <Input.Password
+                  style={{ borderRadius: "2rem" }}
+                  placeholder="input password"
+                  iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+                />
               </Form.Item>
+            </Col>
+            {selectedOption === EAuthChoice.REGISTER && (
+              <>
+                <Col md={11}>
+                  <LabelFormWhite>
+                    Confirm password <RedSpan>*</RedSpan>
+                  </LabelFormWhite>
+                  <Form.Item
+                    name="confirmPassword"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please confirm your password!",
+                      },
+                      () => ({
+                        validator(_, value) {
+                          if (value === formSignUp.getFieldValue("password")) {
+                            return Promise.resolve();
+                          }
+                          return Promise.reject(new Error("passwords do not match"));
+                        },
+                      }),
+                    ]}
+                  >
+                    <Input.Password
+                      style={{ borderRadius: "2rem" }}
+                      placeholder="input password"
+                      iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+                    />
+                  </Form.Item>
+                </Col>
+              </>
+            )}
+          </RowSpaceBetween>
+          <Button onClick={() => formLogin.submit()}>Submit</Button>
+        </Form>
 
-              <Form.Item
-                label="Confirm Password"
-                name="confirmPassword"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please confirm your password!",
-                  },
-                  () => ({
-                    validator(_, value) {
-                      if (value === formSignUp.getFieldValue("password")) {
-                        return Promise.resolve();
-                      }
-                      return Promise.reject(new Error("passwords do not match"));
-                    },
-                  }),
-                ]}
-              >
-                <Input type="password" />
-              </Form.Item>
-
-              <Button onClick={() => formSignUp.submit()}>Submit</Button>
-            </Form>
-          </Else>
-        </If>
         {response && (
           <Title level={5} className="text-center" style={{ color: textColor }}>
             {response}

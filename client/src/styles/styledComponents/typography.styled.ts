@@ -10,5 +10,5 @@ export const LabelFormWhite = styled.label`
   font-size: 1.25rem;
   font-weight: 500;
   padding-left: 1rem;
-  margin: 0.5rem 0;
+  margin: 1rem 0;
 `;
