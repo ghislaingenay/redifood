@@ -5,6 +5,7 @@ import { Button, Col, Divider, Form, Input, Typography } from "antd";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Else, If, Then } from "react-if";
 import whiteLogo from "../../public/redifood-logo-white.png";
 import { EAuthChoice } from "../../src/interfaces/auth.interface";
 import { SpacingDiv25X } from "../styles/styledComponents/div.styled";
@@ -81,17 +82,6 @@ const Auth = () => {
     //     return setResponse("Invalid credentials");
     //   });
   };
-  const handleData = async (values: any) => {
-    switch (selectedOption) {
-      case EAuthChoice.SIGNIN: {
-        return handleLogin(values);
-      }
-
-      case EAuthChoice.REGISTER: {
-        return handleSignUp(values);
-      }
-    }
-  };
 
   const passwordRules = [
     {
@@ -146,6 +136,17 @@ const Auth = () => {
     }),
   ];
 
+  const emailRules = [
+    {
+      required: true,
+      message: "Please input your email!",
+    },
+    {
+      pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+      message: "Please input a valid email address",
+    },
+  ];
+
   // ------------ RENDER ---------
 
   return (
@@ -164,36 +165,15 @@ const Auth = () => {
           />
         </RowCenter>
         <Divider style={{ border: "1px solid white" }} />
-        <Form
-          form={selectedOption === EAuthChoice.SIGNIN ? formLogin : formSignUp}
-          layout="vertical"
-          onFinish={handleData}
-          style={{ backgroundColor: "transparent" }}
-          // onValuesChange={(e, all) => {
-          //   console.log(e);
-          //   console.log(all);
-          // }}
-        >
-          <LabelFormWhite>
-            Email <RedSpan>*</RedSpan>
-          </LabelFormWhite>
-          <Form.Item
-            name="email"
-            rules={[
-              {
-                required: true,
-                message: "Please input your email!",
-              },
-              {
-                pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
-                message: "Please input a valid email address",
-              },
-            ]}
-          >
-            <RoundedInput type="text" />
-          </Form.Item>
-          <RowSpaceBetween>
-            <Col md={selectedOption === EAuthChoice.SIGNIN ? 24 : 11}>
+        <If condition={selectedOption === EAuthChoice.SIGNIN}>
+          <Then>
+            <Form form={formLogin} layout="vertical" onFinish={handleLogin} style={{ backgroundColor: "transparent" }}>
+              <LabelFormWhite>
+                Email <RedSpan>*</RedSpan>
+              </LabelFormWhite>
+              <Form.Item name="email" rules={emailRules}>
+                <RoundedInput type="text" />
+              </Form.Item>
               <LabelFormWhite>
                 Password <RedSpan>*</RedSpan>
               </LabelFormWhite>
@@ -204,9 +184,42 @@ const Auth = () => {
                   iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
                 />
               </Form.Item>
-            </Col>
-            {selectedOption === EAuthChoice.REGISTER && (
-              <>
+              <RowSpaceBetween>
+                <Col span={6}>
+                  <Button onClick={() => formLogin.submit()}>Submit</Button>
+                </Col>
+                <Col span={6}>
+                  <Button type="link">Forgot password</Button>
+                </Col>
+              </RowSpaceBetween>
+            </Form>
+          </Then>
+          <Else>
+            <Form
+              form={formSignUp}
+              layout="vertical"
+              onFinish={handleSignUp}
+              style={{ backgroundColor: "transparent" }}
+            >
+              <LabelFormWhite>
+                Email <RedSpan>*</RedSpan>
+              </LabelFormWhite>
+              <Form.Item name="email" rules={emailRules}>
+                <RoundedInput type="text" />
+              </Form.Item>
+              <RowSpaceBetween>
+                <Col md={11}>
+                  <LabelFormWhite>
+                    Password <RedSpan>*</RedSpan>
+                  </LabelFormWhite>
+                  <Form.Item name="password" rules={passwordRules}>
+                    <Input.Password
+                      style={{ borderRadius: "2rem" }}
+                      placeholder="input password"
+                      iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+                    />
+                  </Form.Item>
+                </Col>
                 <Col md={11}>
                   <LabelFormWhite>
                     Confirm password <RedSpan>*</RedSpan>
@@ -235,12 +248,11 @@ const Auth = () => {
                     />
                   </Form.Item>
                 </Col>
-              </>
-            )}
-          </RowSpaceBetween>
-          <Button onClick={() => formLogin.submit()}>Submit</Button>
-        </Form>
-
+              </RowSpaceBetween>
+              <Button onClick={() => formSignUp.submit()}>Submit</Button>
+            </Form>
+          </Else>
+        </If>
         {response && (
           <Title level={5} className="text-center" style={{ color: textColor }}>
             {response}
