@@ -93,6 +93,59 @@ const Auth = () => {
     }
   };
 
+  const passwordRules = [
+    {
+      required: true,
+      message: "Please input your password!",
+    },
+    () => ({
+      validator(_, value) {
+        if (/\d/.test(value)) {
+          return Promise.resolve();
+        } else {
+          return Promise.reject(new Error("password must contain at least one number"));
+        }
+      },
+    }),
+    () => ({
+      validator(_, value) {
+        if (value.length >= 8 && value.length <= 20) {
+          return Promise.resolve();
+        } else {
+          return Promise.reject(new Error("password should contains between 8 to 20 characters"));
+        }
+      },
+    }),
+    () => ({
+      validator(_, value) {
+        if (/[a-z]/.test(value)) {
+          return Promise.resolve();
+        } else {
+          return Promise.reject(new Error("password must contain at least one lowercase letter"));
+        }
+      },
+    }),
+    () => ({
+      validator(_, value) {
+        if (/[A-Z]/.test(value)) {
+          return Promise.resolve();
+        } else {
+          return Promise.reject(new Error("password must contain at least one uppercase letter"));
+        }
+      },
+    }),
+    () => ({
+      validator(_, value) {
+        // regex special character
+        if (/[!@#$%^()&*_]/.test(value)) {
+          return Promise.resolve();
+        } else {
+          return Promise.reject(new Error("password must contain at least one special character (!@#$%^&()*_)"));
+        }
+      },
+    }),
+  ];
+
   // ------------ RENDER ---------
 
   return (
@@ -144,63 +197,7 @@ const Auth = () => {
               <LabelFormWhite>
                 Password <RedSpan>*</RedSpan>
               </LabelFormWhite>
-              <Form.Item
-                name="password"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your password!",
-                  },
-                  () => ({
-                    validator(_, value) {
-                      if (/\d/.test(value)) {
-                        return Promise.resolve();
-                      } else {
-                        return Promise.reject(new Error("password must contain at least one number"));
-                      }
-                    },
-                  }),
-                  () => ({
-                    validator(_, value) {
-                      if (value.length >= 8 && value.length <= 20) {
-                        return Promise.resolve();
-                      } else {
-                        return Promise.reject(new Error("password should contains between 8 to 20 characters"));
-                      }
-                    },
-                  }),
-                  () => ({
-                    validator(_, value) {
-                      if (/[a-z]/.test(value)) {
-                        return Promise.resolve();
-                      } else {
-                        return Promise.reject(new Error("password must contain at least one lowercase letter"));
-                      }
-                    },
-                  }),
-                  () => ({
-                    validator(_, value) {
-                      if (/[A-Z]/.test(value)) {
-                        return Promise.resolve();
-                      } else {
-                        return Promise.reject(new Error("password must contain at least one uppercase letter"));
-                      }
-                    },
-                  }),
-                  () => ({
-                    validator(_, value) {
-                      // regex special character
-                      if (/[!@#$%^()&*_]/.test(value)) {
-                        return Promise.resolve();
-                      } else {
-                        return Promise.reject(
-                          new Error("password must contain at least one special character (!@#$%^&()*_)"),
-                        );
-                      }
-                    },
-                  }),
-                ]}
-              >
+              <Form.Item name="password" rules={passwordRules}>
                 <Input.Password
                   style={{ borderRadius: "2rem" }}
                   placeholder="input password"
