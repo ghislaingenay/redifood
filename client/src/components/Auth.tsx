@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Else, If, Then } from "react-if";
+import { toast } from "react-toastify";
 import whiteLogo from "../../public/redifood-logo-white.png";
 import { EAuthChoice } from "../../src/interfaces/auth.interface";
 import { SpacingDiv25X } from "../styles/styledComponents/div.styled";
@@ -32,13 +33,25 @@ const Auth = () => {
   ];
   const [selectedOption, setSelectedOption] = useState(options[0].value);
 
-  const [buttonWasClicked, setButtonWasClicked] = useState(true);
-  const isDisabled = buttonWasClicked ? true : false;
+  const [clicked, setClicked] = useState(false);
+  const isDisabled = clicked ? true : false;
 
+  const handleButtonClicked = () => {
+    setClicked(true);
+    setTimeout(() => {
+      setClicked(false);
+    }, 3000);
+  };
   // ------------ HANDLERS ---------
 
   const handleLogin = async (values: any) => {
     console.log("clicked login", values);
+    toast.success("Succesfully logged in !", {
+      position: toast.POSITION.BOTTOM_CENTER,
+    });
+    toast.error("Invalid  credentials !", {
+      position: toast.POSITION.BOTTOM_CENTER,
+    });
     // setResponse(null);
     // setIsError(false);
     // await AxiosFunction({
@@ -62,6 +75,12 @@ const Auth = () => {
 
   const handleSignUp = async (values: any) => {
     console.log("clicked signup", values);
+    toast.success("Succesfully signed up !", {
+      position: toast.POSITION.BOTTOM_CENTER,
+    });
+    toast.error("Invalid  credentials !", {
+      position: toast.POSITION.BOTTOM_CENTER,
+    });
     // setButtonWasClicked(true);
     // setResponse(null);
     // setIsError(false);
@@ -147,6 +166,10 @@ const Auth = () => {
     },
   ];
 
+  // 1 - add toast
+  // 2 - add loading
+  // 3 - user context (later)
+  // 4 - reddo jest testing for this component
   // ------------ RENDER ---------
 
   return (
@@ -186,7 +209,7 @@ const Auth = () => {
               </Form.Item>
               <RowSpaceBetween>
                 <Col span={6}>
-                  <Button onClick={() => formLogin.submit()} loading={buttonWasClicked}>
+                  <Button onClick={() => formLogin.submit()} loading={clicked}>
                     Submit
                   </Button>
                 </Col>
@@ -251,12 +274,13 @@ const Auth = () => {
                   </Form.Item>
                 </Col>
               </RowSpaceBetween>
-              <Button onClick={() => formSignUp.submit()} loading={buttonWasClicked}>
+              <Button onClick={() => formSignUp.submit()} loading={clicked}>
                 Submit
               </Button>
             </Form>
           </Else>
         </If>
+
         {response && (
           <Title level={5} className="text-center" style={{ color: textColor }}>
             {response}

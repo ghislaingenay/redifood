@@ -9,6 +9,8 @@ import { tokenProvider } from "../src/styles/index";
 const { Footer } = Layout;
 // import buildClient from "./api/build-client";
 import "@fortawesome/fontawesome-svg-core/styles.css";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import { config } from "@fortawesome/fontawesome-svg-core";
 import { BACKGROUND_COLOR, ORANGE_LIGHT } from "../src/constants";
@@ -55,6 +57,7 @@ const AppComponent = ({ Component, pageProps, currentUser, loading }) => {
               <Auth />
             </Else>
           </If>
+          <ToastContainer />
         </ConfigProvider>
       </AppProvider>
     </>
