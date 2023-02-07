@@ -42,6 +42,8 @@ const Auth = () => {
       setClicked(false);
     }, 3000);
   };
+
+  const formStyle = { marginTop: "0.25rem" };
   // ------------ HANDLERS ---------
 
   const handleLogin = async (values: any) => {
@@ -194,13 +196,13 @@ const Auth = () => {
               <LabelFormWhite>
                 Email <RedSpan>*</RedSpan>
               </LabelFormWhite>
-              <Form.Item name="email" rules={emailRules}>
+              <Form.Item name="email" rules={emailRules} style={formStyle}>
                 <RoundedInput type="text" />
               </Form.Item>
               <LabelFormWhite>
                 Password <RedSpan>*</RedSpan>
               </LabelFormWhite>
-              <Form.Item name="password" rules={passwordRules}>
+              <Form.Item name="password" rules={passwordRules} style={formStyle}>
                 <Input.Password
                   style={{ borderRadius: "2rem" }}
                   placeholder="input password"
@@ -229,7 +231,7 @@ const Auth = () => {
               <LabelFormWhite>
                 Email <RedSpan>*</RedSpan>
               </LabelFormWhite>
-              <Form.Item name="email" rules={emailRules}>
+              <Form.Item name="email" rules={emailRules} style={formStyle}>
                 <RoundedInput type="text" />
               </Form.Item>
               <RowSpaceBetween>
@@ -237,7 +239,7 @@ const Auth = () => {
                   <LabelFormWhite>
                     Password <RedSpan>*</RedSpan>
                   </LabelFormWhite>
-                  <Form.Item name="password" rules={passwordRules}>
+                  <Form.Item name="password" rules={passwordRules} style={formStyle}>
                     <Input.Password
                       style={{ borderRadius: "2rem" }}
                       placeholder="input password"
@@ -250,6 +252,7 @@ const Auth = () => {
                     Confirm password <RedSpan>*</RedSpan>
                   </LabelFormWhite>
                   <Form.Item
+                    style={formStyle}
                     name="confirmPassword"
                     rules={[
                       {
