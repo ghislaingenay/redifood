@@ -182,6 +182,7 @@ const Auth = () => {
       <SpacingDiv25X>
         <RowCenter style={{ paddingTop: "2rem" }}>
           <RediRadioButton
+            disabled={isDisabled}
             options={options}
             radioGroupName="auth"
             haveIcon="yes"
@@ -283,6 +284,7 @@ const Auth = () => {
             </Form>
           </Else>
         </If>
+        <Button type="primary">Test</Button>
 
         {response && (
           <Title level={5} className="text-center" style={{ color: textColor }}>
