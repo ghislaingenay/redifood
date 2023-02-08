@@ -16,20 +16,27 @@ interface IRediRadioWithIcon extends IRediRadio {
   label: string;
   icon: JSX.Element;
 }
-type ThaveIcon = "yes" | "no";
+export type TRadioIconType = keyof TIconDataMap;
 
-interface IRediRadioButtonProps<T extends ThaveIcon> extends ButtonProps {
+export type TIconDataMap = {
+  true: IRediRadioWithIcon[];
+  false: IRediRadio[];
+};
+
+export type Booleanish = "true" | "false";
+
+interface IRediRadioButtonProps<T extends Booleanish> extends ButtonProps {
   // radioSize: "small" | "middle" | "large";
   // widthButton: string | number;
   radioGroupName: string;
-  options: T extends "yes" ? IRediRadioWithIcon[] : IRediRadio[];
+  options: TIconDataMap[T];
   haveIcon: T;
   selectedButton: string;
   setSelectedButton: Dispatch<SetStateAction<EAuthChoice>>;
   disabled?: boolean;
 }
 
-const RediRadioButton = (props: IRediRadioButtonProps<ThaveIcon>) => {
+const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
   const {
     disabled,
     options,
@@ -39,7 +46,7 @@ const RediRadioButton = (props: IRediRadioButtonProps<ThaveIcon>) => {
     radioGroupName,
   }: // widthButton,
   // radioSize
-  IRediRadioButtonProps<ThaveIcon> = props;
+  IRediRadioButtonProps<Booleanish> = props;
 
   const isSelected = (radioValue: string) => {
     return selectedButton === radioValue;

@@ -185,7 +185,7 @@ const Auth = () => {
             disabled={isDisabled}
             options={options}
             radioGroupName="auth"
-            haveIcon="yes"
+            haveIcon="false"
             selectedButton={selectedOption}
             setSelectedButton={setSelectedOption}
           />
