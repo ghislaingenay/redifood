@@ -6,7 +6,7 @@ interface IRediButtonProps extends ButtonProps {
   buttonType: EButtonType;
 }
 
-const RediButton = ({ buttonType, children, ...props }: IRediButtonProps) => {
+export const RediButton = ({ buttonType, children, ...props }: IRediButtonProps) => {
   const handleButtonColor = (buttonColor: IRediButtonProps["buttonType"]) => {
     const basicStyling = { margin: "1rem 0" };
     switch (buttonColor) {
@@ -40,5 +40,3 @@ const RediButton = ({ buttonType, children, ...props }: IRediButtonProps) => {
     </Button>
   );
 };
-
-export default RediButton;

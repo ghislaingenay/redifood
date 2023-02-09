@@ -14,7 +14,7 @@ export const tokenProvider = {
   borderRadius: 6,
   colorBgBase: "#fff",
 
-  colorPrimary: hexToRgba(PrimaryColor, rcNormal),
+  colorPrimary: hexToRgba(GREY, rcNormal),
   colorPrimaryActive: hexToRgba(GREY, rcActive),
   colorPrimaryBg: hexToRgba(GREY, rcBg),
   colorPrimaryBgHover: hexToRgba(GREY, rcBg),
