@@ -3,28 +3,28 @@ import jwt from "jsonwebtoken";
 import { BadRequestError } from "../errors/bad-request.err";
 import { EMessageErrors, EStatusCodes } from "../interfaces/err.interface";
 import { validateRequest } from "../middlewares/validationrequestnode.mdwr";
-import { User } from "../models/users";
+import { User } from "../models/users.model";
 import { validationUsers } from "../services/auth.const";
 import { PasswordManager } from "../services/password-manager";
 
 const router = express.Router();
 
 router.post("/api/auth/signup", validationUsers, validateRequest, async (req: Request, res: Response) => {
-  const { username, password } = req.body;
+  const { email, password } = req.body;
 
-  const existingUser = await User.findOne({ username });
+  const existingUser = await User.findOne({ email });
   if (existingUser) {
     res.status(EStatusCodes.BAD_REQUEST).send({ errors: [{ message: EMessageErrors.ALREADY_USERNAME }] });
     throw new BadRequestError("Username already in use");
   }
-  const newUser = User.build({ username, password });
+  const newUser = User.build({ email, password });
   const createdUser = await newUser.save();
 
   // Generate JWT
   const userJwt: string = jwt.sign(
     {
       id: createdUser.id,
-      username: createdUser.username,
+      email: createdUser.email,
     },
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     process.env.JWT_TOKEN!,
@@ -34,8 +34,8 @@ router.post("/api/auth/signup", validationUsers, validateRequest, async (req: Re
 });
 
 router.post("/api/auth/login", validationUsers, validateRequest, async (req: Request, res: Response) => {
-  const { username, password } = req.body;
-  const existingUser = await User.findOne({ username });
+  const { email, password } = req.body;
+  const existingUser = await User.findOne({ email });
   if (!existingUser) {
     res.status(EStatusCodes.BAD_REQUEST).send({ errors: [{ message: EMessageErrors.INVALID_CREDENTIALS }] });
     throw new BadRequestError("Invalid credentials");
@@ -49,7 +49,7 @@ router.post("/api/auth/login", validationUsers, validateRequest, async (req: Req
   const userJwt: string = jwt.sign(
     {
       id: existingUser.id,
-      username: existingUser.username,
+      email: existingUser.email,
     },
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     process.env.JWT_TOKEN!,
