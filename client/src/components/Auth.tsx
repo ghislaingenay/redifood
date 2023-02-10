@@ -9,9 +9,11 @@ import { Else, If, Then } from "react-if";
 import { toast } from "react-toastify";
 import whiteLogo from "../../public/redifood-logo-white.png";
 import { EAuthChoice } from "../../src/interfaces/auth.interface";
+import { EButtonType } from "../interfaces";
 import { SpacingDiv25X } from "../styles/styledComponents/div.styled";
 import { RedSpan } from "../styles/styledComponents/span.styled";
 import { LabelFormWhite, RoundedInput } from "../styles/styledComponents/typography.styled";
+import { RediButton } from "./styling/Button.style";
 import { RowCenter, RowSpaceBetween } from "./styling/grid.styled";
 import RediRadioButton from "./styling/RediRadioButton";
 const { Title } = Typography;
@@ -22,7 +24,6 @@ const Auth = () => {
   const router = useRouter();
   // ------------ STATE ---------
 
-  const [response, setResponse] = useState("");
   const [isError, setIsError] = useState(false);
 
   const textColor = isError ? "red" : "green";
@@ -42,6 +43,13 @@ const Auth = () => {
       setClicked(false);
     }, 3000);
   };
+
+  const checkDigit = (value: string) => /\d/.test(value);
+  const checkLength = (value: string) => (value.length >= 8 && value.length <= 20 ? true : false);
+  const checkLower = (value: string) => /[a-z]/.test(value);
+  const checkUpper = (value: string) => /[A-Z]/.test(value);
+  const checkSpecials = (value: string) => /[!@#$%^()&*_]/.test(value);
+  const checkEmail = (value: string) => /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value);
 
   const formStyle = { marginTop: "0.25rem" };
   // ------------ HANDLERS ---------
@@ -111,47 +119,25 @@ const Auth = () => {
     },
     () => ({
       validator(_, value) {
-        if (/\d/.test(value)) {
+        if (checkLength(value) && checkSpecials(value)) {
           return Promise.resolve();
         } else {
-          return Promise.reject(new Error("password must contain at least one number"));
+          return Promise.reject(
+            new Error(
+              "password should contains between 8 to 20 characters and must contains at least one special character (!@#$%^&()*_)",
+            ),
+          );
         }
       },
     }),
     () => ({
       validator(_, value) {
-        if (value.length >= 8 && value.length <= 20) {
+        if (checkUpper(value) && checkLower(value) && checkDigit(value)) {
           return Promise.resolve();
         } else {
-          return Promise.reject(new Error("password should contains between 8 to 20 characters"));
-        }
-      },
-    }),
-    () => ({
-      validator(_, value) {
-        if (/[a-z]/.test(value)) {
-          return Promise.resolve();
-        } else {
-          return Promise.reject(new Error("password must contain at least one lowercase letter"));
-        }
-      },
-    }),
-    () => ({
-      validator(_, value) {
-        if (/[A-Z]/.test(value)) {
-          return Promise.resolve();
-        } else {
-          return Promise.reject(new Error("password must contain at least one uppercase letter"));
-        }
-      },
-    }),
-    () => ({
-      validator(_, value) {
-        // regex special character
-        if (/[!@#$%^()&*_]/.test(value)) {
-          return Promise.resolve();
-        } else {
-          return Promise.reject(new Error("password must contain at least one special character (!@#$%^&()*_)"));
+          return Promise.reject(
+            new Error("password must contain at least one digit, one lowercase and uppercase letter"),
+          );
         }
       },
     }),
@@ -168,8 +154,6 @@ const Auth = () => {
     },
   ];
 
-  // 1 - add toast
-  // 2 - add loading
   // 3 - user context (later)
   // 4 - reddo jest testing for this component
   // ------------ RENDER ---------
@@ -212,9 +196,9 @@ const Auth = () => {
               </Form.Item>
               <RowSpaceBetween>
                 <Col span={6}>
-                  <Button onClick={() => formLogin.submit()} loading={clicked}>
+                  <RediButton buttonType={EButtonType.SUCCESS} onClick={() => formLogin.submit()} loading={clicked}>
                     Submit
-                  </Button>
+                  </RediButton>
                 </Col>
                 <Col span={6}>
                   <Button type="link">Forgot password</Button>
@@ -278,19 +262,12 @@ const Auth = () => {
                   </Form.Item>
                 </Col>
               </RowSpaceBetween>
-              <Button onClick={() => formSignUp.submit()} loading={clicked}>
+              <RediButton buttonType={EButtonType.SUCCESS} onClick={() => formSignUp.submit()} loading={clicked}>
                 Submit
-              </Button>
+              </RediButton>
             </Form>
           </Else>
         </If>
-        <Button type="primary">Test</Button>
-
-        {response && (
-          <Title level={5} className="text-center" style={{ color: textColor }}>
-            {response}
-          </Title>
-        )}
       </SpacingDiv25X>
     </div>
   );
