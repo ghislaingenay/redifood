@@ -3,16 +3,16 @@ import { IFormAuthFields, ITestUserAuth } from "../../src/interfaces/test.interf
 
 export const typeIntoFormAuth = async (
   user,
-  { username, password, confirmPassword }: IFormAuthFields,
+  { email, password, confirmPassword }: IFormAuthFields,
 ): Promise<ITestUserAuth> => {
-  let userKeys = ["usernameElement", "passwordElement", "confirmPasswordElement"];
+  let userKeys = ["emailElement", "passwordElement", "confirmPasswordElement"];
   let finalData = {};
-  if (username) {
-    const usernameInput = screen.getByRole("textbox", {
-      name: /username/i,
+  if (email) {
+    const emailInput = screen.getByRole("textbox", {
+      name: /email/i,
     });
-    await user.type(usernameInput, username);
-    Object.assign(finalData, { usernameElement: usernameInput });
+    await user.type(emailInput, email);
+    Object.assign(finalData, { emailElement: emailInput });
   }
   if (password) {
     const passwordInput: HTMLElement = screen.getByLabelText("Password");

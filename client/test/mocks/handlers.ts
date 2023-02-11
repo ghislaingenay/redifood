@@ -1,23 +1,24 @@
 import { rest } from "msw";
+import { emailValid, passwordValid } from "../_tests_/auth/login.test";
 import { mockedFoodData } from "./mockFoodData";
 import { allDataOrders, getListUnpaidOrders } from "./mockOrdersData";
 
 export const handlers = [
   rest.post("/api/auth/login", async (req, res, ctx) => {
-    const { username, password }: { username: string; password: string } = await req.json();
-    if (username === "test" && password === "pit") {
-      return res(ctx.status(200), ctx.json({ currentUser: { username } }));
+    const { email, password }: { email: string; password: string } = await req.json();
+    if (email === emailValid && password === passwordValid) {
+      return res(ctx.status(200), ctx.json({ currentUser: { email } }));
     } else {
       return res(ctx.status(400), ctx.json({ errors: [{ message: "Invalid credentials" }] }));
     }
   }),
 
   rest.post("/api/auth/signup", async (req, res, ctx) => {
-    const { username }: { username: string; password: string } = await req.json();
-    if (username === "test") {
+    const { email }: { email: string; password: string } = await req.json();
+    if (email === emailValid) {
       return res(ctx.status(400), ctx.json({ errors: [{ message: "Invalid credentials" }] }));
     } else {
-      return res(ctx.status(201), ctx.json({ currentUser: { username } }));
+      return res(ctx.status(201), ctx.json({ currentUser: { email } }));
     }
   }),
 
