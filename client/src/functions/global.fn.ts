@@ -17,3 +17,10 @@ const rgbToRgba = (rgb: { r: number; g: number; b: number }, opacity: number) =>
 export const hexToRgba = (hex: string, opacity: number) => {
   return rgbToRgba(hexToRgb(hex), opacity);
 };
+
+export const checkDigit = (value: string) => /\d/.test(value);
+export const checkLength = (value: string) => (value.length >= 8 && value.length <= 20 ? true : false);
+export const checkLower = (value: string) => /[a-z]/.test(value);
+export const checkUpper = (value: string) => /[A-Z]/.test(value);
+export const checkSpecials = (value: string) => /[!@#$%^()&*_]/.test(value);
+export const checkEmail = (value: string) => /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value);

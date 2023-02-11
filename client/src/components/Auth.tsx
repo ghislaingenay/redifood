@@ -9,6 +9,7 @@ import { Else, If, Then } from "react-if";
 import { toast } from "react-toastify";
 import whiteLogo from "../../public/redifood-logo-white.png";
 import { EAuthChoice } from "../../src/interfaces/auth.interface";
+import { checkDigit, checkLength, checkLower, checkSpecials, checkUpper } from "../functions/global.fn";
 import { EButtonType } from "../interfaces";
 import { SpacingDiv25X } from "../styles/styledComponents/div.styled";
 import { RedSpan } from "../styles/styledComponents/span.styled";
@@ -16,17 +17,13 @@ import { LabelFormWhite, RoundedInput } from "../styles/styledComponents/typogra
 import { RediButton } from "./styling/Button.style";
 import { RowCenter, RowSpaceBetween } from "./styling/grid.styled";
 import RediRadioButton from "./styling/RediRadioButton";
-const { Title } = Typography;
+
 const Auth = () => {
   // ------------ CONSTANTS ---------
   const [formLogin] = Form.useForm();
   const [formSignUp] = Form.useForm();
   const router = useRouter();
   // ------------ STATE ---------
-
-  const [isError, setIsError] = useState(false);
-
-  const textColor = isError ? "red" : "green";
 
   const options = [
     { value: EAuthChoice.SIGNIN, label: "SIGN IN", icon: <FontAwesomeIcon icon={faSign} /> },
@@ -36,13 +33,6 @@ const Auth = () => {
 
   const [clicked, setClicked] = useState(false);
   const isDisabled = clicked ? true : false;
-
-  const checkDigit = (value: string) => /\d/.test(value);
-  const checkLength = (value: string) => (value.length >= 8 && value.length <= 20 ? true : false);
-  const checkLower = (value: string) => /[a-z]/.test(value);
-  const checkUpper = (value: string) => /[A-Z]/.test(value);
-  const checkSpecials = (value: string) => /[!@#$%^()&*_]/.test(value);
-  const checkEmail = (value: string) => /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value);
 
   const formStyle = { marginTop: "0.25rem" };
   // ------------ HANDLERS ---------
