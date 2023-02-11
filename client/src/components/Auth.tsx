@@ -37,13 +37,6 @@ const Auth = () => {
   const [clicked, setClicked] = useState(false);
   const isDisabled = clicked ? true : false;
 
-  const handleButtonClicked = () => {
-    setClicked(true);
-    setTimeout(() => {
-      setClicked(false);
-    }, 3000);
-  };
-
   const checkDigit = (value: string) => /\d/.test(value);
   const checkLength = (value: string) => (value.length >= 8 && value.length <= 20 ? true : false);
   const checkLower = (value: string) => /[a-z]/.test(value);
@@ -56,6 +49,7 @@ const Auth = () => {
 
   const handleLogin = async (values: any) => {
     console.log("clicked login", values);
+    setClicked(true);
     toast.success("Succesfully logged in !", {
       position: toast.POSITION.BOTTOM_CENTER,
     });
@@ -85,6 +79,7 @@ const Auth = () => {
 
   const handleSignUp = async (values: any) => {
     console.log("clicked signup", values);
+    setClicked(true);
     toast.success("Succesfully signed up !", {
       position: toast.POSITION.BOTTOM_CENTER,
     });
@@ -201,7 +196,9 @@ const Auth = () => {
                   </RediButton>
                 </Col>
                 <Col span={6}>
-                  <Button type="link">Forgot password</Button>
+                  <Button loading={clicked} type="link">
+                    Forgot password
+                  </Button>
                 </Col>
               </RowSpaceBetween>
             </Form>
