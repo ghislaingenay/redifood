@@ -1,12 +1,13 @@
 import { EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
 import { faRegistered, faSign } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Button, Col, Divider, Form, Input, Typography } from "antd";
+import { Button, Col, Divider, Form, Input } from "antd";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Else, If, Then } from "react-if";
 import { toast } from "react-toastify";
+import { AxiosFunction } from "../../pages/api/axios-request";
 import whiteLogo from "../../public/redifood-logo-white.png";
 import { EAuthChoice } from "../../src/interfaces/auth.interface";
 import { checkDigit, checkLength, checkLower, checkSpecials, checkUpper } from "../functions/global.fn";
@@ -38,63 +39,52 @@ const Auth = () => {
   // ------------ HANDLERS ---------
 
   const handleLogin = async (values: any) => {
-    console.log("clicked login", values);
     setClicked(true);
-    toast.success("Succesfully logged in !", {
-      position: toast.POSITION.BOTTOM_CENTER,
-    });
-    toast.error("Invalid  credentials !", {
-      position: toast.POSITION.BOTTOM_CENTER,
-    });
-    // setResponse(null);
-    // setIsError(false);
-    // await AxiosFunction({
-    //   queryParams: {},
-    //   url: "/api/auth/login",
-    //   method: "post",
-    //   body: values,
-    // })
-    //   .then(() => {
-    //     setResponse("Successfully logged in");
-    //     setTimeout(() => {
-    //       router.push("/");
-    //     }, 2000);
-    //   })
-    //   .catch(() => {
-    //     setIsError(true);
-    //     return setResponse("Invalid credentials");
-    //     // console.log(err);
-    //   });
+    await AxiosFunction({
+      queryParams: {},
+      url: "/api/auth/login",
+      method: "post",
+      body: values,
+    })
+      .then(() => {
+        toast.success("Succesfully logged in !", {
+          position: toast.POSITION.BOTTOM_CENTER,
+        });
+        setTimeout(() => {
+          router.push("/");
+        }, 2000);
+      })
+      .catch(() => {
+        toast.error("Invalid  credentials !", {
+          position: toast.POSITION.BOTTOM_CENTER,
+        });
+        setClicked(false);
+        // console.log(err);
+      });
   };
 
   const handleSignUp = async (values: any) => {
-    console.log("clicked signup", values);
     setClicked(true);
-    toast.success("Succesfully signed up !", {
-      position: toast.POSITION.BOTTOM_CENTER,
-    });
-    toast.error("Invalid  credentials !", {
-      position: toast.POSITION.BOTTOM_CENTER,
-    });
-    // setButtonWasClicked(true);
-    // setResponse(null);
-    // setIsError(false);
-    // await AxiosFunction({
-    //   queryParams: {},
-    //   url: "/api/auth/signup",
-    //   method: "post",
-    //   body: values,
-    // })
-    //   .then(() => {
-    //     setResponse("Account succesfully created");
-    //     setTimeout(() => {
-    //       router.push("/");
-    //     }, 2000);
-    //   })
-    //   .catch(() => {
-    //     setIsError(true);
-    //     return setResponse("Invalid credentials");
-    //   });
+    await AxiosFunction({
+      queryParams: {},
+      url: "/api/auth/signup",
+      method: "post",
+      body: values,
+    })
+      .then(() => {
+        toast.success("Succesfully signed up !", {
+          position: toast.POSITION.BOTTOM_CENTER,
+        });
+        setTimeout(() => {
+          router.push("/");
+        }, 2000);
+      })
+      .catch(() => {
+        setClicked(false);
+        toast.error("Invalid  credentials !", {
+          position: toast.POSITION.BOTTOM_CENTER,
+        });
+      });
   };
 
   const passwordRules = [
@@ -163,17 +153,18 @@ const Auth = () => {
         <If condition={selectedOption === EAuthChoice.SIGNIN}>
           <Then>
             <Form form={formLogin} layout="vertical" onFinish={handleLogin} style={{ backgroundColor: "transparent" }}>
-              <LabelFormWhite>
+              <LabelFormWhite htmlFor="email-login">
                 Email <RedSpan>*</RedSpan>
               </LabelFormWhite>
-              <Form.Item name="email" rules={emailRules} style={formStyle}>
-                <RoundedInput type="text" />
+              <Form.Item name="email" id="email-login" rules={emailRules} style={formStyle}>
+                <RoundedInput type="text" aria-label="email" />
               </Form.Item>
-              <LabelFormWhite>
+              <LabelFormWhite htmlFor="pwd-login">
                 Password <RedSpan>*</RedSpan>
               </LabelFormWhite>
-              <Form.Item name="password" rules={passwordRules} style={formStyle}>
+              <Form.Item name="password" id="pwd-login" rules={passwordRules} style={formStyle}>
                 <Input.Password
+                  aria-label="Password"
                   style={{ borderRadius: "2rem" }}
                   placeholder="input password"
                   iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
@@ -200,30 +191,32 @@ const Auth = () => {
               onFinish={handleSignUp}
               style={{ backgroundColor: "transparent" }}
             >
-              <LabelFormWhite>
+              <LabelFormWhite htmlFor="email-signup">
                 Email <RedSpan>*</RedSpan>
               </LabelFormWhite>
-              <Form.Item name="email" rules={emailRules} style={formStyle}>
-                <RoundedInput type="text" />
+              <Form.Item name="email" id="email-signup" rules={emailRules} style={formStyle}>
+                <RoundedInput type="text" aria-label="email" placeholder="Email..." />
               </Form.Item>
               <RowSpaceBetween>
                 <Col md={11}>
-                  <LabelFormWhite>
+                  <LabelFormWhite htmlFor="pwd-signup">
                     Password <RedSpan>*</RedSpan>
                   </LabelFormWhite>
-                  <Form.Item name="password" rules={passwordRules} style={formStyle}>
+                  <Form.Item name="password" id="pwd-signup" rules={passwordRules} style={formStyle}>
                     <Input.Password
+                      aria-label="Password"
                       style={{ borderRadius: "2rem" }}
-                      placeholder="input password"
+                      placeholder="Password..."
                       iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
                     />
                   </Form.Item>
                 </Col>
                 <Col md={11}>
-                  <LabelFormWhite>
+                  <LabelFormWhite htmlFor="c-pwd-signup">
                     Confirm password <RedSpan>*</RedSpan>
                   </LabelFormWhite>
                   <Form.Item
+                    id="c-pwd-signup"
                     style={formStyle}
                     name="confirmPassword"
                     rules={[
@@ -242,6 +235,7 @@ const Auth = () => {
                     ]}
                   >
                     <Input.Password
+                      aria-label="Confirm password"
                       style={{ borderRadius: "2rem" }}
                       placeholder="input password"
                       iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
