@@ -13,7 +13,7 @@ export enum EOrderStatus {
 }
 
 export interface IOrder {
-  orderId: string;
+  _id?: string;
   orderStatus: EOrderStatus;
   orderCreatedDate: Date;
   orderCompleteDate: Date;
