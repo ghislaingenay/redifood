@@ -1,11 +1,10 @@
-import { faPlusCircle } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCartShopping, faPenToSquare, faPlusCircle } from "@fortawesome/free-solid-svg-icons";
 import { Col, Row, Space, Table, Typography } from "antd";
 import Head from "next/head";
 import { useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import { RediSelect } from "../src/components/RediSelect";
-import { RediButton } from "../src/components/styling/Button.style";
+import { RediIconButton } from "../src/components/styling/Button.style";
 import AppContext from "../src/contexts/app.context";
 import { EButtonType, IOrder } from "../src/interfaces";
 import { allDataOrders, getListUnpaidOrders } from "../test/mocks/mockOrdersData";
@@ -50,8 +49,20 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
       key: "_id",
       render: (item: IOrder) => (
         <Space>
-          <RediButton buttonType={EButtonType.EDIT}>EDIT</RediButton>
-          <RediButton buttonType={EButtonType.SUCCESS}>PAY</RediButton>
+          <RediIconButton
+            onClick={() => router.push(`/orders/${item._id}/edit`)}
+            buttonType={EButtonType.EDIT}
+            iconFt={faPenToSquare}
+          >
+            EDIT
+          </RediIconButton>
+          <RediIconButton
+            onClick={() => router.push(`/orders/${item._id}`)}
+            iconFt={faCartShopping}
+            buttonType={EButtonType.SUCCESS}
+          >
+            PAY
+          </RediIconButton>
         </Space>
       ),
     },
@@ -92,11 +103,14 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
           />
         </Col>
         <Col className="text-right" lg={4}>
-          <RediButton shape="round" buttonType={EButtonType.CREATE}>
-            <Space>
-              <FontAwesomeIcon icon={faPlusCircle} /> Create Order{" "}
-            </Space>
-          </RediButton>
+          <RediIconButton
+            shape="round"
+            buttonType={EButtonType.CREATE}
+            iconFt={faPlusCircle}
+            onClick={() => router.push("/orders/create")}
+          >
+            Create Order
+          </RediIconButton>
         </Col>
       </Row>
       <Table columns={columns} dataSource={allOrders} />
