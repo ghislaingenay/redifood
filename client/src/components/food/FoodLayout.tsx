@@ -9,7 +9,7 @@ import { ERROR_COLOR, LIGHT_GREY_COLOR, LIGHT_PRIMARY_COLOR } from "../../../src
 import { EFoodMode, IFood } from "../../../src/interfaces/food.interface";
 import { noErrorInTable } from "../../constants";
 import AppContext from "../../contexts/app.context";
-import { sendErrorTableInput } from "../../functions/order.fn";
+import { calculateTotal, checkIfArrayAreTheSame, sendErrorTableInput } from "../../functions/order.fn";
 import { IErrorTableInput, TStatusProps } from "../../interfaces";
 
 const { Title } = Typography;
@@ -94,12 +94,6 @@ const FoodLayout = ({
     setFoodOrder(currentOrder);
   };
 
-  const calculateTotal = (foodOrder) => {
-    if (foodOrder.length === 0) {
-      return 0;
-    }
-    return [...foodOrder].map((food) => food.itemQuantity * food.itemPrice).reduce((t, e) => t + e);
-  };
   const handleSubmit = (foodOrder: IFood[]) => {
     switch (mode) {
       case EFoodMode.CREATE: {
@@ -116,17 +110,6 @@ const FoodLayout = ({
   };
   // function that check if two array are the same
 
-  const checkIfArrayAreTheSame = (array1: IFood[], array2: IFood[]) => {
-    if (array1.length !== array2.length) {
-      return false;
-    }
-    for (let i = 0; i < array1.length; i++) {
-      if (array1[i].itemId !== array2[i].itemId) {
-        return false;
-      }
-    }
-    return true;
-  };
   const handleCancel = (link: string) => {
     if (!checkIfArrayAreTheSame(foodOrder, currentOrder)) {
       return setCancelOrderModal(true);
