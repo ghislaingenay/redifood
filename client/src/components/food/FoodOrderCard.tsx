@@ -2,7 +2,8 @@ import { DeleteOutlined, MinusSquareOutlined, PlusSquareOutlined } from "@ant-de
 import { Col, Row, Typography } from "antd";
 import { IFood } from "../../../src/interfaces/food.interface";
 import { OrderCardStyled } from "../../../src/styles/styledComponents/div.styled";
-import { RediButton } from "../RediButton";
+import { EButtonType } from "../../interfaces";
+import { RediButton } from "../styling/Button.style";
 const { Title } = Typography;
 
 interface IFoodOrderCard {
@@ -30,14 +31,14 @@ const FoodOrderCard = ({ food, handleDeleteFood, handleQty }: IFoodOrderCard) =>
       <Row justify="space-between" align="middle">
         <Col lg={5} style={{ textAlign: "center" }}>
           <RediButton
+            buttonType={EButtonType.ERROR}
             name={`Delete ${food.itemName}`}
-            typeButton="error"
             shape="round"
-            title={<DeleteOutlined aria-label={`delete ${food.itemName}`} />}
             size="large"
-            haveIcon={false}
             onClick={() => handleDeleteFood(food.itemId)}
-          />
+          >
+            <DeleteOutlined aria-label={`delete ${food.itemName}`} />
+          </RediButton>
         </Col>
         <Col lg={5} style={{ textAlign: "center" }}>
           <Title level={4} style={{ marginTop: 0, paddingTop: "0.5rem" }}>
@@ -46,24 +47,24 @@ const FoodOrderCard = ({ food, handleDeleteFood, handleQty }: IFoodOrderCard) =>
         </Col>
         <Col lg={5} style={{ textAlign: "center" }}>
           <RediButton
-            typeButton="display"
+            buttonType={EButtonType.DISPLAY}
             size="large"
             shape="circle"
             disabled={isDisabled}
-            title={<MinusSquareOutlined aria-label={`remove ${food.itemName}`} />}
             onClick={() => handleQty(food.itemId, "remove")}
-            haveIcon={false}
-          />
+          >
+            <MinusSquareOutlined aria-label={`remove ${food.itemName}`} />
+          </RediButton>
         </Col>
         <Col lg={5} style={{ textAlign: "center" }}>
           <RediButton
-            typeButton="success"
+            buttonType={EButtonType.SUCCESS}
             size="large"
             shape="circle"
             onClick={() => handleQty(food.itemId, "add")}
-            title={<PlusSquareOutlined aria-label={`add ${food.itemName}`} />}
-            haveIcon={false}
-          />
+          >
+            <PlusSquareOutlined aria-label={`add ${food.itemName}`} />
+          </RediButton>
         </Col>
       </Row>
     </OrderCardStyled>

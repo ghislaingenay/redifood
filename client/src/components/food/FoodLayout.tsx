@@ -4,13 +4,12 @@ import { useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import ButtonLayout from "../../../src/components/food/ButtonLayout";
 import FoodOrderCard from "../../../src/components/food/FoodOrderCard";
-import { RediButton } from "../../../src/components/RediButton";
-import { ERROR_COLOR, LIGHT_GREY_COLOR, LIGHT_PRIMARY_COLOR } from "../../../src/constants/colors.const";
 import { EFoodMode, IFood } from "../../../src/interfaces/food.interface";
-import { noErrorInTable } from "../../constants";
+import { LIGHT_GREY, noErrorInTable, ORANGE, RED } from "../../constants";
 import AppContext from "../../contexts/app.context";
 import { calculateTotal, checkIfArrayAreTheSame, sendErrorTableInput } from "../../functions/order.fn";
-import { IErrorTableInput, TStatusProps } from "../../interfaces";
+import { EButtonType, IErrorTableInput, TStatusProps } from "../../interfaces";
+import { RediButton } from "../styling/Button.style";
 
 const { Title } = Typography;
 interface IFoodLayoutProps {
@@ -147,7 +146,7 @@ const FoodLayout = ({
                 <Card
                   style={{
                     textAlign: "center",
-                    backgroundColor: LIGHT_GREY_COLOR,
+                    backgroundColor: LIGHT_GREY,
                     boxShadow: "0 0 10px 0 rgba(0,0,0,0.2)",
                   }}
                   onClick={() => {
@@ -171,7 +170,7 @@ const FoodLayout = ({
           </Row>
         </Col>
         <Col lg={8}>
-          <Card style={{ backgroundColor: LIGHT_GREY_COLOR, boxShadow: "0 0 1rem rgba(0,0,0,0.3)", height: "100vh" }}>
+          <Card style={{ backgroundColor: LIGHT_GREY, boxShadow: "0 0 1rem rgba(0,0,0,0.3)", height: "100vh" }}>
             <Row justify="center" align="middle">
               <Title level={5}>Table Number:</Title>
               <InputNumber
@@ -193,7 +192,7 @@ const FoodLayout = ({
               {errorTable.alreadyInDb && <Alert type="error" message="This table number is already allocated" />}
               {errorTable.missingValue && <Alert type="error" message="Please select a table number" />}
             </Row>
-            <Divider style={{ border: `0.125rem solid ${LIGHT_PRIMARY_COLOR}` }} />
+            <Divider style={{ border: `0.125rem solid ${ORANGE}` }} />
             <Title level={5} className="text-center">
               Order List
             </Title>
@@ -201,26 +200,22 @@ const FoodLayout = ({
               <FoodOrderCard key={food.itemId} handleDeleteFood={handleDeleteFood} handleQty={handleQty} food={food} />
             ))}
             {foodOrder.length > 0 && (
-              <Title level={5} className="text-center" style={{ color: ERROR_COLOR }}>
+              <Title level={5} className="text-center" style={{ color: RED }}>
                 Total: {calculateTotal(foodOrder).toFixed(2)} $
               </Title>
             )}
             <RediButton
-              typeButton="success"
+              buttonType={EButtonType.SUCCESS}
               shape="round"
               disabled={isDisabled}
-              title={<b>Validate</b>}
-              haveIcon={false}
               onClick={() => handleSubmit(foodOrder)}
-            />
+            >
+              <b>Validate</b>
+            </RediButton>
 
-            <RediButton
-              typeButton="error"
-              shape="round"
-              title={<b>Cancel order</b>}
-              haveIcon={true}
-              onClick={() => handleCancel("/")}
-            />
+            <RediButton buttonType={EButtonType.ERROR} shape="round" onClick={() => handleCancel("/")}>
+              Cancel Order
+            </RediButton>
           </Card>
           <Modal
             title="Are u sure you want to cancel?"
