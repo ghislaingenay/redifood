@@ -86,6 +86,7 @@ describe("All Orders Page", () => {
     const user = userEvent.setup();
     const SelectElement: Jest.Mock<HTMLSelectElement> = screen.getByRole("combobox");
     expect(SelectElement.value).toBe("ALL");
+
     expect(screen.queryAllByRole("option")).toHaveLength(4);
     await user.click(SelectElement as HTMLElement);
     // await user.click(noneOption);
@@ -101,17 +102,15 @@ describe("All Orders Page", () => {
 describe("All Orders Page - Table unit", () => {
   it("should have 3 card initially after get request with all the included data", async () => {
     render(<AllOrdersPage status="success" allOrders={allDataOrders} getList={getListUnpaidOrders} />);
-    expect(await screen.findAllByRole("card")).toHaveLength(3);
+    expect(await screen.findAllByRole("row")).toHaveLength(3);
     expect(await screen.findAllByRole("button", { name: /edit/i })).toHaveLength(3);
     expect(await screen.findAllByRole("button", { name: /pay/i })).toHaveLength(3);
-    ["Order ID:", "Order Total:", "Order Status:", "Table Number:", "Name", "Quantity", "Price"].forEach(
-      async (text) => {
-        expect(await screen.findAllByText(text)).toHaveLength(3);
-      },
-    );
-    //Check table for each card
-    ["DRINK", "MAN Z", "Choco", "Salad"].forEach(async (text) => {
+    ["ID", "Table", "Amount", "Action"].forEach(async (text) => {
       expect(await screen.findByText(text)).toBeInTheDocument();
+    });
+    //Check table for each card
+    [/APP1/i, /FTP2/i, /KBB3/i].forEach(async (text) => {
+      expect(await screen.findByRole("gridcell", { name: text })).toBeInTheDocument();
     });
   });
 
@@ -148,7 +147,7 @@ describe("All Orders Page - Table unit", () => {
   it("error in front end if data wasn't received from the API", async () => {
     render(<AllOrdersPage status="error" allOrders={[]} getList={[]} />);
     await waitFor(() => {
-      expect(screen.queryAllByRole("card")).toHaveLength(0);
+      expect(screen.queryAllByRole("row")).toHaveLength(0);
     });
     expect(await screen.findByRole("alert")).toBeInTheDocument();
     expect(await screen.findByText(/page will refresh automatically in 5 seconds/i)).toBeInTheDocument();
