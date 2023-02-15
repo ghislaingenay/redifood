@@ -1,7 +1,7 @@
 import { Alert, Card, Col, Divider, InputNumber, Modal, Row, Typography } from "antd";
 import { useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
-import ButtonLayout from "../../../src/components/food/ButtonLayout";
+import { getOptions } from "../../../pages";
 import FoodOrderCard from "../../../src/components/food/FoodOrderCard";
 import { EFoodMode, IFood } from "../../../src/interfaces/food.interface";
 import { LIGHT_GREY, noErrorInTable, ORANGE, RED } from "../../constants";
@@ -9,6 +9,7 @@ import AppContext from "../../contexts/app.context";
 import { calculateTotal, checkIfArrayAreTheSame, sendErrorTableInput } from "../../functions/order.fn";
 import { EButtonType, IErrorTableInput, TStatusProps } from "../../interfaces";
 import { RediButton } from "../styling/Button.style";
+import RediRadioButton from "../styling/RediRadioButton";
 import FoodCard from "./FoodCard";
 
 const { Title } = Typography;
@@ -48,6 +49,8 @@ const FoodLayout = ({
 
   const [currentOrder, setCurrentOrder] = useState<IFood[]>([]);
   const [cancelOrderModal, setCancelOrderModal] = useState(false);
+
+  const [selectedButton, setSelectedButton] = useState<any>("all");
 
   const changeActiveButton = (sectionName: string) => {
     console.log("section", sectionName);
@@ -134,11 +137,14 @@ const FoodLayout = ({
           <Row>
             <Title level={5}>Food List</Title>
           </Row>
-          <ButtonLayout
-            changeActiveButton={changeActiveButton}
-            foodSection={foodSection}
-            setSelectedSection={setSelectedSection}
-            selectedSection={selectedSection}
+          <RediRadioButton
+            disabled={isDisabled}
+            options={getOptions(foodSection)}
+            radioGroupName="food"
+            haveIcon="false"
+            selectedButton={selectedButton}
+            setSelectedButton={setSelectedButton}
+            clickedFn={() => changeActiveButton(selectedButton)}
           />
           <Row gutter={[5, 10]}>
             {sortedFoods.map((food, index) => (

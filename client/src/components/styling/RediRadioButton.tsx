@@ -34,6 +34,7 @@ interface IRediRadioButtonProps<T extends Booleanish> extends ButtonProps {
   selectedButton: string;
   setSelectedButton: Dispatch<SetStateAction<EAuthChoice>>;
   disabled?: boolean;
+  clickedFn?: () => void;
 }
 
 const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
@@ -44,6 +45,7 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
     selectedButton,
     setSelectedButton,
     radioGroupName,
+    clickedFn,
   }: // widthButton,
   // radioSize
   IRediRadioButtonProps<Booleanish> = props;
@@ -101,12 +103,13 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
                 aria-checked={isSelected(value)}
                 onClick={(e) => {
                   const target = e.target as HTMLButtonElement;
+                  if (clickedFn) clickedFn();
                   console.log("target.value", target.value);
                   // @ts-ignore
                   if (!disabled) return setSelectedButton((prevState: EAuthChoice) => target.value as EAuthChoice);
                 }}
               >
-                {haveIcon && <SpanBlockM02Y>{icon}</SpanBlockM02Y>}
+                {haveIcon === "true" && <SpanBlockM02Y>{icon}</SpanBlockM02Y>}
                 {label}
               </RadioButton>
             </Col>
