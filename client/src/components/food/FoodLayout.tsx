@@ -5,7 +5,7 @@ import { useContext, useEffect, useState } from "react";
 import ButtonLayout from "../../../src/components/food/ButtonLayout";
 import FoodOrderCard from "../../../src/components/food/FoodOrderCard";
 import { EFoodMode, IFood } from "../../../src/interfaces/food.interface";
-import { LIGHT_GREY, noErrorInTable, ORANGE, RED } from "../../constants";
+import { BACKGROUND_COLOR, LIGHT_GREY, noErrorInTable, ORANGE, RED } from "../../constants";
 import AppContext from "../../contexts/app.context";
 import { calculateTotal, checkIfArrayAreTheSame, sendErrorTableInput } from "../../functions/order.fn";
 import { EButtonType, IErrorTableInput, TStatusProps } from "../../interfaces";
@@ -155,7 +155,12 @@ const FoodLayout = ({
                   role="card"
                 >
                   <Image
-                    style={{ textAlign: "center", marginBottom: "0.5rem" }}
+                    style={{
+                      textAlign: "center",
+                      marginBottom: "0.5rem",
+                      borderRadius: "50%",
+                      boxShadow: "0 0 10px 0px rgba(0,0,0,0.2)",
+                    }}
                     alt={`Food ${food.itemName}`}
                     src={food.itemPhoto}
                     width={150}
@@ -163,6 +168,19 @@ const FoodLayout = ({
                   />
                   <div style={{ fontWeight: "bold", alignContent: "center", justifyContent: "center" }}>
                     {food.itemName}
+                  </div>
+                  <div
+                    style={{
+                      height: "2rem",
+                      fontSize: "0.75rem",
+                      overflow: "clip",
+                      marginTop: "1rem",
+                      alignContent: "center",
+                      justifyContent: "center",
+                      color: BACKGROUND_COLOR,
+                    }}
+                  >
+                    {food.itemDescription}
                   </div>
                 </Card>
               </Col>
