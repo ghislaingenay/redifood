@@ -5,7 +5,7 @@ import { hexToRgba } from "../../functions/global.fn";
 import { EAuthChoice } from "../../interfaces";
 import { RadioButton } from "../../styles";
 import { SpanBlockM02Y } from "../../styles/styledComponents/span.styled";
-import { RowSpaceBetween } from "./grid.styled";
+import { RowSpaceAround } from "./grid.styled";
 
 interface IRediRadio {
   value: string;
@@ -35,6 +35,8 @@ interface IRediRadioButtonProps<T extends Booleanish> extends ButtonProps {
   setSelectedButton: Dispatch<SetStateAction<EAuthChoice>>;
   disabled?: boolean;
   clickedFn?: () => void;
+  padding?: string;
+  fontSize?: string;
 }
 
 const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
@@ -46,6 +48,8 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
     setSelectedButton,
     radioGroupName,
     clickedFn,
+    padding,
+    fontSize,
   }: // widthButton,
   // radioSize
   IRediRadioButtonProps<Booleanish> = props;
@@ -73,10 +77,10 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
 
   const colorStyle = (currentButton: string) => {
     return {
-      // fontSize: fontStyling,
+      fontSize: fontSize || "1.5rem",
       // padding: paddingStyling,
       // width: widthButton,
-      padding: "1rem 3rem",
+      padding: padding || "1rem 3rem",
       width: "100%",
       backgroundColor: isSelected(currentButton) ? BACKGROUND_COLOR : LIGHT_GREY,
       fontWeight: isSelected(currentButton) ? "bold" : "normal",
@@ -90,7 +94,7 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
 
   return (
     <>
-      <RowSpaceBetween>
+      <RowSpaceAround>
         {options.map(({ label, value, icon }: any, index) => (
           <>
             <Col span={spanValue(options)} style={{ width: "100%" }} key={index}>
@@ -110,12 +114,12 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
                 }}
               >
                 {haveIcon === "true" && <SpanBlockM02Y>{icon}</SpanBlockM02Y>}
-                {label}
+                <b>{label.toUpperCase()}</b>
               </RadioButton>
             </Col>
           </>
         ))}
-      </RowSpaceBetween>
+      </RowSpaceAround>
     </>
   );
 };

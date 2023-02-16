@@ -134,10 +134,9 @@ const FoodLayout = ({
       <Title level={2}>{mainTitle}</Title>
       <Row gutter={[0, 40]} justify="space-between">
         <Col lg={15}>
-          <Row>
-            <Title level={5}>Food List</Title>
-          </Row>
           <RediRadioButton
+            fontSize="1rem"
+            padding="0.5rem 0.5rem"
             disabled={isDisabled}
             options={getOptions(foodSection)}
             radioGroupName="food"
