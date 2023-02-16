@@ -10,7 +10,7 @@ interface IRediButtonProps extends ButtonProps {
 
 export const RediButton = ({ buttonType, children, ...props }: IRediButtonProps) => {
   const handleButtonColor = (buttonColor: IRediButtonProps["buttonType"]) => {
-    const basicStyling = { margin: "1rem 0" };
+    const basicStyling = { margin: 0 };
     switch (buttonColor) {
       case EButtonType.CREATE: {
         return { ...basicStyling, backgroundColor: BLUE };

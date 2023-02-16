@@ -8,6 +8,7 @@ import { LIGHT_GREY, noErrorInTable, ORANGE, RED } from "../../constants";
 import AppContext from "../../contexts/app.context";
 import { calculateTotal, checkIfArrayAreTheSame, sendErrorTableInput } from "../../functions/order.fn";
 import { EButtonType, IErrorTableInput, TStatusProps } from "../../interfaces";
+import { CenteredTitle } from "../../styles/styledComponents/typography.styled";
 import { RediButton } from "../styling/Button.style";
 import RediRadioButton from "../styling/RediRadioButton";
 import FoodCard from "./FoodCard";
@@ -177,9 +178,7 @@ const FoodLayout = ({
               {errorTable.missingValue && <Alert type="error" message="Please select a table number" />}
             </Row>
             <Divider style={{ border: `0.125rem solid ${ORANGE}` }} />
-            <Title level={5} className="text-center">
-              Order List
-            </Title>
+            <CenteredTitle level={5}>Order List</CenteredTitle>
             {foodOrder?.map((food) => (
               <FoodOrderCard key={food.itemId} handleDeleteFood={handleDeleteFood} handleQty={handleQty} food={food} />
             ))}

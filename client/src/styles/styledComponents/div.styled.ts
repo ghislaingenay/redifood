@@ -7,7 +7,7 @@ export const OrderCardStyled = styled.div`
   border-radius: 0.5rem;
   padding: 0.5rem;
   border: 0.02rem solid ${GREY};
-  box-shadow: 0 0 0.2rem rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 0.1rem 0.01rem rgba(0, 0, 0, 0.3);
 `;
 
 export const RediRadio = styled.input`
