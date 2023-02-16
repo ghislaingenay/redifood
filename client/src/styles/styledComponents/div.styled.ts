@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { GREY, ORANGE_DARK, RED } from "../../../src/constants/colors.const";
 
 export const OrderCardStyled = styled.div`
+  border-radius: 2rem;
   margin-bottom: 0.5rem;
   border-radius: 0.5rem;
   padding: 0.5rem;
