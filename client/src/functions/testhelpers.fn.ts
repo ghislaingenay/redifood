@@ -38,3 +38,17 @@ export const clickButton = async (reg: RegExp, user) => {
   });
   await user.click(clickButton);
 };
+
+export const clickRadio = async (reg: RegExp, user) => {
+  const clickButton: HTMLElement = screen.getByRole("radio", {
+    name: reg,
+  });
+  await user.click(clickButton);
+  await user.click(clickButton);
+};
+
+export const findRadio = async (reg: RegExp) => screen.findByRole("radio", { name: reg });
+export const expectCardLength = async (lgt: number) => expect(await screen.findAllByRole("card")).toHaveLength(lgt);
+export const getButton = (btnName: RegExp | string) => screen.getByRole("button", { name: btnName });
+export const findButton = async (btnName: RegExp | string) => screen.findByRole("button", { name: btnName });
+export const findText = async (txt: RegExp | string | number) => screen.findByText(txt);
