@@ -1,5 +1,5 @@
 import { ButtonProps, Col } from "antd";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useEffect } from "react";
 import { BACKGROUND_COLOR, LIGHT_GREY, ORANGE_DARK, ORANGE_LIGHT } from "../../constants";
 import { hexToRgba } from "../../functions/global.fn";
 import { EAuthChoice } from "../../interfaces";
@@ -41,7 +41,6 @@ interface IRediRadioButtonProps<T extends Booleanish> extends ButtonProps {
 
 const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
   const {
-    disabled,
     options,
     haveIcon,
     selectedButton,
@@ -50,9 +49,7 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
     clickedFn,
     padding,
     fontSize,
-  }: // widthButton,
-  // radioSize
-  IRediRadioButtonProps<Booleanish> = props;
+  }: IRediRadioButtonProps<Booleanish> = props;
 
   const isSelected = (radioValue: string) => {
     return selectedButton === radioValue;
@@ -72,14 +69,11 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
     }
   };
 
-  // const fontStyling = radioSize === "small" ? "1rem" : radioSize === "middle" ? "2rem" : "3rem";
-  // const paddingStyling = radioSize === "small" ? "0.5rem 1.5rem" : radioSize === "middle" ? "1rem 3rem" : "2rem 6rem";
+  useEffect(() => {}, [selectedButton]);
 
   const colorStyle = (currentButton: string) => {
     return {
       fontSize: fontSize || "1.5rem",
-      // padding: paddingStyling,
-      // width: widthButton,
       padding: padding || "1rem 3rem",
       width: "100%",
       backgroundColor: isSelected(currentButton) ? BACKGROUND_COLOR : LIGHT_GREY,
@@ -93,34 +87,33 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
   };
 
   return (
-    <>
-      <RowSpaceAround>
-        {options.map(({ label, value, icon }: any, index) => (
-          <>
-            <Col span={spanValue(options)} style={{ width: "100%" }} key={index}>
-              <RadioButton
-                style={{ ...colorStyle(value) }}
-                role="radio"
-                aria-label={label}
-                name={radioGroupName}
-                value={value}
-                aria-checked={isSelected(value)}
-                onClick={(e) => {
-                  const target = e.target as HTMLButtonElement;
-                  if (clickedFn) clickedFn();
-                  console.log("target.value", target.value);
-                  // @ts-ignore
-                  if (!disabled) return setSelectedButton((prevState: EAuthChoice) => target.value as EAuthChoice);
-                }}
-              >
-                {haveIcon === "true" && <SpanBlockM02Y>{icon}</SpanBlockM02Y>}
-                <b>{label.toUpperCase()}</b>
-              </RadioButton>
-            </Col>
-          </>
-        ))}
-      </RowSpaceAround>
-    </>
+    <RowSpaceAround>
+      {options.map(({ label, value, icon }: any, index) => (
+        <>
+          <Col span={spanValue(options)} style={{ width: "100%" }} key={index}>
+            <RadioButton
+              style={{ ...colorStyle(value) }}
+              role="radio"
+              aria-label={label}
+              name={radioGroupName}
+              value={value}
+              aria-checked={isSelected(value)}
+              onClick={(e) => {
+                console.log("tg", e.target);
+                const target = e.target as HTMLButtonElement;
+                if (clickedFn) clickedFn();
+                console.log("target.value", target.value);
+                // @ts-ignore
+                return setSelectedButton(() => target.value as any);
+              }}
+            >
+              {haveIcon === "true" && <SpanBlockM02Y>{icon}</SpanBlockM02Y>}
+              {label.toUpperCase()}
+            </RadioButton>
+          </Col>
+        </>
+      ))}
+    </RowSpaceAround>
   );
 };
 
