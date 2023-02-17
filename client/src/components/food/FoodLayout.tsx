@@ -142,9 +142,9 @@ const FoodLayout = ({
             options={getOptions(foodSection)}
             radioGroupName="food"
             haveIcon="false"
-            selectedButton={selectedButton}
-            setSelectedButton={setSelectedButton}
-            clickedFn={() => changeActiveButton(selectedButton)}
+            selectedButton={selectedSection}
+            setSelectedButton={setSelectedSection}
+            clickedFn={() => changeActiveButton(selectedSection)}
           />
           <Row gutter={[5, 10]}>
             {sortedFoods.map((food, index) => (
