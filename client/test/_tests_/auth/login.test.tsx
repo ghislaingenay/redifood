@@ -4,7 +4,6 @@ import Auth from "../../../src/components/Auth";
 import { clickButton, typeIntoFormAuth } from "../../../src/functions/testhelpers.fn";
 jest.mock("next/navigation", () => require("next-router-mock"));
 jest.setTimeout(40000);
-jest.useFakeTimers();
 
 export const emailValid = "test@test.com";
 export const emailNotIdentical = "testaaa@test.com";
@@ -39,7 +38,7 @@ describe("Login - Validation", () => {
     expect(passwordInput).toBeEnabled();
   });
 
-  it.only("should show error message when password is empty", async () => {
+  it("should show error message when password is empty", async () => {
     render(<Auth />);
     const user = userEvent.setup();
     expect(screen.queryByText(/Please input your password/i)).not.toBeInTheDocument();
@@ -76,8 +75,6 @@ describe("Login - Validation", () => {
     await typeIntoFormAuth(user, {
       email: undefined,
       password: undefined,
-      s,
-      ss,
     });
     await clickButton(/submit/i, user);
     expect(await screen.findByText(/please input your email/i)).toBeInTheDocument();
