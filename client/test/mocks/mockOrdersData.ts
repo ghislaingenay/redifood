@@ -1,6 +1,6 @@
 export const allDataOrders = [
   {
-    orderId: "APP1",
+    _id: "APP1",
     orderStatus: "CREATED",
     orderDate: "2021-01-01",
     tableNumber: 2,
@@ -18,7 +18,7 @@ export const allDataOrders = [
     ],
   },
   {
-    orderId: "FTP2",
+    _id: "FTP2",
     orderStatus: "CREATED",
     orderDate: "2021-04-05",
     tableNumber: 5,
@@ -43,7 +43,7 @@ export const allDataOrders = [
     ],
   },
   {
-    orderId: "KBB3",
+    _id: "KBB3",
     orderStatus: "CREATED",
     orderDate: "2021-07-04",
     tableNumber: 8,

@@ -1,7 +1,7 @@
 import { Skeleton } from "antd";
-import { AxiosFunction } from "pages/api/axios-request";
 import React, { useContext, useEffect, useState } from "react";
-import Auth from "src/components/Auth";
+import { AxiosFunction } from "../../pages/api/axios-request";
+import Auth from "../../src/components/Auth";
 
 // @ts-ignore
 export const AuthContext = React.createContext();

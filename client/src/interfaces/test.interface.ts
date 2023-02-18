@@ -1,10 +1,10 @@
 export interface ITestUserAuth {
-  usernameElement?: HTMLElement;
+  emailElement?: HTMLElement;
   passwordElement?: HTMLElement;
   confirmPasswordElement?: HTMLElement;
 }
 export interface IFormAuthFields {
-  username?: string;
+  email?: string;
   password?: string;
   confirmPassword?: string;
 }

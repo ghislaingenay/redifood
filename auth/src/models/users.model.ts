@@ -3,13 +3,13 @@ import { PasswordManager } from "../services/password-manager";
 
 // what it takes to cerate a user
 interface UserAttrs {
-  username: string;
+  email: string;
   password: string;
 }
 
 // interface that describes the properties the user document has
 interface UserDoc extends mongoose.Document {
-  username: string;
+  email: string;
   password: string;
   // Add mongoose to add properties for us here
 }
@@ -23,7 +23,7 @@ interface UserModel extends mongoose.Model<UserDoc> {
 mongoose.set("strictQuery", false);
 const userSchema = new mongoose.Schema(
   {
-    username: {
+    email: {
       type: String,
       required: true,
     },

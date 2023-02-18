@@ -3,16 +3,16 @@ import { IFormAuthFields, ITestUserAuth } from "../../src/interfaces/test.interf
 
 export const typeIntoFormAuth = async (
   user,
-  { username, password, confirmPassword }: IFormAuthFields,
+  { email, password, confirmPassword }: IFormAuthFields,
 ): Promise<ITestUserAuth> => {
-  let userKeys = ["usernameElement", "passwordElement", "confirmPasswordElement"];
+  let userKeys = ["emailElement", "passwordElement", "confirmPasswordElement"];
   let finalData = {};
-  if (username) {
-    const usernameInput = screen.getByRole("textbox", {
-      name: /username/i,
+  if (email) {
+    const emailInput = screen.getByRole("textbox", {
+      name: /email/i,
     });
-    await user.type(usernameInput, username);
-    Object.assign(finalData, { usernameElement: usernameInput });
+    await user.type(emailInput, email);
+    Object.assign(finalData, { emailElement: emailInput });
   }
   if (password) {
     const passwordInput: HTMLElement = screen.getByLabelText("Password");
@@ -38,3 +38,17 @@ export const clickButton = async (reg: RegExp, user) => {
   });
   await user.click(clickButton);
 };
+
+export const clickRadio = async (reg: RegExp, user) => {
+  const clickButton: HTMLElement = screen.getByRole("radio", {
+    name: reg,
+  });
+  await user.click(clickButton);
+  await user.click(clickButton);
+};
+
+export const findRadio = async (reg: RegExp) => screen.findByRole("radio", { name: reg });
+export const expectCardLength = async (lgt: number) => expect(await screen.findAllByRole("card")).toHaveLength(lgt);
+export const getButton = (btnName: RegExp | string) => screen.getByRole("button", { name: btnName });
+export const findButton = async (btnName: RegExp | string) => screen.findByRole("button", { name: btnName });
+export const findText = async (txt: RegExp | string | number) => screen.findByText(txt);

@@ -1,13 +1,36 @@
+import { BACKGROUND_COLOR, GREEN_A, GREY, LIGHT_GREY, ORANGE_DARK, PURPLE, RED } from "../constants";
+import { hexToRgba } from "../functions/global.fn";
+
+const rcBg = 0.2;
+const rcBorder = 0.35;
+const rcHover = 0.5;
+const rcNormal = 0.7;
+const rcActive = 1;
+
+const PrimaryColor = ORANGE_DARK;
+
 export const tokenProvider = {
   // SeedToken
   borderRadius: 6,
   colorBgBase: "#fff",
-  colorError: "#ff4d4f",
+  colorBgLayout: BACKGROUND_COLOR,
+  colorPrimary: hexToRgba(GREY, rcNormal),
+  colorPrimaryActive: hexToRgba(GREY, rcActive),
+  colorPrimaryBg: hexToRgba(GREY, rcBg),
+  colorPrimaryBgHover: hexToRgba(GREY, rcBg),
+  colorPrimaryBorder: hexToRgba(PrimaryColor, rcBg),
+  colorPrimaryBorderHover: hexToRgba(GREY, rcBorder),
+  // colorPrimaryText: hexToRgba(PrimaryColor, rcNormal),
+  // colorPrimaryTextActive: hexToRgba(PrimaryColor, rcActive),
+  // colorPrimaryTextHover: hexToRgba(PrimaryColor, rcHover),
+
+  colorPrimaryHover: hexToRgba(LIGHT_GREY, rcNormal),
   // colorPrimary: "#1890ff",
-  colorPrimary: "#ffad60",
-  colorInfo: "#1677ff",
-  colorSuccess: "#52c41a",
-  colorWarning: "#faad14",
+  colorError: RED,
+  colorInfo: GREY,
+  colorSuccess: GREEN_A,
+  colorWarning: PURPLE,
+  colorBorder: LIGHT_GREY,
   colorTextBase: "#000",
   controlHeight: 32, // height of basics controls such as buttons and input boxes
   fontFamily: 'Roboto, "Helvetica Neue", Arial, sans-serif',

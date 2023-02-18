@@ -7,7 +7,7 @@ describe("GET /api/users/currentuser", () => {
 
     const response = await request(app).get("/api/auth/currentuser").set("Cookie", cookie).send().expect(200);
 
-    expect(response.body.currentUser.username).toEqual("testingUser");
+    expect(response.body.currentUser.email).toEqual("test@test.com");
   });
 
   it("current user of null is not authenticated", async () => {

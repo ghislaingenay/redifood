@@ -1,11 +1,16 @@
-import { Col, Row, Typography } from "antd";
+import { faCartShopping, faPenToSquare, faPlusCircle, faUtensils } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Alert, Col, Row, Space, Table, Typography } from "antd";
 import Head from "next/head";
 import { useRouter } from "next/navigation";
+import { AlignType } from "rc-table/lib/interface";
 import { useContext, useEffect, useState } from "react";
-import OrderCard from "../src/components/OrderCard";
-import { RediButton } from "../src/components/RediButton";
 import { RediSelect } from "../src/components/RediSelect";
+import { RediIconButton } from "../src/components/styling/Button.style";
+import { RowSpaceAround } from "../src/components/styling/grid.styled";
+import { BACKGROUND_COLOR } from "../src/constants";
 import AppContext from "../src/contexts/app.context";
+import { EButtonType, IOrder } from "../src/interfaces";
 import { allDataOrders, getListUnpaidOrders } from "../test/mocks/mockOrdersData";
 
 export const getOptions = (array: string[]) => {
@@ -25,7 +30,52 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
   const [listAllOrders] = useState(allOrders);
   const [selectedOption, setSelectedOption] = useState("ALL");
   const [filteredOrders, setFilteredOrders] = useState(allOrders);
+  const [spinLoading, setSpinLoading] = useState(true);
   const { Title } = Typography;
+  const columns = [
+    {
+      title: "ID",
+      dataIndex: "_id",
+      key: "_id",
+      align: "center" as AlignType,
+    },
+    {
+      title: "Table",
+      dataIndex: "tableNumber",
+      key: "tableNumber",
+      align: "center" as AlignType,
+    },
+    {
+      title: "Amount",
+      dataIndex: "orderTotal",
+      key: "orderTotal",
+      align: "center" as AlignType,
+    },
+    {
+      title: "Action",
+      dataIndex: "_id",
+      align: "center" as AlignType,
+      key: "_id",
+      render: (item: IOrder) => (
+        <Space>
+          <RediIconButton
+            onClick={() => router.push(`/orders/${item._id}/edit`)}
+            buttonType={EButtonType.EDIT}
+            iconFt={faPenToSquare}
+          >
+            EDIT
+          </RediIconButton>
+          <RediIconButton
+            onClick={() => router.push(`/orders/${item._id}`)}
+            iconFt={faCartShopping}
+            buttonType={EButtonType.SUCCESS}
+          >
+            PAY
+          </RediIconButton>
+        </Space>
+      ),
+    },
+  ];
 
   const showProperData = (option) => {
     // replace later by axios get
@@ -40,6 +90,7 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
   };
 
   useEffect(() => {
+    setSpinLoading(false);
     appValue.setStatus(status);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status, appValue]);
@@ -62,18 +113,50 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
           />
         </Col>
         <Col className="text-right" lg={4}>
-          <RediButton
-            typeButton="create"
-            onClick={() => router.push("/orders/create")}
-            title="Create Order"
-            haveIcon={true}
+          <RediIconButton
             shape="round"
-          />
+            buttonType={EButtonType.CREATE}
+            iconFt={faPlusCircle}
+            onClick={() => router.push("/orders/create")}
+          >
+            Create Order
+          </RediIconButton>
         </Col>
       </Row>
-      {filteredOrders.map((order) => {
-        return <OrderCard order={order} key={order.orderId} />;
-      })}
+      <Alert
+        message="This is a warning message"
+        type="warning"
+        showIcon
+        style={{ fontWeight: 700, marginBottom: "0.5rem", border: "0.125rem solid" }}
+      />
+      <Table
+        loading={spinLoading}
+        rowKey="_id"
+        columns={columns}
+        dataSource={allOrders}
+        pagination={false}
+        expandable={{
+          expandedRowRender: (record: IOrder) => {
+            return (
+              <RowSpaceAround>
+                {record.orderItems.map((item) => {
+                  return (
+                    <Col span={6} key={item.itemId} style={{ color: BACKGROUND_COLOR }}>
+                      <b>
+                        <Space>
+                          <FontAwesomeIcon icon={faUtensils} />
+                          {item.itemName}
+                        </Space>
+                      </b>{" "}
+                      (<em>{item.itemQuantity}</em>)
+                    </Col>
+                  );
+                })}
+              </RowSpaceAround>
+            );
+          },
+        }}
+      />
     </>
   );
 };
@@ -81,7 +164,7 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
 export default AllOrdersPage;
 
 export async function getServerSideProps() {
-  return { props: { allOrders: allDataOrders, getList: getListUnpaidOrders, status: "error" } };
+  return { props: { allOrders: allDataOrders, getList: getListUnpaidOrders, status: "success" } };
   // const url = "/api/orders";
   // await axios
   //   .get(url, { params: { selectedOption: "ALL" } })
