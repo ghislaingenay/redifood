@@ -2,12 +2,14 @@ import request from "supertest";
 import { app } from "../../app";
 import { EMessageErrors } from "../../interfaces/err.interface";
 
+const emailValid = "test@test.com";
+const emailInvalid = "ssffn.co";
 describe("POST /api/auth/login", () => {
-  it("fails when a username that does not exist is supplied", async () => {
+  it("fails when a email that does not exist is supplied", async () => {
     const response = await request(app)
       .post("/api/auth/login")
       .send({
-        username: "test",
+        email: emailValid,
         password: "hueheFy*_6",
       })
       .expect(400);
@@ -18,14 +20,14 @@ describe("POST /api/auth/login", () => {
     await request(app)
       .post("/api/auth/signup")
       .send({
-        username: "test",
+        email: emailValid,
         password: "Fyu89*_vhVgh",
       })
       .expect(201);
     const response = await request(app)
       .post("/api/auth/login")
       .send({
-        username: "test",
+        email: emailValid,
         password: "passd",
       })
       .expect(400);
@@ -38,14 +40,14 @@ describe("POST /api/auth/login", () => {
     await request(app)
       .post("/api/auth/signup")
       .send({
-        username: "test",
+        email: emailValid,
         password: "Fyu89*_vhhvgh",
       })
       .expect(201);
     const response = await request(app)
       .post("/api/auth/login")
       .send({
-        username: "test",
+        email: emailValid,
         password: "Fyu89*_vhhvgh",
       })
       .expect(200);
@@ -59,28 +61,28 @@ describe("POST /api/auth/signup", () => {
     await request(app)
       .post("/api/auth/signup")
       .send({
-        username: "test",
+        email: emailValid,
         password: "Fyu89*_vhhvgh",
       })
       .expect(201);
   });
 
-  it("returns a 400 with an invalid username", async () => {
+  it("returns a 400 with an invalid email", async () => {
     const response = await request(app)
       .post("/api/auth/signup")
       .send({
-        username: "te",
+        email: emailInvalid,
         password: "Fyu89*_vhhvgh",
       })
       .expect(400);
-    expect(response.body.errors[0].message).toEqual("username should be defined and have between 4 and 12 characters");
+    expect(response.body.errors[0].message).toEqual("email should be defined");
   });
 
   it("returns a 400 with an invalid password", async () => {
     await request(app)
       .post("/api/auth/signup")
       .send({
-        username: "test",
+        email: emailValid,
         password: "Fyu89*_vhhvghFyu89*_vhhvghFyu89*_vhhvghFyu89*_vhhvgh",
       })
       .expect(400);
@@ -88,7 +90,7 @@ describe("POST /api/auth/signup", () => {
     await request(app)
       .post("/api/auth/signup")
       .send({
-        username: "test",
+        email: emailValid,
         password: "Fyu8h",
       })
       .expect(400);
@@ -96,21 +98,21 @@ describe("POST /api/auth/signup", () => {
     await request(app)
       .post("/api/auth/signup")
       .send({
-        username: "test",
+        email: emailValid,
         password: "fyu89*_vhhvgh",
       })
       .expect(400);
     await request(app)
       .post("/api/auth/signup")
       .send({
-        username: "test",
+        email: emailValid,
         password: "fyu89vhHvgh",
       })
       .expect(400);
     await request(app)
       .post("/api/auth/signup")
       .send({
-        username: "test",
+        email: emailValid,
         password: "fyu*_vHhvgh",
       })
       .expect(400);
@@ -118,28 +120,28 @@ describe("POST /api/auth/signup", () => {
     await request(app)
       .post("/api/auth/signup")
       .send({
-        username: "test",
+        email: emailValid,
         password: "Fyu89*_vhhvgh",
       })
       .expect(201);
   });
 
-  it("returns a 400 with missing username and password", async () => {
+  it("returns a 400 with missing email and password", async () => {
     return request(app).post("/api/auth/signup").send({}).expect(400);
   });
 
-  it("disallows duplicate usernames", async () => {
+  it("disallows duplicate emails", async () => {
     await request(app)
       .post("/api/auth/signup")
       .send({
-        username: "test",
+        email: emailValid,
         password: "Fyu89*_vhhvgh",
       })
       .expect(201);
     await request(app)
       .post("/api/auth/signup")
       .send({
-        username: "test",
+        email: emailValid,
         password: "Fyu89*_vhhvgh",
       })
       .expect(400);
@@ -148,7 +150,7 @@ describe("POST /api/auth/signup", () => {
     const response = await request(app)
       .post("/api/auth/signup")
       .send({
-        username: "test",
+        email: emailValid,
         password: "Fyu89*_vhhvgh",
       })
       .expect(201);
@@ -162,7 +164,7 @@ describe("signout", () => {
     const response1 = await request(app)
       .post("/api/auth/signup")
       .send({
-        username: "test",
+        email: emailValid,
         password: "Fyu89*_vhhvgh",
       })
       .expect(201);
@@ -170,7 +172,7 @@ describe("signout", () => {
     const response2 = await request(app)
       .post("/api/auth/login")
       .send({
-        username: "test",
+        email: emailValid,
         password: "Fyu89*_vhhvgh",
       })
       .expect(200);

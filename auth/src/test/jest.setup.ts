@@ -35,10 +35,10 @@ afterAll(async () => {
 });
 
 global.signin = async () => {
-  const username = "testingUser";
+  const email = "test@test.com";
   const password = "F4k3P4ssw0rd!";
 
-  const response = await request(app).post("/api/auth/signup").send({ username, password }).expect(201);
+  const response = await request(app).post("/api/auth/signup").send({ email, password }).expect(201);
 
   const cookie = response.get("Set-Cookie");
   return cookie;

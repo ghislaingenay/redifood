@@ -1,7 +1,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { NotificationRes } from "src/definitions/notification.class";
-import { AxiosFunction } from "../src/functions/axios.function";
+import { AxiosFunction } from "../pages/api/axios.function";
 
 const SignOut = () => {
   const router = useRouter();
