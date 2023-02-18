@@ -5,8 +5,8 @@ import Auth from "../src/components/Auth";
 // import { RediHeader } from "../src/components/Page";
 import { AppProvider } from "../src/contexts/app.context";
 import "../src/styles/globals.css";
-import { RediContent, tokenProvider } from "../src/styles/index";
-const { Footer } = Layout;
+import { tokenProvider } from "../src/styles/index";
+const { Footer, Content } = Layout;
 // import buildClient from "./api/build-client";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import { ToastContainer } from "react-toastify";
@@ -41,15 +41,17 @@ const AppComponent = ({ Component, pageProps, currentUser, loading }) => {
                 <Layout style={{ minHeight: "100vh" }}>
                   <RediHeader bgColor={BACKGROUND_COLOR} color={ORANGE_LIGHT} />
                   <Layout className="layout" style={{ backgroundColor: ORANGE_LIGHT, padding: "1rem 2.5%" }}>
-                    <RediContent>
+                    {/* <RediContent> */}
+                    <Content>
                       <Component {...pageProps} />
-                    </RediContent>
+                    </Content>
+                    {/* </RediContent> */}
                     <Footer
                       style={{
                         textAlign: "center",
                         fontWeight: "bold",
                         backgroundColor: "transparent",
-                        margin: "0 0 0.4rem 0",
+                        margin: "1rem 0 0.4rem 0",
                         padding: "0",
                       }}
                     >

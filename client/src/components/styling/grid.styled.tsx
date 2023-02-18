@@ -1,9 +1,16 @@
-import { Row } from "antd";
+import { Row, Space } from "antd";
 
 export const RowCenter = ({ children, ...props }: any) => {
   return (
     <Row {...props} align="middle" justify="center">
       {children}
+    </Row>
+  );
+};
+export const RowCenterSp = ({ children, ...props }: any) => {
+  return (
+    <Row {...props} align="middle" justify="center">
+      <Space>{children}</Space>
     </Row>
   );
 };

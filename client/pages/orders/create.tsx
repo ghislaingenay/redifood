@@ -31,7 +31,7 @@ const CreateOrder = ({ foodList, foodSection, status }) => {
         foodSection={foodSection}
         foodList={foodList}
         mode={EFoodMode.CREATE}
-        mainTitle="Create order"
+        mainTitle="CREATE ORDER"
         handleOrderCreate={handleOrderCreate}
       />
     </>

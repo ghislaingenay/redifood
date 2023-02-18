@@ -9,8 +9,10 @@ import AppContext from "../../contexts/app.context";
 import { useFood } from "../../contexts/food.context";
 import { calculateTotal, checkIfArrayAreTheSame, sendErrorTableInput } from "../../functions/order.fn";
 import { EButtonType, IErrorTableInput, TStatusProps } from "../../interfaces";
+import { Scroll } from "../../styles/styledComponents/div.styled";
 import { CenteredTitle } from "../../styles/styledComponents/typography.styled";
 import { RediButton } from "../styling/Button.style";
+import { RowCenterSp } from "../styling/grid.styled";
 import RediRadioButton from "../styling/RediRadioButton";
 import FoodCard from "./FoodCard";
 
@@ -39,6 +41,8 @@ const FoodLayout = ({ foodList, mode, foodSection, mainTitle, handleOrderCreate,
   const [tableNumberValue, setTableNumberValue] = useState<null | number>(null);
   const [errorTable, setErrorTable] = useState<IErrorTableInput>({ alreadyInDb: false, missingValue: false });
   const isDisabled = foodOrder.length === 0 ? true : false;
+
+  const isVisible = foodOrder.length > 0 ? "visible" : "hidden";
 
   const [currentOrder, setCurrentOrder] = useState<IFood[]>([]);
   const [cancelOrderModal, setCancelOrderModal] = useState(false);
@@ -109,6 +113,7 @@ const FoodLayout = ({ foodList, mode, foodSection, mainTitle, handleOrderCreate,
             ))}
           </Row>
         </Col>
+
         <Col lg={8}>
           <Card style={{ backgroundColor: LIGHT_GREY, boxShadow: "0 0 1rem rgba(0,0,0,0.3)", height: "100vh" }}>
             <Row justify="center" align="middle">
@@ -134,26 +139,28 @@ const FoodLayout = ({ foodList, mode, foodSection, mainTitle, handleOrderCreate,
             </Row>
             <Divider style={{ border: `0.125rem solid ${ORANGE}` }} />
             <CenteredTitle level={5}>Order List</CenteredTitle>
-            {foodOrder?.map((food) => (
-              <FoodOrderCard key={food.itemId} food={food} />
-            ))}
-            {foodOrder.length > 0 && (
-              <Title level={5} className="text-center" style={{ color: RED }}>
-                Total: {calculateTotal(foodOrder).toFixed(2)} $
-              </Title>
-            )}
-            <RediButton
-              buttonType={EButtonType.SUCCESS}
-              shape="round"
-              disabled={isDisabled}
-              onClick={() => handleSubmit(foodOrder)}
-            >
-              <b>Validate</b>
-            </RediButton>
+            <Scroll>
+              {foodOrder?.map((food) => (
+                <FoodOrderCard key={food.itemId} food={food} />
+              ))}
+            </Scroll>
+            <CenteredTitle level={5} style={{ color: RED, visibility: isVisible }}>
+              Total: {calculateTotal(foodOrder).toFixed(2)} $
+            </CenteredTitle>
+            <RowCenterSp style={{ marginTop: "1rem" }}>
+              <RediButton
+                buttonType={EButtonType.SUCCESS}
+                shape="round"
+                disabled={isDisabled}
+                onClick={() => handleSubmit(foodOrder)}
+              >
+                <b>Validate</b>
+              </RediButton>
 
-            <RediButton buttonType={EButtonType.ERROR} shape="round" onClick={() => handleCancel("/")}>
-              Cancel Order
-            </RediButton>
+              <RediButton buttonType={EButtonType.ERROR} shape="round" onClick={() => handleCancel("/")}>
+                Cancel Order
+              </RediButton>
+            </RowCenterSp>
           </Card>
           <Modal
             title="Are u sure you want to cancel?"
