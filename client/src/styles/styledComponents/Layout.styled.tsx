@@ -1,16 +1,17 @@
 import { Layout, Menu } from "antd";
 import styled from "styled-components";
+import { BACKGROUND_COLOR, ORANGE_LIGHT } from "../../constants";
 
-const { Content } = Layout;
+const { Content, Sider } = Layout;
 
+export const RediSider = styled(Sider)`
+  background-color: ${BACKGROUND_COLOR};
+  color: ${ORANGE_LIGHT};
+`;
 export const RediContent = styled(Content)`
-  padding: 1rem 5%;
-  margin: 1.725rem 3.125rem 0.725rem;
-  height: 100vh;
-  overflow-y: scroll;
+  margin-bottom: 1rem;
+  padding: 1rem 3%;
   background-color: rgba(256, 256, 256, 0.5);
-  border-radius: 1rem;
-  scrollbar-color: gray rgb(105, 105, 105);
   box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.2);
 `;
 

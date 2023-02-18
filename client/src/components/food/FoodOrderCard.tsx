@@ -3,6 +3,7 @@ import { Col, Typography } from "antd";
 import { IFood } from "../../../src/interfaces/food.interface";
 import { OrderCardStyled } from "../../../src/styles/styledComponents/div.styled";
 import { GREY } from "../../constants";
+import { useFood } from "../../contexts/food.context";
 import { EButtonType } from "../../interfaces";
 import { CenteredTitle } from "../../styles/styledComponents/typography.styled";
 import { RediButton } from "../styling/Button.style";
@@ -11,11 +12,12 @@ const { Title } = Typography;
 
 interface IFoodOrderCard {
   food: IFood;
-  handleDeleteFood: (foodId: IFood["itemId"]) => void;
-  handleQty: (foodId: IFood["itemId"], type: "add" | "remove") => void;
 }
 
-const FoodOrderCard = ({ food, handleDeleteFood, handleQty }: IFoodOrderCard) => {
+const FoodOrderCard = ({ food }: IFoodOrderCard) => {
+  const {
+    functions: { deleteFood, addFood, removeFood },
+  } = useFood();
   const isDisabled = food.itemQuantity === 1 ? true : false;
   return (
     <OrderCardStyled key={food.itemId} role="card">
@@ -31,7 +33,7 @@ const FoodOrderCard = ({ food, handleDeleteFood, handleQty }: IFoodOrderCard) =>
             name={`Delete ${food.itemName}`}
             shape="round"
             size="large"
-            onClick={() => handleDeleteFood(food.itemId)}
+            onClick={() => deleteFood(food.itemId)}
           >
             <DeleteOutlined aria-label={`delete ${food.itemName}`} />
           </RediButton>
@@ -43,7 +45,7 @@ const FoodOrderCard = ({ food, handleDeleteFood, handleQty }: IFoodOrderCard) =>
               size="large"
               shape="circle"
               disabled={isDisabled}
-              onClick={() => handleQty(food.itemId, "remove")}
+              onClick={() => removeFood(food.itemId)}
             >
               <MinusSquareOutlined aria-label={`remove ${food.itemName}`} />
             </RediButton>
@@ -54,7 +56,7 @@ const FoodOrderCard = ({ food, handleDeleteFood, handleQty }: IFoodOrderCard) =>
               buttonType={EButtonType.SUCCESS}
               size="large"
               shape="circle"
-              onClick={() => handleQty(food.itemId, "add")}
+              onClick={() => addFood(food.itemId)}
             >
               <PlusSquareOutlined aria-label={`add ${food.itemName}`} />
             </RediButton>

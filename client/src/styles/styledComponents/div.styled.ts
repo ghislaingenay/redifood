@@ -40,3 +40,9 @@ export const SpacingDiv25X = styled.div`
 export const SpacingDiv5X = styled.div`
   padding: 0 5%;
 `;
+
+export const Scroll = styled.div`
+  height: 60vh;
+  overflow-y: scroll;
+  scrollbar-color: gray rgb(105, 105, 105);
+`;
