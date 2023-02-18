@@ -114,3 +114,30 @@ export const foodSectionArray = ["all", "pizza", "dessert", "drink"];
 
 export const createErrorProps = { foodList: [], foodSection: [], status: "error" };
 export const createSuccessProps = { foodList: mockedFoodData, foodSection: foodSectionArray, status: "error" };
+
+export const mockOrderEdit = [
+  {
+    itemId: "8",
+    itemName: "Sprite can - 500 mL",
+    itemPhoto:
+      "https://images.unsplash.com/photo-1625772299848-391b6a87d7b3?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80",
+    itemPrice: 1.6,
+    itemDescription: "Sprite can of 500 mL",
+    itemSection: "drink",
+    itemExtra: "soda",
+    itemQuantity: 4,
+    itemCurrency: "USD",
+  },
+  {
+    itemId: "3",
+    itemName: "Millefeuille",
+    itemPhoto:
+      "https://images.unsplash.com/photo-1587122569949-ae6e755c6bdc?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=885&q=80",
+    itemPrice: 4.25,
+    itemDescription: "The traditional French Millefeuille",
+    itemSection: "dessert",
+    itemExtra: "pastry",
+    itemQuantity: 1,
+    itemCurrency: "USD",
+  },
+];
