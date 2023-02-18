@@ -3,7 +3,8 @@ import { ComponentType, ReactElement, useState } from "react";
 import AppContext from "../src/contexts/app.context";
 
 import { AuthContext } from "../src/contexts/auth.context";
-import { TStatusProps } from "../src/interfaces";
+import { FoodContext, useFood } from "../src/contexts/food.context";
+import { IFood, TStatusProps } from "../src/interfaces";
 
 /**
  * Custom renderer example with @testing-library/react
@@ -13,14 +14,35 @@ import { TStatusProps } from "../src/interfaces";
  * please visit https://testing-library.com/docs/react-testing-library/setup
  */
 export const AllTheProviders = ({ children }: { children: any }) => {
-  // const userValue = useAuth();
+  // STATE
+  const [foodOrder, setFoodOrder] = useState<IFood[]>([]);
+  const [status, setStatus] = useState<TStatusProps>("success");
+
+  // RECOVER CONTEXT
+  const {
+    functions: { addFood, removeFood, deleteFood, addToCart },
+  } = useFood();
+
+  // VALUES
   const userValue = {
     authorization: {
       id: "5f9f1b9b0b5b9c0017b5b1a5",
       email: "",
     },
   };
-  const [status, setStatus] = useState<TStatusProps>("success");
+
+  const foodValue = {
+    foodOrder: foodOrder,
+    setFoodOrder: setFoodOrder,
+    functions: {
+      addToCart: addToCart,
+      addFood: addFood,
+      removeFood: removeFood,
+      deleteFood: deleteFood,
+    },
+  };
+
+  // RENDER
   return (
     <>
       <AppContext.Provider
@@ -31,7 +53,9 @@ export const AllTheProviders = ({ children }: { children: any }) => {
           },
         }}
       >
-        <AuthContext.Provider value={userValue}>{children}</AuthContext.Provider>
+        <FoodContext.Provider value={foodValue}>
+          <AuthContext.Provider value={userValue}>{children}</AuthContext.Provider>
+        </FoodContext.Provider>
       </AppContext.Provider>
     </>
   );
