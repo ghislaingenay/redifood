@@ -1,4 +1,4 @@
-import { GREEN_A, GREY, LIGHT_GREY, ORANGE_DARK, PURPLE, RED } from "../constants";
+import { BACKGROUND_COLOR, GREEN_A, GREY, LIGHT_GREY, ORANGE_DARK, PURPLE, RED } from "../constants";
 import { hexToRgba } from "../functions/global.fn";
 
 const rcBg = 0.2;
@@ -13,7 +13,7 @@ export const tokenProvider = {
   // SeedToken
   borderRadius: 6,
   colorBgBase: "#fff",
-
+  colorBgLayout: BACKGROUND_COLOR,
   colorPrimary: hexToRgba(GREY, rcNormal),
   colorPrimaryActive: hexToRgba(GREY, rcActive),
   colorPrimaryBg: hexToRgba(GREY, rcBg),

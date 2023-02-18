@@ -1,8 +1,13 @@
 import { Layout, Menu } from "antd";
 import styled from "styled-components";
+import { BACKGROUND_COLOR, ORANGE_LIGHT } from "../../constants";
 
-const { Content } = Layout;
+const { Content, Sider } = Layout;
 
+export const RediSider = styled(Sider)`
+  background-color: ${BACKGROUND_COLOR};
+  color: ${ORANGE_LIGHT};
+`;
 export const RediContent = styled(Content)`
   padding: 1rem 5%;
   margin: 1.725rem 3.125rem 0.725rem;
