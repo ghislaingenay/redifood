@@ -6,6 +6,7 @@ import FoodOrderCard from "../../../src/components/food/FoodOrderCard";
 import { EFoodMode, IFood } from "../../../src/interfaces/food.interface";
 import { LIGHT_GREY, noErrorInTable, ORANGE, RED } from "../../constants";
 import AppContext from "../../contexts/app.context";
+import { useFood } from "../../contexts/food.context";
 import { calculateTotal, checkIfArrayAreTheSame, sendErrorTableInput } from "../../functions/order.fn";
 import { EButtonType, IErrorTableInput, TStatusProps } from "../../interfaces";
 import { CenteredTitle } from "../../styles/styledComponents/typography.styled";
@@ -16,7 +17,6 @@ import FoodCard from "./FoodCard";
 const { Title } = Typography;
 interface IFoodLayoutProps {
   status: TStatusProps;
-  foodOrder: IFood[];
   foodList: IFood[];
   mode: EFoodMode;
   handleOrderCreate?: (foodOrder: IFood[]) => any;
@@ -26,23 +26,15 @@ interface IFoodLayoutProps {
   mainTitle: string;
 }
 
-const FoodLayout = ({
-  foodOrder: orderList,
-  foodList,
-  mode,
-  foodSection,
-  mainTitle,
-  handleOrderCreate,
-  status,
-}: IFoodLayoutProps) => {
+const FoodLayout = ({ foodList, mode, foodSection, mainTitle, handleOrderCreate, status }: IFoodLayoutProps) => {
   const router = useRouter();
   const tableTaken = [1, 4, 5];
 
   const { setStatus } = useContext(AppContext);
+  const { foodOrder } = useFood();
 
   const [sortedFoods, setSortedFoods] = useState(foodList);
   const [selectedSection, setSelectedSection] = useState("all");
-  const [foodOrder, setFoodOrder] = useState([]);
 
   const [tableNumberValue, setTableNumberValue] = useState<null | number>(null);
   const [errorTable, setErrorTable] = useState<IErrorTableInput>({ alreadyInDb: false, missingValue: false });
@@ -51,8 +43,6 @@ const FoodLayout = ({
   const [currentOrder, setCurrentOrder] = useState<IFood[]>([]);
   const [cancelOrderModal, setCancelOrderModal] = useState(false);
 
-  const [selectedButton, setSelectedButton] = useState<any>("all");
-
   const changeActiveButton = (sectionName: string) => {
     console.log("section", sectionName);
     if (sectionName === "all") {
@@ -60,41 +50,6 @@ const FoodLayout = ({
     }
     let filteredfoods = foodList?.filter((food) => food.itemSection === sectionName);
     setSortedFoods(filteredfoods);
-  };
-
-  const addFoodToCart = (foodId: IFood["itemId"]) => {
-    const foundFound = foodOrder.find((food) => food.itemId === foodId);
-    if (foundFound) {
-      let currentOrder = [...foodOrder];
-      for (let i = 0; i < currentOrder.length; i++) {
-        if (currentOrder[i].itemId === foundFound.itemId) {
-          currentOrder[i].itemQuantity += 1;
-        }
-      }
-      setFoodOrder(currentOrder);
-    } else {
-      let newFood = foodList.find((food) => food.itemId === foodId);
-      newFood.itemQuantity = 1;
-      const currentOrder: any = [...foodOrder];
-      currentOrder.push(newFood);
-      setFoodOrder(currentOrder);
-    }
-  };
-
-  const handleDeleteFood = (foodId) => {
-    const updatedOrder = [...foodOrder].filter((food) => food.itemId !== foodId);
-    setFoodOrder(updatedOrder);
-  };
-
-  const handleQty = (foodId, type: "add" | "remove") => {
-    const currentOrder = [...foodOrder];
-    for (let i = 0; i < currentOrder.length; i++) {
-      if (currentOrder[i].itemId === foodId) {
-        let currentFood = currentOrder[i];
-        type === "remove" ? (currentFood.itemQuantity -= 1) : (currentFood.itemQuantity += 1);
-      }
-    }
-    setFoodOrder(currentOrder);
   };
 
   const handleSubmit = (foodOrder: IFood[]) => {
@@ -123,7 +78,7 @@ const FoodLayout = ({
 
   const loadData = async () => {
     setStatus(status);
-    setCurrentOrder(orderList);
+    setCurrentOrder(foodOrder);
   };
   useEffect(() => {
     loadData();
@@ -149,7 +104,7 @@ const FoodLayout = ({
           <Row gutter={[5, 10]}>
             {sortedFoods.map((food, index) => (
               <Col key={index} lg={6}>
-                <FoodCard addFoodToCart={addFoodToCart} food={food} />
+                <FoodCard foodList={foodList} food={food} />
               </Col>
             ))}
           </Row>
@@ -180,7 +135,7 @@ const FoodLayout = ({
             <Divider style={{ border: `0.125rem solid ${ORANGE}` }} />
             <CenteredTitle level={5}>Order List</CenteredTitle>
             {foodOrder?.map((food) => (
-              <FoodOrderCard key={food.itemId} handleDeleteFood={handleDeleteFood} handleQty={handleQty} food={food} />
+              <FoodOrderCard key={food.itemId} food={food} />
             ))}
             {foodOrder.length > 0 && (
               <Title level={5} className="text-center" style={{ color: RED }}>

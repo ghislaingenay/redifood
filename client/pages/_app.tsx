@@ -15,6 +15,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import RediHeader from "../src/components/Page";
 import { BACKGROUND_COLOR, ORANGE_LIGHT } from "../src/constants";
+import { FoodProvider } from "../src/contexts/food.context";
 // Tell Font Awesome to skip adding the CSS automatically
 // since it's already imported above
 config.autoAddCss = false;
@@ -33,35 +34,37 @@ const AppComponent = ({ Component, pageProps, currentUser, loading }) => {
   return (
     <>
       <AppProvider>
-        <ConfigProvider theme={{ token: tokenProvider, inherit: false }}>
-          <If condition={currentUser}>
-            <Then>
-              <Layout style={{ minHeight: "100vh" }}>
-                <RediHeader bgColor={BACKGROUND_COLOR} color={ORANGE_LIGHT} />
-                <Layout className="layout" style={{ backgroundColor: ORANGE_LIGHT, padding: "1rem 2.5%" }}>
-                  <RediContent>
-                    <Component {...pageProps} />
-                  </RediContent>
-                  <Footer
-                    style={{
-                      textAlign: "center",
-                      fontWeight: "bold",
-                      backgroundColor: "transparent",
-                      margin: "0 0 0.4rem 0",
-                      padding: "0",
-                    }}
-                  >
-                    <em>Redifood ©{new Date().getFullYear()} Created by Ghislain Genay</em>
-                  </Footer>
+        <FoodProvider>
+          <ConfigProvider theme={{ token: tokenProvider, inherit: false }}>
+            <If condition={currentUser}>
+              <Then>
+                <Layout style={{ minHeight: "100vh" }}>
+                  <RediHeader bgColor={BACKGROUND_COLOR} color={ORANGE_LIGHT} />
+                  <Layout className="layout" style={{ backgroundColor: ORANGE_LIGHT, padding: "1rem 2.5%" }}>
+                    <RediContent>
+                      <Component {...pageProps} />
+                    </RediContent>
+                    <Footer
+                      style={{
+                        textAlign: "center",
+                        fontWeight: "bold",
+                        backgroundColor: "transparent",
+                        margin: "0 0 0.4rem 0",
+                        padding: "0",
+                      }}
+                    >
+                      <em>Redifood ©{new Date().getFullYear()} Created by Ghislain Genay</em>
+                    </Footer>
+                  </Layout>
                 </Layout>
-              </Layout>
-            </Then>
-            <Else>
-              <Auth />
-            </Else>
-          </If>
-          <ToastContainer />
-        </ConfigProvider>
+              </Then>
+              <Else>
+                <Auth />
+              </Else>
+            </If>
+            <ToastContainer />
+          </ConfigProvider>
+        </FoodProvider>
       </AppProvider>
     </>
   );

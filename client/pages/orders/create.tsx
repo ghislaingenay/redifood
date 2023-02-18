@@ -1,9 +1,12 @@
+import { useEffect } from "react";
 import FoodLayout from "../../src/components/food/FoodLayout";
+import { useFood } from "../../src/contexts/food.context";
 import { NotificationRes } from "../../src/definitions/notification.class";
 import { EFoodMode, IFood } from "../../src/interfaces/food.interface";
 import { foodSectionArray, mockedFoodData } from "../../test/mocks/mockFoodData";
 
 const CreateOrder = ({ foodList, foodSection, status }) => {
+  const { setFoodOrder } = useFood();
   const handleOrderCreate = (foodOrder: IFood[]) => {
     console.log("order created", foodOrder);
     NotificationRes.onSuccess({
@@ -16,6 +19,11 @@ const CreateOrder = ({ foodList, foodSection, status }) => {
     // axios
   };
 
+  useEffect(() => {
+    setFoodOrder([]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <>
       <FoodLayout
@@ -24,7 +32,6 @@ const CreateOrder = ({ foodList, foodSection, status }) => {
         foodList={foodList}
         mode={EFoodMode.CREATE}
         mainTitle="Create order"
-        foodOrder={[]}
         handleOrderCreate={handleOrderCreate}
       />
     </>
