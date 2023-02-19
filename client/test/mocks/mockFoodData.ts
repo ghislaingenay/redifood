@@ -113,7 +113,7 @@ export const mockedFoodData = [
 export const foodSectionArray = ["all", "pizza", "dessert", "drink"];
 
 export const createErrorProps = { foodList: [], foodSection: [], status: "error" };
-export const createSuccessProps = { foodList: mockedFoodData, foodSection: foodSectionArray, status: "error" };
+export const createSuccessProps = { foodList: mockedFoodData, foodSection: foodSectionArray, status: "success" };
 
 export const mockOrderEdit = [
   {
@@ -141,3 +141,10 @@ export const mockOrderEdit = [
     itemCurrency: "USD",
   },
 ];
+
+export const editSuccessProps = {
+  foodList: mockedFoodData,
+  foodSection: foodSectionArray,
+  currentFoodOrder: mockOrderEdit,
+  status: "success",
+};

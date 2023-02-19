@@ -16,7 +16,6 @@ interface IFoodContext {
 }
 export function useFood() {
   const foodElement = useContext(FoodContext);
-  console.log(foodElement);
   if (!foodElement) {
     throw new Error("useFood must be used within a FoodProvider");
   }

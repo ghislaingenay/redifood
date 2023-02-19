@@ -3,8 +3,8 @@ import { ComponentType, ReactElement, useState } from "react";
 import AppContext from "../src/contexts/app.context";
 
 import { AuthContext } from "../src/contexts/auth.context";
-import { FoodContext, useFood } from "../src/contexts/food.context";
-import { IFood, TStatusProps } from "../src/interfaces";
+import { FoodProvider } from "../src/contexts/food.context";
+import { TStatusProps } from "../src/interfaces";
 
 /**
  * Custom renderer example with @testing-library/react
@@ -15,30 +15,15 @@ import { IFood, TStatusProps } from "../src/interfaces";
  */
 export const AllTheProviders = ({ children }: { children: any }) => {
   // STATE
-  const [foodOrder, setFoodOrder] = useState<IFood[]>([]);
   const [status, setStatus] = useState<TStatusProps>("success");
 
   // RECOVER CONTEXT
-  const {
-    functions: { addFood, removeFood, deleteFood, addToCart },
-  } = useFood();
 
   // VALUES
   const userValue = {
     authorization: {
       id: "5f9f1b9b0b5b9c0017b5b1a5",
       email: "",
-    },
-  };
-
-  const foodValue = {
-    foodOrder: foodOrder,
-    setFoodOrder: setFoodOrder,
-    functions: {
-      addToCart: addToCart,
-      addFood: addFood,
-      removeFood: removeFood,
-      deleteFood: deleteFood,
     },
   };
 
@@ -53,9 +38,9 @@ export const AllTheProviders = ({ children }: { children: any }) => {
           },
         }}
       >
-        <FoodContext.Provider value={foodValue}>
+        <FoodProvider>
           <AuthContext.Provider value={userValue}>{children}</AuthContext.Provider>
-        </FoodContext.Provider>
+        </FoodProvider>
       </AppContext.Provider>
     </>
   );
