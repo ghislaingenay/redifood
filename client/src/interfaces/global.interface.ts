@@ -16,3 +16,10 @@ export enum EButtonType {
   DISPLAY = "display",
   NONE = "none",
 }
+
+export interface IFormInterface {
+  label: string;
+  name: string;
+  component: JSX.Element;
+  rules: Object[];
+}

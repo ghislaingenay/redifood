@@ -1,14 +1,20 @@
-import { Card, Col, Modal, Row, Typography } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
+import { Card, Col, Form, Modal, Row, Typography } from "antd";
+import type { RcFile, UploadFile, UploadProps } from "antd/es/upload";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import { Else, If, Then } from "react-if";
 import { getOptions } from "../../../pages";
 import { EFoodMode, IFood } from "../../../src/interfaces/food.interface";
-import { LIGHT_GREY, noErrorInTable } from "../../constants";
+import { GREY, LIGHT_GREY, noErrorInTable } from "../../constants";
+import { optionsCreateFood } from "../../constants/food.const";
 import AppContext from "../../contexts/app.context";
 import { useFood } from "../../contexts/food.context";
 import { checkIfArrayAreTheSame, sendErrorTableInput } from "../../functions/order.fn";
-import { IErrorTableInput, TStatusProps } from "../../interfaces";
+import { IErrorTableInput, IFormInterface, TStatusProps } from "../../interfaces";
+import { SpacingDiv5X } from "../../styles/styledComponents/div.styled";
+import { RowCenter } from "../styling/grid.styled";
 import RediRadioButton from "../styling/RediRadioButton";
 import FoodCard from "./FoodCard";
 import OrderSection from "./OrderSection";
@@ -26,10 +32,11 @@ interface IFoodLayoutProps {
 }
 
 const FoodLayout = ({ foodList, mode, foodSection, mainTitle, handleOrderCreate, status }: IFoodLayoutProps) => {
+  const [form] = Form.useForm();
   const router = useRouter();
   const tableTaken = [1, 4, 5];
 
-  const isCreateMode = mode === EFoodMode.CREATE ? true : false;
+  const pictureValue = Form.useWatch("itemPhoto", form);
 
   const { setStatus } = useContext(AppContext);
   const { foodOrder } = useFood();
@@ -41,10 +48,34 @@ const FoodLayout = ({ foodList, mode, foodSection, mainTitle, handleOrderCreate,
   const [errorTable, setErrorTable] = useState<IErrorTableInput>({ alreadyInDb: false, missingValue: false });
   const isDisabled = foodOrder.length === 0 ? true : false;
 
-  const isVisible = foodOrder.length > 0 ? "visible" : "hidden";
-
   const [currentOrder, setCurrentOrder] = useState<IFood[]>([]);
   const [cancelOrderModal, setCancelOrderModal] = useState(false);
+
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewImage, setPreviewImage] = useState("");
+  const [previewTitle, setPreviewTitle] = useState("");
+
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
+
+  const cancelUpload = () => setPreviewOpen(false);
+
+  const handlePreview = async (file: UploadFile) => {
+    if (!file.url && !file.preview) {
+      file.preview = await getBase64(file.originFileObj as RcFile);
+    }
+
+    setPreviewImage(file.url || (file.preview as string));
+    setPreviewOpen(true);
+    setPreviewTitle(file.name || file.url!.substring(file.url!.lastIndexOf("/") + 1));
+  };
+  const uploadButton = (
+    <div style={{ border: `0.125rem dashed ${GREY}`, borderRadius: "50%", width: "100%" }}>
+      <PlusOutlined />
+      <div style={{ marginTop: 8 }}>Upload</div>
+    </div>
+  );
+
+  const handlePictureChange: UploadProps["onChange"] = ({ fileList: newFileList }) => setFileList(newFileList);
 
   const changeActiveButton = (sectionName: string) => {
     console.log("section", sectionName);
@@ -88,6 +119,18 @@ const FoodLayout = ({ foodList, mode, foodSection, mainTitle, handleOrderCreate,
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  function onFinish(values: any): void {
+    throw new Error("Function not implemented.");
+  }
+
+  const getBase64 = (file: RcFile): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
+
   return (
     <>
       <Title level={2}>{mainTitle}</Title>
@@ -127,7 +170,44 @@ const FoodLayout = ({ foodList, mode, foodSection, mainTitle, handleOrderCreate,
                 />
               </Then>
               <Else>
-                <p>alter</p>
+                <SpacingDiv5X>
+                  {/* <Upload action="" fileList={fileList} onPreview={handlePreview} onChange={handlePictureChange}>
+                    {fileList.length >= 8 ? null : uploadButton}
+                  </Upload>
+                  <Modal open={previewOpen} title={previewTitle} footer={null} onCancel={cancelUpload}>
+                    <Image alt="example" style={{ width: "100%" }} src={previewImage} />
+                  </Modal> */}
+
+                  {pictureValue ? (
+                    <Image
+                      style={{ width: 200, height: 200, border: `1px dashed ${GREY}`, margin: "0 auto 1rem" }}
+                      src={pictureValue}
+                      alt="new food picture"
+                    />
+                  ) : (
+                    <RowCenter
+                      style={{
+                        width: 200,
+                        height: 200,
+                        border: `1px dashed ${GREY}`,
+                        margin: "0 auto 1rem",
+                        borderRadius: "50%",
+                      }}
+                    >
+                      <PlusOutlined /> Upload
+                    </RowCenter>
+                  )}
+
+                  <Form form={form} onFinish={onFinish} layout="vertical">
+                    {optionsCreateFood.map(({ label, name, component, rules }: IFormInterface) => {
+                      return (
+                        <Form.Item style={{ fontWeight: 700 }} key={name} name={name} label={label} rules={rules}>
+                          {component}
+                        </Form.Item>
+                      );
+                    })}
+                  </Form>
+                </SpacingDiv5X>
               </Else>
             </If>
           </Card>

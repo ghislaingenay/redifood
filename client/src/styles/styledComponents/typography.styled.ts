@@ -1,7 +1,10 @@
-import { Input, Typography } from "antd";
+import { Input, InputNumber, Typography } from "antd";
 import styled from "styled-components";
 const { Title } = Typography;
 export const RoundedInput = styled(Input)`
+  border-radius: 2rem;
+`;
+export const RoundedInputNum = styled(InputNumber)`
   border-radius: 2rem;
 `;
 
