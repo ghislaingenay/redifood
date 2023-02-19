@@ -12,7 +12,7 @@ import { EButtonType, IErrorTableInput, TStatusProps } from "../../interfaces";
 import { Scroll } from "../../styles/styledComponents/div.styled";
 import { CenteredTitle } from "../../styles/styledComponents/typography.styled";
 import { RediButton } from "../styling/Button.style";
-import { RowCenterSp } from "../styling/grid.styled";
+import { RowCenter, RowCenterSp } from "../styling/grid.styled";
 import RediRadioButton from "../styling/RediRadioButton";
 import FoodCard from "./FoodCard";
 
@@ -31,6 +31,8 @@ interface IFoodLayoutProps {
 const FoodLayout = ({ foodList, mode, foodSection, mainTitle, handleOrderCreate, status }: IFoodLayoutProps) => {
   const router = useRouter();
   const tableTaken = [1, 4, 5];
+
+  const isCreateMode = mode === EFoodMode.CREATE ? true : false;
 
   const { setStatus } = useContext(AppContext);
   const { foodOrder } = useFood();
@@ -116,7 +118,7 @@ const FoodLayout = ({ foodList, mode, foodSection, mainTitle, handleOrderCreate,
 
         <Col lg={8}>
           <Card style={{ backgroundColor: LIGHT_GREY, boxShadow: "0 0 1rem rgba(0,0,0,0.3)", height: "100vh" }}>
-            <Row justify="center" align="middle">
+            <RowCenter>
               <Title level={5}>Table Number:</Title>
               <InputNumber
                 type="number"
@@ -128,6 +130,7 @@ const FoodLayout = ({ foodList, mode, foodSection, mainTitle, handleOrderCreate,
                     setTableNumberValue(null);
                   }
                 }}
+                disabled={!isCreateMode ? true : false}
                 name="tableNumber"
                 min={0}
                 aria-label="tableNumber"
@@ -136,7 +139,12 @@ const FoodLayout = ({ foodList, mode, foodSection, mainTitle, handleOrderCreate,
               />
               {errorTable.alreadyInDb && <Alert type="error" message="This table number is already allocated" />}
               {errorTable.missingValue && <Alert type="error" message="Please select a table number" />}
-            </Row>
+            </RowCenter>
+            {EFoodMode.EDIT && (
+              <RowCenter>
+                <Title level={5}>Order #</Title>
+              </RowCenter>
+            )}
             <Divider style={{ border: `0.125rem solid ${ORANGE}` }} />
             <CenteredTitle level={5}>Order List</CenteredTitle>
             <Scroll>
