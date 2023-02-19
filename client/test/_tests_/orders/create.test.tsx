@@ -157,7 +157,6 @@ describe("Create Order - Food List", () => {
 
   it("DESSERT button selected should contains 3 cards", async () => {
     render(<CreateOrder {...createSuccessProps} />);
-    const user = userEvent.setup();
     await expectCardLength(9);
     await clickRadio(/DESSERT/i);
     await expectCardLength(3);
@@ -198,7 +197,7 @@ describe("Create Order - Food List", () => {
 
   it("PIZZA button selected should contains 2 cards", async () => {
     render(<CreateOrder {...createSuccessProps} />);
-    const user = userEvent.setup();
+
     await expectCardLength(9);
     await clickRadio(/PIZZA/i);
     await expectCardLength(2);
@@ -206,7 +205,6 @@ describe("Create Order - Food List", () => {
 
   it("DRINK button selected should contains 4 cards", async () => {
     render(<CreateOrder {...createSuccessProps} />);
-    const user = userEvent.setup();
     await expectCardLength(9);
     await clickRadio(/DRINK/i);
     await expectCardLength(4);
