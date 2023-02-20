@@ -12,6 +12,7 @@ interface IFoodContext {
     addFood: (item: IFood["itemId"]) => void;
     removeFood: (item: IFood["itemId"]) => void;
     addToCart: (item: IFood["itemId"], foodList: IFood[]) => void;
+    selectFood: (item: IFood["itemId"], foodList: IFood[]) => void;
   };
 }
 export function useFood() {
@@ -51,6 +52,15 @@ export function FoodProvider({ children }) {
     setFoodOrder(currentOrder);
   };
 
+  const selectFood = (foodId: IFood["itemId"], foodList: IFood[]) => {
+    setFoodOrder([]);
+    const foundFound = foodList.filter((food) => food.itemId === foodId);
+    if (foundFound) {
+      setFoodOrder(foundFound);
+    }
+    return null;
+  };
+
   const addToCart = (foodId: IFood["itemId"], foodList: IFood[]) => {
     const foundFound = foodOrder.find((food) => food.itemId === foodId);
     if (foundFound) {
@@ -78,6 +88,7 @@ export function FoodProvider({ children }) {
       removeFood: removeFood,
       addFood: addFood,
       addToCart: addToCart,
+      selectFood: selectFood,
     },
   };
 
