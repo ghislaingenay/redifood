@@ -1,11 +1,17 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect } from "react";
 import FoodLayout from "../src/components/food/FoodLayout";
+import { useFood } from "../src/contexts/food.context";
 import { EFoodMode } from "../src/interfaces";
 import { foodSectionArray, mockedFoodData } from "../test/mocks/mockFoodData";
 
 const FoodPage = ({ foodList, foodSection, status }) => {
-  const handleFoodChange = () => {
-    console.log("altered food");
-  };
+  const { setFoodOrder } = useFood();
+
+  useEffect(() => {
+    setFoodOrder([]);
+  }, []);
+
   return (
     <FoodLayout
       status={status}
@@ -13,7 +19,6 @@ const FoodPage = ({ foodList, foodSection, status }) => {
       foodList={foodList}
       mode={EFoodMode.ALTER}
       mainTitle="FOOD SECTION"
-      updateFood={handleFoodChange}
     />
   );
 };
