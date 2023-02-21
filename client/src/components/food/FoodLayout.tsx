@@ -124,7 +124,7 @@ const FoodLayout = ({ foodList, mode, foodSection, mainTitle, handleOrderCreate,
                 />
               </Then>
               <Else>
-                <FoodForm />
+                <FoodForm foodSection={foodSection} foodList={foodList} />
               </Else>
             </If>
           </Card>

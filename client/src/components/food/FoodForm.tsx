@@ -1,18 +1,26 @@
 import { PlusOutlined } from "@ant-design/icons";
 import { faFilePen, faSquarePlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Form } from "antd";
+import { Form, Select } from "antd";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { GREY } from "../../constants";
 import { optionsCreateFood } from "../../constants/food.const";
 import { useFood } from "../../contexts/food.context";
+import { convertFoodToSection } from "../../functions/food.fn";
+import { capitalize } from "../../functions/global.fn";
 import { IFood, IFormInterface } from "../../interfaces";
 import { SpacingDiv5X } from "../../styles/styledComponents/div.styled";
+import { RedSpan } from "../../styles/styledComponents/span.styled";
+import { LabelFormBlack, RoundedInput } from "../../styles/styledComponents/typography.styled";
 import { RowCenter } from "../styling/grid.styled";
 import RediRadioButton from "../styling/RediRadioButton";
-
-const FoodForm = () => {
+const { Option } = Select;
+interface IFoodForm {
+  foodSection: string[];
+  foodList: IFood[];
+}
+const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
   const {
     foodOrder,
     functions: { selectFood },
@@ -27,6 +35,13 @@ const FoodForm = () => {
   ];
 
   const [currentFood, setCurrentFood] = useState<IFood>(foodOrder[0]);
+
+  const [selectedSection, setSelectedSection] = useState<string>("");
+  const [inputSection, setInputSection] = useState<string>("");
+  const [inputExtra, setInputExtra] = useState<string>("");
+  const [selectedExtra, setSelectedExtra] = useState<string>("");
+
+  const [sectionExtraObj, setSectionExtraObj] = useState<Record<string, string[]>>({});
 
   const onFinish = (values: any) => {
     console.log("submitted", values);
@@ -73,13 +88,20 @@ const FoodForm = () => {
 
   useEffect(() => {
     if (newFoodMode === "false" && foodOrder[0]) {
+      // get section
+      // get also table
       setCurrentFood(foodOrder[0]);
       form.setFieldsValue({
         itemName: foodOrder[0].itemName,
         itemDescription: foodOrder[0].itemDescription,
         itemPrice: foodOrder[0].itemPrice,
         itemPhoto: foodOrder[0].itemPhoto,
+        section: foodOrder[0].itemSection,
+        // extra: foodOrder[0].itemExtra,
       });
+      setSectionExtraObj(convertFoodToSection(foodList, foodSection));
+      setSelectedSection(foodOrder[0].itemSection);
+      setSelectedExtra(foodOrder[0].itemExtra);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectFood]);
@@ -121,13 +143,62 @@ const FoodForm = () => {
       <Form form={form} onFinish={onFinish} layout="vertical">
         {optionsCreateFood.map(({ label, name, component, rules }: IFormInterface) => {
           return (
-            <Form.Item style={{ fontWeight: 700 }} key={name} name={name} label={label} rules={rules}>
-              {component}
-            </Form.Item>
+            <>
+              <LabelFormBlack htmlFor={name}>
+                {label} <RedSpan>*</RedSpan>
+              </LabelFormBlack>
+              <Form.Item
+                id={name}
+                style={{ fontWeight: 700, marginBottom: "1rem" }}
+                key={name}
+                name={name}
+                rules={rules}
+              >
+                {component}
+              </Form.Item>
+            </>
           );
         })}
-        {/* <Form.Item style={{ fontWeight: 700 }} key={name} name={name} label={label} rules={rules}></Form.Item> */}
+        <LabelFormBlack htmlFor="section">
+          Section <RedSpan>*</RedSpan>
+        </LabelFormBlack>
+        <Form.Item name="itemSection">
+          <Select
+            style={{ borderRadius: "2rem" }}
+            value={selectedSection}
+            onChange={() => {
+              setSelectedExtra("");
+            }}
+          >
+            {foodSection.map((section, index) => (
+              <Option key={index} value={section}>
+                {capitalize(section)}
+              </Option>
+            ))}
+            <Option value="addSection">Add Section</Option>
+          </Select>
+        </Form.Item>
+        {selectedSection === "addSection" && (
+          <RoundedInput value={inputSection} onChange={(e) => setInputSection(e.target.value)} />
+        )}
+        {selectedSection !== "addSection" && (
+          <>
+            <LabelFormBlack htmlFor="section">
+              Extra <RedSpan>*</RedSpan>
+            </LabelFormBlack>
+            <Select>
+              <Option value="">Select ...</Option>
+              {sectionExtraObj[selectedSection]?.map((extra, index) => (
+                <Option key={index} value={extra}>
+                  {capitalize(extra)}
+                </Option>
+              ))}
+              <Option value="addExtra">Add EXtra</Option>
+            </Select>
+          </>
+        )}
       </Form>
+      {/* <Form.Item style={{ fontWeight: 700 }} key={name} name={name} label={label} rules={rules}></Form.Item> */}
     </SpacingDiv5X>
   );
 };
