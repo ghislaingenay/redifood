@@ -15,6 +15,10 @@ export const LabelFormWhite = styled.label`
   padding-left: 1rem;
   margin: 1rem 0;
 `;
+export const LabelFormBlack = styled(LabelFormWhite)`
+  color: black;
+  font-weight: 700;
+`;
 
 export const CenteredTitle = styled(Title)`
   text-align: center;
