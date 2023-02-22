@@ -29,3 +29,13 @@ export const capitalize = (value: string) => {
   if (typeof value !== "string") return "";
   return value[0].toUpperCase() + value.slice(1);
 };
+
+export const getOptions = (array: string[]) => {
+  const newArray = array.map((item) => {
+    return {
+      value: item,
+      label: capitalize(item),
+    };
+  });
+  return newArray;
+};

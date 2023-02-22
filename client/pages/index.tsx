@@ -10,18 +10,9 @@ import { RediIconButton } from "../src/components/styling/Button.style";
 import { RowSpaceAround } from "../src/components/styling/grid.styled";
 import { BACKGROUND_COLOR } from "../src/constants";
 import AppContext from "../src/contexts/app.context";
+import { getOptions } from "../src/functions/global.fn";
 import { EButtonType, IOrder } from "../src/interfaces";
 import { allDataOrders, getListUnpaidOrders } from "../test/mocks/mockOrdersData";
-
-export const getOptions = (array: string[]) => {
-  const newArray = array.map((item) => {
-    return {
-      value: item,
-      label: item,
-    };
-  });
-  return newArray;
-};
 
 const AllOrdersPage = ({ allOrders, getList, status }) => {
   const appValue = useContext(AppContext);
