@@ -1,3 +1,5 @@
+import { ECurrency } from "../../src/interfaces";
+
 export const mockedFoodData = [
   {
     itemId: "1",
@@ -10,7 +12,7 @@ export const mockedFoodData = [
     itemSection: "pizza",
     itemExtra: "tomato",
     itemQuantity: 0,
-    itemCurrency: "USD",
+    itemCurrency: ECurrency.USD,
   },
   {
     itemId: "2",
@@ -22,7 +24,7 @@ export const mockedFoodData = [
     itemSection: "pizza",
     itemExtra: "cream",
     itemQuantity: 0,
-    itemCurrency: "USD",
+    itemCurrency: ECurrency.USD,
   },
   {
     itemId: "3",
@@ -34,7 +36,7 @@ export const mockedFoodData = [
     itemSection: "dessert",
     itemExtra: "pastry",
     itemQuantity: 0,
-    itemCurrency: "USD",
+    itemCurrency: ECurrency.USD,
   },
   {
     itemId: "4",
@@ -46,7 +48,7 @@ export const mockedFoodData = [
     itemSection: "dessert",
     itemExtra: "pastry",
     itemQuantity: 0,
-    itemCurrency: "USD",
+    itemCurrency: ECurrency.USD,
   },
   {
     itemId: "5",
@@ -58,7 +60,7 @@ export const mockedFoodData = [
     itemSection: "dessert",
     itemExtra: "cake",
     itemQuantity: 0,
-    itemCurrency: "USD",
+    itemCurrency: ECurrency.USD,
   },
   {
     itemId: "6",
@@ -70,7 +72,7 @@ export const mockedFoodData = [
     itemSection: "drink",
     itemExtra: "hot drink",
     itemQuantity: 0,
-    itemCurrency: "USD",
+    itemCurrency: ECurrency.USD,
   },
   {
     itemId: "7",
@@ -82,7 +84,7 @@ export const mockedFoodData = [
     itemSection: "drink",
     itemExtra: "soda",
     itemQuantity: 0,
-    itemCurrency: "USD",
+    itemCurrency: ECurrency.USD,
   },
   {
     itemId: "8",
@@ -94,7 +96,7 @@ export const mockedFoodData = [
     itemSection: "drink",
     itemExtra: "soda",
     itemQuantity: 0,
-    itemCurrency: "USD",
+    itemCurrency: ECurrency.USD,
   },
   {
     itemId: "9",
@@ -106,7 +108,7 @@ export const mockedFoodData = [
     itemSection: "drink",
     itemExtra: "beer",
     itemQuantity: 0,
-    itemCurrency: "USD",
+    itemCurrency: ECurrency.USD,
   },
 ];
 
