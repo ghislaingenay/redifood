@@ -1,20 +1,22 @@
 import { PlusOutlined } from "@ant-design/icons";
 import { faFilePen, faSquarePlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Form, Select } from "antd";
+import { Alert, Form, Select } from "antd";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { Case, Default, Switch } from "react-if";
 import { GREY } from "../../constants";
 import { optionsCreateFood } from "../../constants/food.const";
 import { useFood } from "../../contexts/food.context";
 import { convertFoodToSection } from "../../functions/food.fn";
 import { capitalize } from "../../functions/global.fn";
-import { IFood, IFormInterface } from "../../interfaces";
+import { EButtonType, IFood, IFormInterface } from "../../interfaces";
 import { SpacingDiv5X } from "../../styles/styledComponents/div.styled";
 import { RedSpan } from "../../styles/styledComponents/span.styled";
-import { LabelFormBlack, RoundedInput } from "../../styles/styledComponents/typography.styled";
+import { LabelFormBlack, LabelFormOrange, RoundedInput } from "../../styles/styledComponents/typography.styled";
+import { RediButton } from "../styling/Button.style";
 import { RowCenter } from "../styling/grid.styled";
-import RediRadioButton from "../styling/RediRadioButton";
+import RediRadioButton, { Booleanish } from "../styling/RediRadioButton";
 const { Option } = Select;
 interface IFoodForm {
   foodSection: string[];
@@ -27,7 +29,9 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
   } = useFood();
   const [form] = Form.useForm();
   const pictureValue = Form.useWatch("itemPhoto", form);
-  const [newFoodMode, setNewFoodMode] = useState("false");
+  const sectionValue = Form.useWatch("itemSection", form);
+  const extraValue = Form.useWatch("itemExtra", form);
+  const [editMode, setEditMode] = useState<Booleanish>("false");
 
   const foodRadioOptions = [
     { label: "EDIT", value: "false", icon: <FontAwesomeIcon icon={faFilePen} /> },
@@ -35,7 +39,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
   ];
 
   const [currentFood, setCurrentFood] = useState<IFood>(foodOrder[0]);
-
+  const [newFoodData, setNewFoodData] = useState<IFood | null>(null);
   const [selectedSection, setSelectedSection] = useState<string>("");
   const [inputSection, setInputSection] = useState<string>("");
   const [inputExtra, setInputExtra] = useState<string>("");
@@ -87,9 +91,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
   // if (foodOrder[0] === currentFood) {
 
   useEffect(() => {
-    if (newFoodMode === "false" && foodOrder[0]) {
-      // get section
-      // get also table
+    if (editMode === "false" && foodOrder[0]) {
       setCurrentFood(foodOrder[0]);
       form.setFieldsValue({
         itemName: foodOrder[0].itemName,
@@ -102,9 +104,11 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
       setSectionExtraObj(convertFoodToSection(foodList, foodSection));
       setSelectedSection(foodOrder[0].itemSection);
       setSelectedExtra(foodOrder[0].itemExtra);
+    } else {
+      form.setFieldsValue({});
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectFood]);
+  }, [selectFood, editMode]);
   return (
     <SpacingDiv5X>
       <RediRadioButton
@@ -113,91 +117,125 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
         fontSize="0.75rem"
         options={foodRadioOptions}
         haveIcon={"true"}
-        selectedButton={newFoodMode}
-        setSelectedButton={setNewFoodMode}
+        selectedButton={editMode}
+        setSelectedButton={setEditMode}
+        clickedFn={() => {
+          form.setFieldsValue({});
+        }}
       />
-      <RowCenter style={{ marginTop: "1rem" }}>
-        {pictureValue ? (
-          <Image
-            height={200}
-            width={200}
-            style={{ borderRadius: "50%", border: `1px dashed ${GREY}`, margin: "0 auto 1rem" }}
-            src={pictureValue}
-            alt="new food picture"
+      <Switch>
+        <Case condition={editMode === "false" && foodOrder.length === 0}>
+          <Alert
+            type="warning"
+            style={{ fontWeight: 700, height: "80vh", textAlign: "center", fontSize: "1rem", marginTop: "1.5rem" }}
+            message="Please a select a food to update"
           />
-        ) : (
-          <RowCenter
-            style={{
-              width: 200,
-              height: 200,
-              border: `1px dashed ${GREY}`,
-              margin: "0 auto 1rem",
-              borderRadius: "50%",
-            }}
-          >
-            <PlusOutlined /> Upload
-          </RowCenter>
-        )}
-      </RowCenter>
-
-      <Form form={form} onFinish={onFinish} layout="vertical">
-        {optionsCreateFood.map(({ label, name, component, rules }: IFormInterface) => {
-          return (
-            <>
-              <LabelFormBlack htmlFor={name}>
-                {label} <RedSpan>*</RedSpan>
-              </LabelFormBlack>
-              <Form.Item
-                id={name}
-                style={{ fontWeight: 700, marginBottom: "1rem" }}
-                key={name}
-                name={name}
-                rules={rules}
+        </Case>
+        <Default>
+          <RowCenter style={{ marginTop: "1rem" }}>
+            {pictureValue ? (
+              <Image
+                height={200}
+                width={200}
+                style={{ borderRadius: "50%", border: `1px dashed ${GREY}`, margin: "0 auto 1rem" }}
+                src={pictureValue}
+                alt="new food picture"
+              />
+            ) : (
+              <RowCenter
+                style={{
+                  width: 200,
+                  height: 200,
+                  border: `1px dashed ${GREY}`,
+                  margin: "0 auto 1rem",
+                  borderRadius: "50%",
+                }}
               >
-                {component}
-              </Form.Item>
-            </>
-          );
-        })}
-        <LabelFormBlack htmlFor="section">
-          Section <RedSpan>*</RedSpan>
-        </LabelFormBlack>
-        <Form.Item name="itemSection">
-          <Select
-            style={{ borderRadius: "2rem" }}
-            value={selectedSection}
-            onChange={() => {
-              setSelectedExtra("");
+                <PlusOutlined /> Upload
+              </RowCenter>
+            )}
+          </RowCenter>
+
+          <Form
+            form={form}
+            onFinish={onFinish}
+            layout="vertical"
+            onValuesChange={(e, all) => {
+              console.log(e);
+              if (editMode === "true") {
+                setNewFoodData(all);
+              }
             }}
           >
-            {foodSection.map((section, index) => (
-              <Option key={index} value={section}>
-                {capitalize(section)}
-              </Option>
-            ))}
-            <Option value="addSection">Add Section</Option>
-          </Select>
-        </Form.Item>
-        {selectedSection === "addSection" && (
-          <RoundedInput value={inputSection} onChange={(e) => setInputSection(e.target.value)} />
-        )}
-        {selectedSection !== "addSection" && (
-          <>
+            {optionsCreateFood.map(({ label, name, component, rules }: IFormInterface) => {
+              return (
+                <>
+                  <LabelFormBlack htmlFor={name}>
+                    {label} <RedSpan>*</RedSpan>
+                  </LabelFormBlack>
+                  <Form.Item
+                    id={name}
+                    style={{ fontWeight: 700, marginBottom: "1rem" }}
+                    key={name}
+                    name={name}
+                    rules={rules}
+                  >
+                    {component}
+                  </Form.Item>
+                </>
+              );
+            })}
             <LabelFormBlack htmlFor="section">
-              Extra <RedSpan>*</RedSpan>
+              Section <RedSpan>*</RedSpan>
             </LabelFormBlack>
-            <Select>
-              <Option value="">Select ...</Option>
-              {sectionExtraObj[selectedSection]?.map((extra, index) => (
-                <Option key={index} value={extra}>
-                  {capitalize(extra)}
-                </Option>
-              ))}
-              <Option value="addExtra">Add EXtra</Option>
-            </Select>
-          </>
-        )}
-      </Form>
+            <Form.Item name="itemSection">
+              <Select
+                style={{ borderRadius: "2rem" }}
+                onChange={() => {
+                  form.setFieldValue("itemExtra", "");
+                }}
+              >
+                {foodSection.map((section, index) => (
+                  <Option key={index} value={section}>
+                    {capitalize(section)}
+                  </Option>
+                ))}
+                <Option value="addSection">Add Section</Option>
+              </Select>
+            </Form.Item>
+            {sectionValue === "addSection" && (
+              <>
+                <LabelFormOrange>Create a new section</LabelFormOrange>
+                <RoundedInput value={inputSection} onChange={(e) => setInputSection(e.target.value)} />
+                <RediButton
+                  buttonType={EButtonType.SUCCESS}
+                  onClick={() => {
+                    console.log("new section clicked");
+                  }}
+                >
+                  Create Section
+                </RediButton>
+              </>
+            )}
+            {selectedSection !== "addSection" && (
+              <>
+                <LabelFormBlack htmlFor="section">
+                  Extra <RedSpan>*</RedSpan>
+                </LabelFormBlack>
+                <Select>
+                  <Option value="">Select ...</Option>
+                  {sectionExtraObj[selectedSection]?.map((extra, index) => (
+                    <Option key={index} value={extra}>
+                      {capitalize(extra)}
+                    </Option>
+                  ))}
+                  <Option value="addExtra">Add EXtra</Option>
+                </Select>
+              </>
+            )}
+          </Form>
+        </Default>
+      </Switch>
       {/* <Form.Item style={{ fontWeight: 700 }} key={name} name={name} label={label} rules={rules}></Form.Item> */}
     </SpacingDiv5X>
   );
