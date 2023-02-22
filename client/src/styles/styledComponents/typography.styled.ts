@@ -1,5 +1,6 @@
 import { Input, InputNumber, Typography } from "antd";
 import styled from "styled-components";
+import { ORANGE_DARK } from "../../constants";
 const { Title } = Typography;
 export const RoundedInput = styled(Input)`
   border-radius: 2rem;
@@ -17,6 +18,10 @@ export const LabelFormWhite = styled.label`
 `;
 export const LabelFormBlack = styled(LabelFormWhite)`
   color: black;
+  font-weight: 700;
+`;
+export const LabelFormOrange = styled(LabelFormBlack)`
+  color: ${ORANGE_DARK};
   font-weight: 700;
 `;
 
