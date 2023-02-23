@@ -1,4 +1,3 @@
-import TextArea from "antd/es/input/TextArea";
 import { IFormInterface } from "../interfaces";
 import { RoundedInput, RoundedInputNum } from "../styles/styledComponents/typography.styled";
 
@@ -19,7 +18,7 @@ export const optionsCreateFood: IFormInterface[] = [
   {
     label: "Description",
     name: "itemDescription",
-    component: <TextArea maxLength={40} rows={2} placeholder="Description" style={styleNoM} />,
+    component: <RoundedInput maxLength={40} placeholder="Description" style={styleNoM} />,
     rules: [{ required: false, message: "A description is required" }],
   },
   {
