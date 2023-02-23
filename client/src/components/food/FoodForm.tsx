@@ -1,7 +1,7 @@
 import { PlusOutlined } from "@ant-design/icons";
-import { faFilePen, faSquarePlus } from "@fortawesome/free-solid-svg-icons";
+import { faBan, faFileCircleCheck, faFilePen, faSquarePlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Alert, Form, Popover, Select } from "antd";
+import { Alert, Form, Select } from "antd";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Case, Default, Switch } from "react-if";
@@ -13,9 +13,9 @@ import { capitalize } from "../../functions/global.fn";
 import { EButtonType, IFood, IFormInterface } from "../../interfaces";
 import { SpacingDiv5X } from "../../styles/styledComponents/div.styled";
 import { RedSpan } from "../../styles/styledComponents/span.styled";
-import { LabelFormBlack, LabelFormOrange, RoundedInput } from "../../styles/styledComponents/typography.styled";
-import { RediButton } from "../styling/Button.style";
-import { RowCenter } from "../styling/grid.styled";
+import { LabelFormBlack, LabelFormBlue, RoundedInput } from "../../styles/styledComponents/typography.styled";
+import { RediButton, RediIconButton } from "../styling/Button.style";
+import { RowCenter, RowCenterSp } from "../styling/grid.styled";
 import RediRadioButton, { Booleanish } from "../styling/RediRadioButton";
 const { Option } = Select;
 interface IFoodForm {
@@ -195,12 +195,12 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
             <LabelFormBlack htmlFor="itemSection">
               Section <RedSpan>*</RedSpan>
             </LabelFormBlack>
-            <Form.Item name="itemSection" id="itemSection">
+            <Form.Item name="itemSection" id="itemSection" style={{ fontWeight: 700, marginBottom: "0.5rem" }}>
               <Select
                 style={{ borderRadius: "2rem" }}
                 // options={getOptions(foodSection).push({ label: "Add Section", value: "addSection" })}
                 onChange={() => {
-                  form.setFieldValue("itemExtra", "");
+                  form.setFieldValue("itemExtra", "none");
                 }}
               >
                 <Option value="none">Select ...</Option>
@@ -215,22 +215,23 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
             <Switch>
               <Case condition={sectionValue === "addSection"}>
                 <>
-                  <LabelFormOrange>Create a new section</LabelFormOrange>
+                  <LabelFormBlue>Create a new section</LabelFormBlue>
                   <RoundedInput value={inputSection} onChange={(e) => setInputSection(e.target.value)} />
-                  <Popover>
-                    <RediButton
-                      buttonType={EButtonType.SUCCESS}
-                      disabled={inputSection === "" ? true : false}
-                      onClick={() => {
-                        console.log("new section clicked", inputSection);
-                      }}
-                    >
-                      Create Section
-                    </RediButton>
-                  </Popover>
+                  <RediButton
+                    buttonType={EButtonType.CREATE}
+                    disabled={inputSection === "" ? true : false}
+                    onClick={() => {
+                      // ViewSectionModel
+                      form.setFieldValue("itemSection", "none");
+                      setInputSection("");
+                      console.log("new section clicked", inputSection);
+                    }}
+                  >
+                    Create Section
+                  </RediButton>
                 </>
               </Case>
-              <Case condition={sectionValue !== "addSection" && sectionValue !== "all"}>
+              <Case condition={sectionValue !== "addSection" && sectionValue !== "all" && sectionValue !== "none"}>
                 <>
                   <LabelFormBlack htmlFor="itemExtra">
                     Extra <RedSpan>*</RedSpan>
@@ -238,7 +239,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                   <Form.Item name="itemExtra" id="itemExtra" style={{ fontWeight: 700, marginBottom: "0.5rem" }}>
                     <Select>
                       <Option value="none">Select ...</Option>
-                      {sortedFood[selectedSection]?.map((extra, index) => (
+                      {sortedFood[sectionValue]?.map((extra, index) => (
                         <Option key={index} value={extra}>
                           {capitalize(extra)}
                         </Option>
@@ -247,8 +248,36 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                     </Select>
                   </Form.Item>
                 </>
+                {extraValue === "addExtra" && (
+                  <>
+                    <LabelFormBlue>Create a new extra</LabelFormBlue>
+                    <RowCenterSp>
+                      <RoundedInput value={inputExtra} onChange={(e) => setInputExtra(e.target.value)} />
+                      <RediButton
+                        buttonType={EButtonType.CREATE}
+                        disabled={inputExtra === "" ? true : false}
+                        onClick={() => {
+                          // ViewExtraModel
+                          form.setFieldValue("itemExtra", "none");
+                          setInputExtra("");
+                          console.log("new section clicked", inputSection);
+                        }}
+                      >
+                        Create Extra
+                      </RediButton>
+                    </RowCenterSp>
+                  </>
+                )}
               </Case>
             </Switch>
+            <RowCenterSp style={{ marginTop: "1rem" }}>
+              <RediIconButton buttonType={EButtonType.SUCCESS} iconFt={faFileCircleCheck}>
+                Confirm
+              </RediIconButton>
+              <RediIconButton buttonType={EButtonType.ERROR} iconFt={faBan}>
+                Cancel
+              </RediIconButton>
+            </RowCenterSp>
           </Form>
         </Default>
       </Switch>
