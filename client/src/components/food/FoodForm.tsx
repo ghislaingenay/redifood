@@ -230,7 +230,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                   </Popover>
                 </>
               </Case>
-              <Case style={{ margin: 0 }} condition={sectionValue !== "addSection" && sectionValue !== "all"}>
+              <Case condition={sectionValue !== "addSection" && sectionValue !== "all"}>
                 <>
                   <LabelFormBlack htmlFor="itemExtra">
                     Extra <RedSpan>*</RedSpan>

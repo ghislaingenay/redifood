@@ -30,7 +30,7 @@ interface IRediRadioButtonProps<T extends Booleanish> extends ButtonProps {
   radioGroupName: string;
   options: TIconDataMap[T];
   haveIcon: T;
-  selectedButton: string;
+  selectedButton: any;
   setSelectedButton: Dispatch<SetStateAction<any>>;
   disabled?: boolean;
   clickedFn?: () => void;
