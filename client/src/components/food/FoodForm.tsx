@@ -1,7 +1,7 @@
 import { PlusOutlined } from "@ant-design/icons";
 import { faFilePen, faSquarePlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Alert, Form, Select } from "antd";
+import { Alert, Form, Popover, Select } from "antd";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Case, Default, Switch } from "react-if";
@@ -28,6 +28,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
     functions: { selectFood },
   } = useFood();
   const [form] = Form.useForm();
+  const pictureSize = 150;
   const pictureValue = Form.useWatch("itemPhoto", form);
   const sectionValue = Form.useWatch("itemSection", form);
   const extraValue = Form.useWatch("itemExtra", form);
@@ -38,14 +39,14 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
     { label: "CREATE", value: "true", icon: <FontAwesomeIcon icon={faSquarePlus} /> },
   ];
 
+  const [sortedFood, setSortedFood] = useState<Record<string, string[]>>({});
+
   const [currentFood, setCurrentFood] = useState<IFood>(foodOrder[0]);
   const [newFoodData, setNewFoodData] = useState<IFood | null>(null);
   const [selectedSection, setSelectedSection] = useState<string>("");
   const [inputSection, setInputSection] = useState<string>("");
   const [inputExtra, setInputExtra] = useState<string>("");
   const [selectedExtra, setSelectedExtra] = useState<string>("");
-
-  const [sectionExtraObj, setSectionExtraObj] = useState<Record<string, string[]>>({});
 
   const onFinish = (values: any) => {
     console.log("submitted", values);
@@ -91,21 +92,25 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
   // if (foodOrder[0] === currentFood) {
 
   useEffect(() => {
-    if (editMode === "false" && foodOrder[0]) {
+    if (editMode === "false" && foodOrder.length !== 0) {
+      console.log("fdp", foodOrder[0]);
       setCurrentFood(foodOrder[0]);
       form.setFieldsValue({
         itemName: foodOrder[0].itemName,
         itemDescription: foodOrder[0].itemDescription,
         itemPrice: foodOrder[0].itemPrice,
         itemPhoto: foodOrder[0].itemPhoto,
-        section: foodOrder[0].itemSection,
-        // extra: foodOrder[0].itemExtra,
+        itemSection: foodOrder[0].itemSection,
+        itemExtra: foodOrder[0].itemExtra,
       });
-      setSectionExtraObj(convertFoodToSection(foodList, foodSection));
+      setSortedFood(convertFoodToSection(foodList, foodSection));
       setSelectedSection(foodOrder[0].itemSection);
       setSelectedExtra(foodOrder[0].itemExtra);
     } else {
-      form.setFieldsValue({});
+      form.setFieldsValue({
+        itemSection: "none",
+        itemExtra: "none",
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectFood, editMode]);
@@ -135,8 +140,8 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
           <RowCenter style={{ marginTop: "1rem" }}>
             {pictureValue ? (
               <Image
-                height={200}
-                width={200}
+                height={pictureSize}
+                width={pictureSize}
                 style={{ borderRadius: "50%", border: `1px dashed ${GREY}`, margin: "0 auto 1rem" }}
                 src={pictureValue}
                 alt="new food picture"
@@ -144,8 +149,8 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
             ) : (
               <RowCenter
                 style={{
-                  width: 200,
-                  height: 200,
+                  width: { pictureSize },
+                  height: { pictureSize },
                   border: `1px dashed ${GREY}`,
                   margin: "0 auto 1rem",
                   borderRadius: "50%",
@@ -161,7 +166,9 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
             onFinish={onFinish}
             layout="vertical"
             onValuesChange={(e, all) => {
+              console.log("all", all);
               console.log(e);
+              form.setFieldsValue(all);
               if (editMode === "true") {
                 setNewFoodData(all);
               }
@@ -175,7 +182,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                   </LabelFormBlack>
                   <Form.Item
                     id={name}
-                    style={{ fontWeight: 700, marginBottom: "1rem" }}
+                    style={{ fontWeight: 700, marginBottom: "0.5rem" }}
                     key={name}
                     name={name}
                     rules={rules}
@@ -185,16 +192,18 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                 </>
               );
             })}
-            <LabelFormBlack htmlFor="section">
+            <LabelFormBlack htmlFor="itemSection">
               Section <RedSpan>*</RedSpan>
             </LabelFormBlack>
-            <Form.Item name="itemSection">
+            <Form.Item name="itemSection" id="itemSection">
               <Select
                 style={{ borderRadius: "2rem" }}
+                // options={getOptions(foodSection).push({ label: "Add Section", value: "addSection" })}
                 onChange={() => {
                   form.setFieldValue("itemExtra", "");
                 }}
               >
+                <Option value="none">Select ...</Option>
                 {foodSection.map((section, index) => (
                   <Option key={index} value={section}>
                     {capitalize(section)}
@@ -203,36 +212,43 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                 <Option value="addSection">Add Section</Option>
               </Select>
             </Form.Item>
-            {sectionValue === "addSection" && (
-              <>
-                <LabelFormOrange>Create a new section</LabelFormOrange>
-                <RoundedInput value={inputSection} onChange={(e) => setInputSection(e.target.value)} />
-                <RediButton
-                  buttonType={EButtonType.SUCCESS}
-                  onClick={() => {
-                    console.log("new section clicked");
-                  }}
-                >
-                  Create Section
-                </RediButton>
-              </>
-            )}
-            {selectedSection !== "addSection" && (
-              <>
-                <LabelFormBlack htmlFor="section">
-                  Extra <RedSpan>*</RedSpan>
-                </LabelFormBlack>
-                <Select>
-                  <Option value="">Select ...</Option>
-                  {sectionExtraObj[selectedSection]?.map((extra, index) => (
-                    <Option key={index} value={extra}>
-                      {capitalize(extra)}
-                    </Option>
-                  ))}
-                  <Option value="addExtra">Add EXtra</Option>
-                </Select>
-              </>
-            )}
+            <Switch>
+              <Case condition={sectionValue === "addSection"}>
+                <>
+                  <LabelFormOrange>Create a new section</LabelFormOrange>
+                  <RoundedInput value={inputSection} onChange={(e) => setInputSection(e.target.value)} />
+                  <Popover>
+                    <RediButton
+                      buttonType={EButtonType.SUCCESS}
+                      disabled={inputSection === "" ? true : false}
+                      onClick={() => {
+                        console.log("new section clicked", inputSection);
+                      }}
+                    >
+                      Create Section
+                    </RediButton>
+                  </Popover>
+                </>
+              </Case>
+              <Case style={{ margin: 0 }} condition={sectionValue !== "addSection" && sectionValue !== "all"}>
+                <>
+                  <LabelFormBlack htmlFor="itemExtra">
+                    Extra <RedSpan>*</RedSpan>
+                  </LabelFormBlack>
+                  <Form.Item name="itemExtra" id="itemExtra" style={{ fontWeight: 700, marginBottom: "0.5rem" }}>
+                    <Select>
+                      <Option value="none">Select ...</Option>
+                      {sortedFood[selectedSection]?.map((extra, index) => (
+                        <Option key={index} value={extra}>
+                          {capitalize(extra)}
+                        </Option>
+                      ))}
+                      <Option value="addExtra">Add Extra</Option>
+                    </Select>
+                  </Form.Item>
+                </>
+              </Case>
+            </Switch>
           </Form>
         </Default>
       </Switch>
