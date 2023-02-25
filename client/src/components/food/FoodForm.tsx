@@ -40,6 +40,7 @@ enum EHandleType {
 const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
   const {
     foodOrder,
+    setFoodOrder,
     functions: { selectFood },
   } = useFood();
   const [form] = Form.useForm();
@@ -47,13 +48,13 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
   const pictureValue = Form.useWatch("itemPhoto", form);
   const sectionValue = Form.useWatch("itemSection", form);
   const extraValue = Form.useWatch("itemExtra", form);
-  const [editMode, setEditMode] = useState<Booleanish>("false");
+  const [editMode, setEditMode] = useState<Booleanish>("true");
 
   const [handleType, setHandleType] = useState<EHandleType>(EHandleType.NONE);
 
   const foodRadioOptions = [
-    { label: "EDIT", value: "false", icon: <FontAwesomeIcon icon={faFilePen} /> },
-    { label: "CREATE", value: "true", icon: <FontAwesomeIcon icon={faSquarePlus} /> },
+    { label: "EDIT", value: "true", icon: <FontAwesomeIcon icon={faFilePen} /> },
+    { label: "CREATE", value: "false", icon: <FontAwesomeIcon icon={faSquarePlus} /> },
   ];
 
   const [sortedFood, setSortedFood] = useState<Record<string, string[]>>({});
@@ -142,7 +143,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
   // if (foodOrder[0] === currentFood) {
 
   useEffect(() => {
-    if (editMode === "false" && foodOrder.length !== 0) {
+    if (editMode === "true" && foodOrder.length !== 0) {
       console.log("fdp", foodOrder[0]);
       setCurrentFood(foodOrder[0]);
       form.setFieldsValue({
@@ -173,11 +174,19 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
         selectedButton={editMode}
         setSelectedButton={setEditMode}
         clickedFn={() => {
-          form.setFieldsValue({});
+          setFoodOrder([]);
+          form.setFieldsValue({
+            itemPhoto: "",
+            itemName: "",
+            itemPrice: "",
+            itemDescription: "",
+            itemSection: EHandleType.NONE,
+            itemExtra: EHandleType.NONE,
+          });
         }}
       />
       <Switch>
-        <Case condition={editMode === "false" && foodOrder.length === 0}>
+        <Case condition={editMode === "true" && foodOrder.length === 0}>
           <Alert
             type="warning"
             style={{ fontWeight: 700, height: "80vh", textAlign: "center", fontSize: "1rem", marginTop: "1.5rem" }}
@@ -195,17 +204,19 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                 alt="new food picture"
               />
             ) : (
-              <RowCenter
+              <div
                 style={{
-                  width: { pictureSize },
-                  height: { pictureSize },
+                  // width: { pictureSize },
+                  // height: { pictureSize },
                   border: `1px dashed ${GREY}`,
                   margin: "0 auto 1rem",
                   borderRadius: "50%",
                 }}
               >
-                <PlusOutlined /> Upload
-              </RowCenter>
+                <RowCenterSp>
+                  <PlusOutlined /> Upload
+                </RowCenterSp>
+              </div>
             )}
           </RowCenter>
 
