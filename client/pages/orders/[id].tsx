@@ -1,15 +1,16 @@
 import { faCartShopping, faCashRegister, faCreditCard } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Alert, Card, Col, Space } from "antd";
+import { Alert, Col, Space } from "antd";
 import { useState } from "react";
 
 import { useRouter } from "next/navigation";
 import { RediIconButton } from "../../src/components/styling/Button.style";
 import { RowSpaceBetween } from "../../src/components/styling/grid.styled";
 import RediRadioButton from "../../src/components/styling/RediRadioButton";
-import { LIGHT_GREY, RED } from "../../src/constants";
+import { RED } from "../../src/constants";
 import { capitalize, hexToRgba } from "../../src/functions/global.fn";
 import { EButtonType, EPaymentType } from "../../src/interfaces";
+import { LGCard } from "../../src/styles";
 import { SpacingDiv5X } from "../../src/styles/styledComponents/div.styled";
 import { mockOneOrder } from "../../test/mocks/mockOrdersData";
 
@@ -31,7 +32,7 @@ const CurrentOrder = ({ currentOrder, status }: any) => {
 
   return (
     <SpacingDiv5X>
-      <Card style={{ backgroundColor: LIGHT_GREY, padding: "0 1rem", boxShadow: "0 0 1rem rgba(0,0,0,0.3)" }}>
+      <LGCard style={{ padding: "0 1rem" }}>
         <RowSpaceBetween>
           <Col lg={8}>
             <b>Order #</b>
@@ -47,12 +48,10 @@ const CurrentOrder = ({ currentOrder, status }: any) => {
             <Alert type={messageType} message={alertMessage} style={{ fontWeight: 700, color: colorAlert }} />
           </Col>
         </RowSpaceBetween>
-      </Card>
-      <Card
+      </LGCard>
+      <LGCard
         style={{
-          backgroundColor: LIGHT_GREY,
           padding: "0 1rem",
-          boxShadow: "0 0 1rem rgba(0,0,0,0.3)",
           margin: "2rem 0",
         }}
       >
@@ -86,7 +85,7 @@ const CurrentOrder = ({ currentOrder, status }: any) => {
               <td></td>
               <td></td>
               <td></td>
-              <td rowSpan={2}></td>
+              <td></td>
               <td>Total before VAT</td>
               <td>{orderTotal} $</td>
             </tr>
@@ -108,7 +107,7 @@ const CurrentOrder = ({ currentOrder, status }: any) => {
             </tr>
           </tbody>
         </table>
-      </Card>
+      </LGCard>
       <RediRadioButton
         radioGroupName="payment"
         padding="1rem 1rem"

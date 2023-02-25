@@ -1,14 +1,15 @@
-import { Card, Col, Modal, Row, Typography } from "antd";
+import { Col, Modal, Row, Typography } from "antd";
 import { useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import { Else, If, Then } from "react-if";
-import { LIGHT_GREY, noErrorInTable } from "../../constants";
+import { noErrorInTable } from "../../constants";
 import AppContext from "../../contexts/app.context";
 import { useFood } from "../../contexts/food.context";
 import { getOptions } from "../../functions/global.fn";
 import { checkIfArrayAreTheSame, sendErrorTableInput } from "../../functions/order.fn";
 import { IErrorTableInput, TStatusProps } from "../../interfaces";
 import { EFoodMode, IFood } from "../../interfaces/food.interface";
+import { LGCard } from "../../styles";
 import RediRadioButton from "../styling/RediRadioButton";
 import FoodCard from "./FoodCard";
 import FoodForm from "./FoodForm";
@@ -111,7 +112,7 @@ const FoodLayout = ({ foodList, mode, foodSection, mainTitle, handleOrderCreate,
         </Col>
 
         <Col lg={8}>
-          <Card style={{ backgroundColor: LIGHT_GREY, boxShadow: "0 0 1rem rgba(0,0,0,0.3)", height: "100vh" }}>
+          <LGCard style={{ height: "100vh" }}>
             <If condition={mode !== EFoodMode.ALTER}>
               <Then>
                 <OrderSection
@@ -127,7 +128,7 @@ const FoodLayout = ({ foodList, mode, foodSection, mainTitle, handleOrderCreate,
                 <FoodForm foodSection={foodSection} foodList={foodList} />
               </Else>
             </If>
-          </Card>
+          </LGCard>
           <Modal
             title="Are u sure you want to cancel?"
             open={cancelOrderModal}
