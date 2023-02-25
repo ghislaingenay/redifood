@@ -10,7 +10,7 @@ import RediRadioButton from "../../src/components/styling/RediRadioButton";
 import { RED } from "../../src/constants";
 import { capitalize, hexToRgba } from "../../src/functions/global.fn";
 import { EButtonType, EPaymentType } from "../../src/interfaces";
-import { LGCard } from "../../src/styles";
+import { LGCard, RediTable, TH, THead, TR, TRLight } from "../../src/styles";
 import { SpacingDiv5X } from "../../src/styles/styledComponents/div.styled";
 import { mockOneOrder } from "../../test/mocks/mockOrdersData";
 
@@ -49,65 +49,63 @@ const CurrentOrder = ({ currentOrder, status }: any) => {
           </Col>
         </RowSpaceBetween>
       </LGCard>
-      <LGCard
-        style={{
-          padding: "0 1rem",
-          margin: "2rem 0",
-        }}
-      >
-        <table style={{ margin: "2rem 0", width: "100%", textAlign: "center", borderTop: "1px solid black" }}>
-          <thead>
-            <tr>
-              <th>Food</th>
-              <th>Section</th>
-              <th>Extra</th>
-              <th>Qty</th>
-              <th>Unit cost</th>
-              <th>Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orderItems.map((item) => {
-              const { itemName, itemSection, itemExtra, itemQuantity, itemPrice, itemId } = item;
-              return (
-                <tr key={itemId}>
-                  <td>{itemName}</td>
-                  <td>{capitalize(itemSection)}</td>
-                  <td>{capitalize(itemExtra)}</td>
-                  <td>{itemQuantity}</td>
-                  <td>{itemPrice}</td>
-                  <td>{(itemPrice * itemQuantity).toFixed(2)}</td>
-                </tr>
-              );
-            })}
 
-            <tr>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td>Total before VAT</td>
-              <td>{orderTotal} $</td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td>VAT(%)</td>
-              <td>200</td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td>Total for payment</td>
-              <td>{orderTotal} $</td>
-            </tr>
-          </tbody>
-        </table>
-      </LGCard>
+      <RediTable>
+        <THead>
+          <TR>
+            <TH>FOOD</TH>
+            <TH>SECTION</TH>
+            <TH>EXTRA</TH>
+            <TH>QTY</TH>
+            <TH>Price unit</TH>
+            <TH>Total</TH>
+          </TR>
+        </THead>
+        <tbody>
+          {orderItems.map((item, index) => {
+            const { itemName, itemSection, itemExtra, itemQuantity, itemPrice, itemId } = item;
+            if (index % 2 === 0) {
+            } else {
+            }
+            return (
+              <TRLight key={itemId}>
+                <td>{itemName}</td>
+                <td>{capitalize(itemSection)}</td>
+                <td>{capitalize(itemExtra)}</td>
+                <td>{itemQuantity}</td>
+                <td>{itemPrice}</td>
+                <td>{(itemPrice * itemQuantity).toFixed(2)}</td>
+              </TRLight>
+            );
+          })}
+
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>Total before VAT</td>
+            <td>{orderTotal} $</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>VAT(%)</td>
+            <td>200</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>Total for payment</td>
+            <td>{orderTotal} $</td>
+          </tr>
+        </tbody>
+      </RediTable>
+
       <RediRadioButton
         radioGroupName="payment"
         padding="1rem 1rem"
