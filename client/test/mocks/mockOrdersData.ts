@@ -1,3 +1,5 @@
+import { ECurrency } from "../../src/interfaces";
+
 export const allDataOrders = [
   {
     _id: "APP1",
@@ -72,11 +74,12 @@ export const allDataOrders = [
 export const getListUnpaidOrders = ["ALL", "APP1", "FTP2", "KBB3"];
 
 export const mockOneOrder = {
-  _id: "APP1",
+  OrderId: "APP1",
   orderStatus: "CREATED",
   orderDate: "2021-01-01",
   tableNumber: 2,
   orderTotal: 10.65,
+  orderCurrency: ECurrency.USD,
   orderItems: [
     {
       itemId: "8",
