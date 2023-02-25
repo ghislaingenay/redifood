@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import FoodLayout from "../../src/components/food/FoodLayout";
+import FoodLayout from "../../src/components/food-order/FoodLayout";
 import { useFood } from "../../src/contexts/food.context";
 import { NotificationRes } from "../../src/definitions/notification.class";
 import { EFoodMode, IFood } from "../../src/interfaces/food.interface";

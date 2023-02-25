@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from "react";
-import FoodLayout from "../src/components/food/FoodLayout";
+import FoodLayout from "../src/components/food-order/FoodLayout";
 import { useFood } from "../src/contexts/food.context";
 import { EFoodMode } from "../src/interfaces";
 import { foodSectionArray, mockedFoodData } from "../test/mocks/mockFoodData";
