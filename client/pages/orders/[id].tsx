@@ -1,6 +1,6 @@
 import { faCartShopping, faCashRegister, faCreditCard } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Col } from "antd";
+import { Col, Space } from "antd";
 import { useState } from "react";
 
 import { useRouter } from "next/navigation";
@@ -93,18 +93,19 @@ const CurrentOrder = ({ currentOrder, status }: any) => {
         setSelectedButton={setPaymentChoice}
         selectedButton={paymentChoice}
       />
-      <RediIconButton
-        onClick={() => router.push(`/orders/${orderId}`)}
-        iconFt={faCartShopping}
-        disabled={isDisabled}
-        buttonType={EButtonType.SUCCESS}
-      >
-        PAY
-      </RediIconButton>
+      <Space>
+        <RediIconButton
+          onClick={() => router.push(`/orders/${orderId}`)}
+          iconFt={faCartShopping}
+          disabled={isDisabled}
+          buttonType={EButtonType.SUCCESS}
+        >
+          PAY
+        </RediIconButton>
+      </Space>
     </SpacingDiv5X>
   );
 };
-
 export default CurrentOrder;
 
 export async function getServerSideProps() {
