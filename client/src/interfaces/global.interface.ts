@@ -23,3 +23,8 @@ export interface IFormInterface {
   component: JSX.Element;
   rules: Object[];
 }
+
+export interface IGlobalOptions {
+  value: string | number;
+  label: string;
+}
