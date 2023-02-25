@@ -25,9 +25,6 @@ export const optionsCreateFood: IFormInterface[] = [
     label: "Price",
     name: "itemPrice",
     component: <RoundedInputNum placeholder="Price..." addonAfter="$" style={styleNoM} />,
-    rules: [
-      { required: true, message: "A price is required" },
-      { min: 0, message: "A price can't be below 0" },
-    ],
+    rules: [{ required: true, message: "A price is required" }],
   },
 ];
