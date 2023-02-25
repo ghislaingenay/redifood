@@ -60,10 +60,10 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
 
   const [currentFood, setCurrentFood] = useState<IFood>(foodOrder[0]);
   const [newFoodData, setNewFoodData] = useState<IFood | null>(null);
-  const [selectedSection, setSelectedSection] = useState<string>("");
   const [inputSection, setInputSection] = useState<string>("");
   const [delSection, setDelSection] = useState<string>("");
   const [inputExtra, setInputExtra] = useState<string>("");
+  const [delExtra, setDelExtra] = useState<string>("");
   const [selectedExtra, setSelectedExtra] = useState<string>("");
 
   const isDisabled =
@@ -86,6 +86,20 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
       case EHandleType.DELETESECTION: {
         console.log("deleted section", delSection);
         setDelSection("");
+        form.setFieldValue("itemSection", EHandleType.NONE);
+        break;
+      }
+      case EHandleType.ADDEXTRA: {
+        console.log("created extra", inputExtra);
+        form.setFieldValue("itemExtra", EHandleType.NONE);
+        setInputExtra("");
+        break;
+      }
+      case EHandleType.DELETEEXTRA: {
+        console.log("deleted extra", delExtra);
+        form.setFieldValue("itemExtra", EHandleType.NONE);
+        setDelExtra("");
+        break;
       }
       default: {
       }
@@ -140,12 +154,10 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
         itemExtra: foodOrder[0].itemExtra,
       });
       setSortedFood(convertFoodToSection(foodList, foodSection));
-      setSelectedSection(foodOrder[0].itemSection);
-      setSelectedExtra(foodOrder[0].itemExtra);
     } else {
       form.setFieldsValue({
-        itemSection: "none",
-        itemExtra: "none",
+        itemSection: EHandleType.NONE,
+        itemExtra: EHandleType.NONE,
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -312,10 +324,11 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                         </Option>
                       ))}
                       <Option value={EHandleType.ADDEXTRA}>Add Extra</Option>
+                      <Option value={EHandleType.DELETEEXTRA}>Delete Extra</Option>
                     </Select>
                   </Form.Item>
                 </>
-                {extraValue === "addExtra" && (
+                {extraValue === EHandleType.ADDEXTRA && (
                   <>
                     <LabelFormBlue>Create a new extra</LabelFormBlue>
                     <RowCenterSp>
@@ -326,8 +339,8 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                         onClick={() => {
                           // ViewExtraModel
                           form.setFieldValue("itemExtra", "none");
-                          setInputExtra("");
-                          console.log("new section clicked", inputSection);
+                          setHandleType(EHandleType.ADDEXTRA);
+                          form.submit();
                         }}
                       >
                         Create Extra
@@ -335,9 +348,36 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                     </RowCenterSp>
                   </>
                 )}
+                {extraValue === EHandleType.DELETEEXTRA && (
+                  <>
+                    <LabelFormRed>Delete extra</LabelFormRed>
+                    <RowCenterSp style={{ marginBottom: 0 }}>
+                      <Select value={delExtra} onChange={(e) => setDelExtra(e)}>
+                        <Option value="">Select ...</Option>
+                        {sortedFood[sectionValue]?.map((section, index) => (
+                          <Option key={index} value={section}>
+                            {capitalize(section)}
+                          </Option>
+                        ))}
+                      </Select>
+                      <RediButton
+                        buttonType={EButtonType.ERROR}
+                        disabled={delExtra === "" ? true : false}
+                        onClick={() => {
+                          // ViewExtraModel
+                          form.setFieldValue("itemExtra", "none");
+                          setHandleType(EHandleType.DELETEEXTRA);
+                          form.submit();
+                        }}
+                      >
+                        Delete Extra
+                      </RediButton>
+                    </RowCenterSp>
+                  </>
+                )}
               </Case>
             </Switch>
-            <RowCenterSp style={{ marginTop: "1rem" }}>
+            <RowCenterSp style={{ marginTop: "0.25rem" }}>
               <RediIconButton buttonType={EButtonType.SUCCESS} disabled={isDisabled} iconFt={faFileCircleCheck}>
                 Confirm
               </RediIconButton>
