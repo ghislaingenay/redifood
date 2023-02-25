@@ -1,3 +1,4 @@
+import { Button } from "antd";
 import styled from "styled-components";
 
 export const RadioButton = styled.button`
@@ -5,4 +6,10 @@ export const RadioButton = styled.button`
   margin: 0 0.5rem 0.5rem;
   &:hover {
     box-shadow: none;
+`;
+
+export const BtnHover = styled(Button)`
+  &:hover {
+    opacity: 0.85;
+  }
 `;

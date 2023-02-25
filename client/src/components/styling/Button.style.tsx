@@ -1,8 +1,9 @@
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Button, ButtonProps, Space } from "antd";
+import { ButtonProps, Space } from "antd";
 import { BLUE, GREEN_A, GREY, ORANGE, PURPLE, RED } from "../../constants";
 import { EButtonType } from "../../interfaces";
+import { BtnHover } from "../../styles";
 
 interface IRediButtonProps extends ButtonProps {
   buttonType: EButtonType;
@@ -37,9 +38,9 @@ export const RediButton = ({ buttonType, children, ...props }: IRediButtonProps)
   };
 
   return (
-    <Button {...props} type="primary" style={handleButtonColor(buttonType)}>
+    <BtnHover {...props} type="primary" style={handleButtonColor(buttonType)}>
       {children}
-    </Button>
+    </BtnHover>
   );
 };
 
