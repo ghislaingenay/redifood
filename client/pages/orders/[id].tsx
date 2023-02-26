@@ -62,7 +62,7 @@ const CurrentOrder = ({ currentOrder, status }: any) => {
       />
       <Space>
         <RediIconButton
-          onClick={() => router.push(`/orders/${orderId}`)}
+          onClick={() => router.push(`/orders/${orderId}/payment/${paymentChoice}`)}
           iconFt={faCartShopping}
           disabled={isDisabled}
           buttonType={EButtonType.SUCCESS}
