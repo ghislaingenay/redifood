@@ -4,13 +4,14 @@ import { Alert, Col, Space } from "antd";
 import { useState } from "react";
 
 import { useRouter } from "next/navigation";
+import SummaryTable from "../../src/components/food-order/SummaryTable";
 import { RediIconButton } from "../../src/components/styling/Button.style";
 import { RowSpaceBetween } from "../../src/components/styling/grid.styled";
 import RediRadioButton from "../../src/components/styling/RediRadioButton";
 import { RED } from "../../src/constants";
-import { capitalize, hexToRgba } from "../../src/functions/global.fn";
+import { hexToRgba } from "../../src/functions/global.fn";
 import { EButtonType, EPaymentType } from "../../src/interfaces";
-import { LGCard, RediTable, TH, THead, TR, TRLight } from "../../src/styles";
+import { LGCard } from "../../src/styles";
 import { SpacingDiv5X } from "../../src/styles/styledComponents/div.styled";
 import { mockOneOrder } from "../../test/mocks/mockOrdersData";
 
@@ -49,63 +50,7 @@ const CurrentOrder = ({ currentOrder, status }: any) => {
           </Col>
         </RowSpaceBetween>
       </LGCard>
-
-      <RediTable>
-        <THead>
-          <TR>
-            <TH>FOOD</TH>
-            <TH>SECTION</TH>
-            <TH>EXTRA</TH>
-            <TH>QTY</TH>
-            <TH>Price unit</TH>
-            <TH>Total</TH>
-          </TR>
-        </THead>
-        <tbody>
-          {orderItems.map((item, index) => {
-            const { itemName, itemSection, itemExtra, itemQuantity, itemPrice, itemId } = item;
-            if (index % 2 === 0) {
-            } else {
-            }
-            return (
-              <TRLight key={itemId}>
-                <td>{itemName}</td>
-                <td>{capitalize(itemSection)}</td>
-                <td>{capitalize(itemExtra)}</td>
-                <td>{itemQuantity}</td>
-                <td>{itemPrice}</td>
-                <td>{(itemPrice * itemQuantity).toFixed(2)}</td>
-              </TRLight>
-            );
-          })}
-
-          <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>Total before VAT</td>
-            <td>{orderTotal} $</td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>VAT(%)</td>
-            <td>200</td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>Total for payment</td>
-            <td>{orderTotal} $</td>
-          </tr>
-        </tbody>
-      </RediTable>
-
+      <SummaryTable order={currentOrder} />
       <RediRadioButton
         radioGroupName="payment"
         padding="1rem 1rem"

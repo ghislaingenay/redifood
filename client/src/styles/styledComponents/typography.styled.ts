@@ -9,6 +9,10 @@ export const RoundedInputNum = styled(InputNumber)`
   border-radius: 2rem;
 `;
 
+export const CenteredP = styled.p`
+  text-align: center;
+`;
+
 export const LabelFormWhite = styled.label`
   color: white;
   font-size: 1.25rem;
