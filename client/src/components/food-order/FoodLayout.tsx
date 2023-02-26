@@ -7,7 +7,7 @@ import AppContext from "../../contexts/app.context";
 import { useFood } from "../../contexts/food.context";
 import { getOptions } from "../../functions/global.fn";
 import { checkIfArrayAreTheSame, sendErrorTableInput } from "../../functions/order.fn";
-import { IErrorTableInput, TStatusProps } from "../../interfaces";
+import { IErrorTableInput } from "../../interfaces";
 import { EFoodMode, IFood } from "../../interfaces/food.interface";
 import { LGCard } from "../../styles";
 import RediRadioButton from "../styling/RediRadioButton";
@@ -17,7 +17,7 @@ import OrderSection from "./OrderSection";
 
 const { Title } = Typography;
 interface IFoodLayoutProps {
-  status: TStatusProps;
+  status: string;
   foodList: IFood[];
   mode: EFoodMode;
   handleOrderCreate?: (foodOrder: IFood[]) => any;

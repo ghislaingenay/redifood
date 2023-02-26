@@ -212,7 +212,6 @@ describe("Create Order - Food List", () => {
 
   it("DESSERT button selected should contains 3 cards", async () => {
     render(<CreateOrder {...createSuccessProps} />);
-    const user = userEvent.setup();
     await expectCardLength(9);
     await clickRadio(/DESSERT/i);
     await expectCardLength(3);

@@ -38,7 +38,8 @@ export const typeIntoFormAuth = async (
   return finalData;
 };
 
-export const clickButton = async (reg: RegExp, user) => {
+export const clickButton = async (reg: RegExp, user?) => {
+  user = userEvent.setup();
   const clickButton: HTMLElement = screen.getByRole("button", {
     name: reg,
   });
@@ -65,3 +66,8 @@ export const expectFindText = async (text: SReg) => expect(await findText(text))
 
 export const clickFindAltText = async (text: SReg) => await user.click(await screen.findByAltText(text));
 export const clickFindButton = async (text: SReg) => await user.click(await findButton(text));
+
+export const expectCheckedRadio = async (reg: RegExp) => expect(await findRadio(reg)).toBeChecked();
+export const expectNotCheckedRadio = async (reg: RegExp) => expect(await findRadio(reg)).not.toBeChecked();
+
+export const expectAlertLength = async (lgt: number) => expect(await screen.findAllByRole("alert")).toHaveLength(lgt);

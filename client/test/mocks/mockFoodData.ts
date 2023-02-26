@@ -1,4 +1,4 @@
-import { ECurrency } from "../../src/interfaces";
+import { ECurrency, EFoodMode } from "../../src/interfaces";
 
 export const mockedFoodData = [
   {
@@ -149,4 +149,13 @@ export const editSuccessProps = {
   foodSection: foodSectionArray,
   currentFoodOrder: mockOrderEdit,
   status: "success",
+};
+
+export const foodAlterProps = {
+  foodList: mockedFoodData,
+  foodSection: foodSectionArray,
+  currentFoodOrder: mockOrderEdit,
+  mode: EFoodMode.ALTER,
+  status: "success",
+  mainTitle: "FOOD SECTION",
 };
