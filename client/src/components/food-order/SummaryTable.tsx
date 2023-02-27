@@ -1,10 +1,9 @@
-import { Col, Typography } from "antd";
+import { Col } from "antd";
 import { BACKGROUND_COLOR, GREY, ORANGE_DARK } from "../../constants";
 import { hexToRgba } from "../../functions/global.fn";
 import { IFood, IOrder } from "../../interfaces";
 import { CenteredP, CenteredTitle } from "../../styles";
 import { RowSpaceAround } from "../styling/grid.styled";
-const { Title } = Typography;
 
 interface ISummaryTable {
   order: IOrder;

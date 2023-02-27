@@ -3,12 +3,12 @@ import { RoundedInput, RoundedInputNum } from "../styles/styledComponents/typogr
 
 const styleNoM = { margin: 0 };
 export const optionsCreateFood: IFormInterface[] = [
-  {
-    label: "Picture",
-    name: "itemPhoto",
-    component: <RoundedInput style={styleNoM} />,
-    rules: [{ required: true, message: "A picture is required" }],
-  },
+  // {
+  //   label: "Picture",
+  //   name: "itemPhoto",
+  //   component: <RoundedInput style={styleNoM} />,
+  //   rules: [{ required: true, message: "A picture is required" }],
+  // },
   {
     label: "Name",
     name: "itemName",
