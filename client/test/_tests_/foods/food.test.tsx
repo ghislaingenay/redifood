@@ -1,5 +1,6 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { render } from "../..";
 import FoodLayout from "../../../src/components/food-order/FoodLayout";
 import { convertFoodToSection } from "../../../src/functions/food.fn";
 import {

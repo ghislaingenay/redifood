@@ -4,7 +4,6 @@ import AppContext from "../src/contexts/app.context";
 
 import { AuthContext } from "../src/contexts/auth.context";
 import { FoodProvider } from "../src/contexts/food.context";
-import { TStatusProps } from "../src/interfaces";
 
 /**
  * Custom renderer example with @testing-library/react
@@ -15,7 +14,7 @@ import { TStatusProps } from "../src/interfaces";
  */
 export const AllTheProviders = ({ children }: { children: any }) => {
   // STATE
-  const [status, setStatus] = useState<TStatusProps>("success");
+  const [status, setStatus] = useState<"success" | "error">("success");
 
   // RECOVER CONTEXT
 
