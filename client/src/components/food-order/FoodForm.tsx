@@ -1,8 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
-import { PlusOutlined } from "@ant-design/icons";
-import { faBan, faFileCircleCheck, faFilePen, faSquarePlus } from "@fortawesome/free-solid-svg-icons";
+import { faBan, faFileCircleCheck, faFilePen, faSquarePlus, faUpload } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Alert, Form, Select } from "antd";
+import { Alert, Form, message, Select } from "antd";
+import { RcFile, UploadFile } from "antd/es/upload";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Case, Default, Switch } from "react-if";
@@ -85,8 +85,8 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
   const [inputExtra, setInputExtra] = useState<string>("");
   const [delExtra, setDelExtra] = useState<string>("");
 
-  const [loading, setLoading] = useState(false);
-  const [imageUrl, setImageUrl] = useState<string>();
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [uploading, setUploading] = useState(false);
 
   const isDisabled =
     sectionValue === EHandleType.NONE ||
@@ -129,12 +129,6 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
     console.log("submitted", values);
   };
 
-  // const uploadButton = (
-  //   <div style={{ border: `0.125rem dashed ${GREY}`, borderRadius: "50%", width: "100%" }}>
-  //     <PlusOutlined />
-  //     <div style={{ marginTop: 8 }}>Upload</div>
-  //   </div>
-  // );
   // const handleChange: UploadProps["onChange"] = (info: UploadChangeParam<UploadFile>) => {
   //   if (info.file.status === "uploading") {
   //     setLoading(true);
@@ -149,6 +143,25 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
   //   }
   // };
 
+  const beforeUpload = (file: RcFile) => {
+    const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
+    if (!isJpgOrPng) {
+      message.error("You can only upload JPG/PNG file!");
+    }
+    const isLt2M = file.size / 1024 / 1024 < 2;
+    if (!isLt2M) {
+      message.error("Image must smaller than 2MB!");
+    }
+    return isJpgOrPng && isLt2M;
+  };
+
+  const onRemove = (file: RcFile) => {
+    const index = fileList.indexOf(file);
+    const newFileList = fileList.slice();
+    newFileList.splice(index, 1);
+    setFileList(newFileList);
+  };
+
   useEffect(() => {
     if (editMode === "true" && foodOrder.length !== 0) {
       console.log("fdp", foodOrder[0]);
@@ -161,8 +174,8 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
         itemSection: foodOrder[0].itemSection,
         itemExtra: foodOrder[0].itemExtra,
       });
-      setImageUrl(foodOrder[0].itemPhoto);
       setSortedFood(convertFoodToSection(foodList, foodSection));
+      setFileList([{ uid: "-1", name: foodOrder[0].itemName, url: foodOrder[0].itemPhoto }]);
     } else {
       form.setFieldsValue({
         itemSection: EHandleType.NONE,
@@ -203,7 +216,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
         </Case>
         <Default>
           <RowCenter style={{ marginTop: "1rem" }}>
-            {pictureValue ? (
+            {pictureValue && (
               <Image
                 height={pictureSize}
                 width={pictureSize}
@@ -211,47 +224,14 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                 src={pictureValue}
                 alt="new food picture"
               />
-            ) : (
-              <div style={{ margin: "2rem 0" }}>
-                <div
-                  style={{
-                    position: "absolute",
-                    width: pictureSize,
-                    height: pictureSize,
-                    border: `1px dashed ${GREY}`,
-                    margin: "0 auto 1rem",
-                    borderRadius: "50%",
-                  }}
-                >
-                  <RowCenterSp>
-                    <PlusOutlined /> Upload
-                  </RowCenterSp>
-                </div>
-              </div>
             )}
           </RowCenter>
-          {/* <div style={{ margin: "1rem 33%" }}>
-            <Upload
-              style={{ width: 200, height: 200 }}
-              name="avatar"
-              listType="picture"
-              className="avatar-uploader"
-              showUploadList={false}
-              action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-              beforeUpload={beforeUpload}
-              onChange={handleChange}
-            >
-              {imageUrl ? (
-                <img
-                  src={imageUrl}
-                  alt="avatar"
-                  style={{ width: 100, height: 100, borderRadius: "50%", objectFit: "fill" }}
-                />
-              ) : (
-                uploadButton
-              )}
-            </Upload>
-          </div> */}
+          <RowCenter>
+            <RediIconButton iconFt={faUpload} buttonType={EButtonType.EDIT}>
+              Select a file
+            </RediIconButton>
+          </RowCenter>
+
           <Form
             form={form}
             onFinish={onFinish}
@@ -265,6 +245,11 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
               }
             }}
           >
+            <Form.Item
+              style={{ display: "none" }}
+              name="itemPhoto"
+              rules={[{ required: true, message: "A picture is required" }]}
+            />
             {optionsCreateFood.map(({ label, name, component, rules }: IFormInterface) => {
               return (
                 <>
