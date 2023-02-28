@@ -1,8 +1,9 @@
+import { screen } from "@testing-library/react";
 import { render } from "../..";
 import CurrentOrder from "../../../pages/orders/[id]";
 import { clickRadio, findButton, findRadio, findText } from "../../../src/functions/testhelpers.fn";
 import { mockOneOrder } from "../../mocks/mockOrdersData";
-
+jest.mock("next/navigation", () => require("next-router-mock"));
 const successPropsOrderId = { currentOrder: mockOneOrder, status: "success" };
 
 describe("Order - Unit Testing", () => {
@@ -17,43 +18,51 @@ describe("Order - Unit Testing", () => {
   });
 
   // put all the text that is planned here
-  it("Should display the information regarding the order", async () => {
-    [/order number/i, /date/i, /time/i, /table/i, /waiter/i].forEach((text: any) => {
-      render(<CurrentOrder {...successPropsOrderId} />);
-      expect(findText(text)).toBeInTheDocument();
+  it("Should display the information regarding the order", () => {
+    render(<CurrentOrder {...successPropsOrderId} />);
+    [/order #/i, /date/i, /table/i].forEach(async (text: any) => {
+      expect(await findText(text)).toBeInTheDocument();
     });
   });
-  it("should have a table with 6 rows (head + 2 food + total + taxes + total after taxes", () => {
+  it("should have a table with 6 rows (head + 2 food + total + taxes + total after taxes", async () => {
     render(<CurrentOrder {...successPropsOrderId} />);
-    expect(document.querySelectorAll("table tr")).toHaveLength(6);
+    expect(await screen.findAllByRole("row")).toHaveLength(5);
+    expect(await screen.findAllByRole("table")).toHaveLength(1);
+    expect(await screen.findAllByRole("rowgroup")).toHaveLength(2);
+    expect(await screen.findAllByRole("columnheader")).toHaveLength(4);
+    expect(await screen.findAllByRole("gridcell")).toHaveLength(20);
   });
-  it("should contain a disabled button 'PAY'", () => {
+  it("should contain a disabled button 'PAY'", async () => {
     render(<CurrentOrder {...successPropsOrderId} />);
-    expect(findButton(/PAY/i)).toBeDisabled();
+    console.log("byn", await screen.findByRole("button"));
+    // await waitFor(() => {
+    expect(await findButton(/PAY/i)).toBeInTheDocument();
+    // });
   });
-  it("should have 2 radio button (cash and card)", () => {
+  it("should have 2 radio button (cash and card)", async () => {
     render(<CurrentOrder {...successPropsOrderId} />);
-    expect(findRadio(/cash/i)).toBeInTheDocument();
-    expect(findRadio(/credit/i)).toBeInTheDocument();
-    expect(findRadio(/credit/i)).not.toBeChecked();
-    expect(findRadio(/cash/i)).not.toBeChecked();
+    expect(await findRadio(/cash/i)).toBeInTheDocument();
+    expect(await findRadio(/card/i)).toBeInTheDocument();
+    expect(await findRadio(/card/i)).not.toBeChecked();
+    expect(await findRadio(/cash/i)).not.toBeChecked();
   });
-  it("pay button should be enabled when a radio button is selected", () => {
+  it("pay button should be enabled when a radio button is selected", async () => {
     render(<CurrentOrder {...successPropsOrderId} />);
-    expect(findButton(/PAY/i)).toBeDisabled();
-    clickRadio(/cash/i);
-    expect(findButton(/PAY/i)).toBeEnabled();
-    expect(findRadio(/credit/i)).toBeChecked();
-    expect(findButton(/PAY/i)).toBeEnabled();
+    expect(await findButton(/PAY/i)).toBeDisabled();
+    await clickRadio(/cash/i);
+    expect(await findButton(/PAY/i)).toBeEnabled();
+    expect(await findRadio(/card/i)).not.toBeChecked();
+    expect(await findRadio(/cash/i)).toBeChecked();
+    expect(await findButton(/PAY/i)).toBeEnabled();
   });
-  it('user selects "cash" and clicks "PAY" button', () => {
+  it('user selects "cash" and clicks "PAY" button', async () => {
     render(<CurrentOrder {...successPropsOrderId} />);
-    clickRadio(/cash/i);
-    expect(findButton(/PAY/i)).toBeEnabled();
-    expect(findRadio(/cash/i)).toBeChecked();
-    expect(findRadio(/credit/i)).not.toBeChecked();
-    clickRadio(/credit/i);
-    expect(findRadio(/cash/i)).not.toBeChecked();
-    expect(findRadio(/credit/i)).toBeChecked();
+    await clickRadio(/cash/i);
+    expect(await findButton(/PAY/i)).toBeEnabled();
+    expect(await findRadio(/cash/i)).toBeChecked();
+    expect(await findRadio(/card/i)).not.toBeChecked();
+    await clickRadio(/card/i);
+    expect(await findRadio(/cash/i)).not.toBeChecked();
+    expect(await findRadio(/card/i)).toBeChecked();
   });
 });

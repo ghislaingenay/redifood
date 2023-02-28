@@ -57,7 +57,7 @@ export const clickRadio = async (reg: RegExp) => {
 export const findRadio = async (reg: RegExp) => screen.findByRole("radio", { name: reg });
 export const expectCardLength = async (lgt: number) => expect(await screen.findAllByRole("card")).toHaveLength(lgt);
 export const getButton = (btnName: SReg) => screen.getByRole("button", { name: btnName });
-export const findButton = async (btnName: SReg) => screen.findByRole("button", { name: btnName });
+export const findButton = async (btnName: SReg) => await screen.findByRole("button", { name: btnName });
 export const findText = async (txt: NSReg) => screen.findByText(txt);
 
 export const queryText = (text: SReg) => screen.queryByText(text);
