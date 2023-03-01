@@ -1,12 +1,12 @@
 /* eslint-disable @next/next/no-img-element */
-import { faBan, faFileCircleCheck, faFilePen, faSquarePlus, faUpload } from "@fortawesome/free-solid-svg-icons";
+import { faBan, faFileCircleCheck, faFilePen, faSquarePlus, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Alert, Form, message, Select } from "antd";
-import { RcFile, UploadFile } from "antd/es/upload";
+import { Alert, Form, Select } from "antd";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { Case, Default, Switch } from "react-if";
-import { GREY } from "../../constants";
+import { useDropzone } from "react-dropzone";
+import { Case, Default, Else, If, Switch, Then } from "react-if";
+import { GREY, ORANGE_DARK } from "../../constants";
 import { optionsCreateFood } from "../../constants/food.const";
 import { useFood } from "../../contexts/food.context";
 import { convertFoodToSection } from "../../functions/food.fn";
@@ -15,6 +15,7 @@ import { EButtonType, IFood, IFormInterface } from "../../interfaces";
 import { SpacingDiv5X } from "../../styles/styledComponents/div.styled";
 import { RedSpan } from "../../styles/styledComponents/span.styled";
 import {
+  CenteredP,
   LabelFormBlack,
   LabelFormBlue,
   LabelFormRed,
@@ -85,8 +86,9 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
   const [inputExtra, setInputExtra] = useState<string>("");
   const [delExtra, setDelExtra] = useState<string>("");
 
-  const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [uploading, setUploading] = useState(false);
+
+  const [files, setFiles] = useState([]);
 
   const isDisabled =
     sectionValue === EHandleType.NONE ||
@@ -97,6 +99,37 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
     extraValue === EHandleType.DELETEEXTRA
       ? true
       : false;
+
+  const { getRootProps, getInputProps } = useDropzone({
+    accept: "image/.jpg",
+    minSize: 0,
+    maxFiles: 1,
+    onDrop: async (acceptedFiles) => {
+      setUploading(true);
+      setFiles(
+        acceptedFiles.map((file) =>
+          Object.assign(file, {
+            preview: URL.createObjectURL(file),
+          }),
+        ),
+      );
+      const formData = new FormData();
+
+      // This is working for now
+      formData.append("file", acceptedFiles[0]);
+      console.log("acc", acceptedFiles);
+      // formData.append("upload_preset", String(process.env.NEXT_PUBLIC_UPLOAD_PRESET));
+      // const response = await axios.post(
+      //   `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_NAME}/image/upload`,
+      //   formData,
+      // );
+      // const { statusText, data } = response;
+      // console.log(data.secure_url);
+      // if (statusText === "OK") {
+      // return setUrlFile(data.secure_url);
+      // }
+    },
+  });
 
   const onFinish = (values: any) => {
     switch (handleType) {
@@ -129,38 +162,17 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
     console.log("submitted", values);
   };
 
-  // const handleChange: UploadProps["onChange"] = (info: UploadChangeParam<UploadFile>) => {
-  //   if (info.file.status === "uploading") {
-  //     setLoading(true);
-  //     return;
+  // const beforeUpload = (file: RcFile) => {
+  //   const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
+  //   if (!isJpgOrPng) {
+  //     message.error("You can only upload JPG/PNG file!");
   //   }
-  //   if (info.file.status === "done") {
-  //     // Get this url from response in real world.
-  //     getBase64(info.file.originFileObj as RcFile, (url) => {
-  //       setLoading(false);
-  //       setImageUrl(url);
-  //     });
+  //   const isLt2M = file.size / 1024 / 1024 < 2;
+  //   if (!isLt2M) {
+  //     message.error("Image must smaller than 2MB!");
   //   }
+  //   return isJpgOrPng && isLt2M;
   // };
-
-  const beforeUpload = (file: RcFile) => {
-    const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
-    if (!isJpgOrPng) {
-      message.error("You can only upload JPG/PNG file!");
-    }
-    const isLt2M = file.size / 1024 / 1024 < 2;
-    if (!isLt2M) {
-      message.error("Image must smaller than 2MB!");
-    }
-    return isJpgOrPng && isLt2M;
-  };
-
-  const onRemove = (file: RcFile) => {
-    const index = fileList.indexOf(file);
-    const newFileList = fileList.slice();
-    newFileList.splice(index, 1);
-    setFileList(newFileList);
-  };
 
   useEffect(() => {
     if (editMode === "true" && foodOrder.length !== 0) {
@@ -174,8 +186,8 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
         itemSection: foodOrder[0].itemSection,
         itemExtra: foodOrder[0].itemExtra,
       });
+      setFiles([foodOrder[0].itemPhoto]);
       setSortedFood(convertFoodToSection(foodList, foodSection));
-      setFileList([{ uid: "-1", name: foodOrder[0].itemName, url: foodOrder[0].itemPhoto }]);
     } else {
       form.setFieldsValue({
         itemSection: EHandleType.NONE,
@@ -215,22 +227,46 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
           />
         </Case>
         <Default>
-          <RowCenter style={{ marginTop: "1rem" }}>
-            {pictureValue && (
-              <Image
-                height={pictureSize}
-                width={pictureSize}
-                style={{ borderRadius: "50%", border: `1px dashed ${GREY}`, margin: "0 auto 1rem" }}
-                src={pictureValue}
-                alt="new food picture"
-              />
-            )}
-          </RowCenter>
-          <RowCenter>
-            <RediIconButton iconFt={faUpload} buttonType={EButtonType.EDIT}>
-              Select a file
-            </RediIconButton>
-          </RowCenter>
+          <If condition={files.length === 0}>
+            <Then>
+              <RowCenter style={{ margin: "1rem 0" }}>
+                <div
+                  style={{ border: `1px solid ${ORANGE_DARK}`, width: "100%", borderRadius: "2rem" }}
+                  {...getRootProps()}
+                >
+                  <input name="file" placeholder="Upload an image" type="file" {...getInputProps()} />
+                  <CenteredP>Drop files here</CenteredP>
+                </div>
+              </RowCenter>
+            </Then>
+            <Else>
+              <RowCenter style={{ marginTop: "1rem" }}>
+                {pictureValue && (
+                  <Image
+                    height={pictureSize}
+                    width={pictureSize}
+                    style={{ borderRadius: "50%", border: `1px dashed ${GREY}`, margin: "0 auto 1rem" }}
+                    src={pictureValue}
+                    alt="new food picture"
+                  />
+                )}
+              </RowCenter>
+
+              <RowCenter>
+                <RediIconButton
+                  iconFt={faXmark}
+                  buttonType={EButtonType.ERROR}
+                  onClick={() => {
+                    setFiles([]);
+                    form.setFieldValue("itemPhoto", "");
+                  }}
+                  loading={uploading}
+                >
+                  Remove file
+                </RediIconButton>
+              </RowCenter>
+            </Else>
+          </If>
 
           <Form
             form={form}
