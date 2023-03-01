@@ -85,6 +85,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
   const [delSection, setDelSection] = useState<string>("");
   const [inputExtra, setInputExtra] = useState<string>("");
   const [delExtra, setDelExtra] = useState<string>("");
+  const [error, setError] = useState(false);
 
   const [uploading, setUploading] = useState(false);
 
@@ -132,6 +133,11 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
   });
 
   const onFinish = (values: any) => {
+    console.log("validated");
+    if (files.length === 0) {
+      return setError(true);
+    }
+    setError(false);
     switch (handleType) {
       case EHandleType.ADDSECTION: {
         console.log("new section added", inputSection);
@@ -235,7 +241,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                   {...getRootProps()}
                 >
                   <input name="file" placeholder="Upload an image" type="file" {...getInputProps()} />
-                  <CenteredP>Drop files here</CenteredP>
+                  <CenteredP>Drop a file here</CenteredP>
                 </div>
               </RowCenter>
             </Then>
@@ -267,6 +273,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
               </RowCenter>
             </Else>
           </If>
+          {error && <Alert type="error" message="A picture is required" />}
 
           <Form
             form={form}
@@ -281,11 +288,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
               }
             }}
           >
-            <Form.Item
-              style={{ display: "none" }}
-              name="itemPhoto"
-              rules={[{ required: true, message: "A picture is required" }]}
-            />
+            <Form.Item style={{ display: "none" }} name="itemPhoto" />
             {optionsCreateFood.map(({ label, name, component, rules }: IFormInterface) => {
               return (
                 <>
@@ -442,7 +445,12 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
               </Case>
             </Switch>
             <RowCenterSp style={{ marginTop: "1rem" }}>
-              <RediIconButton buttonType={EButtonType.SUCCESS} disabled={isDisabled} iconFt={faFileCircleCheck}>
+              <RediIconButton
+                buttonType={EButtonType.SUCCESS}
+                disabled={isDisabled}
+                iconFt={faFileCircleCheck}
+                onClick={() => form.submit()}
+              >
                 Confirm
               </RediIconButton>
               <RediIconButton buttonType={EButtonType.ERROR} iconFt={faBan}>
