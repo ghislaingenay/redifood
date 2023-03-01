@@ -66,6 +66,7 @@ const CurrentOrder = ({ currentOrder, status }: any) => {
           iconFt={faCartShopping}
           disabled={isDisabled}
           buttonType={EButtonType.SUCCESS}
+          aria-label="PAY"
         >
           PAY
         </RediIconButton>
