@@ -1,9 +1,10 @@
 import { Skeleton } from "antd";
 import React, { useContext, useEffect, useState } from "react";
-import Auth from "src/components/Auth";
-import { AxiosFunction } from "../functions/axios.function";
+import { AxiosFunction } from "../../pages/api/axios-request";
+import Auth from "../../src/components/Auth";
 
-export const AuthContext = React.createContext({});
+// @ts-ignore
+export const AuthContext = React.createContext();
 
 export function useAuth() {
   const userValue = useContext(AuthContext);

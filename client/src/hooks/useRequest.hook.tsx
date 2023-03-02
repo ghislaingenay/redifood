@@ -1,7 +1,7 @@
-import { IAxiosRequest, IUseRequestHook } from "@interfaces/hook.interface";
 import { Alert, Typography } from "antd";
 import axios from "axios";
 import { useState } from "react";
+import { IAxiosRequest, IUseRequestHook } from "../../src/interfaces/hook.interface";
 const { Title } = Typography;
 
 const useRequest = ({ url, method, onSuccess, onFailure, params }: IUseRequestHook) => {

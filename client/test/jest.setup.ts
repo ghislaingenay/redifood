@@ -1,5 +1,6 @@
 import "@testing-library/jest-dom";
 import "@testing-library/jest-dom/extend-expect";
+import jestFetchMock from "jest-fetch-mock";
 import JestMock from "jest-mock";
 import "next-router-mock";
 import { server } from "./mocks/server";
@@ -27,6 +28,7 @@ beforeAll(() => {
 beforeEach(() => {
   jest.resetModules();
   jest.setTimeout(50000);
+  jestFetchMock.enableMocks();
   jest.mock("next/navigation", () => require("next-router-mock"));
 });
 afterEach(() => server.resetHandlers());

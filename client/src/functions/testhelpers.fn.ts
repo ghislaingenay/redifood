@@ -1,18 +1,24 @@
-import { IFormAuthFields, ITestUserAuth } from "@interfaces/test.interface";
 import { screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { IFormAuthFields, ITestUserAuth } from "../../src/interfaces/test.interface";
+
+type NSReg = number | string | RegExp;
+type SReg = RegExp | string;
+
+const user = userEvent.setup();
 
 export const typeIntoFormAuth = async (
   user,
-  { username, password, confirmPassword }: IFormAuthFields,
+  { email, password, confirmPassword }: IFormAuthFields,
 ): Promise<ITestUserAuth> => {
-  let userKeys = ["usernameElement", "passwordElement", "confirmPasswordElement"];
+  let userKeys = ["emailElement", "passwordElement", "confirmPasswordElement"];
   let finalData = {};
-  if (username) {
-    const usernameInput = screen.getByRole("textbox", {
-      name: /username/i,
+  if (email) {
+    const emailInput = screen.getByRole("textbox", {
+      name: /email/i,
     });
-    await user.type(usernameInput, username);
-    Object.assign(finalData, { usernameElement: usernameInput });
+    await user.type(emailInput, email);
+    Object.assign(finalData, { emailElement: emailInput });
   }
   if (password) {
     const passwordInput: HTMLElement = screen.getByLabelText("Password");
@@ -32,9 +38,36 @@ export const typeIntoFormAuth = async (
   return finalData;
 };
 
-export const clickButton = async (reg: RegExp, user) => {
+export const clickButton = async (reg: RegExp, user?) => {
+  user = userEvent.setup();
   const clickButton: HTMLElement = screen.getByRole("button", {
     name: reg,
   });
   await user.click(clickButton);
 };
+
+export const clickRadio = async (reg: RegExp) => {
+  const clickButton: HTMLElement = screen.getByRole("radio", {
+    name: reg,
+  });
+  await user.click(clickButton);
+  await user.click(clickButton);
+};
+
+export const findRadio = async (reg: RegExp) => screen.findByRole("radio", { name: reg });
+export const expectCardLength = async (lgt: number) => expect(await screen.findAllByRole("card")).toHaveLength(lgt);
+export const getButton = (btnName: SReg) => screen.getByRole("button", { name: btnName });
+export const findButton = async (btnName: SReg) => await screen.findByRole("button", { name: btnName });
+export const findText = async (txt: NSReg) => screen.findByText(txt);
+
+export const queryText = (text: SReg) => screen.queryByText(text);
+export const expectNotFoundText = (text: SReg) => expect(queryText(text)).toBe(null);
+export const expectFindText = async (text: SReg) => expect(await findText(text)).toBeInTheDocument();
+
+export const clickFindAltText = async (text: SReg) => await user.click(await screen.findByAltText(text));
+export const clickFindButton = async (text: SReg) => await user.click(await findButton(text));
+
+export const expectCheckedRadio = async (reg: RegExp) => expect(await findRadio(reg)).toBeChecked();
+export const expectNotCheckedRadio = async (reg: RegExp) => expect(await findRadio(reg)).not.toBeChecked();
+
+export const expectAlertLength = async (lgt: number) => expect(await screen.findAllByRole("alert")).toHaveLength(lgt);

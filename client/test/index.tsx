@@ -1,7 +1,9 @@
 import { render as baseRender, RenderOptions, RenderResult } from "@testing-library/react";
-import { ComponentType, ReactElement } from "react";
+import { ComponentType, ReactElement, useState } from "react";
+import AppContext from "../src/contexts/app.context";
 
-import { AuthContext, useAuth } from "src/contexts/auth.context";
+import { AuthContext } from "../src/contexts/auth.context";
+import { FoodProvider } from "../src/contexts/food.context";
 
 /**
  * Custom renderer example with @testing-library/react
@@ -11,10 +13,34 @@ import { AuthContext, useAuth } from "src/contexts/auth.context";
  * please visit https://testing-library.com/docs/react-testing-library/setup
  */
 export const AllTheProviders = ({ children }: { children: any }) => {
-  const userValue = useAuth();
+  // STATE
+  const [status, setStatus] = useState<"success" | "error">("success");
+
+  // RECOVER CONTEXT
+
+  // VALUES
+  const userValue = {
+    authorization: {
+      id: "5f9f1b9b0b5b9c0017b5b1a5",
+      email: "",
+    },
+  };
+
+  // RENDER
   return (
     <>
-      <AuthContext.Provider value={userValue}>{children}</AuthContext.Provider>
+      <AppContext.Provider
+        value={{
+          setStatus: setStatus,
+          state: {
+            status: status,
+          },
+        }}
+      >
+        <FoodProvider>
+          <AuthContext.Provider value={userValue}>{children}</AuthContext.Provider>
+        </FoodProvider>
+      </AppContext.Provider>
     </>
   );
 };

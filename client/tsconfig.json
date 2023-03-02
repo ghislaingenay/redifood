@@ -13,26 +13,10 @@
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "isolatedModules": false,
+    "isolatedModules": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "jsx": "preserve",
-    "baseUrl": ".",
-    "paths": {
-      "@components/*": ["src/components/auth/*"],
-      "@components": ["src/components"],
-      "@public/*": ["public/*"],
-      "@public": ["public"],
-      "@constants/*": ["src/constants/*"],
-      "@constants": ["src/constants"],
-      "@interfaces/*": ["src/interfaces/*"],
-      "@interfaces": ["src/interfaces"],
-      "@styles/*": ["src/styles/*.css"],
-      "@styles": ["src/styles/index"],
-      "@functions/*": ["src/functions/*"],
-      "@test/*": ["test/*"],
-      "@test": ["test"]
-    }
+    "jsx": "preserve"
   },
   "include": [
     "next-env.d.ts",

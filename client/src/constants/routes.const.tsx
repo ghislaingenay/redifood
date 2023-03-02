@@ -1,19 +1,16 @@
-import {
-  AppleOutlined,
-  AreaChartOutlined,
-  HomeOutlined,
-  LogoutOutlined,
-  PauseOutlined,
-  SettingOutlined,
-} from "@ant-design/icons";
-import { ENavList } from "@interfaces/nav.interface";
-
+import { AreaChartOutlined, HomeOutlined, LogoutOutlined, SettingOutlined } from "@ant-design/icons";
+import { faHamburger } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { MenuProps } from "antd";
 const fontSizeIcons = { fontSize: "1rem" };
-export const navRoutes = [
-  { key: ENavList.HOME, icon: <HomeOutlined style={fontSizeIcons} />, label: ENavList.HOME_LABEL },
-  { key: ENavList.FOOD, icon: <AppleOutlined style={fontSizeIcons} />, label: ENavList.FOOD_LABEL },
-  { key: ENavList.ANALYTICS, icon: <AreaChartOutlined style={fontSizeIcons} />, label: ENavList.ANALYTICS_LABEL },
-  { key: ENavList.SETTINGS, icon: <SettingOutlined style={fontSizeIcons} />, label: ENavList.SETTINGS_LABEL },
-  { key: ENavList.ABOUT_US, icon: <PauseOutlined style={fontSizeIcons} />, label: ENavList.ABOUT_US_LABEL },
-  { key: ENavList.SIGNOUT, icon: <LogoutOutlined style={fontSizeIcons} />, label: ENavList.SIGNOUT_LABEL },
+
+type MenuItem = Required<MenuProps>["items"][number];
+export const navRoutes: MenuItem[] = [
+  // key === link
+  // can add other subMenu using children key
+  { key: "/", icon: <HomeOutlined style={fontSizeIcons} />, label: "HOME" },
+  { key: "/food", icon: <FontAwesomeIcon icon={faHamburger} style={fontSizeIcons} />, label: "FOOD" },
+  { key: "/history", icon: <AreaChartOutlined style={fontSizeIcons} />, label: "HISTORY" },
+  { key: "/settings", icon: <SettingOutlined style={fontSizeIcons} />, label: "SETTINGS" },
+  { key: "/signout", icon: <LogoutOutlined style={fontSizeIcons} />, label: "SIGNOUT" },
 ];
