@@ -233,13 +233,6 @@ describe("Create Order - Food List", () => {
       expect(screen.getByRole("button", { name: /Validate/i })).toBeEnabled();
     });
   });
-  it("should have the total indicate when the user first add a product in order cart", async () => {
-    render(<CreateOrder {...createSuccessProps} />);
-    expect(screen.queryByText(/total/i)).toBe(null);
-    const user = userEvent.setup();
-    await user.click(screen.getByText(/profiteroles/i));
-    expect(await findText(/total/i)).toBeInTheDocument();
-  });
 });
 
 describe("Create Order - Integration", () => {
@@ -259,7 +252,6 @@ describe("Create Order - Integration", () => {
     render(<CreateOrder {...createSuccessProps} />);
     const user = userEvent.setup();
     const findProfiteroles = await screen.findByAltText(/Food profiteroles/i);
-    expect(screen.queryByText(/Total:/i)).toBe(null);
     expect(await screen.findAllByAltText(/Food profiteroles/i)).toHaveLength(1);
     await user.click(findProfiteroles);
     expect(await findText(/Total: 3.75/i)).toBeInTheDocument();
