@@ -1,10 +1,10 @@
 import { DeleteOutlined, MinusSquareOutlined, PlusSquareOutlined } from "@ant-design/icons";
 import { Col, Typography } from "antd";
-import { IFood } from "../../../src/interfaces/food.interface";
-import { OrderCardStyled } from "../../../src/styles/styledComponents/div.styled";
 import { GREY } from "../../constants";
 import { useFood } from "../../contexts/food.context";
 import { EButtonType } from "../../interfaces";
+import { IFood } from "../../interfaces/food.interface";
+import { OrderCardStyled } from "../../styles/styledComponents/div.styled";
 import { CenteredTitle } from "../../styles/styledComponents/typography.styled";
 import { RediButton } from "../styling/Button.style";
 import { RowSpaceAround, RowSpaceBetween } from "../styling/grid.styled";

@@ -1,5 +1,11 @@
 import { screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { IFormAuthFields, ITestUserAuth } from "../../src/interfaces/test.interface";
+
+type NSReg = number | string | RegExp;
+type SReg = RegExp | string;
+
+const user = userEvent.setup();
 
 export const typeIntoFormAuth = async (
   user,
@@ -32,14 +38,15 @@ export const typeIntoFormAuth = async (
   return finalData;
 };
 
-export const clickButton = async (reg: RegExp, user) => {
+export const clickButton = async (reg: RegExp, user?) => {
+  user = userEvent.setup();
   const clickButton: HTMLElement = screen.getByRole("button", {
     name: reg,
   });
   await user.click(clickButton);
 };
 
-export const clickRadio = async (reg: RegExp, user) => {
+export const clickRadio = async (reg: RegExp) => {
   const clickButton: HTMLElement = screen.getByRole("radio", {
     name: reg,
   });
@@ -49,6 +56,18 @@ export const clickRadio = async (reg: RegExp, user) => {
 
 export const findRadio = async (reg: RegExp) => screen.findByRole("radio", { name: reg });
 export const expectCardLength = async (lgt: number) => expect(await screen.findAllByRole("card")).toHaveLength(lgt);
-export const getButton = (btnName: RegExp | string) => screen.getByRole("button", { name: btnName });
-export const findButton = async (btnName: RegExp | string) => screen.findByRole("button", { name: btnName });
-export const findText = async (txt: RegExp | string | number) => screen.findByText(txt);
+export const getButton = (btnName: SReg) => screen.getByRole("button", { name: btnName });
+export const findButton = async (btnName: SReg) => await screen.findByRole("button", { name: btnName });
+export const findText = async (txt: NSReg) => screen.findByText(txt);
+
+export const queryText = (text: SReg) => screen.queryByText(text);
+export const expectNotFoundText = (text: SReg) => expect(queryText(text)).toBe(null);
+export const expectFindText = async (text: SReg) => expect(await findText(text)).toBeInTheDocument();
+
+export const clickFindAltText = async (text: SReg) => await user.click(await screen.findByAltText(text));
+export const clickFindButton = async (text: SReg) => await user.click(await findButton(text));
+
+export const expectCheckedRadio = async (reg: RegExp) => expect(await findRadio(reg)).toBeChecked();
+export const expectNotCheckedRadio = async (reg: RegExp) => expect(await findRadio(reg)).not.toBeChecked();
+
+export const expectAlertLength = async (lgt: number) => expect(await screen.findAllByRole("alert")).toHaveLength(lgt);

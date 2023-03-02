@@ -157,9 +157,8 @@ describe("Create Order - Food List", () => {
 
   it("DESSERT button selected should contains 3 cards", async () => {
     render(<CreateOrder {...createSuccessProps} />);
-    const user = userEvent.setup();
     await expectCardLength(9);
-    await clickRadio(/DESSERT/i, user);
+    await clickRadio(/DESSERT/i);
     await expectCardLength(3);
     ["Carrot cake", "Profiteroles", "Millefeuille"].forEach(async (name) => {
       expect(await screen.findAllByText(name)).toHaveLength(1);
@@ -190,7 +189,7 @@ describe("Create Order - Food List", () => {
     const user = userEvent.setup();
     expect(await findRadio(/ALL/i)).toBeChecked();
     expect(await findRadio(/DRINK/i)).not.toBeChecked();
-    await clickRadio(/DRINK/i, user);
+    await clickRadio(/DRINK/i);
     await expectCardLength(4);
     expect(await findRadio(/ALL/i)).not.toBeChecked();
     expect(await findRadio(/DRINK/i)).toBeChecked();
@@ -198,25 +197,23 @@ describe("Create Order - Food List", () => {
 
   it("PIZZA button selected should contains 2 cards", async () => {
     render(<CreateOrder {...createSuccessProps} />);
-    const user = userEvent.setup();
+
     await expectCardLength(9);
-    await clickRadio(/PIZZA/i, user);
+    await clickRadio(/PIZZA/i);
     await expectCardLength(2);
   });
 
   it("DRINK button selected should contains 4 cards", async () => {
     render(<CreateOrder {...createSuccessProps} />);
-    const user = userEvent.setup();
     await expectCardLength(9);
-    await clickRadio(/DRINK/i, user);
+    await clickRadio(/DRINK/i);
     await expectCardLength(4);
   });
 
   it("DESSERT button selected should contains 3 cards", async () => {
     render(<CreateOrder {...createSuccessProps} />);
-    const user = userEvent.setup();
     await expectCardLength(9);
-    await clickRadio(/DESSERT/i, user);
+    await clickRadio(/DESSERT/i);
     await expectCardLength(3);
   });
 
@@ -346,12 +343,12 @@ describe("Create Order - Integration Testing", () => {
     const user = userEvent.setup();
     await user.click(await screen.findByAltText(/food millefeuille/i));
     expect(await findText(/Total: 4.25/i)).toBeInTheDocument();
-    await clickRadio(/PIZZA/i, user);
+    await clickRadio(/PIZZA/i);
     await expectCardLength(3);
     await user.click(await screen.findByAltText(/food pizza cheesy/i));
     await user.click(await screen.findByAltText(/food pizza cheesy/i));
     expect(await findText(/Total: 32.23/i)).toBeInTheDocument();
-    await clickRadio(/DRINK/i, user);
+    await clickRadio(/DRINK/i);
     await user.click(await screen.findByAltText(/330 mL/i));
     expect(await findText(/Total: 33.43/i)).toBeInTheDocument();
     await user.click(await findButton(/add Sprite can - 330 mL/i));
@@ -370,20 +367,20 @@ describe("Create Order - Integration Testing", () => {
   it("User order multiple products but remove all of them, can't validate order, so cancel it", async () => {
     render(<CreateOrder {...createSuccessProps} />);
     const user = userEvent.setup();
-    await clickRadio(/DESSERT/i, user);
+    await clickRadio(/DESSERT/i);
     await expectCardLength(3);
     await user.click(await screen.findByAltText(/food carrot cake/i));
     expect(await findText(/Total: 5.20/i)).toBeInTheDocument();
     for (let i = 0; i < 4; i++) await user.click(await findButton(/add carrot cake/i));
     expect(await findText(/Total: 26.00/i)).toBeInTheDocument();
-    await clickRadio(/PIZZA/i, user);
+    await clickRadio(/PIZZA/i);
     await user.click(await screen.findByAltText(/pizza mediterranean/i));
     await user.click(await findButton(/add pizza mediterranean/i));
     await user.click(await findButton(/add pizza mediterranean/i));
     expect(await findText(/Total: 63.50/i)).toBeInTheDocument();
     await user.click(await findButton(/remove pizza mediterranean/i));
     expect(await findText(/Total: 51.00/i)).toBeInTheDocument();
-    await clickRadio(/DRINK/i, user);
+    await clickRadio(/DRINK/i);
     await user.click(await screen.findByAltText(/espresso/i));
     expect(await findText(/Total: 52.00/i)).toBeInTheDocument();
     expect(await findButton(/remove espresso/i)).toBeDisabled();

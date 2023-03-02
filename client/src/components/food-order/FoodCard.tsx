@@ -2,15 +2,16 @@ import { Card } from "antd";
 import Image from "next/image";
 import { BACKGROUND_COLOR, LIGHT_GREY } from "../../constants";
 import { useFood } from "../../contexts/food.context";
-import { IFood } from "../../interfaces";
+import { EFoodMode, IFood } from "../../interfaces";
 
 interface IFoodCard {
   food: IFood;
   foodList: IFood[];
+  mode: EFoodMode;
 }
-const FoodCard = ({ food, foodList }: IFoodCard) => {
+const FoodCard = ({ food, foodList, mode }: IFoodCard) => {
   const {
-    functions: { addToCart },
+    functions: { addToCart, selectFood },
   } = useFood();
   return (
     <>
@@ -21,7 +22,11 @@ const FoodCard = ({ food, foodList }: IFoodCard) => {
           boxShadow: "0 0 10px 0 rgba(0,0,0,0.2)",
         }}
         onClick={() => {
-          addToCart(food.itemId, foodList);
+          if (mode === EFoodMode.ALTER) {
+            selectFood(food.itemId, foodList);
+          } else {
+            addToCart(food.itemId, foodList);
+          }
         }}
         role="card"
       >

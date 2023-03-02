@@ -1,24 +1,23 @@
-import { Alert, Card, Col, Divider, InputNumber, Modal, Row, Typography } from "antd";
+import { Col, Modal, Row, Typography } from "antd";
 import { useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
-import { getOptions } from "../../../pages";
-import FoodOrderCard from "../../../src/components/food/FoodOrderCard";
-import { EFoodMode, IFood } from "../../../src/interfaces/food.interface";
-import { LIGHT_GREY, noErrorInTable, ORANGE, RED } from "../../constants";
+import { Else, If, Then } from "react-if";
+import { noErrorInTable } from "../../constants";
 import AppContext from "../../contexts/app.context";
 import { useFood } from "../../contexts/food.context";
-import { calculateTotal, checkIfArrayAreTheSame, sendErrorTableInput } from "../../functions/order.fn";
-import { EButtonType, IErrorTableInput, TStatusProps } from "../../interfaces";
-import { Scroll } from "../../styles/styledComponents/div.styled";
-import { CenteredTitle } from "../../styles/styledComponents/typography.styled";
-import { RediButton } from "../styling/Button.style";
-import { RowCenterSp } from "../styling/grid.styled";
+import { getOptions } from "../../functions/global.fn";
+import { checkIfArrayAreTheSame, sendErrorTableInput } from "../../functions/order.fn";
+import { IErrorTableInput } from "../../interfaces";
+import { EFoodMode, IFood } from "../../interfaces/food.interface";
+import { LGCard } from "../../styles";
 import RediRadioButton from "../styling/RediRadioButton";
 import FoodCard from "./FoodCard";
+import FoodForm from "./FoodForm";
+import OrderSection from "./OrderSection";
 
 const { Title } = Typography;
 interface IFoodLayoutProps {
-  status: TStatusProps;
+  status: string;
   foodList: IFood[];
   mode: EFoodMode;
   handleOrderCreate?: (foodOrder: IFood[]) => any;
@@ -41,8 +40,6 @@ const FoodLayout = ({ foodList, mode, foodSection, mainTitle, handleOrderCreate,
   const [tableNumberValue, setTableNumberValue] = useState<null | number>(null);
   const [errorTable, setErrorTable] = useState<IErrorTableInput>({ alreadyInDb: false, missingValue: false });
   const isDisabled = foodOrder.length === 0 ? true : false;
-
-  const isVisible = foodOrder.length > 0 ? "visible" : "hidden";
 
   const [currentOrder, setCurrentOrder] = useState<IFood[]>([]);
   const [cancelOrderModal, setCancelOrderModal] = useState(false);
@@ -108,60 +105,30 @@ const FoodLayout = ({ foodList, mode, foodSection, mainTitle, handleOrderCreate,
           <Row gutter={[5, 10]}>
             {sortedFoods.map((food, index) => (
               <Col key={index} lg={6}>
-                <FoodCard foodList={foodList} food={food} />
+                <FoodCard foodList={foodList} food={food} mode={mode} />
               </Col>
             ))}
           </Row>
         </Col>
 
         <Col lg={8}>
-          <Card style={{ backgroundColor: LIGHT_GREY, boxShadow: "0 0 1rem rgba(0,0,0,0.3)", height: "100vh" }}>
-            <Row justify="center" align="middle">
-              <Title level={5}>Table Number:</Title>
-              <InputNumber
-                type="number"
-                value={tableNumberValue}
-                onChange={(e) => {
-                  if (typeof e === "number") {
-                    setTableNumberValue(Number(e));
-                  } else {
-                    setTableNumberValue(null);
-                  }
-                }}
-                name="tableNumber"
-                min={0}
-                aria-label="tableNumber"
-                style={{ height: "50%", top: "0.5rem", marginLeft: "1rem" }}
-                placeholder="Select a table number"
-              />
-              {errorTable.alreadyInDb && <Alert type="error" message="This table number is already allocated" />}
-              {errorTable.missingValue && <Alert type="error" message="Please select a table number" />}
-            </Row>
-            <Divider style={{ border: `0.125rem solid ${ORANGE}` }} />
-            <CenteredTitle level={5}>Order List</CenteredTitle>
-            <Scroll>
-              {foodOrder?.map((food) => (
-                <FoodOrderCard key={food.itemId} food={food} />
-              ))}
-            </Scroll>
-            <CenteredTitle level={5} style={{ color: RED, visibility: isVisible }}>
-              Total: {calculateTotal(foodOrder).toFixed(2)} $
-            </CenteredTitle>
-            <RowCenterSp style={{ marginTop: "1rem" }}>
-              <RediButton
-                buttonType={EButtonType.SUCCESS}
-                shape="round"
-                disabled={isDisabled}
-                onClick={() => handleSubmit(foodOrder)}
-              >
-                <b>Validate</b>
-              </RediButton>
-
-              <RediButton buttonType={EButtonType.ERROR} shape="round" onClick={() => handleCancel("/")}>
-                Cancel Order
-              </RediButton>
-            </RowCenterSp>
-          </Card>
+          <LGCard style={{ height: "100vh" }}>
+            <If condition={mode !== EFoodMode.ALTER}>
+              <Then>
+                <OrderSection
+                  tableNumber={tableNumberValue}
+                  setTableNumber={setTableNumberValue}
+                  mode={mode}
+                  errorTable={errorTable}
+                  handleSubmit={handleSubmit}
+                  handleCancel={handleCancel}
+                />
+              </Then>
+              <Else>
+                <FoodForm foodSection={foodSection} foodList={foodList} />
+              </Else>
+            </If>
+          </LGCard>
           <Modal
             title="Are u sure you want to cancel?"
             open={cancelOrderModal}

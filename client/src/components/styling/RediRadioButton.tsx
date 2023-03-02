@@ -2,7 +2,6 @@ import { ButtonProps, Col } from "antd";
 import { Dispatch, SetStateAction, useEffect } from "react";
 import { BACKGROUND_COLOR, LIGHT_GREY, ORANGE_DARK, ORANGE_LIGHT } from "../../constants";
 import { hexToRgba } from "../../functions/global.fn";
-import { EAuthChoice } from "../../interfaces";
 import { RadioButton } from "../../styles";
 import { SpanBlockM02Y } from "../../styles/styledComponents/span.styled";
 import { RowSpaceAround } from "./grid.styled";
@@ -31,8 +30,8 @@ interface IRediRadioButtonProps<T extends Booleanish> extends ButtonProps {
   radioGroupName: string;
   options: TIconDataMap[T];
   haveIcon: T;
-  selectedButton: string;
-  setSelectedButton: Dispatch<SetStateAction<EAuthChoice>>;
+  selectedButton: any;
+  setSelectedButton: Dispatch<SetStateAction<any>>;
   disabled?: boolean;
   clickedFn?: () => void;
   padding?: string;

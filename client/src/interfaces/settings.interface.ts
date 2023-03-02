@@ -1,3 +1,3 @@
 export enum ECurrency {
-  US_DOLLAR = "USD",
+  USD = "USD",
 }

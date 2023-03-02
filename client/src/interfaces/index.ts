@@ -6,3 +6,4 @@ export * from "./nav.interface";
 export * from "./order.interface";
 export * from "./settings.interface";
 export * from "./test.interface";
+export * from "./payment.interface";

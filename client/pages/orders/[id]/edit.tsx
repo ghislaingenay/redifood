@@ -1,14 +1,14 @@
 import { useEffect } from "react";
-import FoodLayout from "../../src/components/food-order/FoodLayout";
-import { useFood } from "../../src/contexts/food.context";
-import { NotificationRes } from "../../src/definitions/notification.class";
-import { EFoodMode, IFood } from "../../src/interfaces/food.interface";
-import { foodSectionArray, mockedFoodData } from "../../test/mocks/mockFoodData";
+import FoodLayout from "../../../src/components/food-order/FoodLayout";
+import { useFood } from "../../../src/contexts/food.context";
+import { NotificationRes } from "../../../src/definitions/notification.class";
+import { EFoodMode, IFood } from "../../../src/interfaces";
+import { foodSectionArray, mockedFoodData, mockOrderEdit } from "../../../test/mocks/mockFoodData";
 
-const CreateOrder = ({ foodList, foodSection, status }) => {
+const EditOrder = ({ foodList, currentFoodOrder, foodSection, status }) => {
   const { setFoodOrder } = useFood();
-  const handleOrderCreate = (foodOrder: IFood[]) => {
-    console.log("order created", foodOrder);
+  const editOrder = (foodOrder: IFood[]) => {
+    console.log("order edites", foodOrder);
     NotificationRes.onSuccess({
       title: "Order was succesfully created",
       description: "You will be redirected in 2 seconds",
@@ -20,7 +20,7 @@ const CreateOrder = ({ foodList, foodSection, status }) => {
   };
 
   useEffect(() => {
-    setFoodOrder([]);
+    setFoodOrder(currentFoodOrder);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -30,19 +30,24 @@ const CreateOrder = ({ foodList, foodSection, status }) => {
         status={status}
         foodSection={foodSection}
         foodList={foodList}
-        mode={EFoodMode.CREATE}
-        mainTitle="CREATE ORDER"
-        handleOrderCreate={handleOrderCreate}
+        mode={EFoodMode.EDIT}
+        mainTitle="EDIT ORDER"
+        editOrder={editOrder}
       />
     </>
   );
 };
 
-export default CreateOrder;
+export default EditOrder;
 
 export async function getServerSideProps() {
   return {
-    props: { foodList: mockedFoodData, foodSection: foodSectionArray, status: "success" },
+    props: {
+      foodList: mockedFoodData,
+      currentFoodOrder: mockOrderEdit,
+      foodSection: foodSectionArray,
+      status: "success",
+    },
   };
   // await axios
   //   .get("/api/foods", { params: { selectedSection: "all" } })

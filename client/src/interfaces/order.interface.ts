@@ -1,4 +1,5 @@
 import { IFood } from "./food.interface";
+import { ECurrency } from "./settings.interface";
 
 export interface IErrorTableInput {
   alreadyInDb: boolean;
@@ -20,4 +21,5 @@ export interface IOrder {
   tableNumber: number;
   orderTotal: number;
   orderItems: IFood[];
+  orderCurrency: ECurrency;
 }

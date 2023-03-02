@@ -24,3 +24,18 @@ export const checkLower = (value: string) => /[a-z]/.test(value);
 export const checkUpper = (value: string) => /[A-Z]/.test(value);
 export const checkSpecials = (value: string) => /[!@#$%^()&*_]/.test(value);
 export const checkEmail = (value: string) => /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value);
+
+export const capitalize = (value: string) => {
+  if (typeof value !== "string") return "";
+  return value[0].toUpperCase() + value.slice(1);
+};
+
+export const getOptions = (array: string[]) => {
+  const newArray = array.map((item) => {
+    return {
+      value: item,
+      label: capitalize(item),
+    };
+  });
+  return newArray;
+};

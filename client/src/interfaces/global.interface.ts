@@ -1,9 +1,7 @@
-export type TStatusProps = "error" | "success";
-
 export interface IGetServerSideProps {
   props: {
     data: Record<string, any>;
-    status: TStatusProps;
+    status: "error" | "success";
   };
 }
 
@@ -15,4 +13,16 @@ export enum EButtonType {
   INFO = "info",
   DISPLAY = "display",
   NONE = "none",
+}
+
+export interface IFormInterface {
+  label: string;
+  name: string;
+  component: JSX.Element;
+  rules: Object[];
+}
+
+export interface IGlobalOptions {
+  value: string | number;
+  label: string;
 }
