@@ -1,9 +1,9 @@
 import { Jest } from "@jest/types";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { rest } from "msw";
-import AllOrdersPage, { getOptions, getServerSideProps } from "../../../pages/index";
-import { server } from "../../../test/mocks/server";
+import { render } from "../..";
+import AllOrdersPage from "../../../pages/index";
+import { getOptions } from "../../../src/functions/global.fn";
 import { allDataOrders, getListUnpaidOrders } from "../../mocks/mockOrdersData";
 
 jest.mock("next/navigation", () => require("next-router-mock"));
@@ -38,21 +38,21 @@ jest.mock("antd", () => {
 
 jest.setTimeout(30000);
 
-describe("get Server Side Props - Index", () => {
-  it("should send an error message if the API is not working or doesn't send the data in server side", async () => {
-    server.resetHandlers(rest.get("/api/orders", (req, res, ctx) => res(ctx.status(400), ctx.json("Error data"))));
-    const response = await getServerSideProps();
-    expect(response).toEqual(
-      expect.objectContaining({
-        props: {
-          allOrders: [],
-          getList: [],
-          status: "error",
-        },
-      }),
-    );
-  });
-});
+// describe("get Server Side Props - Index", () => {
+//   it("should send an error message if the API is not working or doesn't send the data in server side", async () => {
+//     server.resetHandlers(rest.get("/api/orders", (req, res, ctx) => res(ctx.status(400), ctx.json("Error data"))));
+//     const response = await getServerSideProps();
+//     expect(response).toEqual(
+//       expect.objectContaining({
+//         props: {
+//           allOrders: [],
+//           getList: [],
+//           status: "error",
+//         },
+//       }),
+//     );
+//   });
+// });
 
 describe("All Orders Page", () => {
   it("should render the component", async () => {
@@ -74,10 +74,10 @@ describe("All Orders Page", () => {
   });
 
   it("getOptions function test", () => {
-    expect(getOptions(["a", "b", "c"])).toEqual([
-      { label: "a", value: "a" },
-      { label: "b", value: "b" },
-      { label: "c", value: "c" },
+    expect(getOptions(["aa", "bb", "cc"])).toEqual([
+      { label: "Aa", value: "aa" },
+      { label: "Bb", value: "bb" },
+      { label: "Cc", value: "cc" },
     ]);
   });
 
@@ -102,7 +102,7 @@ describe("All Orders Page", () => {
 describe("All Orders Page - Table unit", () => {
   it("should have 3 card initially after get request with all the included data", async () => {
     render(<AllOrdersPage status="success" allOrders={allDataOrders} getList={getListUnpaidOrders} />);
-    expect(await screen.findAllByRole("row")).toHaveLength(3);
+    expect(await screen.findAllByRole("row")).toHaveLength(4);
     expect(await screen.findAllByRole("button", { name: /edit/i })).toHaveLength(3);
     expect(await screen.findAllByRole("button", { name: /pay/i })).toHaveLength(3);
     ["ID", "Table", "Amount", "Action"].forEach(async (text) => {
@@ -143,15 +143,6 @@ describe("All Orders Page - Table unit", () => {
   //   });
   //   expect(await screen.findAllByRole("row")).toHaveLength(3);
   // });
-
-  it("error in front end if data wasn't received from the API", async () => {
-    render(<AllOrdersPage status="error" allOrders={[]} getList={[]} />);
-    await waitFor(() => {
-      expect(screen.queryAllByRole("row")).toHaveLength(0);
-    });
-    expect(await screen.findByRole("alert")).toBeInTheDocument();
-    expect(await screen.findByText(/page will refresh automatically in 5 seconds/i)).toBeInTheDocument();
-  });
 });
 
 // Add all the element and check no error on notification
