@@ -16,6 +16,7 @@ const PaymentSystem = ({ paymentType, currentOrder }) => {
 
   const [selectAmount, setSelectAmount] = useState<TStrNull>("");
   const [selectedAmount, setSelectedAmount] = useState<TStrNull>("");
+  const [renderAmount, setRenderAmount] = useState(0);
 
   const onAdd = (val: string) => setSelectAmount((prevValue: string) => prevValue + val);
   const onConfirm = () => {
@@ -64,7 +65,7 @@ const PaymentSystem = ({ paymentType, currentOrder }) => {
             <Col span={11}>
               <LGCard>
                 <RowCenter style={{ marginBottom: "1rem" }}>
-                  <LRoundedInput aria-label="select amount" value={renderedValue()} />
+                  <LRoundedInput readOnly={true} aria-label="select amount" value={renderedValue()} />
                 </RowCenter>
                 <RowCenter gutter={20}>
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num: number) => {
@@ -121,12 +122,12 @@ const PaymentSystem = ({ paymentType, currentOrder }) => {
             </Col>
             <Col span={11}>
               <CenteredTitle>Transaction amount</CenteredTitle>
-              <LRoundedInput aria-label="" value={currentOrder.orderTotal} />
+              <LRoundedInput readOnly={true} aria-label="transactionAmount" value={currentOrder.orderTotal} />
               <CenteredTitle>Amount</CenteredTitle>
-              <LRoundedInput aria-label="selected amount" value={selectedAmount} />
+              <LRoundedInput readOnly={true} aria-label="selected amount" value={selectedAmount} />
 
               <CenteredTitle>Render</CenteredTitle>
-              <LRoundedInput aria-label="selected amount" />
+              <LRoundedInput readOnly={true} aria-label="render" value={renderAmount} />
               <RediIconButton iconFt={faCartShopping} buttonType={EButtonType.SUCCESS} disabled={isDisabled}>
                 Finalize payment
               </RediIconButton>
