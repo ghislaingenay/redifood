@@ -1,5 +1,5 @@
 import { faBan, faCartShopping } from "@fortawesome/free-solid-svg-icons";
-import { Col } from "antd";
+import { Alert, Col } from "antd";
 import { useCallback, useState } from "react";
 import { Else, If, Then } from "react-if";
 import { RediButton, RediIconButton } from "../../../../src/components/styling/Button.style";
@@ -16,14 +16,11 @@ const PaymentSystem = ({ paymentType, currentOrder }) => {
 
   const [selectAmount, setSelectAmount] = useState<TStrNull>("");
   const [selectedAmount, setSelectedAmount] = useState<TStrNull>("");
-  const [renderAmount, setRenderAmount] = useState(0);
 
   const onAdd = (val: string) => setSelectAmount((prevValue: string) => prevValue + val);
   const onConfirm = () => {
     setSelectedAmount(() => selectAmount);
-    setTimeout(() => {
-      setSelectAmount(null);
-    }, 1000);
+    setSelectAmount("");
   };
 
   const havePoint = (str: string) => {
@@ -39,7 +36,9 @@ const PaymentSystem = ({ paymentType, currentOrder }) => {
     return true;
   };
 
-  const isDisabled = selectedAmount && selectedAmount >= orderTotal ? false : true;
+  const diffAmount = Number(selectedAmount) - orderTotal;
+  const amountToGive = diffAmount === orderTotal || diffAmount < 0 ? 0 : diffAmount;
+  const isDisabled = selectedAmount && selectedAmount >= orderTotal && diffAmount > 0 ? false : true;
   const confirmDisabled =
     selectAmount === "" || selectAmount === "." || !havePoint(selectAmount) || !haveValueSeparated(selectAmount)
       ? // !(selectAmount.includes(".") && selectAmount.split(".").length !== 1)
@@ -56,7 +55,6 @@ const PaymentSystem = ({ paymentType, currentOrder }) => {
   const renderedValue = useCallback(() => {
     return selectAmount;
   }, [selectAmount]);
-
   return (
     <>
       <If condition={paymentType === EPaymentType.CASH}>
@@ -121,16 +119,25 @@ const PaymentSystem = ({ paymentType, currentOrder }) => {
               </LGCard>
             </Col>
             <Col span={11}>
-              <CenteredTitle>Transaction amount</CenteredTitle>
-              <LRoundedInput readOnly={true} aria-label="transactionAmount" value={currentOrder.orderTotal} />
-              <CenteredTitle>Amount</CenteredTitle>
-              <LRoundedInput readOnly={true} aria-label="selected amount" value={selectedAmount} />
-
-              <CenteredTitle>Render</CenteredTitle>
-              <LRoundedInput readOnly={true} aria-label="render" value={renderAmount} />
-              <RediIconButton iconFt={faCartShopping} buttonType={EButtonType.SUCCESS} disabled={isDisabled}>
-                Finalize payment
-              </RediIconButton>
+              <RowCenter>
+                <CenteredTitle level={4}>Transaction amount</CenteredTitle>
+                <LRoundedInput readOnly={true} aria-label="transactionAmount" value={currentOrder.orderTotal} />
+              </RowCenter>
+              <RowCenter>
+                <CenteredTitle level={4}>Given amount</CenteredTitle>
+                <LRoundedInput readOnly={true} aria-label="selected amount" value={selectedAmount} />
+              </RowCenter>
+              <RowCenter>
+                <CenteredTitle level={4}>Amount to give</CenteredTitle>
+                <LRoundedInput readOnly={true} aria-label="render" value={amountToGive} />
+              </RowCenter>
+              <RowCenter style={{ marginTop: "2rem" }}>
+                {isDisabled && <Alert type="error" style={{ margin: "1rem 2rem" }} message="Not enough funds" />}
+                <RediIconButton iconFt={faCartShopping} buttonType={EButtonType.SUCCESS} disabled={isDisabled}>
+                  {" "}
+                  Finalize payment
+                </RediIconButton>
+              </RowCenter>
             </Col>
           </RowSpaceAround>
         </Then>
