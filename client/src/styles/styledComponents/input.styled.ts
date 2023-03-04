@@ -5,7 +5,7 @@ import { hexToRgba } from "../../functions/global.fn";
 export const LRoundedInput = styled.input`
   border-radius: 2rem;
   padding: 0.5rem 2rem;
-  width: 60%;
+  width: 80%;
   text-align: center;
   font-size: 2rem;
   text-align: center;
