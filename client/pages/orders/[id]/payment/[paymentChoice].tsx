@@ -25,15 +25,20 @@ const PaymentSystem = ({ paymentType, currentOrder }) => {
     }, 1000);
   };
 
-  const havePoint = (str: string) => str.indexOf(".") === str.lastIndexOf(".");
+  const havePoint = (str: string) => {
+    if (selectAmount?.includes(".")) {
+      return str.indexOf(".") === str.lastIndexOf(".");
+    }
+    return true;
+  };
   const haveValueSeparated = (str: string) => {
-    if (selectAmount.includes(".")) {
+    if (selectAmount?.includes(".")) {
       return /(\d+).(\d+)/i.test(str);
     }
     return true;
   };
 
-  const isDisabled = selectedAmount && selectedAmount > orderTotal ? false : true;
+  const isDisabled = selectedAmount && selectedAmount >= orderTotal ? false : true;
   const confirmDisabled =
     selectAmount === "" || selectAmount === "." || !havePoint(selectAmount) || !haveValueSeparated(selectAmount)
       ? // !(selectAmount.includes(".") && selectAmount.split(".").length !== 1)
