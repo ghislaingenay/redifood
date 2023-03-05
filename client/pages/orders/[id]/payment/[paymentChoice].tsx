@@ -142,7 +142,9 @@ const PaymentSystem = ({ paymentType, currentOrder }) => {
                 <LRoundedInput readOnly={true} aria-label="render" id="render" value={amountToGive} />
               </RowCenter>
               <RowCenter style={{ marginTop: "2rem" }}>
-                {isDisabled && <Alert type="error" style={{ margin: "1rem 2rem" }} message="Not enough funds" />}
+                {isDisabled && selectedAmount !== "" && (
+                  <Alert type="error" style={{ margin: "1rem 2rem" }} message="Not enough funds" />
+                )}
                 <RediIconButton iconFt={faCartShopping} buttonType={EButtonType.SUCCESS} disabled={isDisabled}>
                   {" "}
                   Finalize payment
