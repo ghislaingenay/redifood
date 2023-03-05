@@ -24,6 +24,15 @@ export const LabelFormBlack = styled(LabelFormWhite)`
   color: black;
   font-weight: 700;
 `;
+
+export const CenteredLabel = styled.label`
+  margin-top: 1rem;
+  margin-bottom: 0.25rem;
+  color: black;
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 700;
+`;
 export const LabelFormOrange = styled(LabelFormBlack)`
   color: ${ORANGE_DARK};
   font-weight: 700;

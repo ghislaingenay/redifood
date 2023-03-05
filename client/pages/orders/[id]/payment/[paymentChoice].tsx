@@ -5,7 +5,7 @@ import { Else, If, Then } from "react-if";
 import { RediButton, RediIconButton } from "../../../../src/components/styling/Button.style";
 import { RowCenter, RowCenterSp, RowSpaceAround } from "../../../../src/components/styling/grid.styled";
 import { EButtonType, EPaymentType } from "../../../../src/interfaces";
-import { CenteredTitle, LGCard, LRoundedInput } from "../../../../src/styles";
+import { CenteredLabel, LGCard, LRoundedInput } from "../../../../src/styles";
 import { mockOneOrder } from "../../../../test/mocks/mockOrdersData";
 
 type TStrNull = string | null;
@@ -120,16 +120,26 @@ const PaymentSystem = ({ paymentType, currentOrder }) => {
             </Col>
             <Col span={11}>
               <RowCenter>
-                <CenteredTitle level={4}>Transaction amount</CenteredTitle>
-                <LRoundedInput readOnly={true} aria-label="transactionAmount" value={currentOrder.orderTotal} />
+                <CenteredLabel htmlFor="transactionAmount">Transaction amount ($)</CenteredLabel>
+                <LRoundedInput
+                  readOnly={true}
+                  aria-label="transactionAmount"
+                  id="transactionAmount"
+                  value={currentOrder.orderTotal}
+                />
               </RowCenter>
               <RowCenter>
-                <CenteredTitle level={4}>Given amount</CenteredTitle>
-                <LRoundedInput readOnly={true} aria-label="selected amount" value={selectedAmount} />
+                <CenteredLabel htmlFor="selected amount">Given amount</CenteredLabel>
+                <LRoundedInput
+                  readOnly={true}
+                  aria-label="selected amount"
+                  id="selected amount"
+                  value={selectedAmount}
+                />
               </RowCenter>
               <RowCenter>
-                <CenteredTitle level={4}>Amount to give</CenteredTitle>
-                <LRoundedInput readOnly={true} aria-label="render" value={amountToGive} />
+                <CenteredLabel htmlFor="render">Amount to give</CenteredLabel>
+                <LRoundedInput readOnly={true} aria-label="render" id="render" value={amountToGive} />
               </RowCenter>
               <RowCenter style={{ marginTop: "2rem" }}>
                 {isDisabled && <Alert type="error" style={{ margin: "1rem 2rem" }} message="Not enough funds" />}
