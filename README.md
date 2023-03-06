@@ -9,7 +9,7 @@ This project started on January 2023 and it based on redifood-v1. This project w
 ### Front-end
 
 - HTML5/CSS3
-- Ant Design / Tailwind / Styled components
+- Ant Design / Styled components
 - Javascript
 - TypeScript
 - Next.js
