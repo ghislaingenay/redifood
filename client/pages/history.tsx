@@ -1,9 +1,15 @@
+import { faList } from "@fortawesome/free-solid-svg-icons";
 import { Col, DatePicker, Form } from "antd";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { RowCenter } from "../src/components/styling/grid.styled";
-import { mockedFoodData } from "../test/mocks/mockFoodData";
+import { RediIconButton } from "../src/components/styling/Button.style";
+import { RowCenter, RowSpaceBetween } from "../src/components/styling/grid.styled";
+import { EButtonType, IOrder } from "../src/interfaces";
+import { CenteredPBold, LGCard } from "../src/styles";
+import { mockOneOrder } from "../test/mocks/mockOrdersData";
 
 const History = ({ FoodOrderList }) => {
+  const router = useRouter();
   const [form] = Form.useForm();
   const [params, setParams] = useState({ startDate: undefined, endDate: undefined });
 
@@ -41,6 +47,41 @@ const History = ({ FoodOrderList }) => {
           </Col>
         </RowCenter>
       </Form>
+      {FoodOrderList.map((foodOrder: IOrder) => {
+        return (
+          <>
+            <LGCard>
+              <RowSpaceBetween>
+                <Col span={15}>
+                  <RowCenter>
+                    <Col span={12}>
+                      <CenteredPBold>Order number: {foodOrder?._id}</CenteredPBold>
+                    </Col>
+                    <Col span={12}>
+                      <CenteredPBold>Date: </CenteredPBold>
+                    </Col>
+                    <Col span={12}>
+                      <CenteredPBold>Amount: {foodOrder?.orderTotal}</CenteredPBold>
+                    </Col>
+                    <Col span={12}>
+                      <CenteredPBold>Amount: {foodOrder?.orderCurrency}</CenteredPBold>
+                    </Col>
+                  </RowCenter>
+                </Col>
+                <Col span={7}>
+                  <RediIconButton
+                    iconFt={faList}
+                    buttonType={EButtonType.EDIT}
+                    onClick={() => router.push(`/orders/${foodOrder?._id}`)}
+                  >
+                    VIEW ORDER
+                  </RediIconButton>
+                </Col>
+              </RowSpaceBetween>
+            </LGCard>
+          </>
+        );
+      })}
     </>
   );
 };
@@ -49,6 +90,6 @@ export default History;
 
 export async function getServerSideProps() {
   return {
-    props: { FoodOrderList: [mockedFoodData], status: "success" },
+    props: { FoodOrderList: [mockOneOrder], status: "success" },
   };
 }

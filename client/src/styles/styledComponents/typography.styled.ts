@@ -12,6 +12,10 @@ export const RoundedInputNum = styled(InputNumber)`
 export const CenteredP = styled.p`
   text-align: center;
 `;
+export const CenteredPBold = styled.p`
+  text-align: center;
+  font-weight: 700;
+`;
 
 export const LabelFormWhite = styled.label`
   color: white;
