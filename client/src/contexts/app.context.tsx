@@ -13,6 +13,8 @@ interface IAppContext {
   setStatus: (status: "success" | "error") => void;
   setLanguage: (val: ELanguage) => void;
   setCurrency: (val: ECurrency) => void;
+  convertPrice: (price: number) => number;
+  displayCurrency: () => string;
 }
 export default AppContext;
 
@@ -32,6 +34,19 @@ export const AppProvider = ({ children }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status]);
 
+  const convertPrice = (price: number) => {
+    switch (currency) {
+      case ECurrency.USD:
+        return price;
+      case ECurrency.EUR:
+        return price * 0.85;
+      default:
+        return price;
+    }
+  };
+
+  const displayCurrency = () => (currency === ECurrency.USD ? "$" : "€");
+
   return (
     <AppContext.Provider
       value={{
@@ -43,6 +58,8 @@ export const AppProvider = ({ children }) => {
         setStatus: setStatus,
         setLanguage: setLanguage,
         setCurrency: setCurrency,
+        convertPrice: convertPrice,
+        displayCurrency: displayCurrency,
       }}
     >
       {children}
