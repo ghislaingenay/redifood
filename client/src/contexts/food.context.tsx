@@ -14,6 +14,12 @@ interface IFoodContext {
     addToCart: (item: IFood["itemId"], foodList: IFood[]) => void;
     selectFood: (item: IFood["itemId"], foodList: IFood[]) => void;
   };
+  foodPictures: {
+    haveFoodDescription: boolean;
+    setHaveFoodDescription: (val: boolean) => void;
+    haveFoodPicture: boolean;
+    setHaveFoodPicture: (val: boolean) => void;
+  };
 }
 export function useFood() {
   const foodElement = useContext(FoodContext);
@@ -25,6 +31,8 @@ export function useFood() {
 
 export function FoodProvider({ children }) {
   const [foodOrder, setFoodOrder] = useState<IFood[]>([]);
+  const [haveFoodDescription, setHaveFoodDescription] = useState(true);
+  const [haveFoodPicture, setHaveFoodPicture] = useState(true);
 
   const deleteFood = (itemId: IFood["itemId"]) => {
     const updatedOrder = [...foodOrder].filter((food) => food.itemId !== itemId);
@@ -89,6 +97,12 @@ export function FoodProvider({ children }) {
       addFood: addFood,
       addToCart: addToCart,
       selectFood: selectFood,
+    },
+    foodPictures: {
+      haveFoodDescription: haveFoodDescription,
+      setHaveFoodDescription: setHaveFoodDescription,
+      haveFoodPicture: haveFoodPicture,
+      setHaveFoodPicture: setHaveFoodPicture,
     },
   };
 
