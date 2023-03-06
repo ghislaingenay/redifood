@@ -26,3 +26,8 @@ export interface IGlobalOptions {
   value: string | number;
   label: string;
 }
+
+export enum ELanguage {
+  ENGLISH = "en",
+  FRENCH = "fr",
+}

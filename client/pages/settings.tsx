@@ -3,7 +3,7 @@ import { use, useEffect } from "react";
 import { RowSpaceAround } from "../src/components/styling/grid.styled";
 import AppContext from "../src/contexts/app.context";
 import { useFood } from "../src/contexts/food.context";
-import { ECurrency } from "../src/interfaces";
+import { ECurrency, ELanguage } from "../src/interfaces";
 import { CenteredTitle, NoSpacingDivider, RediDivider, RoundedInput } from "../src/styles";
 const { Title } = Typography;
 
@@ -81,8 +81,8 @@ const Settings = () => {
           <Col span={11}>
             <Form.Item label="Language" name="language">
               <Radio.Group buttonStyle="solid" onChange={(e) => setLanguage(e.target.value)}>
-                <Radio.Button value={"en-US"}>English</Radio.Button>
-                <Radio.Button value={"fr"}>French</Radio.Button>
+                <Radio.Button value={ELanguage.ENGLISH}>English</Radio.Button>
+                <Radio.Button value={ELanguage.FRENCH}>French</Radio.Button>
               </Radio.Group>
             </Form.Item>
           </Col>
