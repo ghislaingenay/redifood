@@ -1,19 +1,25 @@
 import { createContext, useEffect, useState } from "react";
 import { NotificationRes } from "../../src/definitions/notification.class";
-import { TStatusProps } from "../interfaces/global.interface";
+import { ECurrency } from "../interfaces";
 
 // @ts-ignore
 const AppContext = createContext({} as IAppContext);
 interface IAppContext {
   state: {
     status: "error" | "success";
+    language: string;
+    currency: ECurrency;
   };
-  setStatus: (status: TStatusProps) => void;
+  setStatus: (status: "success" | "error") => void;
+  setLanguage: (val: string) => void;
+  setCurrency: (val: ECurrency) => void;
 }
 export default AppContext;
 
 export const AppProvider = ({ children }) => {
-  const [status, setStatus] = useState<TStatusProps>("success");
+  const [status, setStatus] = useState<"success" | "error">("success");
+  const [language, setLanguage] = useState<string>("en");
+  const [currency, setCurrency] = useState<ECurrency>(ECurrency.USD);
 
   useEffect(() => {
     if (status === "error") {
@@ -31,8 +37,12 @@ export const AppProvider = ({ children }) => {
       value={{
         state: {
           status: status,
+          language: language,
+          currency: currency,
         },
         setStatus: setStatus,
+        setLanguage: setLanguage,
+        setCurrency: setCurrency,
       }}
     >
       {children}
