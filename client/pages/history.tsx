@@ -22,10 +22,9 @@ const History = ({ FoodOrderList }) => {
           if (startDate) {
             startingDate = startDate["$d"];
           }
-          if (endingDate) {
+          if (endDate) {
             endingDate = endDate["$d"];
           }
-          console.log(startingDate, endingDate);
           setParams(() => Object.assign({ params }, { startDate: startingDate, endDate: endingDate }));
         }}
       >
