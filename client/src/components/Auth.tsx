@@ -12,7 +12,7 @@ import whiteLogo from "../../public/redifood-logo-white.png";
 import { EAuthChoice } from "../../src/interfaces/auth.interface";
 import { checkDigit, checkLength, checkLower, checkSpecials, checkUpper } from "../functions/global.fn";
 import { EButtonType } from "../interfaces";
-import { SpacingDiv25X } from "../styles/styledComponents/div.styled";
+import { SpacingDiv5X } from "../styles";
 import { RedSpan } from "../styles/styledComponents/span.styled";
 import { LabelFormWhite, RoundedInput } from "../styles/styledComponents/typography.styled";
 import { RediButton } from "./styling/Button.style";
@@ -138,7 +138,7 @@ const Auth = () => {
       <RowCenter style={{ paddingTop: "3rem" }}>
         <Image src={whiteLogo} alt="Redifood logo white" width={200} height={200} />
       </RowCenter>
-      <SpacingDiv25X>
+      <SpacingDiv5X>
         <RowCenter style={{ paddingTop: "2rem" }}>
           <RediRadioButton
             disabled={isDisabled}
@@ -198,7 +198,7 @@ const Auth = () => {
                 <RoundedInput type="text" aria-label="email" placeholder="Email..." />
               </Form.Item>
               <RowSpaceBetween>
-                <Col md={11}>
+                <Col xs={24} md={11}>
                   <LabelFormWhite htmlFor="pwd-signup">
                     Password <RedSpan>*</RedSpan>
                   </LabelFormWhite>
@@ -211,7 +211,7 @@ const Auth = () => {
                     />
                   </Form.Item>
                 </Col>
-                <Col md={11}>
+                <Col xs={24} md={11}>
                   <LabelFormWhite htmlFor="c-pwd-signup">
                     Confirm password <RedSpan>*</RedSpan>
                   </LabelFormWhite>
@@ -249,7 +249,7 @@ const Auth = () => {
             </Form>
           </Else>
         </If>
-      </SpacingDiv25X>
+      </SpacingDiv5X>
     </div>
   );
 };

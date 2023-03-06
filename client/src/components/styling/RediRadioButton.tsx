@@ -89,7 +89,7 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
     <RowSpaceAround>
       {options.map(({ label, value, icon }: any, index) => (
         <>
-          <Col span={spanValue(options)} style={{ width: "100%" }} key={index}>
+          <Col xs={24} sm={24} md={spanValue(options)} style={{ width: "100%" }} key={index}>
             <RadioButton
               style={{ ...colorStyle(value) }}
               role="radio"
