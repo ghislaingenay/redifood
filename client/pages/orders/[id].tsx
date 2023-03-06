@@ -51,26 +51,30 @@ const CurrentOrder = ({ currentOrder, status }: any) => {
         </RowSpaceBetween>
       </LGCard>
       <SummaryTable order={currentOrder} />
-      <RediRadioButton
-        radioGroupName="payment"
-        padding="1rem 1rem"
-        fontSize="1rem"
-        options={radioPaymentOptions}
-        haveIcon="true"
-        setSelectedButton={setPaymentChoice}
-        selectedButton={paymentChoice}
-      />
-      <Space>
-        <RediIconButton
-          onClick={() => router.push(`/orders/${orderId}/payment/${paymentChoice}`)}
-          iconFt={faCartShopping}
-          disabled={isDisabled}
-          buttonType={EButtonType.SUCCESS}
-          aria-label="PAY"
-        >
-          PAY
-        </RediIconButton>
-      </Space>
+      {orderStatus !== "COMPLETE" && (
+        <>
+          <RediRadioButton
+            radioGroupName="payment"
+            padding="1rem 1rem"
+            fontSize="1rem"
+            options={radioPaymentOptions}
+            haveIcon="true"
+            setSelectedButton={setPaymentChoice}
+            selectedButton={paymentChoice}
+          />
+          <Space>
+            <RediIconButton
+              onClick={() => router.push(`/orders/${orderId}/payment/${paymentChoice}`)}
+              iconFt={faCartShopping}
+              disabled={isDisabled}
+              buttonType={EButtonType.SUCCESS}
+              aria-label="PAY"
+            >
+              PAY
+            </RediIconButton>
+          </Space>
+        </>
+      )}
     </SpacingDiv5X>
   );
 };

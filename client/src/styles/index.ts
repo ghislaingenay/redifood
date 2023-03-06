@@ -6,3 +6,4 @@ export * from "./styledComponents/Layout.styled";
 export * from "./styledComponents/span.styled";
 export * from "./styledComponents/table.styled";
 export * from "./styledComponents/typography.styled";
+export * from "./styledComponents/input.styled";
