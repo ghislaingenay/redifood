@@ -13,8 +13,6 @@ interface IAppContext {
   setStatus: (status: "success" | "error") => void;
   setLanguage: (val: ELanguage) => void;
   setCurrency: (val: ECurrency) => void;
-  convertPrice: (price: number, direction: "backToFront" | "frontToBack") => number;
-  displayCurrency: () => string;
 }
 export default AppContext;
 
@@ -34,22 +32,6 @@ export const AppProvider = ({ children }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status]);
 
-  const convertPrice = (price: number, direction: "backToFront" | "frontToBack") => {
-    const stocks = [
-      { currencyValue: ECurrency.USD, value: 1 },
-      { currencyValue: ECurrency.EUR, value: 0.85 },
-    ];
-    if (direction === "backToFront") {
-      const stock = stocks.find((stock) => stock.currencyValue === currency);
-      return price * stock.value;
-    } else {
-      const stock = stocks.find((stock) => stock.currencyValue === currency);
-      return price / stock.value;
-    }
-  };
-
-  const displayCurrency = () => (currency === ECurrency.USD ? "$" : "€");
-
   return (
     <AppContext.Provider
       value={{
@@ -61,8 +43,6 @@ export const AppProvider = ({ children }) => {
         setStatus: setStatus,
         setLanguage: setLanguage,
         setCurrency: setCurrency,
-        convertPrice: convertPrice,
-        displayCurrency: displayCurrency,
       }}
     >
       {children}

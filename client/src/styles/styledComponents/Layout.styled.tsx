@@ -13,7 +13,7 @@ export const RediContent = styled(Content)`
   overflow-y: scroll;
   margin: 0;
   padding: 1rem 3%;
-  height: 88vh;
+  height: 100vh;
   background-color: rgba(256, 256, 256, 0.5);
   box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.2);
 `;

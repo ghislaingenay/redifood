@@ -7,6 +7,7 @@ export const allDataOrders = [
     orderDate: "2021-01-01",
     tableNumber: 2,
     orderTotal: 100,
+    orderCurrency: ECurrency.USD,
     orderItems: [
       {
         itemId: 456,
@@ -25,6 +26,7 @@ export const allDataOrders = [
     orderDate: "2021-04-05",
     tableNumber: 5,
     orderTotal: 200,
+    orderCurrency: ECurrency.USD,
     orderItems: [
       {
         itemName: "cd",
@@ -50,6 +52,7 @@ export const allDataOrders = [
     orderDate: "2021-07-04",
     tableNumber: 8,
     orderTotal: 1890,
+    orderCurrency: ECurrency.USD,
     orderItems: [
       {
         itemName: "Pottaes",

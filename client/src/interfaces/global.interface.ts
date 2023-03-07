@@ -28,6 +28,6 @@ export interface IGlobalOptions {
 }
 
 export enum ELanguage {
-  ENGLISH = "en",
-  FRENCH = "fr",
+  ENGLISH = "en-US",
+  FRENCH = "fr-FR",
 }

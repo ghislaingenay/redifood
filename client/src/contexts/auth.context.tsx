@@ -19,10 +19,10 @@ export function AuthProvider({ children }) {
   const [spinLoading, setSpinLoading] = useState(true);
 
   useEffect(() => {
-    setSpinLoading(true);
-    setTimeout(() => {
-      setSpinLoading(false);
-    }, 1000);
+    // setSpinLoading(true);
+    // setTimeout(() => {
+    setSpinLoading(false);
+    // }, 1000);
     // new Promise((resolve, reject) => {
     //   AxiosFunction({ url: "/api/auth/currentuser", method: "get", body: {}, queryParams: {} })
     //     .then((res) => {
