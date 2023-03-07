@@ -32,17 +32,6 @@ const AppComponent = ({ Component, pageProps }) => {
                     <RediContent>
                       <Component {...pageProps} />
                     </RediContent>
-                    {/* <Footer
-                      style={{
-                        textAlign: "center",
-                        fontWeight: "bold",
-                        backgroundColor: ORANGE_LIGHT,
-                        margin: "1rem 0 0",
-                        padding: "0",
-                      }}
-                    >
-                      <em>Redifood ©{new Date().getFullYear()} Created by Ghislain Genay</em>
-                    </Footer> */}
                   </Layout>
                 </Layout>
               </Suspense>
