@@ -2,7 +2,7 @@ import { ConfigProvider, Layout } from "antd";
 // import { RediHeader } from "../src/components/Page";
 import { AppProvider } from "../src/contexts/app.context";
 import "../src/styles/globals.css";
-import { tokenProvider } from "../src/styles/index";
+import { RediContent, tokenProvider } from "../src/styles/index";
 const { Footer, Content } = Layout;
 // import buildClient from "./api/build-client";
 import "@fortawesome/fontawesome-svg-core/styles.css";
@@ -28,23 +28,21 @@ const AppComponent = ({ Component, pageProps }) => {
               <Suspense fallback={<div>Loading...</div>}>
                 <Layout style={{ minHeight: "100vh" }}>
                   <RediHeader bgColor={BACKGROUND_COLOR} color={ORANGE_LIGHT} />
-                  <Layout className="layout" style={{ backgroundColor: ORANGE_LIGHT, padding: "1rem 2.5%" }}>
-                    {/* <RediContent> */}
-                    <Content>
+                  <Layout className="layout" style={{ backgroundColor: ORANGE_LIGHT, overflowY: "hidden" }}>
+                    <RediContent>
                       <Component {...pageProps} />
-                    </Content>
-                    {/* </RediContent> */}
-                    <Footer
+                    </RediContent>
+                    {/* <Footer
                       style={{
                         textAlign: "center",
                         fontWeight: "bold",
-                        backgroundColor: "transparent",
-                        margin: "1rem 0 0.4rem 0",
+                        backgroundColor: ORANGE_LIGHT,
+                        margin: "1rem 0 0",
                         padding: "0",
                       }}
                     >
                       <em>Redifood ©{new Date().getFullYear()} Created by Ghislain Genay</em>
-                    </Footer>
+                    </Footer> */}
                   </Layout>
                 </Layout>
               </Suspense>
