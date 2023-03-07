@@ -114,7 +114,7 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
       </Head>
       <Title level={2}>{t("index.title")}</Title>
       <RowSpaceBetween gutter={10} style={{ marginBottom: "1rem" }}>
-        <Col span={10}>
+        <Col span={12}>
           <RediSelect
             style={{ width: "8rem" }}
             value={selectedOption}
@@ -122,7 +122,7 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
             options={getOptions(getList)}
           />
         </Col>
-        <Col span={10}>
+        <Col span={11} style={{ textAlign: "right" }}>
           <RediIconButton
             shape="round"
             buttonType={EButtonType.CREATE}
