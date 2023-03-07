@@ -1,7 +1,4 @@
-import { ConfigProvider, Layout, Spin } from "antd";
-import { useEffect, useState } from "react";
-import { Else, If, Then } from "react-if";
-import Auth from "../src/components/Auth";
+import { ConfigProvider, Layout } from "antd";
 // import { RediHeader } from "../src/components/Page";
 import { AppProvider } from "../src/contexts/app.context";
 import "../src/styles/globals.css";
@@ -13,31 +10,22 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import { config } from "@fortawesome/fontawesome-svg-core";
+import { Suspense } from "react";
 import RediHeader from "../src/components/Page";
 import { BACKGROUND_COLOR, ORANGE_LIGHT } from "../src/constants";
+import { AuthProvider } from "../src/contexts/auth.context";
 import { FoodProvider } from "../src/contexts/food.context";
 // Tell Font Awesome to skip adding the CSS automatically
 // since it's already imported above
 config.autoAddCss = false;
-
-const AppComponent = ({ Component, pageProps, currentUser, loading }) => {
-  const [loadingSpin, setLoadingSpin] = useState<boolean>(loading || true);
-  // const [status, setStatus] = useState<"error" | "success">("success");
-  useEffect(() => {
-    setLoadingSpin(loading);
-  }, [loading]);
-
-  if (loadingSpin) {
-    return <Spin />;
-  }
-
+const AppComponent = ({ Component, pageProps }) => {
   return (
     <>
       <AppProvider>
         <FoodProvider>
           <ConfigProvider theme={{ token: tokenProvider, inherit: false }}>
-            <If condition={currentUser}>
-              <Then>
+            <AuthProvider>
+              <Suspense fallback={<div>Loading...</div>}>
                 <Layout style={{ minHeight: "100vh" }}>
                   <RediHeader bgColor={BACKGROUND_COLOR} color={ORANGE_LIGHT} />
                   <Layout className="layout" style={{ backgroundColor: ORANGE_LIGHT, padding: "1rem 2.5%" }}>
@@ -59,11 +47,8 @@ const AppComponent = ({ Component, pageProps, currentUser, loading }) => {
                     </Footer>
                   </Layout>
                 </Layout>
-              </Then>
-              <Else>
-                <Auth />
-              </Else>
-            </If>
+              </Suspense>
+            </AuthProvider>
             <ToastContainer />
           </ConfigProvider>
         </FoodProvider>
@@ -71,12 +56,12 @@ const AppComponent = ({ Component, pageProps, currentUser, loading }) => {
     </>
   );
 };
+export default AppComponent;
 
 AppComponent.getInitialProps = async (appContext) => {
   return {
     // currentUser: null,
     currentUser: { username: "pit" },
-    loading: false,
   };
   // console.log("appContext", appContext.Component);
   // const client = buildClient(appContext.ctx);
@@ -84,13 +69,9 @@ AppComponent.getInitialProps = async (appContext) => {
   // console.log("data", data);
   // let pageProps = {};
   // if (appContext.Component.getInitialProps) {
-  //   pageProps = await appContext.Component.getInitialProps(appContext.ctx);
+  //   pageProps = await appContext.Component.getnitialProps(appContext.ctx);
   // }
   // return {
   //   pageProps,
-  //   currentUser: data.currentUser,
-  //   loading: false,
   // };
 };
-
-export default AppComponent;

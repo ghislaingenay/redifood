@@ -1,6 +1,5 @@
 import { Skeleton } from "antd";
 import React, { useContext, useEffect, useState } from "react";
-import { AxiosFunction } from "../../pages/api/axios-request";
 import Auth from "../../src/components/Auth";
 
 // @ts-ignore
@@ -21,19 +20,22 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     setSpinLoading(true);
-    new Promise((resolve, reject) => {
-      AxiosFunction({ url: "/api/auth/currentuser", method: "get", body: {}, params: {} })
-        .then((res) => {
-          setCurrentUser(res.data.currentUser);
-          setSpinLoading(true);
-          resolve(res);
-        })
-        .catch((err) => {
-          setCurrentUser(null);
-          setSpinLoading(false);
-          reject(err);
-        });
-    });
+    setTimeout(() => {
+      setSpinLoading(false);
+    }, 1000);
+    // new Promise((resolve, reject) => {
+    //   AxiosFunction({ url: "/api/auth/currentuser", method: "get", body: {}, queryParams: {} })
+    //     .then((res) => {
+    //       setCurrentUser(res.data.currentUser);
+    //       setSpinLoading(true);
+    //       resolve(res);
+    //     })
+    //     .catch((err) => {
+    //       setCurrentUser(null);
+    //       setSpinLoading(false);
+    //       reject(err);
+    //     });
+    // });
   }, [currentUser]);
 
   if (spinLoading) {
