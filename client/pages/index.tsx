@@ -1,6 +1,8 @@
 import { faCartShopping, faPenToSquare, faPlusCircle, faUtensils } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Alert, Col, Row, Space, Table, Typography } from "antd";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useRouter } from "next/navigation";
 import { AlignType } from "rc-table/lib/interface";
@@ -15,6 +17,7 @@ import { EButtonType, IOrder } from "../src/interfaces";
 import { allDataOrders, getListUnpaidOrders } from "../test/mocks/mockOrdersData";
 
 const AllOrdersPage = ({ allOrders, getList, status }) => {
+  const { t } = useTranslation("");
   const appValue = useContext(AppContext);
   appValue.setStatus(status);
   const router = useRouter();
@@ -93,7 +96,7 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
         <meta name="description" content="List of all unpaid orders" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Title level={2}>List of all orders</Title>
+      <Title level={2}>{t("index.title")}</Title>
       <Row justify="space-between" align="middle" gutter={10} className="mb-5">
         <Col>
           <RediSelect
@@ -110,7 +113,7 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
             iconFt={faPlusCircle}
             onClick={() => router.push("/orders/create")}
           >
-            Create Order
+            {t("index.orderButton")}
           </RediIconButton>
         </Col>
       </Row>
@@ -154,8 +157,15 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
 
 export default AllOrdersPage;
 
-export async function getServerSideProps() {
-  return { props: { allOrders: allDataOrders, getList: getListUnpaidOrders, status: "success" } };
+export async function getServerSideProps({ locale }) {
+  return {
+    props: {
+      allOrders: allDataOrders,
+      getList: getListUnpaidOrders,
+      status: "success",
+      ...(await serverSideTranslations(locale, ["common"])),
+    },
+  };
   // const url = "/api/orders";
   // await axios
   //   .get(url, { params: { selectedOption: "ALL" } })
