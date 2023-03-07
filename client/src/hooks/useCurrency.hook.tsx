@@ -1,12 +1,13 @@
-import { useContext } from "react";
-import AppContext from "../contexts/app.context";
 import { ECurrency, ELanguage } from "../interfaces";
 
-const useCurrency = () => {
-  const {
-    state: { currency },
-  } = useContext(AppContext);
-
+interface IUseCurrency {
+  convertPrice: (price: number, direction: "backToFront" | "frontToBack") => string;
+  displayCurrency: () => string;
+}
+interface IUseCurrencyProps {
+  currency: ECurrency;
+}
+const useCurrency = ({ currency }: IUseCurrencyProps) => {
   const stocks = [
     { currencyValue: ECurrency.USD, value: 1, numberFormat: ELanguage.ENGLISH, symbol: "$" },
     { currencyValue: ECurrency.EUR, value: 0.85, numberFormat: ELanguage.FRENCH, symbol: "€" },
@@ -19,9 +20,11 @@ const useCurrency = () => {
   };
 
   const convertFormat = (price: number) => {
-    const { currencyValue } = findStock();
-    return new Intl.NumberFormat(currencyValue, {
+    const { numberFormat, currencyValue } = findStock();
+    return new Intl.NumberFormat(numberFormat, {
       maximumSignificantDigits: 2,
+      style: "currency",
+      currency: currencyValue,
     }).format(price);
   };
 
@@ -40,7 +43,7 @@ const useCurrency = () => {
     return symbol;
   };
 
-  return { convertPrice, displayCurrency };
+  return { convertPrice, displayCurrency } as IUseCurrency;
 };
 
 export default useCurrency;

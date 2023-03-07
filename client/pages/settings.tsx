@@ -1,5 +1,5 @@
 import { Col, Form, Radio, Typography } from "antd";
-import { use, useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { RowSpaceAround } from "../src/components/styling/grid.styled";
 import AppContext from "../src/contexts/app.context";
 import { useFood } from "../src/contexts/food.context";
@@ -15,7 +15,7 @@ const Settings = () => {
     setCurrency,
     setLanguage,
     state: { currency, language },
-  } = use(AppContext);
+  } = useContext(AppContext);
   const [userForm] = Form.useForm();
   const [settingsForm] = Form.useForm();
 
@@ -80,7 +80,7 @@ const Settings = () => {
         <RowSpaceAround>
           <Col span={11}>
             <Form.Item label="Language" name="language">
-              <Radio.Group buttonStyle="solid" onChange={(e) => setLanguage(e.target.value)}>
+              <Radio.Group buttonStyle="solid" onChange={(e) => setLanguage(e.target.value as ELanguage)}>
                 <Radio.Button value={ELanguage.ENGLISH}>English</Radio.Button>
                 <Radio.Button value={ELanguage.FRENCH}>French</Radio.Button>
               </Radio.Group>
@@ -88,7 +88,7 @@ const Settings = () => {
           </Col>
           <Col span={11}>
             <Form.Item label="Currency" name="currency">
-              <Radio.Group buttonStyle="solid" onChange={(e) => setCurrency(e.target.value)}>
+              <Radio.Group buttonStyle="solid" onChange={(e) => setCurrency(e.target.value as ECurrency)}>
                 <Radio.Button value={ECurrency.USD}>$</Radio.Button>
                 <Radio.Button value={ECurrency.EUR}>€</Radio.Button>
               </Radio.Group>
