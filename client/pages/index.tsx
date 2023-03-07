@@ -1,6 +1,6 @@
 import { faCartShopping, faPenToSquare, faPlusCircle, faUtensils } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Alert, Col, Row, Space, Table, Typography } from "antd";
+import { Col, Space, Table, Typography } from "antd";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
@@ -9,21 +9,23 @@ import { AlignType } from "rc-table/lib/interface";
 import { useContext, useEffect, useState } from "react";
 import { RediSelect } from "../src/components/RediSelect";
 import { RediIconButton } from "../src/components/styling/Button.style";
-import { RowSpaceAround } from "../src/components/styling/grid.styled";
+import { RowSpaceAround, RowSpaceBetween } from "../src/components/styling/grid.styled";
 import { BACKGROUND_COLOR } from "../src/constants";
 import AppContext from "../src/contexts/app.context";
 import { getOptions } from "../src/functions/global.fn";
+import useCurrency from "../src/hooks/useCurrency.hook";
 import { EButtonType, IOrder } from "../src/interfaces";
 import { allDataOrders, getListUnpaidOrders } from "../test/mocks/mockOrdersData";
 
 const AllOrdersPage = ({ allOrders, getList, status }) => {
   const { t } = useTranslation("");
+  const { convertPrice } = useCurrency();
   const appValue = useContext(AppContext);
   appValue.setStatus(status);
   const router = useRouter();
   const [listAllOrders] = useState(allOrders);
   const [selectedOption, setSelectedOption] = useState("ALL");
-  const [filteredOrders, setFilteredOrders] = useState(allOrders);
+  const [filteredOrders, setFilteredOrders] = useState([]);
   const [spinLoading, setSpinLoading] = useState(true);
   const { Title } = Typography;
   const columns = [
@@ -84,10 +86,24 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
   };
 
   useEffect(() => {
+    console.log("val", appValue.state.language);
+    // data coming from backend
+    const sortedData = allOrders.map((order: IOrder) => {
+      return {
+        ...order,
+        key: order._id,
+        orderTotal: `$${convertPrice(order.orderTotal, "backToFront")}`,
+      };
+    });
+    setFilteredOrders(sortedData);
+    // i18next.changeLanguage(appValue.state.language, (err, t) => {
+    //   if (err) return console.log("something went wrong loading", err);
+    //   t("key"); // -> same as i18next.t
+    // });
     setSpinLoading(false);
     appValue.setStatus(status);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status, appValue]);
+  }, [status, selectedOption]);
 
   return (
     <>
@@ -97,8 +113,8 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Title level={2}>{t("index.title")}</Title>
-      <Row justify="space-between" align="middle" gutter={10} className="mb-5">
-        <Col>
+      <RowSpaceBetween gutter={10} style={{ marginBottom: "1rem" }}>
+        <Col span={10}>
           <RediSelect
             style={{ width: "8rem" }}
             value={selectedOption}
@@ -106,7 +122,7 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
             options={getOptions(getList)}
           />
         </Col>
-        <Col className="text-right" lg={4}>
+        <Col span={10}>
           <RediIconButton
             shape="round"
             buttonType={EButtonType.CREATE}
@@ -116,18 +132,12 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
             {t("index.orderButton")}
           </RediIconButton>
         </Col>
-      </Row>
-      <Alert
-        message="This is a warning message"
-        type="warning"
-        showIcon
-        style={{ fontWeight: 700, marginBottom: "0.5rem", border: "0.125rem solid" }}
-      />
+      </RowSpaceBetween>
       <Table
         loading={spinLoading}
         rowKey="_id"
         columns={columns}
-        dataSource={allOrders}
+        dataSource={filteredOrders}
         pagination={false}
         expandable={{
           expandedRowRender: (record: IOrder) => {
