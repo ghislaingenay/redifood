@@ -20,8 +20,8 @@ import { allDataOrders, getListUnpaidOrders } from "../test/mocks/mockOrdersData
 const AllOrdersPage = ({ allOrders, getList, status }) => {
   const { t } = useTranslation("");
   const { convertPrice } = useCurrency({ currency: ECurrency.USD });
-  const appValue = useContext(AppContext);
-  appValue.setStatus(status);
+  const { setStatus } = useContext(AppContext);
+
   const router = useRouter();
   const [listAllOrders] = useState(allOrders);
   const [selectedOption, setSelectedOption] = useState("ALL");
@@ -86,7 +86,7 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
   };
 
   useEffect(() => {
-    console.log("val", appValue.state.currency);
+    setStatus(status);
     // data coming from backend
     const sortedData = allOrders.map((order: IOrder) => {
       return {
@@ -96,12 +96,9 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
       };
     });
     setFilteredOrders(sortedData);
-    // i18next.changeLanguage(appValue.state.language, (err, t) => {
-    //   if (err) return console.log("something went wrong loading", err);
-    //   t("key"); // -> same as i18next.t
-    // });
+
     setSpinLoading(false);
-    appValue.setStatus(status);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status, selectedOption]);
 
@@ -168,12 +165,13 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
 export default AllOrdersPage;
 
 export async function getServerSideProps({ locale }) {
+  console.log("l", locale);
   return {
     props: {
       allOrders: allDataOrders,
       getList: getListUnpaidOrders,
       status: "success",
-      ...(await serverSideTranslations(locale, ["common"])),
+      ...(await serverSideTranslations("en", ["common"])),
     },
   };
   // const url = "/api/orders";

@@ -6,7 +6,6 @@ import { ECurrency, ELanguage } from "../interfaces";
 const AppContext = createContext({} as IAppContext);
 interface IAppContext {
   state: {
-    status: "error" | "success";
     language: string;
     currency: ECurrency;
   };
@@ -30,13 +29,12 @@ export const AppProvider = ({ children }) => {
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status]);
+  }, []);
 
   return (
     <AppContext.Provider
       value={{
         state: {
-          status: status,
           language: language,
           currency: currency,
         },
