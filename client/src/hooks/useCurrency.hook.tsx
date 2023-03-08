@@ -3,7 +3,7 @@ import AppContext from "../contexts/app.context";
 import { ECurrency, ELanguage } from "../interfaces";
 
 interface IUseCurrency {
-  convertPrice: (price: number, direction: "backToFront" | "frontToBack") => string;
+  convertPrice: (price: number, direction: "backToFront" | "frontToBack", currBool: boolean) => string;
   displayCurrency: () => string;
 }
 
@@ -22,22 +22,23 @@ const useCurrency = () => {
     return res;
   };
 
-  const convertFormat = (price: number) => {
+  const convertFormat = (price: number, currBool: boolean) => {
     const { numberFormat, currencyValue } = findStock();
+    const styling = currBool && { style: "currency", currency: currencyValue };
     return new Intl.NumberFormat(numberFormat, {
       maximumSignificantDigits: 2,
-      style: "currency",
-      currency: currencyValue,
+      maximumFractionDigits: 2,
+      ...styling,
     }).format(price);
   };
 
-  const convertPrice = (price: number, direction: "backToFront" | "frontToBack") => {
+  const convertPrice = (price: number, direction: "backToFront" | "frontToBack", currBool: boolean) => {
     if (direction === "backToFront") {
       const stock = stocks.find((stock) => stock.currencyValue === currency);
-      return convertFormat(price * stock.value);
+      return convertFormat(price * stock.value, currBool);
     } else {
       const stock = stocks.find((stock) => stock.currencyValue === currency);
-      return convertFormat(price / stock.value);
+      return convertFormat(price / stock.value, currBool);
     }
   };
 
