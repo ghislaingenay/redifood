@@ -1,6 +1,7 @@
 import { Col } from "antd";
 import { BACKGROUND_COLOR, GREY, ORANGE_DARK } from "../../constants";
 import { hexToRgba } from "../../functions/global.fn";
+import useCurrency from "../../hooks/useCurrency.hook";
 import { IFood, IOrder } from "../../interfaces";
 import { CenteredP, CenteredTitle } from "../../styles";
 import { RowSpaceAround } from "../styling/grid.styled";
@@ -18,6 +19,7 @@ const noMP = { margin: 0, padding: 0 };
 const headerColumns = ["FOOD", "QTY", "PRICE (ua)", "TOTAL"];
 
 const SummaryTable = ({ order, xSize, sSize, mSize, lSize }: ISummaryTable) => {
+  const { convertPrice } = useCurrency();
   const lgValue = lSize || 5;
   const mdValue = mSize || 5;
   const sValue = sSize || 5;
@@ -58,10 +60,10 @@ const SummaryTable = ({ order, xSize, sSize, mSize, lSize }: ISummaryTable) => {
                 <CenteredP>{food.itemQuantity}</CenteredP>
               </Col>
               <Col {...sizeProps} role="gridcell">
-                <CenteredP>{food.itemPrice}</CenteredP>
+                <CenteredP>{convertPrice(food.itemPrice, "backToFront", false)}</CenteredP>
               </Col>
               <Col {...sizeProps} role="gridcell">
-                <CenteredP>{(food.itemPrice * food.itemQuantity).toFixed(2)}</CenteredP>
+                <CenteredP>{convertPrice(food.itemPrice * food.itemQuantity, "backToFront", false)}</CenteredP>
               </Col>
             </RowSpaceAround>
           );
@@ -73,7 +75,7 @@ const SummaryTable = ({ order, xSize, sSize, mSize, lSize }: ISummaryTable) => {
             <CenteredP>Total before VAT</CenteredP>
           </Col>
           <Col {...sizeProps} role="gridcell">
-            <CenteredP>{orderTotal.toFixed(2)}$</CenteredP>
+            <CenteredP>{convertPrice(orderTotal, "backToFront", true)}</CenteredP>
           </Col>
         </RowSpaceAround>
         <RowSpaceAround role="row" style={{ backgroundColor: hexToRgba(BACKGROUND_COLOR, 0.5) }}>
@@ -93,7 +95,7 @@ const SummaryTable = ({ order, xSize, sSize, mSize, lSize }: ISummaryTable) => {
             <CenteredP>Total for payment</CenteredP>
           </Col>
           <Col {...sizeProps} role="gridcell">
-            <CenteredP>{(orderTotal * 1.07).toFixed(2)}$</CenteredP>
+            <CenteredP>{convertPrice(orderTotal * 1.07, "backToFront", true)}</CenteredP>
           </Col>
         </RowSpaceAround>
       </div>

@@ -11,6 +11,7 @@ import { optionsCreateFood } from "../../constants/food.const";
 import { useFood } from "../../contexts/food.context";
 import { convertFoodToSection } from "../../functions/food.fn";
 import { capitalize } from "../../functions/global.fn";
+import useCurrency from "../../hooks/useCurrency.hook";
 import { EButtonType, IFood, IFormInterface } from "../../interfaces";
 import { SpacingDiv5X } from "../../styles/styledComponents/div.styled";
 import { RedSpan } from "../../styles/styledComponents/span.styled";
@@ -63,6 +64,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
     setFoodOrder,
     functions: { selectFood },
   } = useFood();
+  const { displayCurrency, convertPrice } = useCurrency();
   const [form] = Form.useForm();
   const pictureSize = 150;
   const pictureValue = Form.useWatch("itemPhoto", form);
@@ -187,7 +189,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
       form.setFieldsValue({
         itemName: foodOrder[0].itemName,
         itemDescription: foodOrder[0].itemDescription,
-        itemPrice: foodOrder[0].itemPrice,
+        itemPrice: convertPrice(foodOrder[0].itemPrice, "backToFront", false),
         itemPhoto: foodOrder[0].itemPhoto,
         itemSection: foodOrder[0].itemSection,
         itemExtra: foodOrder[0].itemExtra,
@@ -289,7 +291,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
             }}
           >
             <Form.Item style={{ display: "none" }} name="itemPhoto" />
-            {optionsCreateFood.map(({ label, name, component, rules }: IFormInterface) => {
+            {optionsCreateFood(displayCurrency).map(({ label, name, component, rules }: IFormInterface) => {
               return (
                 <>
                   <LabelFormBlack htmlFor={name}>

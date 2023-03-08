@@ -2,6 +2,7 @@ import { Alert, Divider, InputNumber, Typography } from "antd";
 import { ORANGE, RED } from "../../constants";
 import { useFood } from "../../contexts/food.context";
 import { calculateTotal } from "../../functions/order.fn";
+import useCurrency from "../../hooks/useCurrency.hook";
 import { EButtonType, EFoodMode } from "../../interfaces";
 import { Scroll } from "../../styles/styledComponents/div.styled";
 import { CenteredTitle } from "../../styles/styledComponents/typography.styled";
@@ -10,6 +11,7 @@ import { RowCenter, RowCenterSp } from "../styling/grid.styled";
 import FoodOrderCard from "./FoodOrderCard";
 const { Title } = Typography;
 const OrderSection = ({ tableNumber, setTableNumber, mode, errorTable, handleSubmit, handleCancel }) => {
+  const { convertPrice } = useCurrency();
   const { foodOrder } = useFood();
   const isCreateMode = mode === EFoodMode.CREATE ? true : false;
   const isVisible = foodOrder.length > 0 ? "visible" : "hidden";
@@ -52,7 +54,7 @@ const OrderSection = ({ tableNumber, setTableNumber, mode, errorTable, handleSub
         ))}
       </Scroll>
       <CenteredTitle level={5} style={{ color: RED, visibility: isVisible }}>
-        Total: {calculateTotal(foodOrder).toFixed(2)} $
+        Total: {convertPrice(Number(calculateTotal(foodOrder)), "backToFront", true)}
       </CenteredTitle>
       <RowCenterSp style={{ marginTop: "1rem" }}>
         <RediButton

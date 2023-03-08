@@ -1,16 +1,17 @@
 import { faList } from "@fortawesome/free-solid-svg-icons";
 import { Col } from "antd";
 import { useRouter } from "next/navigation";
+import useCurrency from "../../hooks/useCurrency.hook";
 import { EButtonType, IOrder } from "../../interfaces";
 import { CenteredPBold, LGCard } from "../../styles";
 import { RediIconButton } from "../styling/Button.style";
 import { RowCenter, RowSpaceBetween } from "../styling/grid.styled";
 
-
 interface IOrderHistoryCard {
   foodOrder: IOrder;
 }
 const OrderHistoryCard = ({ foodOrder }: IOrderHistoryCard) => {
+  const { convertPrice } = useCurrency();
   const router = useRouter();
   return (
     <LGCard>
@@ -24,7 +25,7 @@ const OrderHistoryCard = ({ foodOrder }: IOrderHistoryCard) => {
               <CenteredPBold>Date: </CenteredPBold>
             </Col>
             <Col span={12}>
-              <CenteredPBold>Amount: {foodOrder?.orderTotal}</CenteredPBold>
+              <CenteredPBold>Amount: {convertPrice(foodOrder?.orderTotal, "backToFront", true)}</CenteredPBold>
             </Col>
             <Col span={12}>
               <CenteredPBold>Amount: {foodOrder?.orderCurrency}</CenteredPBold>

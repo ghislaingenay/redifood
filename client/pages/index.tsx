@@ -14,12 +14,12 @@ import { BACKGROUND_COLOR } from "../src/constants";
 import AppContext from "../src/contexts/app.context";
 import { getOptions } from "../src/functions/global.fn";
 import useCurrency from "../src/hooks/useCurrency.hook";
-import { EButtonType, ECurrency, IOrder } from "../src/interfaces";
+import { EButtonType, IOrder } from "../src/interfaces";
 import { allDataOrders, getListUnpaidOrders } from "../test/mocks/mockOrdersData";
 
 const AllOrdersPage = ({ allOrders, getList, status }) => {
   const { t } = useTranslation("");
-  const { convertPrice } = useCurrency({ currency: ECurrency.USD });
+  const { convertPrice } = useCurrency();
   const { setStatus } = useContext(AppContext);
 
   const router = useRouter();
@@ -92,7 +92,7 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
       return {
         ...order,
         key: order._id,
-        orderTotal: `${convertPrice(order.orderTotal, "backToFront")}`,
+        orderTotal: `${convertPrice(order.orderTotal, "backToFront", true)}`,
       };
     });
     setFilteredOrders(sortedData);
