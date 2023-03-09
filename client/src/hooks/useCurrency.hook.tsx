@@ -5,6 +5,7 @@ import { ECurrency, ELanguage } from "../interfaces";
 interface IUseCurrency {
   convertPrice: (price: number, direction: "backToFront" | "frontToBack", currBool: boolean) => string;
   displayCurrency: () => string;
+  convertAmount: (price: number | string) => string;
 }
 
 const useCurrency = () => {
@@ -47,7 +48,16 @@ const useCurrency = () => {
     return symbol;
   };
 
-  return { convertPrice, displayCurrency } as IUseCurrency;
+  const convertAmount = (price: number | string) => {
+    const { numberFormat, currencyValue } = findStock();
+    const amount = Number(price);
+    return new Intl.NumberFormat(numberFormat, {
+      // style: "currency",
+      currency: currencyValue,
+    }).format(amount);
+  };
+
+  return { convertPrice, displayCurrency, convertAmount } as IUseCurrency;
 };
 
 export default useCurrency;
