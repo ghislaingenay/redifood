@@ -1,5 +1,5 @@
 import { ButtonProps, Col } from "antd";
-import { Dispatch, SetStateAction, useEffect } from "react";
+import { Dispatch, SetStateAction, useMemo } from "react";
 import { BACKGROUND_COLOR, LIGHT_GREY, ORANGE_DARK, ORANGE_LIGHT } from "../../constants";
 import { hexToRgba } from "../../functions/global.fn";
 import { RadioButton } from "../../styles";
@@ -68,7 +68,9 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
     }
   };
 
-  useEffect(() => {}, [selectedButton]);
+  const selectedValue = useMemo(() => {
+    return selectedButton;
+  }, [selectedButton]);
 
   const colorStyle = (currentButton: string) => {
     return {
@@ -96,14 +98,16 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
               aria-label={label}
               name={radioGroupName}
               value={value}
-              aria-checked={isSelected(value)}
+              aria-checked={isSelected(selectedValue)}
               onClick={(e) => {
-                console.log("tg", e.target);
                 const target = e.target as HTMLButtonElement;
+                if (!target) {
+                  console.log("ente");
+                  return setSelectedButton(selectedValue);
+                }
                 if (clickedFn) clickedFn();
-                console.log("target.value", target.value);
-                // @ts-ignore
-                return setSelectedButton(() => target.value as any);
+                console.log("target", target.value);
+                return setSelectedButton(target.value as any);
               }}
             >
               {haveIcon === "true" && <SpanBlockM02Y>{icon}</SpanBlockM02Y>}
