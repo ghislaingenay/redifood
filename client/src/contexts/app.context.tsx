@@ -18,7 +18,7 @@ export default AppContext;
 export const AppProvider = ({ children }) => {
   const [status, setStatus] = useState<"success" | "error">("success");
   const [language, setLanguage] = useState<ELanguage>(ELanguage.ENGLISH);
-  const [currency, setCurrency] = useState<ECurrency>(ECurrency.EUR);
+  const [currency, setCurrency] = useState<ECurrency>(ECurrency.USD);
 
   useEffect(() => {
     if (status === "error") {

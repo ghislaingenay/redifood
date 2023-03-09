@@ -4,6 +4,7 @@ import { useCallback, useState } from "react";
 import { Else, If, Then } from "react-if";
 import { RediButton, RediIconButton } from "../../../../src/components/styling/Button.style";
 import { RowCenter, RowCenterSp, RowSpaceAround } from "../../../../src/components/styling/grid.styled";
+import useCurrency from "../../../../src/hooks/useCurrency.hook";
 import { EButtonType, EPaymentType } from "../../../../src/interfaces";
 import { CenteredLabel, LGCard, LRoundedInput } from "../../../../src/styles";
 import { mockOneOrder } from "../../../../test/mocks/mockOrdersData";
@@ -11,6 +12,7 @@ import { mockOneOrder } from "../../../../test/mocks/mockOrdersData";
 type TStrNull = string | null;
 
 const PaymentSystem = ({ paymentType, currentOrder }) => {
+  const { convertPrice, displayCurrency, convertAmount } = useCurrency();
   const { orderTotal } = currentOrder;
   console.log(orderTotal);
 
@@ -19,7 +21,7 @@ const PaymentSystem = ({ paymentType, currentOrder }) => {
 
   const onAdd = (val: string) => setSelectAmount((prevValue: string) => prevValue + val);
   const onConfirm = () => {
-    setSelectedAmount(() => selectAmount);
+    setSelectedAmount(() => convertAmount(selectAmount));
     setSelectAmount("");
   };
 
@@ -41,16 +43,9 @@ const PaymentSystem = ({ paymentType, currentOrder }) => {
   const isDisabled = selectedAmount && selectedAmount >= orderTotal && diffAmount > 0 ? false : true;
   const confirmDisabled =
     selectAmount === "" || selectAmount === "." || !havePoint(selectAmount) || !haveValueSeparated(selectAmount)
-      ? // !(selectAmount.includes(".") && selectAmount.split(".").length !== 1)
-        true
+      ? true
       : false;
-  const clearDisabled =
-    selectAmount === ""
-      ? // ||
-        // (selectAmount.includes(".") && selectAmount.length === 1) ||
-        // selectAmount.match(/./g).length === 1
-        true
-      : false;
+  const clearDisabled = selectAmount === "" ? true : false;
 
   const renderedValue = useCallback(() => {
     return selectAmount;
@@ -96,7 +91,7 @@ const PaymentSystem = ({ paymentType, currentOrder }) => {
                     <RediButton
                       buttonType={EButtonType.INFO}
                       aria-label="point"
-                      value={`.`}
+                      value={"."}
                       onClick={() => setSelectAmount((prevValue: string) => prevValue + ".")}
                     >
                       .
@@ -120,16 +115,16 @@ const PaymentSystem = ({ paymentType, currentOrder }) => {
             </Col>
             <Col span={11}>
               <RowCenter>
-                <CenteredLabel htmlFor="transactionAmount">Transaction amount ($)</CenteredLabel>
+                <CenteredLabel htmlFor="transactionAmount">Transaction amount ({displayCurrency()})</CenteredLabel>
                 <LRoundedInput
                   readOnly={true}
                   aria-label="transactionAmount"
                   id="transactionAmount"
-                  value={currentOrder.orderTotal}
+                  value={convertPrice(currentOrder.orderTotal, "backToFront", false)}
                 />
               </RowCenter>
               <RowCenter>
-                <CenteredLabel htmlFor="selected amount">Given amount</CenteredLabel>
+                <CenteredLabel htmlFor="selected amount">Given amount ({displayCurrency()})</CenteredLabel>
                 <LRoundedInput
                   readOnly={true}
                   aria-label="selected amount"
@@ -138,8 +133,8 @@ const PaymentSystem = ({ paymentType, currentOrder }) => {
                 />
               </RowCenter>
               <RowCenter>
-                <CenteredLabel htmlFor="render">Amount to give</CenteredLabel>
-                <LRoundedInput readOnly={true} aria-label="render" id="render" value={amountToGive} />
+                <CenteredLabel htmlFor="render">Amount to give ({displayCurrency()})</CenteredLabel>
+                <LRoundedInput readOnly={true} aria-label="render" id="render" value={convertAmount(amountToGive)} />
               </RowCenter>
               <RowCenter style={{ marginTop: "2rem" }}>
                 {isDisabled && selectedAmount !== "" && (
