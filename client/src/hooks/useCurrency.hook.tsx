@@ -27,7 +27,7 @@ const useCurrency = () => {
     const { numberFormat, currencyValue } = findStock();
     const styling = currBool && { style: "currency", currency: currencyValue };
     return new Intl.NumberFormat(numberFormat, {
-      maximumSignificantDigits: 2,
+      // maximumSignificantDigits: 2,
       maximumFractionDigits: 2,
       ...styling,
     }).format(price);
