@@ -61,7 +61,4 @@ export const convertStringToEnumCurrency = (str: string): ECurrency => {
   }
 };
 
-export const storeCurrency = () => {
-  const currencyValue = convertStringToEnumCurrency(localStorage.getItem("currency"));
-  return currencyValue ? currencyValue : ECurrency.USD;
-};
+export const storeCurrency = () => convertStringToEnumCurrency(localStorage.getItem("currency"));

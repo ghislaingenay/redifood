@@ -18,15 +18,17 @@ const useLanguage = () => {
     const buff = Buffer.from(str);
     return buff.toString() as ELanguage;
   };
-
-  const setCookie = () => Cookies.set("lang", encodeCookie(languageChoice));
+  const setCookie = () => {
+    Cookies.remove("lang");
+    Cookies.set("lang", encodeCookie(languageChoice));
+  };
 
   const retrieveCookie = (): ELanguage => {
     const cookieInfo = Cookies.get("lang");
     if (cookieInfo) {
       return decodeCookie(Cookies.get("lang"));
     }
-    return ELanguage.ENGLISH;
+    return undefined;
   };
 
   useEffect(() => {
