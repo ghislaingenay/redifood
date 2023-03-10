@@ -91,7 +91,23 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
     <RowSpaceAround>
       {options.map(({ label, value, icon }: any, index) => (
         <>
-          <Col xs={24} sm={24} md={spanValue(options)} style={{ width: "100%" }} key={index}>
+          <Col
+            xs={24}
+            sm={24}
+            md={spanValue(options)}
+            style={{ width: "100%" }}
+            key={index}
+            onClick={(e) => {
+              const target = e.target as HTMLButtonElement;
+              if (!target) {
+                console.log("ente");
+                return setSelectedButton(selectedValue);
+              }
+              if (clickedFn) clickedFn();
+              console.log("target", target.value);
+              return setSelectedButton(target.value as any);
+            }}
+          >
             <RadioButton
               style={{ ...colorStyle(value) }}
               role="radio"
@@ -99,16 +115,6 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
               name={radioGroupName}
               value={value}
               aria-checked={isSelected(selectedValue)}
-              onClick={(e) => {
-                const target = e.target as HTMLButtonElement;
-                if (!target) {
-                  console.log("ente");
-                  return setSelectedButton(selectedValue);
-                }
-                if (clickedFn) clickedFn();
-                console.log("target", target.value);
-                return setSelectedButton(target.value as any);
-              }}
             >
               {haveIcon === "true" && <SpanBlockM02Y>{icon}</SpanBlockM02Y>}
               {label.toUpperCase()}
