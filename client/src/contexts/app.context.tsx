@@ -1,5 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import { NotificationRes } from "../../src/definitions/notification.class";
+import { storeCurrency } from "../functions/global.fn";
 import { ECurrency, ELanguage } from "../interfaces";
 
 // @ts-ignore
@@ -28,8 +29,10 @@ export const AppProvider = ({ children }) => {
         placement: "topRight",
       });
     }
+    setCurrency(storeCurrency());
+    // localStorage.setItem('currency', )
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [currency]);
 
   return (
     <AppContext.Provider

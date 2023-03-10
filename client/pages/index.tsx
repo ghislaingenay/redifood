@@ -19,7 +19,7 @@ import { allDataOrders, getListUnpaidOrders } from "../test/mocks/mockOrdersData
 
 const AllOrdersPage = ({ allOrders, getList, status }) => {
   const { t } = useTranslation("");
-  const { convertPrice } = useCurrency();
+  const { displayCurrency } = useCurrency();
   const { setStatus } = useContext(AppContext);
 
   const router = useRouter();
@@ -28,6 +28,8 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [spinLoading, setSpinLoading] = useState(true);
   const { Title } = Typography;
+
+  const renderAmount = (orderTotal: number) => (displayCurrency() === "$" ? orderTotal : 0.85 * orderTotal);
   const columns = [
     {
       title: "ID",
@@ -42,10 +44,11 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
       align: "center" as AlignType,
     },
     {
-      title: "Amount",
+      title: `Amount (${displayCurrency()})`,
       dataIndex: "orderTotal",
       key: "orderTotal",
       align: "center" as AlignType,
+      render: (item: number) => renderAmount(item).toFixed(2),
     },
     {
       title: "Action",
@@ -92,7 +95,7 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
       return {
         ...order,
         key: order._id,
-        orderTotal: `${convertPrice(order.orderTotal, "backToFront", true)}`,
+        orderTotal: renderAmount(order.orderTotal),
       };
     });
     setFilteredOrders(sortedData);

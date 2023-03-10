@@ -1,5 +1,6 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import AppContext from "../contexts/app.context";
+import { storeCurrency } from "../functions/global.fn";
 import { ECurrency, ELanguage } from "../interfaces";
 
 interface IUseCurrency {
@@ -9,6 +10,8 @@ interface IUseCurrency {
 }
 
 const useCurrency = () => {
+  const [currencyChoice, setCurrencyChoice] = useState<ECurrency>(ECurrency.USD);
+
   const {
     state: { currency },
   } = useContext(AppContext);
@@ -18,7 +21,7 @@ const useCurrency = () => {
   ];
 
   const findStock = () => {
-    const res = stocks.find((stock) => stock.currencyValue === currency);
+    const res = stocks.find((stock) => stock.currencyValue === currencyChoice);
     if (!res) throw new Error("Currency not found");
     return res;
   };
@@ -35,10 +38,10 @@ const useCurrency = () => {
 
   const convertPrice = (price: number, direction: "backToFront" | "frontToBack", currBool: boolean) => {
     if (direction === "backToFront") {
-      const stock = stocks.find((stock) => stock.currencyValue === currency);
+      const stock = stocks.find((stock) => stock.currencyValue === currencyChoice);
       return convertFormat(price * stock.value, currBool);
     } else {
-      const stock = stocks.find((stock) => stock.currencyValue === currency);
+      const stock = stocks.find((stock) => stock.currencyValue === currencyChoice);
       return convertFormat(price / stock.value, currBool);
     }
   };
@@ -56,6 +59,10 @@ const useCurrency = () => {
       currency: currencyValue,
     }).format(amount);
   };
+
+  useEffect(() => {
+    return setCurrencyChoice(storeCurrency());
+  }, [currency]);
 
   return { convertPrice, displayCurrency, convertAmount } as IUseCurrency;
 };
