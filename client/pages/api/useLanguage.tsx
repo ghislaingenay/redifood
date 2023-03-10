@@ -31,12 +31,21 @@ const useLanguage = () => {
     return undefined;
   };
 
+  const getCookieInformation = (lang: string) => {
+    const buff = Buffer.from(lang).toString();
+    let value: ELanguage | undefined = undefined;
+    if (Object.values(ELanguage).includes(buff as ELanguage)) {
+      return (value = buff as ELanguage | undefined);
+    }
+    return undefined;
+  };
+
   useEffect(() => {
     return setLanguageChoice(retrieveCookie());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [language]);
 
-  return { setCookie, retrieveCookie, languageChoice };
+  return { setCookie, getCookieInformation, languageChoice };
 };
 
 export default useLanguage;
