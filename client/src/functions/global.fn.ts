@@ -1,3 +1,5 @@
+import { ECurrency } from "../interfaces";
+
 // function that convert hex to rgb
 const hexToRgb = (hex: string) => {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -38,4 +40,19 @@ export const getOptions = (array: string[]) => {
     };
   });
   return newArray;
+};
+export const convertStringToEnumCurrency = (str: string): ECurrency => {
+  switch (str) {
+    case "USD": {
+      return ECurrency.USD;
+    }
+
+    case "EUR": {
+      return ECurrency.EUR;
+    }
+
+    default: {
+      return ECurrency.USD;
+    }
+  }
 };
