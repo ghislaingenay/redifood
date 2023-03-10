@@ -42,6 +42,10 @@ export const getOptions = (array: string[]) => {
   return newArray;
 };
 export const convertStringToEnumCurrency = (str: string): ECurrency => {
+  if (!Object.values(ECurrency).includes(str as ECurrency)) {
+    localStorage.setItem("currency", ECurrency.USD);
+    return ECurrency.USD;
+  }
   switch (str) {
     case "USD": {
       return ECurrency.USD;
