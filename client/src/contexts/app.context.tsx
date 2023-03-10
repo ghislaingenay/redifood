@@ -7,7 +7,7 @@ import { ECurrency, ELanguage } from "../interfaces";
 const AppContext = createContext({} as IAppContext);
 interface IAppContext {
   state: {
-    language: string;
+    language: ELanguage;
     currency: ECurrency;
   };
   setStatus: (status: "success" | "error") => void;
