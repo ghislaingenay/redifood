@@ -14,14 +14,17 @@ const useLanguage = () => {
     const buff = Buffer.from(str);
     return buff.toString("base64");
   };
+
   const decodeCookie = (str: string | ELanguage) => {
     const buff = Buffer.from(str);
     return buff.toString() as ELanguage;
   };
-  const setCookie = () => {
-    Cookies.remove("lang");
-    Cookies.set("lang", encodeCookie(languageChoice));
-  };
+
+  // const setCookie = () => {
+  //   Cookies.remove("lang");
+  //   console.log("lang choice", language);
+  //   Cookies.set("lang", encodeCookie(language));
+  // };
 
   const retrieveCookie = (): ELanguage => {
     const cookieInfo = Cookies.get("lang");
@@ -35,9 +38,15 @@ const useLanguage = () => {
     const buff = Buffer.from(lang).toString();
     let value: ELanguage | undefined = undefined;
     if (Object.values(ELanguage).includes(buff as ELanguage)) {
-      return (value = buff as ELanguage | undefined);
+      value = buff as ELanguage | undefined;
     }
-    return undefined;
+    return value;
+  };
+
+  const setCookieInformation = (lang: ELanguage) => {
+    Cookies.remove("lang");
+    console.log("lang choice", language);
+    Cookies.set("lang", encodeCookie(lang));
   };
 
   useEffect(() => {
@@ -45,7 +54,7 @@ const useLanguage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [language]);
 
-  return { setCookie, getCookieInformation, languageChoice };
+  return { setCookieInformation, getCookieInformation };
 };
 
 export default useLanguage;
