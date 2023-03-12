@@ -100,7 +100,6 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
       };
     });
     setFilteredOrders(sortedData);
-
     setSpinLoading(false);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -109,7 +108,7 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
   return (
     <>
       <Head>
-        <title>List of all unpaid orders</title>
+        <title>{t("index.title")}</title>
         <meta name="description" content="List of all unpaid orders" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
@@ -117,6 +116,7 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
       <RowSpaceBetween gutter={10} style={{ marginBottom: "1rem" }}>
         <Col span={12}>
           <RediSelect
+            initialOption={{ value: "ALL", label: "ALL" }}
             style={{ width: "8rem" }}
             value={selectedOption}
             onChange={(e: string) => showProperData(e)}

@@ -74,7 +74,7 @@ export const allDataOrders = [
   },
 ];
 
-export const getListUnpaidOrders = ["ALL", "APP1", "FTP2", "KBB3"];
+export const getListUnpaidOrders = ["APP1", "FTP2", "KBB3"];
 
 export const mockOneOrder = {
   OrderId: "APP1",
