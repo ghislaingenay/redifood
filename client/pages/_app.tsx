@@ -10,12 +10,13 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import { config } from "@fortawesome/fontawesome-svg-core";
+import { appWithTranslation } from "next-i18next";
 import { Suspense } from "react";
 import RediHeader from "../src/components/Page";
 import { BACKGROUND_COLOR, ORANGE_LIGHT } from "../src/constants";
 import { AuthProvider } from "../src/contexts/auth.context";
 import { FoodProvider } from "../src/contexts/food.context";
-import { appWithTranslation } from "next-i18next";
+import { buildLanguage } from "./api/build-language";
 // Tell Font Awesome to skip adding the CSS automatically
 // since it's already imported above
 config.autoAddCss = false;
@@ -26,16 +27,22 @@ const AppComponent = ({ Component, pageProps }) => {
         <FoodProvider>
           <ConfigProvider theme={{ token: tokenProvider, inherit: false }}>
             <AuthProvider>
-              <Suspense fallback={<div>Loading...</div>}>
-                <Layout style={{ minHeight: "100vh" }}>
-                  <RediHeader bgColor={BACKGROUND_COLOR} color={ORANGE_LIGHT} />
-                  <Layout className="layout" style={{ backgroundColor: ORANGE_LIGHT, overflowY: "hidden" }}>
-                    <RediContent>
+              <Layout style={{ minHeight: "100vh" }}>
+                <RediHeader bgColor={BACKGROUND_COLOR} color={ORANGE_LIGHT} />
+                <Layout className="layout" style={{ backgroundColor: ORANGE_LIGHT, overflowY: "hidden" }}>
+                  <RediContent>
+                    <Suspense
+                      fallback={
+                        <div style={{ width: "100%", height: "100%", backgroundColor: "black", color: "white" }}>
+                          Loading...
+                        </div>
+                      }
+                    >
                       <Component {...pageProps} />
-                    </RediContent>
-                  </Layout>
+                    </Suspense>
+                  </RediContent>
                 </Layout>
-              </Suspense>
+              </Layout>
             </AuthProvider>
             <ToastContainer />
           </ConfigProvider>
@@ -54,6 +61,9 @@ AppComponent.getInitialProps = async (appContext) => {
   // const client = buildClient(appContext.ctx);
   // const { data } = await client.get("/api/auth/currentuser");
   // console.log("data", data);
+  console.log("path", appContext.ctx.pathname);
+  const getLanguageValue = buildLanguage(appContext);
+  console.log("vv", getLanguageValue);
   let pageProps = {};
   if (appContext.Component.getInitialProps) {
     pageProps = (await appContext.Component.getInitialProps(appContext.ctx)) as any;

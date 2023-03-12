@@ -7,7 +7,7 @@ export const encodeCookie = (str: string | ELanguage) => {
 };
 
 export const decodeCookie = (str: string | ELanguage) => {
-  const buff = Buffer.from(str);
+  const buff = Buffer.from(str, "base64");
   return buff.toString() as ELanguage;
 };
 
@@ -27,12 +27,15 @@ export const setCookieInformation = (lang: ELanguage) => {
 };
 export const buildLanguage = (appContext: any) => {
   const locale = appContext.ctx.locale;
-  const lang = appContext.ctx.req.cookies;
-  console.log("val", locale, lang);
-  const getLanguage = getCookieInformation(lang);
+  const cookies = appContext.ctx.req.cookies;
+  const lang = cookies?.lang;
 
+  if (!lang) {
+    return locale;
+  }
+  const getLanguage = decodeCookie(lang);
   if (!getLanguage) {
     return locale;
   }
-  return lang;
+  return getLanguage;
 };

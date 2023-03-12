@@ -5,6 +5,7 @@ import AppContext from "../src/contexts/app.context";
 import { useFood } from "../src/contexts/food.context";
 import { ECurrency, ELanguage } from "../src/interfaces";
 import { CenteredTitle, NoSpacingDivider, RediDivider, RoundedInput } from "../src/styles";
+import { setCookieInformation } from "./api/build-language";
 const { Title } = Typography;
 
 const Settings = () => {
@@ -72,7 +73,7 @@ const Settings = () => {
         style={{ margin: "2rem 0" }}
         form={settingsForm}
         layout="horizontal"
-        onValuesChange={(e, all) => {
+        onValuesChange={(e: any, all: any) => {
           console.log("all", all);
           handleSettingsInfo(all);
         }}
@@ -84,8 +85,8 @@ const Settings = () => {
                 buttonStyle="solid"
                 onChange={(e) => {
                   console.log(e);
-
                   setLanguage(e.target.value as ELanguage);
+                  setCookieInformation(e.target.value as ELanguage);
                 }}
               >
                 <Radio.Button value={ELanguage.ENGLISH}>English</Radio.Button>
