@@ -1,4 +1,5 @@
 import { createContext, useEffect, useState } from "react";
+import useLanguage from "../../pages/api/useLanguage";
 import { NotificationRes } from "../../src/definitions/notification.class";
 import { storeCurrency } from "../functions/global.fn";
 import { ECurrency, ELanguage } from "../interfaces";
@@ -20,6 +21,7 @@ export const AppProvider = ({ children }) => {
   const [status, setStatus] = useState<"success" | "error">("success");
   const [language, setLanguage] = useState<ELanguage>(ELanguage.ENGLISH);
   const [currency, setCurrency] = useState<ECurrency>(ECurrency.USD);
+  const { retrieveCookie } = useLanguage(language);
 
   useEffect(() => {
     if (status === "error") {
@@ -30,6 +32,7 @@ export const AppProvider = ({ children }) => {
       });
     }
     setCurrency(storeCurrency());
+    setLanguage(retrieveCookie());
     // localStorage.setItem('currency', )
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currency]);

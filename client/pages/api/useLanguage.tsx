@@ -1,36 +1,29 @@
 import Cookies from "js-cookie";
-import { useContext, useEffect, useState } from "react";
-import AppContext from "../../src/contexts/app.context";
+import { useEffect } from "react";
 import { ELanguage } from "../../src/interfaces";
 import { decodeCookie, encodeCookie } from "./build-language";
 
-const useLanguage = () => {
-  const {
-    state: { language },
-  } = useContext(AppContext);
-
-  const [languageChoice, setLanguageChoice] = useState<string>(ELanguage.ENGLISH);
-
+const useLanguage = (language: ELanguage) => {
   const setCookie = () => {
     Cookies.remove("lang");
     console.log("lang choice", language);
     Cookies.set("lang", encodeCookie(language));
   };
 
-  const retrieveCookie = (): ELanguage => {
+  const retrieveCookie = () => {
     const cookieInfo = Cookies.get("lang");
     if (cookieInfo) {
       return decodeCookie(Cookies.get("lang"));
     }
-    return undefined;
+    setCookie();
+    return ELanguage.ENGLISH;
   };
 
   useEffect(() => {
-    return setLanguageChoice(retrieveCookie());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [language]);
 
-  return { languageChoice, setCookie, retrieveCookie };
+  return { setCookie, retrieveCookie };
 };
 
 export default useLanguage;
