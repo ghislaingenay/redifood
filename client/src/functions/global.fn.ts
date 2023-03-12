@@ -33,12 +33,15 @@ export const capitalize = (value: string) => {
 };
 
 export const getOptions = (array: string[]) => {
-  const newArray = array.map((item) => {
-    return {
+  const newArray = [];
+  for (let i = 0; i < array.length; i++) {
+    const item = array[i];
+    console.log("item", item);
+    newArray.push({
       value: item,
       label: capitalize(item),
-    };
-  });
+    });
+  }
   return newArray;
 };
 export const convertStringToEnumCurrency = (str: string): ECurrency => {
