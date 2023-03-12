@@ -25,9 +25,8 @@ export const setCookieInformation = (lang: ELanguage) => {
   console.log("lang choice", lang);
   Cookies.set("lang", encodeCookie(lang));
 };
-export const buildLanguage = (appContext: any) => {
-  const locale = appContext.ctx.locale;
-  const cookies = appContext.ctx.req.cookies;
+export const buildLanguage = (locale, req) => {
+  const cookies = req?.cookies;
   const lang = cookies?.lang;
 
   if (!lang) {

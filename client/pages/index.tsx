@@ -16,6 +16,7 @@ import { getOptions } from "../src/functions/global.fn";
 import useCurrency from "../src/hooks/useCurrency.hook";
 import { EButtonType, IOrder } from "../src/interfaces";
 import { allDataOrders, getListUnpaidOrders } from "../test/mocks/mockOrdersData";
+import { buildLanguage } from "./api/build-language";
 
 const AllOrdersPage = ({ allOrders, getList, status }) => {
   const { t } = useTranslation("");
@@ -167,14 +168,14 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
 
 export default AllOrdersPage;
 
-export async function getServerSideProps({ locale }) {
-  console.log("l", locale);
+export async function getServerSideProps({ locale, req }) {
+  const getLanguageValue = buildLanguage(locale, req);
   return {
     props: {
       allOrders: allDataOrders,
       getList: getListUnpaidOrders,
       status: "success",
-      ...(await serverSideTranslations("en", ["common"])),
+      ...(await serverSideTranslations(getLanguageValue, ["common"])),
     },
   };
   // const url = "/api/orders";

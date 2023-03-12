@@ -16,7 +16,6 @@ import RediHeader from "../src/components/Page";
 import { BACKGROUND_COLOR, ORANGE_LIGHT } from "../src/constants";
 import { AuthProvider } from "../src/contexts/auth.context";
 import { FoodProvider } from "../src/contexts/food.context";
-import { buildLanguage } from "./api/build-language";
 // Tell Font Awesome to skip adding the CSS automatically
 // since it's already imported above
 config.autoAddCss = false;
@@ -62,8 +61,7 @@ AppComponent.getInitialProps = async (appContext) => {
   // const { data } = await client.get("/api/auth/currentuser");
   // console.log("data", data);
   console.log("path", appContext.ctx.pathname);
-  const getLanguageValue = buildLanguage(appContext);
-  console.log("vv", getLanguageValue);
+
   let pageProps = {};
   if (appContext.Component.getInitialProps) {
     pageProps = (await appContext.Component.getInitialProps(appContext.ctx)) as any;
