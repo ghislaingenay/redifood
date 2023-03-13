@@ -1,6 +1,19 @@
 {
+  "buttons": {
+    "pay": "PAY",
+    "create": "CREATE",
+    "edit": "EDIT"
+  },
+  "variables": {
+    "all": "ALL"
+  },
   "index": {
+    "head": {
+      "title": "List of all orders",
+      "description": "Show the current orders"
+    },
     "title": "List of all orders",
-    "orderButton": "Create order"
+    "orderButton": "Create order",
+    "amount": "amount"
   }
 }

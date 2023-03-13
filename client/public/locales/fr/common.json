@@ -1,6 +1,19 @@
 {
+  "buttons": {
+    "pay": "PAYER",
+    "create": "CREER",
+    "edit": "MODIFIER"
+  },
+  "variables": {
+    "all": "TOUS"
+  },
   "index": {
+    "head": {
+      "title": "Liste des commandes",
+      "description": "Voici les différentes commandes"
+    },
     "title": "Liste des commandes",
-    "orderButton": "Creer une commande"
+    "orderButton": "Creer une commande",
+    "amount": "montant"
   }
 }
