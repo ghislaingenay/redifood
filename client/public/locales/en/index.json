@@ -1,13 +1,4 @@
 {
-  "buttons": {
-    "pay": "PAY",
-    "create": "CREATE",
-    "edit": "EDIT"
-  },
-  "variables": {
-    "all": "ALL",
-    "amount": "Amount"
-  },
   "index": {
     "head": {
       "title": "List of all orders",

@@ -1,0 +1,15 @@
+{
+  "history": {
+    "head": {
+      "title": "Paid orders",
+      "description": "Here are the paid orders history"
+    },
+    "form-label": {
+      "from": "From",
+      "to": "To"
+    },
+    "order-number": "Order number",
+    "amount": "Montant",
+    "view-order": "VOIR COMMANDE"
+  }
+}

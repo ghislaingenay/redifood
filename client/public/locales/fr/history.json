@@ -1,0 +1,15 @@
+{
+  "history": {
+    "head": {
+      "title": "Commandes payées",
+      "description": "Voici l'historique de toutes les différentes commandes payées"
+    },
+    "form-label": {
+      "from": "De",
+      "to": "A"
+    },
+    "order-number": "Commande No.",
+    "amount": "Montant",
+    "view-order": "VOIR COMMANDE"
+  }
+}

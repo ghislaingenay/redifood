@@ -1,13 +1,4 @@
 {
-  "buttons": {
-    "pay": "PAYER",
-    "create": "CREER",
-    "edit": "MODIFIER"
-  },
-  "variables": {
-    "all": "TOUS",
-    "amount": "Montant"
-  },
   "index": {
     "head": {
       "title": "Liste des commandes",
