@@ -1,6 +1,8 @@
 import { faList } from "@fortawesome/free-solid-svg-icons";
 import { Col } from "antd";
+import { useTranslation } from "next-i18next";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import useCurrency from "../../hooks/useCurrency.hook";
 import { EButtonType, IOrder } from "../../interfaces";
 import { CenteredPBold, LGCard } from "../../styles";
@@ -11,6 +13,12 @@ interface IOrderHistoryCard {
   foodOrder: IOrder;
 }
 const OrderHistoryCard = ({ foodOrder }: IOrderHistoryCard) => {
+  const { t, i18n } = useTranslation("history");
+
+  useEffect(() => {
+    i18n.changeLanguage("en");
+  }, [i18n]);
+
   const { convertPrice } = useCurrency();
   const router = useRouter();
   return (
@@ -19,16 +27,22 @@ const OrderHistoryCard = ({ foodOrder }: IOrderHistoryCard) => {
         <Col span={15}>
           <RowCenter>
             <Col span={12}>
-              <CenteredPBold>Order number: {foodOrder?._id}</CenteredPBold>
+              <CenteredPBold>
+                {t("history.order-number")}: {foodOrder?._id}
+              </CenteredPBold>
             </Col>
             <Col span={12}>
               <CenteredPBold>Date: </CenteredPBold>
             </Col>
             <Col span={12}>
-              <CenteredPBold>Amount: {convertPrice(foodOrder?.orderTotal, "backToFront", true)}</CenteredPBold>
+              <CenteredPBold>
+                {t("history.amount")}: {convertPrice(foodOrder?.orderTotal, "backToFront", true)}
+              </CenteredPBold>
             </Col>
             <Col span={12}>
-              <CenteredPBold>Amount: {foodOrder?.orderCurrency}</CenteredPBold>
+              <CenteredPBold>
+                {t("history.amount")}: {foodOrder?.orderCurrency}
+              </CenteredPBold>
             </Col>
           </RowCenter>
         </Col>

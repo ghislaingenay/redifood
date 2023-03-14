@@ -18,6 +18,8 @@ import { AuthProvider } from "../src/contexts/auth.context";
 import { FoodProvider } from "../src/contexts/food.context";
 // Tell Font Awesome to skip adding the CSS automatically
 // since it's already imported above
+import "../i18n.ts";
+
 config.autoAddCss = false;
 const AppComponent = ({ Component, pageProps }) => {
   return (

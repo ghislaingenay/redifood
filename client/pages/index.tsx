@@ -112,8 +112,8 @@ const AllOrdersPage = ({ allOrders, getList, status, language }) => {
   return (
     <>
       <Head>
-        <title>{t("index.title")}</title>
-        <meta name="description" content="List of all unpaid orders" />
+        <title>{t("index.head.title")}</title>
+        <meta name="description" content={t("index.head.description")} />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Title level={2}>{t("index.title")}</Title>
