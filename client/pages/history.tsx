@@ -10,7 +10,7 @@ import { mockOneOrder } from "../test/mocks/mockOrdersData";
 import { buildLanguage } from "./api/build-language";
 
 const History = ({ FoodOrderList }) => {
-  const { t } = useTranslation("history");
+  const { t } = useTranslation("");
   const [form] = Form.useForm();
   const [params, setParams] = useState({ startDate: undefined, endDate: undefined });
 
@@ -68,7 +68,7 @@ export async function getServerSideProps({ locale, req }) {
     props: {
       FoodOrderList: [mockOneOrder],
       status: "success",
-      ...(await serverSideTranslations(getLanguageValue, ["history"])),
+      ...(await serverSideTranslations(getLanguageValue, ["common"])),
     },
   };
 }

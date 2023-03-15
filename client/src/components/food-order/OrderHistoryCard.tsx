@@ -14,7 +14,7 @@ interface IOrderHistoryCard {
   foodOrder: IOrder;
 }
 const OrderHistoryCard = ({ foodOrder }: IOrderHistoryCard) => {
-  const { t, i18n } = useTranslation("history");
+  const { t, i18n } = useTranslation("");
 
   useEffect(() => {
     i18n.changeLanguage(recoverCookie());
@@ -37,12 +37,12 @@ const OrderHistoryCard = ({ foodOrder }: IOrderHistoryCard) => {
             </Col>
             <Col span={12}>
               <CenteredPBold>
-                {t("history.amount")}: {convertPrice(foodOrder?.orderTotal, "backToFront", true)}
+                {t("glossary.amount")}: {convertPrice(foodOrder?.orderTotal, "backToFront", true)}
               </CenteredPBold>
             </Col>
             <Col span={12}>
               <CenteredPBold>
-                {t("history.amount")}: {foodOrder?.orderCurrency}
+                {t("glossary.amount")}: {foodOrder?.orderCurrency}
               </CenteredPBold>
             </Col>
           </RowCenter>

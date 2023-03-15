@@ -18,8 +18,7 @@
       "description": "Show the current orders"
     },
     "title": "List of all orders",
-    "orderButton": "Create order",
-    "amount": "Amount"
+    "orderButton": "Create order"
   },
 
   "history": {
@@ -52,5 +51,13 @@
       "english": "English",
       "french": "French"
     }
+  },
+  "auth": {
+    "signin": "SIGN IN",
+    "register": "REGISTER",
+    "password": "Password",
+    "confirm-password": "Confirm password",
+    "submit": "Submit",
+    "forget-password": "Forget password ?"
   }
 }

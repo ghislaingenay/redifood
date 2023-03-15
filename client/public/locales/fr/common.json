@@ -51,5 +51,13 @@
       "english": "Anglais",
       "french": "Français"
     }
+  },
+  "auth": {
+    "signin": "SE CONNECTER",
+    "register": "S'INSCRIRE",
+    "password": "Mot de passe",
+    "confirm-password": "Confirmer le mot de passe",
+    "submit": "Envoyer",
+    "forget-password": "Mot de passe oublié ?"
   }
 }
