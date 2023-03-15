@@ -1,4 +1,4 @@
-import { ECurrency, ELanguage } from "../interfaces";
+import { ECurrency } from "../interfaces";
 
 // function that convert hex to rgb
 const hexToRgb = (hex: string) => {
@@ -65,12 +65,3 @@ export const convertStringToEnumCurrency = (str: string): ECurrency => {
 };
 
 export const storeCurrency = () => convertStringToEnumCurrency(localStorage.getItem("currency"));
-
-export const showProperLanguage = (language: ELanguage, data: any) => {
-  let newObj = {};
-  for (const key in data) {
-    newObj[key] = data[key][language];
-  }
-  console.log(newObj);
-  return newObj as Record<string, string>;
-};

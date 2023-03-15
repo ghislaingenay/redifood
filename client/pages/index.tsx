@@ -10,27 +10,22 @@ import { useContext, useEffect, useState } from "react";
 import { RediSelect } from "../src/components/RediSelect";
 import { RediIconButton } from "../src/components/styling/Button.style";
 import { RowSpaceAround, RowSpaceBetween } from "../src/components/styling/grid.styled";
-import { BACKGROUND_COLOR, indexLanguageOptions } from "../src/constants";
+import { BACKGROUND_COLOR } from "../src/constants";
 import AppContext from "../src/contexts/app.context";
-import { getOptions, showProperLanguage } from "../src/functions/global.fn";
+import { getOptions } from "../src/functions/global.fn";
 import useCurrency from "../src/hooks/useCurrency.hook";
 import { EButtonType, IOrder } from "../src/interfaces";
 import { allDataOrders, getListUnpaidOrders } from "../test/mocks/mockOrdersData";
 import { buildLanguage } from "./api/build-language";
 
-const AllOrdersPage = ({ allOrders, getList, status, language }) => {
+const AllOrdersPage = ({ allOrders, getList, status }) => {
   const { t } = useTranslation("");
   const { displayCurrency } = useCurrency();
   const { setStatus } = useContext(AppContext);
 
-  const { showProperAmount, showPayButton, showEditBtn, selectValue } = showProperLanguage(
-    language,
-    indexLanguageOptions,
-  );
-
   const router = useRouter();
   const [listAllOrders] = useState(allOrders);
-  const [selectedOption, setSelectedOption] = useState(selectValue);
+  const [selectedOption, setSelectedOption] = useState("ALL");
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [spinLoading, setSpinLoading] = useState(true);
   const { Title } = Typography;
@@ -50,7 +45,7 @@ const AllOrdersPage = ({ allOrders, getList, status, language }) => {
       align: "center" as AlignType,
     },
     {
-      title: ` ${showProperAmount} (${displayCurrency()})`,
+      title: ` ${t("glossary.amount")} (${displayCurrency()})`,
       dataIndex: "orderTotal",
       key: "orderTotal",
       align: "center" as AlignType,
@@ -68,14 +63,14 @@ const AllOrdersPage = ({ allOrders, getList, status, language }) => {
             buttonType={EButtonType.EDIT}
             iconFt={faPenToSquare}
           >
-            {showEditBtn}
+            {t("buttons.edit")}
           </RediIconButton>
           <RediIconButton
             onClick={() => router.push(`/orders/${item._id}`)}
             iconFt={faCartShopping}
             buttonType={EButtonType.SUCCESS}
           >
-            {showPayButton}
+            {t("buttons.pay")}
           </RediIconButton>
         </Space>
       ),
@@ -85,7 +80,7 @@ const AllOrdersPage = ({ allOrders, getList, status, language }) => {
   const showProperData = (option) => {
     // replace later by axios get
     setSelectedOption(option);
-    if (option === selectValue) {
+    if (option === "ALL") {
       return setFilteredOrders(listAllOrders);
     }
     const newList = listAllOrders.filter((order) => order.orderId === option);
@@ -123,7 +118,7 @@ const AllOrdersPage = ({ allOrders, getList, status, language }) => {
       <RowSpaceBetween gutter={10} style={{ marginBottom: "1rem" }}>
         <Col span={12}>
           <RediSelect
-            initialOption={{ value: selectValue, label: selectValue }}
+            initialOption={{ value: "ALL", label: t("glossary.all") }}
             style={{ width: "8rem" }}
             value={selectedOption}
             onChange={(e: string) => showProperData(e)}
@@ -180,7 +175,6 @@ export async function getServerSideProps({ locale, req }) {
   const getLanguageValue = buildLanguage(locale, req);
   return {
     props: {
-      language: getLanguageValue,
       allOrders: allDataOrders,
       getList: getListUnpaidOrders,
       status: "success",

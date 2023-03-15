@@ -5,17 +5,15 @@ import Head from "next/head";
 import { useRouter } from "next/navigation";
 import { useContext, useEffect } from "react";
 import { RowSpaceAround } from "../src/components/styling/grid.styled";
-import { LanguageOptions, YesNoOptions } from "../src/constants";
 import AppContext from "../src/contexts/app.context";
 import { useFood } from "../src/contexts/food.context";
-import { showProperLanguage } from "../src/functions/global.fn";
 import { ECurrency, ELanguage } from "../src/interfaces";
 import { CenteredTitle, NoSpacingDivider, RediDivider, RoundedInput } from "../src/styles";
 import { buildLanguage, setCookieInformation } from "./api/build-language";
 const { Title } = Typography;
 
 const Settings = ({ language }) => {
-  const { t } = useTranslation("settings");
+  const { t } = useTranslation("");
   const router = useRouter();
   const {
     foodPictures: { setHaveFoodDescription, setHaveFoodPicture, haveFoodDescription, haveFoodPicture },
@@ -27,9 +25,6 @@ const Settings = ({ language }) => {
   } = useContext(AppContext);
   const [userForm] = Form.useForm();
   const [settingsForm] = Form.useForm();
-
-  const { showLanguageFrInfo, showLanguageEnInfo } = showProperLanguage(language, LanguageOptions);
-  const { yes, no } = showProperLanguage(language, YesNoOptions);
 
   useEffect(() => {
     settingsForm.setFieldsValue({
@@ -107,8 +102,8 @@ const Settings = ({ language }) => {
                     router.replace(`/${e.target.value}/settings`);
                   }}
                 >
-                  <Radio.Button value={ELanguage.ENGLISH}>{showLanguageEnInfo}</Radio.Button>
-                  <Radio.Button value={ELanguage.FRENCH}>{showLanguageFrInfo}</Radio.Button>
+                  <Radio.Button value={ELanguage.ENGLISH}>{t("settings.form-values.english")}</Radio.Button>
+                  <Radio.Button value={ELanguage.FRENCH}>{t("settings.form-values.french")}</Radio.Button>
                 </Radio.Group>
               </Form.Item>
             </Col>
@@ -129,16 +124,16 @@ const Settings = ({ language }) => {
             <Col span={11}>
               <Form.Item label={t("settings.form-label.show-image")} name="haveFoodPicture">
                 <Radio.Group buttonStyle="solid" onChange={(e) => setHaveFoodPicture(e.target.value as boolean)}>
-                  <Radio.Button value={true}>{yes}</Radio.Button>
-                  <Radio.Button value={false}>{no}</Radio.Button>
+                  <Radio.Button value={true}>{t("glossary.yes")}</Radio.Button>
+                  <Radio.Button value={false}>{t("glossary.no")}</Radio.Button>
                 </Radio.Group>
               </Form.Item>
             </Col>
             <Col span={11}>
               <Form.Item label={t("settings.form-label.show-image-description")} name="haveFoodDescription">
                 <Radio.Group buttonStyle="solid" onChange={(e) => setHaveFoodDescription(e.target.value as boolean)}>
-                  <Radio.Button value={true}>{yes}</Radio.Button>
-                  <Radio.Button value={false}>{no}</Radio.Button>
+                  <Radio.Button value={true}>{t("glossary.yes")}</Radio.Button>
+                  <Radio.Button value={false}>{t("glossary.no")}</Radio.Button>
                 </Radio.Group>
               </Form.Item>
             </Col>
@@ -154,6 +149,6 @@ export default Settings;
 export async function getStaticProps({ locale, req }) {
   const getLanguageValue = buildLanguage(locale, req);
   return {
-    props: { language: getLanguageValue, ...(await serverSideTranslations(getLanguageValue, ["settings"])) }, // will be passed to the page component as props
+    props: { language: getLanguageValue, ...(await serverSideTranslations(getLanguageValue, ["common"])) }, // will be passed to the page component as props
   };
 }
