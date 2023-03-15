@@ -105,6 +105,7 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
               }
               if (clickedFn) clickedFn();
               console.log("target", target.value);
+
               return setSelectedButton(target.value as any);
             }}
           >
@@ -114,7 +115,7 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
               aria-label={label}
               name={radioGroupName}
               value={value}
-              aria-checked={isSelected(selectedValue)}
+              aria-checked={isSelected(value)}
             >
               {haveIcon === "true" && <SpanBlockM02Y>{icon}</SpanBlockM02Y>}
               {label.toUpperCase()}
