@@ -11,6 +11,16 @@ export const decodeCookie = (str: string | ELanguage) => {
   return buff.toString() as ELanguage;
 };
 
+export const recoverCookie = () => {
+  const buff = decodeCookie(Cookies.get("lang"));
+  let value: ELanguage | undefined = undefined;
+  if (Object.values(ELanguage).includes(buff as ELanguage)) {
+    value = buff as ELanguage | undefined;
+  } else {
+    value = ELanguage.ENGLISH;
+  }
+  return value;
+};
 export const getCookieInformation = (lang: string) => {
   const buff = decodeCookie(lang);
   let value: ELanguage | undefined = undefined;

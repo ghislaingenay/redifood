@@ -3,6 +3,7 @@ import { Col } from "antd";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { recoverCookie } from "../../../pages/api/build-language";
 import useCurrency from "../../hooks/useCurrency.hook";
 import { EButtonType, IOrder } from "../../interfaces";
 import { CenteredPBold, LGCard } from "../../styles";
@@ -16,7 +17,7 @@ const OrderHistoryCard = ({ foodOrder }: IOrderHistoryCard) => {
   const { t, i18n } = useTranslation("history");
 
   useEffect(() => {
-    i18n.changeLanguage("en");
+    i18n.changeLanguage(recoverCookie());
   }, [i18n]);
 
   const { convertPrice } = useCurrency();
@@ -52,7 +53,7 @@ const OrderHistoryCard = ({ foodOrder }: IOrderHistoryCard) => {
             buttonType={EButtonType.EDIT}
             onClick={() => router.push(`/orders/${foodOrder?._id}`)}
           >
-            VIEW ORDER
+            {t("history.view-order")}
           </RediIconButton>
         </Col>
       </RowSpaceBetween>
