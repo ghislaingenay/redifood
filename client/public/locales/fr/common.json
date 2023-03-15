@@ -53,6 +53,7 @@
     }
   },
   "auth": {
+    "email": "Email",
     "signin": "SE CONNECTER",
     "register": "S'INSCRIRE",
     "password": "Mot de passe",

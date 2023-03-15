@@ -5,6 +5,7 @@ import { Button, Col, Divider, Form, Input } from "antd";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Else, If, Then } from "react-if";
 import { toast } from "react-toastify";
 import { AxiosFunction } from "../../pages/api/axios-request";
@@ -25,10 +26,10 @@ const Auth = () => {
   const [formSignUp] = Form.useForm();
   const router = useRouter();
   // ------------ STATE ---------
-
+  const { t } = useTranslation("");
   const options = [
-    { value: EAuthChoice.SIGNIN, label: "SIGN IN", icon: <FontAwesomeIcon icon={faSign} /> },
-    { value: EAuthChoice.REGISTER, label: "REGISTER", icon: <FontAwesomeIcon icon={faRegistered} /> },
+    { value: EAuthChoice.SIGNIN, label: t("auth.signin"), icon: <FontAwesomeIcon icon={faSign} /> },
+    { value: EAuthChoice.REGISTER, label: t("auth.register"), icon: <FontAwesomeIcon icon={faRegistered} /> },
   ];
   const [selectedOption, setSelectedOption] = useState(options[0].value);
 
@@ -134,123 +135,133 @@ const Auth = () => {
   // ------------ RENDER ---------
 
   return (
-    <div className="background-auth">
-      <RowCenter style={{ paddingTop: "3rem" }}>
-        <Image src={whiteLogo} alt="Redifood logo white" width={200} height={200} />
-      </RowCenter>
-      <SpacingDiv5X>
-        <RowCenter style={{ paddingTop: "2rem" }}>
-          <RediRadioButton
-            disabled={isDisabled}
-            options={options}
-            radioGroupName="auth"
-            haveIcon="false"
-            selectedButton={selectedOption}
-            setSelectedButton={setSelectedOption}
-          />
-        </RowCenter>
-        <Divider style={{ border: "1px solid white" }} />
-        <If condition={selectedOption === EAuthChoice.SIGNIN}>
-          <Then>
-            <Form form={formLogin} layout="vertical" onFinish={handleLogin} style={{ backgroundColor: "transparent" }}>
-              <LabelFormWhite htmlFor="email-login">
-                Email <RedSpan>*</RedSpan>
-              </LabelFormWhite>
-              <Form.Item name="email" id="email-login" rules={emailRules} style={formStyle}>
-                <RoundedInput type="text" aria-label="email" />
-              </Form.Item>
-              <LabelFormWhite htmlFor="pwd-login">
-                Password <RedSpan>*</RedSpan>
-              </LabelFormWhite>
-              <Form.Item name="password" id="pwd-login" rules={passwordRules} style={formStyle}>
-                <Input.Password
-                  aria-label="Password"
-                  style={{ borderRadius: "2rem" }}
-                  placeholder="input password"
-                  iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
-                />
-              </Form.Item>
-              <RowSpaceBetween>
-                <Col span={6}>
-                  <RediButton buttonType={EButtonType.SUCCESS} onClick={() => formLogin.submit()} loading={clicked}>
-                    Submit
-                  </RediButton>
-                </Col>
-                <Col span={6}>
-                  <Button loading={clicked} type="link">
-                    Forgot password
-                  </Button>
-                </Col>
-              </RowSpaceBetween>
-            </Form>
-          </Then>
-          <Else>
-            <Form
-              form={formSignUp}
-              layout="vertical"
-              onFinish={handleSignUp}
-              style={{ backgroundColor: "transparent" }}
-            >
-              <LabelFormWhite htmlFor="email-signup">
-                Email <RedSpan>*</RedSpan>
-              </LabelFormWhite>
-              <Form.Item name="email" id="email-signup" rules={emailRules} style={formStyle}>
-                <RoundedInput type="text" aria-label="email" placeholder="Email..." />
-              </Form.Item>
-              <RowSpaceBetween>
-                <Col xs={24} md={11}>
-                  <LabelFormWhite htmlFor="pwd-signup">
-                    Password <RedSpan>*</RedSpan>
+    <>
+      <main>
+        <div className="background-auth">
+          <RowCenter style={{ paddingTop: "3rem" }}>
+            <Image src={whiteLogo} alt="Redifood logo white" width={200} height={200} />
+          </RowCenter>
+          <SpacingDiv5X>
+            <RowCenter style={{ paddingTop: "2rem" }}>
+              <RediRadioButton
+                disabled={isDisabled}
+                options={options}
+                radioGroupName="auth"
+                haveIcon="false"
+                selectedButton={selectedOption}
+                setSelectedButton={setSelectedOption}
+              />
+            </RowCenter>
+            <Divider style={{ border: "1px solid white" }} />
+            <If condition={selectedOption === EAuthChoice.SIGNIN}>
+              <Then>
+                <Form
+                  form={formLogin}
+                  layout="vertical"
+                  onFinish={handleLogin}
+                  style={{ backgroundColor: "transparent" }}
+                >
+                  <LabelFormWhite htmlFor="email-login">
+                    {t("auth.email")} <RedSpan>*</RedSpan>
                   </LabelFormWhite>
-                  <Form.Item name="password" id="pwd-signup" rules={passwordRules} style={formStyle}>
+                  <Form.Item name="email" id="email-login" rules={emailRules} style={formStyle}>
+                    <RoundedInput type="text" aria-label="email" />
+                  </Form.Item>
+                  <LabelFormWhite htmlFor="pwd-login">
+                    {t("auth.password")} <RedSpan>*</RedSpan>
+                  </LabelFormWhite>
+                  <Form.Item name="password" id="pwd-login" rules={passwordRules} style={formStyle}>
                     <Input.Password
                       aria-label="Password"
-                      style={{ borderRadius: "2rem" }}
-                      placeholder="Password..."
-                      iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
-                    />
-                  </Form.Item>
-                </Col>
-                <Col xs={24} md={11}>
-                  <LabelFormWhite htmlFor="c-pwd-signup">
-                    Confirm password <RedSpan>*</RedSpan>
-                  </LabelFormWhite>
-                  <Form.Item
-                    id="c-pwd-signup"
-                    style={formStyle}
-                    name="confirmPassword"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please confirm your password!",
-                      },
-                      () => ({
-                        validator(_, value) {
-                          if (value === formSignUp.getFieldValue("password")) {
-                            return Promise.resolve();
-                          }
-                          return Promise.reject(new Error("passwords do not match"));
-                        },
-                      }),
-                    ]}
-                  >
-                    <Input.Password
-                      aria-label="Confirm password"
                       style={{ borderRadius: "2rem" }}
                       placeholder="input password"
                       iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
                     />
                   </Form.Item>
-                </Col>
-              </RowSpaceBetween>
-              <RediButton buttonType={EButtonType.SUCCESS} onClick={() => formSignUp.submit()} loading={clicked}>
-                Submit
-              </RediButton>
-            </Form>
-          </Else>
-        </If>
-      </SpacingDiv5X>
-    </div>
+                  <RowSpaceBetween>
+                    <Col span={6}>
+                      <RediButton buttonType={EButtonType.SUCCESS} onClick={() => formLogin.submit()} loading={clicked}>
+                        {t("auth.submit")}
+                      </RediButton>
+                    </Col>
+                    <Col span={6}>
+                      <Button loading={clicked} type="link">
+                        {t("auth.forget-password")}
+                      </Button>
+                    </Col>
+                  </RowSpaceBetween>
+                </Form>
+              </Then>
+              <Else>
+                <Form
+                  form={formSignUp}
+                  layout="vertical"
+                  onFinish={handleSignUp}
+                  style={{ backgroundColor: "transparent" }}
+                >
+                  <LabelFormWhite htmlFor="email-signup">
+                    {t("auth.email")} <RedSpan>*</RedSpan>
+                  </LabelFormWhite>
+                  <Form.Item name="email" id="email-signup" rules={emailRules} style={formStyle}>
+                    <RoundedInput type="text" aria-label="email" placeholder="Email..." />
+                  </Form.Item>
+                  <RowSpaceBetween>
+                    <Col xs={24} md={11}>
+                      <LabelFormWhite htmlFor="pwd-signup">
+                        {t("auth.password")} <RedSpan>*</RedSpan>
+                      </LabelFormWhite>
+                      <Form.Item name="password" id="pwd-signup" rules={passwordRules} style={formStyle}>
+                        <Input.Password
+                          aria-label="Password"
+                          style={{ borderRadius: "2rem" }}
+                          placeholder="Password..."
+                          iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+                        />
+                      </Form.Item>
+                    </Col>
+                    <Col xs={24} md={11}>
+                      <LabelFormWhite htmlFor="c-pwd-signup">
+                        {t("auth.confirm-password")}
+                        <RedSpan>*</RedSpan>
+                      </LabelFormWhite>
+                      <Form.Item
+                        id="c-pwd-signup"
+                        style={formStyle}
+                        name="confirmPassword"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please confirm your password!",
+                          },
+                          () => ({
+                            validator(_, value) {
+                              if (value === formSignUp.getFieldValue("password")) {
+                                return Promise.resolve();
+                              }
+                              return Promise.reject(new Error("passwords do not match"));
+                            },
+                          }),
+                        ]}
+                      >
+                        <Input.Password
+                          aria-label="Confirm password"
+                          style={{ borderRadius: "2rem" }}
+                          placeholder="input password"
+                          iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+                        />
+                      </Form.Item>
+                    </Col>
+                  </RowSpaceBetween>
+                  <RediButton buttonType={EButtonType.SUCCESS} onClick={() => formSignUp.submit()} loading={clicked}>
+                    Submit
+                  </RediButton>
+                </Form>
+              </Else>
+            </If>
+          </SpacingDiv5X>
+        </div>
+      </main>
+    </>
   );
 };
 export default Auth;
