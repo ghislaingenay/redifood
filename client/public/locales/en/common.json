@@ -1,13 +1,56 @@
 {
-  "common": {
-    "buttons": {
-      "pay": "PAY",
-      "create": "CREATE",
-      "edit": "EDIT"
+  "buttons": {
+    "pay": "PAY",
+    "create": "CREATE",
+    "edit": "EDIT",
+    "view-order": "VIEW ORDER"
+  },
+
+  "glossary": {
+    "all": "ALL",
+    "amount": "Amount",
+    "yes": "Yes",
+    "no": "No"
+  },
+
+  "index": {
+    "head": {
+      "title": "List of all orders",
+      "description": "Show the current orders"
     },
-    "variables": {
-      "all": "ALL",
-      "amount": "Amount"
+    "title": "List of all orders",
+    "orderButton": "Create order",
+    "amount": "Amount"
+  },
+
+  "history": {
+    "head": {
+      "title": "Paid orders",
+      "description": "Here are the paid orders history"
+    },
+    "form-label": {
+      "from": "From",
+      "to": "To"
+    },
+    "order-number": "Order number"
+  },
+
+  "settings": {
+    "head": {
+      "title": "Settings",
+      "description": "Settings page"
+    },
+    "user-info": "User information",
+    "global-settings": "Global settings",
+    "form-label": {
+      "show-image": "Show image",
+      "show-image-description": "Show image description",
+      "currency": "Currency",
+      "Language": "Language"
+    },
+    "form-values": {
+      "english": "English",
+      "french": "French"
     }
   }
 }

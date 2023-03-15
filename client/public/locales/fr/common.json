@@ -2,8 +2,54 @@
   "buttons": {
     "pay": "PAYER",
     "create": "CREER",
-    "edit": "MODIFIER"
+    "edit": "MODIFIER",
+    "view-order": "VOIR COMMANDE"
   },
-  "all": "TOUS",
-  "amount": "Montant"
+
+  "glossary": {
+    "all": "TOUS",
+    "amount": "Montant",
+    "yes": "Oui",
+    "no": "Non"
+  },
+
+  "index": {
+    "head": {
+      "title": "Liste des commandes",
+      "description": "Voici les différentes commandes"
+    },
+    "title": "Liste des commandes",
+    "orderButton": "Creer une commande"
+  },
+
+  "history": {
+    "head": {
+      "title": "Commandes payées",
+      "description": "Voici l'historique de toutes les différentes commandes payées"
+    },
+    "form-label": {
+      "from": "De",
+      "to": "A"
+    },
+    "order-number": "Commande No."
+  },
+
+  "settings": {
+    "head": {
+      "title": "Paramètres",
+      "description": "Paramètres de la page"
+    },
+    "user-info": "Information concernant l'utilisateur",
+    "global-settings": "Paramètres globaux",
+    "form-label": {
+      "show-image": "Montrer image",
+      "show-image-description": "Montrer la description de l'image",
+      "currency": "Monnaie",
+      "Language": "Language"
+    },
+    "form-values": {
+      "english": "Anglais",
+      "french": "Français"
+    }
+  }
 }

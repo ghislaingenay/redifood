@@ -1,0 +1,23 @@
+{
+  "settings": {
+    "head": {
+      "title": "Settings",
+      "description": "Settings page"
+    },
+    "user-info": "User information",
+    "global-settings": "Global settings",
+    "form-label": {
+      "show-image": "Show image",
+      "show-image-description": "Show image description",
+      "currency": "Currency",
+      "Language": "Language"
+    },
+    "english": "English",
+    "values": {
+      "english": "English",
+      "french": "French",
+      "yes": "Yes",
+      "no": "No"
+    }
+  }
+}

@@ -19,7 +19,7 @@ import { allDataOrders, getListUnpaidOrders } from "../test/mocks/mockOrdersData
 import { buildLanguage } from "./api/build-language";
 
 const AllOrdersPage = ({ allOrders, getList, status, language }) => {
-  const { t } = useTranslation(["index", "common"]);
+  const { t } = useTranslation("index");
   const { displayCurrency } = useCurrency();
   const { setStatus } = useContext(AppContext);
 
@@ -50,7 +50,7 @@ const AllOrdersPage = ({ allOrders, getList, status, language }) => {
       align: "center" as AlignType,
     },
     {
-      title: `${showProperAmount} (${displayCurrency()})`,
+      title: ` ${showProperAmount} (${displayCurrency()})`,
       dataIndex: "orderTotal",
       key: "orderTotal",
       align: "center" as AlignType,
@@ -85,7 +85,7 @@ const AllOrdersPage = ({ allOrders, getList, status, language }) => {
   const showProperData = (option) => {
     // replace later by axios get
     setSelectedOption(option);
-    if (option === t("variables.all")) {
+    if (option === selectValue) {
       return setFilteredOrders(listAllOrders);
     }
     const newList = listAllOrders.filter((order) => order.orderId === option);
@@ -181,7 +181,7 @@ export async function getServerSideProps({ locale, req }) {
       allOrders: allDataOrders,
       getList: getListUnpaidOrders,
       status: "success",
-      ...(await serverSideTranslations(getLanguageValue, ["common", "index"])),
+      ...(await serverSideTranslations(getLanguageValue, ["index"])),
     },
   };
   // const url = "/api/orders";

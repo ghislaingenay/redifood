@@ -1,10 +1,7 @@
 import i18n from "i18next";
-import Cookies from "js-cookie";
 import { initReactI18next } from "react-i18next";
-import { decodeCookie } from "./pages/api/build-language";
-
 i18n.use(initReactI18next).init({
-  lng: Cookies.get("lang") ? decodeCookie(Cookies.get("lang")) : "en",
+  lng: "en",
   fallbackLng: "en",
   debug: true,
   interpolation: {
