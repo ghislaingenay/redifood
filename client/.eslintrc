@@ -6,7 +6,7 @@
     {
       "files": ["*.js", "*.ts", "*.tsx"],
       "rules": {
-        "@typescript-eslint/no-var-requires": "on",
+        "@typescript-eslint/no-var-requires": 1,
         "jest-dom/prefer-checked": "error",
         "jest-dom/prefer-enabled-disabled": "error",
         "jest-dom/prefer-required": "error",
@@ -20,6 +20,14 @@
         "extensions": [".js", ".jsx", ".ts", ".tsx"],
         "paths": ["src"]
       }
+    },
+    "jsx-a11y": {
+      "components": {
+        "CityInput": "input",
+        "CustomButton": "button",
+        "MyButton": "button",
+        "RoundButton": "button"
+      }
     }
   },
   "env": {
@@ -28,17 +36,12 @@
     "amd": true
   },
   "extends": [
-    "next/babel",
     "plugin:jest-dom/recommended",
     "eslint:recommended",
-    "plugin:@typescript-eslint/eslint-recommended",
-    "plugin:@typescript-eslint/recommended",
-    "prettier/@typescript-eslint",
     "plugin:prettier/recommended",
-    "plugin:testing-library/recommended",
-    "plugin:testing-library/react",
-    "plugin:jsx-a11y/recommended",
-    "plugin:prettier/recommended",
-    "plugin:cypress/recommended"
+    "next",
+    "next/core-web-vitals",
+    "plugin:jsx-a11y/recommended"
   ]
 }
+// "next/babel",
