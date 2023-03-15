@@ -17,7 +17,7 @@ import OrderSection from "./OrderSection";
 
 const { Title } = Typography;
 interface IFoodLayoutProps {
-  status?: "error" | "success";
+  status?: string;
   foodList: IFood[];
   mode: EFoodMode;
   handleOrderCreate?: (foodOrder: IFood[]) => any;

@@ -19,7 +19,7 @@ import { allDataOrders, getListUnpaidOrders } from "../test/mocks/mockOrdersData
 import { buildLanguage } from "./api/build-language";
 
 const AllOrdersPage = ({ allOrders, getList, status, language }) => {
-  const { t } = useTranslation("index");
+  const { t } = useTranslation("");
   const { displayCurrency } = useCurrency();
   const { setStatus } = useContext(AppContext);
 
@@ -117,7 +117,9 @@ const AllOrdersPage = ({ allOrders, getList, status, language }) => {
         <meta name="description" content={t("index.head.description")} />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Title level={2}>{t("index.title")}</Title>
+      <Title level={2} aria-label="List of all orders">
+        {t("index.title")}
+      </Title>
       <RowSpaceBetween gutter={10} style={{ marginBottom: "1rem" }}>
         <Col span={12}>
           <RediSelect
@@ -132,6 +134,7 @@ const AllOrdersPage = ({ allOrders, getList, status, language }) => {
           <RediIconButton
             shape="round"
             buttonType={EButtonType.CREATE}
+            aria-label="create order"
             iconFt={faPlusCircle}
             onClick={() => router.push("/orders/create")}
           >
@@ -181,7 +184,7 @@ export async function getServerSideProps({ locale, req }) {
       allOrders: allDataOrders,
       getList: getListUnpaidOrders,
       status: "success",
-      ...(await serverSideTranslations(getLanguageValue, ["index"])),
+      ...(await serverSideTranslations(getLanguageValue, ["common"])),
     },
   };
   // const url = "/api/orders";

@@ -14,42 +14,6 @@ import {
 import { render } from "../../index";
 jest.mock("next/navigation", () => require("next-router-mock"));
 jest.setTimeout(30000);
-// describe("Create Order - Server Side Props", () => {
-//   it("should return food data if API call is successful", async () => {
-//     const response = await getServerSideProps();
-//     expect(response).toEqual(
-//       expect.objectContaining({
-//         props: {
-//           foodList: mockedFoodData,
-//           status: "success",
-//         },
-//       }),
-//     );
-//   });
-
-//   it.skip("should return error if API call is unsuccessful", async () => {
-//     server.resetHandlers(
-//       rest.get("/api/orders", (req, res, ctx) => res(ctx.status(400), ctx.json({ foodList: [], status: "error" }))),
-//     );
-//     const response = await getServerSideProps();
-//     expect(response).toEqual(
-//       expect.objectContaining({
-//         props: {
-//           foodList: [],
-//           status: "error",
-//         },
-//       }),
-//     );
-//   });
-//   it.skip("should send an error if the data is not properly recovered", async () => {
-//     render(<CreateOrder {...createErrorProps} />);
-//     await waitFor(() => {
-//       expect(screen.queryAllByRole("card")).toHaveLength(0);
-//     });
-//     expect(await screen.findByRole("alert")).toBeInTheDocument();
-//     expect(await findText(/please refresh the page/i)).toBeInTheDocument();
-//   });
-// });
 
 describe("Function testing", () => {
   it("test convertDataForAPI function", () => {
@@ -132,13 +96,6 @@ describe("Create Order - Food List", () => {
     expect(validateButton).toBeEnabled();
   });
 
-  // it("should send an error and refresh the page if food data is not recovered", async () => {
-  //   render(<CreateOrder {...createErrorProps} />);
-  //   expect(await screen.findByRole("alert")).toBeInTheDocument();
-  //   expect(await findText(/An error occured/i)).toBeInTheDocument();
-  //   expect(await findText(/Please refresh the page/i)).toBeInTheDocument();
-  // });
-
   it("order cart should be empty when the page is loaded", () => {
     render(<CreateOrder {...createSuccessProps} />);
     expect(screen.getByRole("button", { name: /Validate/i })).toBeDisabled();
@@ -186,7 +143,6 @@ describe("Create Order - Food List", () => {
 
   it("DRINK should be selected when clicked", async () => {
     render(<CreateOrder {...createSuccessProps} />);
-    const user = userEvent.setup();
     expect(await findRadio(/ALL/i)).toBeChecked();
     expect(await findRadio(/DRINK/i)).not.toBeChecked();
     await clickRadio(/DRINK/i);
@@ -254,9 +210,9 @@ describe("Create Order - Integration", () => {
     const findProfiteroles = await screen.findByAltText(/Food profiteroles/i);
     expect(await screen.findAllByAltText(/Food profiteroles/i)).toHaveLength(1);
     await user.click(findProfiteroles);
-    expect(await findText(/Total: 3.75/i)).toBeInTheDocument();
+    expect(await findText(/Total: [$]3.75/i)).toBeInTheDocument();
     await user.click(findProfiteroles);
-    expect(await findText(/Total: 7.50/i)).toBeInTheDocument();
+    expect(await findText(/Total: [$]7.50/i)).toBeInTheDocument();
   });
 
   it("should add one quantity to the food if already in the cart via order cart list", async () => {
@@ -265,9 +221,9 @@ describe("Create Order - Integration", () => {
     const findProfiteroles = await screen.findByAltText(/Food profiteroles/i);
     expect(await screen.findAllByAltText(/Food profiteroles/i)).toHaveLength(1);
     await user.click(findProfiteroles);
-    expect(await findText(/Total: 3.75/i)).toBeInTheDocument();
+    expect(await findText(/Total: [$]3.75/i)).toBeInTheDocument();
     await user.click(await screen.findByRole("img", { name: /add profiteroles/i }));
-    expect(await findText(/Total: 7.50/i)).toBeInTheDocument();
+    expect(await findText(/Total: [$]7.50/i)).toBeInTheDocument();
   });
 
   it("button remove button is deactivated when quantity is 1", async () => {
@@ -276,7 +232,7 @@ describe("Create Order - Integration", () => {
     const findProfiteroles = await screen.findByAltText(/Food profiteroles/i);
     expect(await screen.findAllByAltText(/Food profiteroles/i)).toHaveLength(1);
     await user.click(findProfiteroles);
-    expect(await findText(/Total: 3.75/i)).toBeInTheDocument();
+    expect(await findText(/Total: [$]3.75/i)).toBeInTheDocument();
     expect(await findButton(/remove profiteroles/i)).toBeDisabled();
   });
 
@@ -288,7 +244,7 @@ describe("Create Order - Integration", () => {
     await user.click(findProfiteroles);
     expect(await findButton(/remove profiteroles/i)).toBeDisabled();
     await user.click(findProfiteroles);
-    expect(await findText(/Total: 7.50/i)).toBeInTheDocument();
+    expect(await findText(/Total: [$]7.50/i)).toBeInTheDocument();
     expect(await findButton(/remove profiteroles/i)).toBeEnabled();
   });
 
@@ -296,11 +252,11 @@ describe("Create Order - Integration", () => {
     render(<CreateOrder {...createSuccessProps} />);
     const user = userEvent.setup();
     await user.click(await screen.findByAltText(/Food profiteroles/i));
-    expect(await findText(/Total: 3.75/i)).toBeInTheDocument();
+    expect(await findText(/Total: [$]3.75/i)).toBeInTheDocument();
     await user.click(await screen.findByAltText(/Food millefeuille/i));
-    expect(await findText(/Total: 8.00/i)).toBeInTheDocument();
+    expect(await findText(/Total: [$]8.00/i)).toBeInTheDocument();
     await user.click(await findButton(/delete profiteroles/i));
-    expect(await findText(/Total: 4.25/i)).toBeInTheDocument();
+    expect(await findText(/Total: [$]4.25/i)).toBeInTheDocument();
   });
 
   it("should be able to cancel the order when clicking on the cancel button if cart is empty", async () => {
@@ -334,22 +290,22 @@ describe("Create Order - Integration Testing", () => {
     render(<CreateOrder {...createSuccessProps} />);
     const user = userEvent.setup();
     await user.click(await screen.findByAltText(/food millefeuille/i));
-    expect(await findText(/Total: 4.25/i)).toBeInTheDocument();
+    expect(await findText(/Total: [$]4.25/i)).toBeInTheDocument();
     await clickRadio(/PIZZA/i);
     await expectCardLength(3);
     await user.click(await screen.findByAltText(/food pizza cheesy/i));
     await user.click(await screen.findByAltText(/food pizza cheesy/i));
-    expect(await findText(/Total: 32.23/i)).toBeInTheDocument();
+    expect(await findText(/Total: [$]32.23/i)).toBeInTheDocument();
     await clickRadio(/DRINK/i);
     await user.click(await screen.findByAltText(/330 mL/i));
-    expect(await findText(/Total: 33.43/i)).toBeInTheDocument();
+    expect(await findText(/Total: [$]33.43/i)).toBeInTheDocument();
     await user.click(await findButton(/add Sprite can - 330 mL/i));
     await user.click(await findButton(/add Sprite can - 330 mL/i));
-    expect(await findText(/Total: 35.83/i)).toBeInTheDocument();
+    expect(await findText(/Total: [$]35.83/i)).toBeInTheDocument();
     await user.click(await findButton(/remove Sprite can - 330 mL/i));
-    expect(await findText(/Total: 34.63/i)).toBeInTheDocument();
+    expect(await findText(/Total: [$]34.63/i)).toBeInTheDocument();
     await user.click(await findButton(/delete pizza cheesy/i));
-    expect(await findText(/Total: 6.65/i)).toBeInTheDocument();
+    expect(await findText(/Total: [$]6.65/i)).toBeInTheDocument();
     await user.type(screen.getByRole("spinbutton", { name: /tableNumber/i }), "2");
     await user.click(screen.getByRole("button", { name: /Cancel order/i }));
     expect(await findText(/Are u sure you want to cancel?/i));
@@ -362,22 +318,22 @@ describe("Create Order - Integration Testing", () => {
     await clickRadio(/DESSERT/i);
     await expectCardLength(3);
     await user.click(await screen.findByAltText(/food carrot cake/i));
-    expect(await findText(/Total: 5.20/i)).toBeInTheDocument();
+    expect(await findText(/Total: [$]5.20/i)).toBeInTheDocument();
     for (let i = 0; i < 4; i++) await user.click(await findButton(/add carrot cake/i));
-    expect(await findText(/Total: 26.00/i)).toBeInTheDocument();
+    expect(await findText(/Total: [$]26.00/i)).toBeInTheDocument();
     await clickRadio(/PIZZA/i);
     await user.click(await screen.findByAltText(/pizza mediterranean/i));
     await user.click(await findButton(/add pizza mediterranean/i));
     await user.click(await findButton(/add pizza mediterranean/i));
-    expect(await findText(/Total: 63.50/i)).toBeInTheDocument();
+    expect(await findText(/Total: [$]63.50/i)).toBeInTheDocument();
     await user.click(await findButton(/remove pizza mediterranean/i));
-    expect(await findText(/Total: 51.00/i)).toBeInTheDocument();
+    expect(await findText(/Total: [$]51.00/i)).toBeInTheDocument();
     await clickRadio(/DRINK/i);
     await user.click(await screen.findByAltText(/espresso/i));
-    expect(await findText(/Total: 52.00/i)).toBeInTheDocument();
+    expect(await findText(/Total: [$]52.00/i)).toBeInTheDocument();
     expect(await findButton(/remove espresso/i)).toBeDisabled();
     await user.click(await findButton(/delete espresso/i));
-    expect(await findText(/Total: 51.00/i)).toBeInTheDocument();
+    expect(await findText(/Total: [$]51.00/i)).toBeInTheDocument();
     await user.click(await findButton(/delete pizza mediterranean/i));
     expect(await findButton(/Validate/i)).toBeEnabled();
     await user.click(await findButton(/delete carrot cake/i));

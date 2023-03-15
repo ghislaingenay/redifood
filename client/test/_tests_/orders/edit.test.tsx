@@ -49,7 +49,7 @@ describe("Edit Order - Food List", () => {
 
   it("order cart should contains a total of 10.65 when the page is loaded", async () => {
     render(<EditOrder {...editSuccessProps} />);
-    expect(await findText(/Total: 10.65/i)).toBeInTheDocument();
+    expect(await findText(/Total: [$]10.65/i)).toBeInTheDocument();
   });
 
   it("should add food to the cart when clicking on the food card", async () => {
@@ -89,9 +89,9 @@ describe("Edit Order - Food List", () => {
   it("should add food to the cart when clicking on the food card", async () => {
     render(<EditOrder {...editSuccessProps} />);
     const user = userEvent.setup();
-    expect(await findText(/Total: 10.65/i)).toBeInTheDocument();
+    expect(await findText(/Total: [$]10.65/i)).toBeInTheDocument();
     await user.click(screen.getByText(/espresso/i));
-    expect(await findText(/Total: 11.65/i)).toBeInTheDocument();
+    expect(await findText(/Total: [$]11.65/i)).toBeInTheDocument();
   });
 });
 
@@ -105,12 +105,12 @@ describe("Edit Order - Integration", () => {
     render(<EditOrder {...editSuccessProps} />);
     const user = userEvent.setup();
     const findProfiteroles = await screen.findByAltText(/Food profiteroles/i);
-    expect(await findText(/Total: 10.65/i)).toBeInTheDocument();
+    expect(await findText(/Total: [$]10.65/i)).toBeInTheDocument();
     expect(await screen.findAllByAltText(/Food profiteroles/i)).toHaveLength(1);
     await user.click(findProfiteroles);
-    expect(await findText(/Total: 14.40/i)).toBeInTheDocument();
+    expect(await findText(/Total: [$]14.40/i)).toBeInTheDocument();
     await user.click(findProfiteroles);
-    expect(await findText(/Total: 18.15/i)).toBeInTheDocument();
+    expect(await findText(/Total: [$]18.15/i)).toBeInTheDocument();
   });
 
   it("should add one quantity to the food if already in the cart via order cart list", async () => {
@@ -119,9 +119,9 @@ describe("Edit Order - Integration", () => {
     const findProfiteroles = await screen.findByAltText(/Food profiteroles/i);
     expect(await screen.findAllByAltText(/Food profiteroles/i)).toHaveLength(1);
     await user.click(findProfiteroles);
-    expect(await findText(/Total: 14.40/i)).toBeInTheDocument();
+    expect(await findText(/Total: [$]14.40/i)).toBeInTheDocument();
     await user.click(await screen.findByRole("img", { name: /add profiteroles/i }));
-    expect(await findText(/Total: 18.15/i)).toBeInTheDocument();
+    expect(await findText(/Total: [$]18.15/i)).toBeInTheDocument();
   });
 
   it("button remove button is deactivated when quantity is 1", async () => {
@@ -130,7 +130,7 @@ describe("Edit Order - Integration", () => {
     const findProfiteroles = await screen.findByAltText(/Food profiteroles/i);
     expect(await screen.findAllByAltText(/Food profiteroles/i)).toHaveLength(1);
     await user.click(findProfiteroles);
-    expect(await findText(/Total: 14.40/i)).toBeInTheDocument();
+    expect(await findText(/Total: [$]14.40/i)).toBeInTheDocument();
     expect(await findButton(/remove profiteroles/i)).toBeDisabled();
   });
 
@@ -142,7 +142,7 @@ describe("Edit Order - Integration", () => {
     await user.click(findProfiteroles);
     expect(await findButton(/remove profiteroles/i)).toBeDisabled();
     await user.click(findProfiteroles);
-    expect(await findText(/Total: 18.15/i)).toBeInTheDocument();
+    expect(await findText(/Total: [$]18.15/i)).toBeInTheDocument();
     expect(await findButton(/remove profiteroles/i)).toBeEnabled();
   });
 
@@ -171,9 +171,9 @@ describe("Edit Order - Integration", () => {
   it("should be able to remove one food quantity inside the order when clicking on the food card", () => {
     render(<EditOrder {...editSuccessProps} />);
     clickFindAltText(/Food profiteroles/i);
-    expectFindText(/Total: 14.40/i);
+    expectFindText(/Total: [$]14.40/i);
     clickFindButton(/delete profiteroles/i);
-    expectFindText(/Total: 10.65/i);
+    expectFindText(/Total: [$]10.65/i);
   });
   it.todo("should send an error notification when the order was not saved");
 });
@@ -181,22 +181,22 @@ describe("Edit Order - Integration", () => {
 describe("Edit Order - Integration Testing", () => {
   it("User order multiple products and click on the cancel button", () => {
     render(<EditOrder {...editSuccessProps} />);
-    expectFindText(/Total: 10.65/i);
+    expectFindText(/Total: [$]10.65/i);
     clickFindAltText(/food millefeuille/i);
-    expectFindText(/Total: 14.90/i);
+    expectFindText(/Total: [$]14.90/i);
     clickRadio(/PIZZA/i);
     clickFindAltText(/food pizza cheesy/i);
     clickFindAltText(/food pizza cheesy/i);
-    expectFindText(/Total: 42.88/i);
+    expectFindText(/Total: [$]42.88/i);
     clickRadio(/DRINK/i);
     clickFindAltText(/330 mL/i);
-    expectFindText(/Total: 44.08/i);
+    expectFindText(/Total: [$]44.08/i);
     clickFindButton(/add Sprite can - 330 mL/i);
     clickFindButton(/add Sprite can - 330 mL/i);
-    expectFindText(/Total: 46.48/i);
+    expectFindText(/Total: [$]46.48/i);
     clickFindButton(/remove Sprite can - 330 mL/i);
-    expectFindText(/Total: 45.28/i);
+    expectFindText(/Total: [$]45.28/i);
     clickFindButton(/delete pizza cheesy/i);
-    expectFindText(/Total: 17.30/i);
+    expectFindText(/Total: [$]17.30/i);
   });
 });
