@@ -3,7 +3,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Alert, Col, Space } from "antd";
 import { useState } from "react";
 
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import Head from "next/head";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "react-i18next";
 import SummaryTable from "../../src/components/food-order/SummaryTable";
 import { RediIconButton } from "../../src/components/styling/Button.style";
 import { RowSpaceBetween } from "../../src/components/styling/grid.styled";
@@ -14,11 +17,13 @@ import { EButtonType, EPaymentType } from "../../src/interfaces";
 import { LGCard } from "../../src/styles";
 import { SpacingDiv5X } from "../../src/styles/styledComponents/div.styled";
 import { mockOneOrder } from "../../test/mocks/mockOrdersData";
+import { buildLanguage } from "../api/build-language";
 
 const CurrentOrder = ({ currentOrder, status }: any) => {
+  const { t } = useTranslation("");
   const router = useRouter();
   console.log(status);
-  const { orderItems, orderTotal, orderDate, orderId, tableNumber, orderStatus } = currentOrder;
+  const { orderDate, orderId, tableNumber, orderStatus } = currentOrder;
   const [paymentChoice, setPaymentChoice] = useState<EPaymentType | null>(null);
 
   const isDisabled = paymentChoice === null ? true : false;
@@ -27,61 +32,77 @@ const CurrentOrder = ({ currentOrder, status }: any) => {
     { label: EPaymentType.CARD, value: EPaymentType.CARD, icon: <FontAwesomeIcon icon={faCreditCard} /> },
   ];
 
-  const alertMessage = orderStatus === "COMPLETE" ? "PAID" : "NOT PAID";
+  const alertMessage = orderStatus === "COMPLETE" ? t("orders.paid") : t("orders.not-paid");
   const messageType = orderStatus === "COMPLETE" ? "success" : "error";
   const colorAlert = orderStatus !== "COMPLETE" && hexToRgba(RED, 0.7);
 
   return (
-    <SpacingDiv5X>
-      <LGCard style={{ padding: "0 1rem" }}>
-        <RowSpaceBetween>
-          <Col lg={8}>
-            <b>Order #</b>
-            {orderId}
-          </Col>
-          <Col lg={8}>
-            <b>Table</b> {tableNumber}
-          </Col>
-          <Col lg={8}>
-            <b>Date</b> {orderDate}
-          </Col>
-          <Col lg={8}>
-            <Alert type={messageType} message={alertMessage} style={{ fontWeight: 700, color: colorAlert }} />
-          </Col>
-        </RowSpaceBetween>
-      </LGCard>
-      <SummaryTable order={currentOrder} />
-      {orderStatus !== "COMPLETE" && (
-        <>
-          <RediRadioButton
-            radioGroupName="payment"
-            padding="1rem 1rem"
-            fontSize="1rem"
-            options={radioPaymentOptions}
-            haveIcon="true"
-            setSelectedButton={setPaymentChoice}
-            selectedButton={paymentChoice}
-          />
-          <Space>
-            <RediIconButton
-              onClick={() => router.push(`/orders/${orderId}/payment/${paymentChoice}`)}
-              iconFt={faCartShopping}
-              disabled={isDisabled}
-              buttonType={EButtonType.SUCCESS}
-              aria-label="PAY"
-            >
-              PAY
-            </RediIconButton>
-          </Space>
-        </>
-      )}
-    </SpacingDiv5X>
+    <>
+      <Head>
+        <title>{t("orders.head-view.title")}</title>
+        <meta name="description" content={t("orders.head-view.description")} />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      <body>
+        <SpacingDiv5X>
+          <LGCard style={{ padding: "0 1rem" }}>
+            <RowSpaceBetween>
+              <Col lg={8}>
+                <b>{t("glossary.order")} #</b>
+                {orderId}
+              </Col>
+              <Col lg={8}>
+                <b>{t("glossary.table")}</b> {tableNumber}
+              </Col>
+              <Col lg={8}>
+                <b>{t("glossary.date")}</b> {orderDate}
+              </Col>
+              <Col lg={8}>
+                <Alert type={messageType} message={alertMessage} style={{ fontWeight: 700, color: colorAlert }} />
+              </Col>
+            </RowSpaceBetween>
+          </LGCard>
+          <SummaryTable order={currentOrder} />
+          {orderStatus !== "COMPLETE" && (
+            <>
+              <RediRadioButton
+                radioGroupName="payment"
+                padding="1rem 1rem"
+                fontSize="1rem"
+                options={radioPaymentOptions}
+                haveIcon="true"
+                setSelectedButton={setPaymentChoice}
+                selectedButton={paymentChoice}
+              />
+              <Space>
+                <RediIconButton
+                  onClick={() => router.push(`/orders/${orderId}/payment/${paymentChoice}`)}
+                  iconFt={faCartShopping}
+                  disabled={isDisabled}
+                  buttonType={EButtonType.SUCCESS}
+                  aria-label="PAY"
+                >
+                  {t("buttons.pay")}
+                </RediIconButton>
+              </Space>
+            </>
+          )}
+        </SpacingDiv5X>
+      </body>
+    </>
   );
 };
 export default CurrentOrder;
 
-export async function getServerSideProps() {
+export async function getServerSideProps({ locale, req }) {
+  const getLanguageValue = buildLanguage(locale, req);
   // context: any
   // const id: string = context.query["id"];
-  return { props: { currentOrder: mockOneOrder, status: "success" } };
+  return {
+    props: {
+      currentOrder: mockOneOrder,
+      status: "success",
+      ...(await serverSideTranslations(getLanguageValue, ["common"])),
+    },
+  };
 }

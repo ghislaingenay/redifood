@@ -1,5 +1,7 @@
 import { faBan, faCartShopping } from "@fortawesome/free-solid-svg-icons";
 import { Alert, Col } from "antd";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useCallback, useState } from "react";
 import { Else, If, Then } from "react-if";
 import { RediButton, RediIconButton } from "../../../../src/components/styling/Button.style";
@@ -8,10 +10,12 @@ import useCurrency from "../../../../src/hooks/useCurrency.hook";
 import { EButtonType, EPaymentType } from "../../../../src/interfaces";
 import { CenteredLabel, LGCard, LRoundedInput } from "../../../../src/styles";
 import { mockOneOrder } from "../../../../test/mocks/mockOrdersData";
+import { buildLanguage } from "../../../api/build-language";
 
 type TStrNull = string | null;
 
 const PaymentSystem = ({ paymentType, currentOrder }) => {
+  const { t } = useTranslation();
   const { convertPrice, displayCurrency, convertAmount } = useCurrency();
   const { orderTotal } = currentOrder;
   console.log(orderTotal);
@@ -99,7 +103,7 @@ const PaymentSystem = ({ paymentType, currentOrder }) => {
                   </Col>
                   <RowCenterSp>
                     <RediButton buttonType={EButtonType.SUCCESS} disabled={confirmDisabled} onClick={() => onConfirm()}>
-                      Confirm
+                      {t("buttons.confirm")}
                     </RediButton>
                     <RediIconButton
                       buttonType={EButtonType.ERROR}
@@ -107,7 +111,7 @@ const PaymentSystem = ({ paymentType, currentOrder }) => {
                       disabled={clearDisabled}
                       onClick={() => setSelectAmount("")}
                     >
-                      Clear
+                      {t("buttons.clear")}
                     </RediIconButton>
                   </RowCenterSp>
                 </RowCenter>
@@ -115,7 +119,9 @@ const PaymentSystem = ({ paymentType, currentOrder }) => {
             </Col>
             <Col span={11}>
               <RowCenter>
-                <CenteredLabel htmlFor="transactionAmount">Transaction amount ({displayCurrency()})</CenteredLabel>
+                <CenteredLabel htmlFor="transactionAmount">
+                  {t("payments.transaction-amount")} ({displayCurrency()})
+                </CenteredLabel>
                 <LRoundedInput
                   readOnly={true}
                   aria-label="transactionAmount"
@@ -124,7 +130,9 @@ const PaymentSystem = ({ paymentType, currentOrder }) => {
                 />
               </RowCenter>
               <RowCenter>
-                <CenteredLabel htmlFor="selected amount">Given amount ({displayCurrency()})</CenteredLabel>
+                <CenteredLabel htmlFor="selected amount">
+                  {t("payments.given-amount")} ({displayCurrency()})
+                </CenteredLabel>
                 <LRoundedInput
                   readOnly={true}
                   aria-label="selected amount"
@@ -133,16 +141,18 @@ const PaymentSystem = ({ paymentType, currentOrder }) => {
                 />
               </RowCenter>
               <RowCenter>
-                <CenteredLabel htmlFor="render">Amount to give ({displayCurrency()})</CenteredLabel>
+                <CenteredLabel htmlFor="render">
+                  {t("payments.amount-to-give")} ({displayCurrency()})
+                </CenteredLabel>
                 <LRoundedInput readOnly={true} aria-label="render" id="render" value={convertAmount(amountToGive)} />
               </RowCenter>
               <RowCenter style={{ marginTop: "2rem" }}>
                 {isDisabled && selectedAmount !== "" && (
-                  <Alert type="error" style={{ margin: "1rem 2rem" }} message="Not enough funds" />
+                  <Alert type="error" style={{ margin: "1rem 2rem" }} message={t("payments.funds-error")} />
                 )}
                 <RediIconButton iconFt={faCartShopping} buttonType={EButtonType.SUCCESS} disabled={isDisabled}>
                   {" "}
-                  Finalize payment
+                  {t("buttons.finalize-payment")}
                 </RediIconButton>
               </RowCenter>
             </Col>
@@ -157,6 +167,8 @@ const PaymentSystem = ({ paymentType, currentOrder }) => {
 };
 export default PaymentSystem;
 export async function getServerSideProps(context: any) {
+  const { locale, req } = context;
+  const getLanguageValue = buildLanguage(locale, req);
   console.log("connected");
   // const id: string = context.query['id'];
   const paymentChoice: string = context.query["paymentChoice"];
@@ -164,6 +176,7 @@ export async function getServerSideProps(context: any) {
     props: {
       paymentType: paymentChoice,
       currentOrder: mockOneOrder,
+      ...(await serverSideTranslations(getLanguageValue, ["common"])),
     },
   };
   // const url = String(`${process.env.BACK_END}/payment/${id}`)

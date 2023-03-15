@@ -1,4 +1,5 @@
 import { Col } from "antd";
+import { useTranslation } from "next-i18next";
 import { BACKGROUND_COLOR, GREY, ORANGE_DARK } from "../../constants";
 import { hexToRgba } from "../../functions/global.fn";
 import useCurrency from "../../hooks/useCurrency.hook";
@@ -14,16 +15,20 @@ interface ISummaryTable {
   lSize?: number;
 }
 
-const noMP = { margin: 0, padding: 0 };
-
-const headerColumns = ["FOOD", "QTY", "PRICE (ua)", "TOTAL"];
-
 const SummaryTable = ({ order, xSize, sSize, mSize, lSize }: ISummaryTable) => {
+  const noMP = { margin: 0, padding: 0 };
+  const { t } = useTranslation("");
   const { convertPrice } = useCurrency();
   const lgValue = lSize || 5;
   const mdValue = mSize || 5;
   const sValue = sSize || 5;
   const xsValue = xSize || 5;
+  const headerColumns = [
+    t("orders.summary-table.food"),
+    t("orders.summary-table.quantity"),
+    t("orders.summary-table.price"),
+    t("orders.summary-table.total"),
+  ];
   const { orderItems, orderTotal } = order;
   const sizeProps = { lg: lgValue, xs: xsValue, sm: sValue, md: mdValue };
   return (
@@ -72,7 +77,7 @@ const SummaryTable = ({ order, xSize, sSize, mSize, lSize }: ISummaryTable) => {
           <Col {...sizeProps} role="gridcell"></Col>
           <Col {...sizeProps} role="gridcell"></Col>
           <Col {...sizeProps} role="gridcell">
-            <CenteredP>Total before VAT</CenteredP>
+            <CenteredP>{t("orders.summary-table.tot-before-vat")}</CenteredP>
           </Col>
           <Col {...sizeProps} role="gridcell">
             <CenteredP>{convertPrice(orderTotal, "backToFront", true)}</CenteredP>
@@ -82,7 +87,7 @@ const SummaryTable = ({ order, xSize, sSize, mSize, lSize }: ISummaryTable) => {
           <Col {...sizeProps} role="gridcell"></Col>
           <Col {...sizeProps} role="gridcell"></Col>
           <Col {...sizeProps} role="gridcell">
-            <CenteredP>VAT(%)</CenteredP>
+            <CenteredP>{t("orders.summary-table.vat")}</CenteredP>
           </Col>
           <Col {...sizeProps} role="gridcell">
             <CenteredP>7</CenteredP>
@@ -92,7 +97,7 @@ const SummaryTable = ({ order, xSize, sSize, mSize, lSize }: ISummaryTable) => {
           <Col {...sizeProps} role="gridcell"></Col>
           <Col {...sizeProps} role="gridcell"></Col>
           <Col {...sizeProps} role="gridcell">
-            <CenteredP>Total for payment</CenteredP>
+            <CenteredP>{t("orders.summary-table.total-price")}</CenteredP>
           </Col>
           <Col {...sizeProps} role="gridcell">
             <CenteredP>{convertPrice(orderTotal * 1.07, "backToFront", true)}</CenteredP>

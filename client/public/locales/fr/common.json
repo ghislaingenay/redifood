@@ -10,14 +10,18 @@
     "remove-file": "ENLEVER FICHIER",
     "clear": "EFFACER",
     "confirm": "CONFIRMER",
-    "cancel": "ANNULER"
+    "cancel": "ANNULER",
+    "finalize-payment": "TERMINER PAIMENT"
   },
 
   "glossary": {
     "all": "TOUS",
     "amount": "Montant",
     "yes": "Oui",
-    "no": "Non"
+    "no": "Non",
+    "order": "Commande",
+    "table": "Table",
+    "date": "Date"
   },
 
   "index": {
@@ -83,6 +87,17 @@
       "title": "Voir commande",
       "description": "Vous pouvez voir le detail de la commande ici"
     },
+    "paid": "PAID",
+    "not-paid": "NOT PAID",
+    "summary-table": {
+      "food": "PRODUIT",
+      "quantity": "QTE",
+      "price": "PRIX (ua)",
+      "total": "TOTAL",
+      "tot-before-vat": "Total avant TVA",
+      "vat": "TVA (%)",
+      "total-price": "Prix total"
+    },
     "table-number": "No. de table",
     "create-order": "CREER UNE COMMANDE",
     "edit-order": "MODIFIER UNE COMMANDE",
@@ -127,5 +142,16 @@
       "create-extra": "Créer extra"
     },
     "alert-no-food": "Veuillez choisir un produit a modifier"
+  },
+
+  "payments": {
+    "head": {
+      "title": "Paiement de la commande",
+      "description": "Paiement par carte ou cash"
+    },
+    "transaction-amount": "Montant de la commande",
+    "given-amount": "Montant donné",
+    "amount-to-give": "A rendre",
+    "funds-error": "Pas assez d'argent"
   }
 }
