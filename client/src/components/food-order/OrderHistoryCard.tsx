@@ -53,7 +53,7 @@ const OrderHistoryCard = ({ foodOrder }: IOrderHistoryCard) => {
             buttonType={EButtonType.EDIT}
             onClick={() => router.push(`/orders/${foodOrder?._id}`)}
           >
-            {t("history.view-order")}
+            {t("buttons.view-order")}
           </RediIconButton>
         </Col>
       </RowSpaceBetween>

@@ -2,7 +2,10 @@
   "buttons": {
     "pay": "PAYER",
     "create": "CREER",
-    "edit": "MODIFIER"
+    "edit": "MODIFIER",
+    "validate": "VALIDER",
+    "cancel-order": "ANNULER",
+    "view-order": "VOIR COMMANDE"
   },
 
   "glossary": {
@@ -30,8 +33,7 @@
       "from": "De",
       "to": "A"
     },
-    "order-number": "Commande No.",
-    "view-order": "VOIR COMMANDE"
+    "order-number": "Commande No."
   },
 
   "settings": {
@@ -52,6 +54,7 @@
       "french": "Français"
     }
   },
+
   "auth": {
     "email": "Email",
     "signin": "SE CONNECTER",
@@ -60,5 +63,29 @@
     "confirm-password": "Confirmer le mot de passe",
     "submit": "Envoyer",
     "forget-password": "Mot de passe oublié ?"
+  },
+
+  "orders": {
+    "head-create": {
+      "title": "Creer une commande",
+      "description": "vous pouvez creer une commande ici"
+    },
+    "head-edit": {
+      "title": "Modifier une commande",
+      "description": "Tu peux modifier une commande ici"
+    },
+    "head-view": {
+      "title": "Voir commande",
+      "description": "Vous pouvez voir le detail de la commande ici"
+    },
+    "table-number": "No. de table",
+    "create-order": "CREER UNE COMMANDE",
+    "edit-order": "MODIFIER UNE COMMANDE",
+    "order": "Commande",
+    "order-list": "List des products",
+    "error-type": {
+      "missing-table": "Veuillez entrer un numero de table",
+      "allocated-table": "Ce numero de table est deja utilise"
+    }
   }
 }

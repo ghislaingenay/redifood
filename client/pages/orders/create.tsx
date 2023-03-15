@@ -1,12 +1,17 @@
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import Head from "next/head";
 import { useEffect } from "react";
 import FoodLayout from "../../src/components/food-order/FoodLayout";
 import { useFood } from "../../src/contexts/food.context";
 import { NotificationRes } from "../../src/definitions/notification.class";
 import { EFoodMode, IFood } from "../../src/interfaces/food.interface";
 import { foodSectionArray, mockedFoodData } from "../../test/mocks/mockFoodData";
+import { buildLanguage } from "../api/build-language";
 
 const CreateOrder = ({ foodList, foodSection, status }) => {
   const { setFoodOrder } = useFood();
+  const { t } = useTranslation("");
   const handleOrderCreate = (foodOrder: IFood[]) => {
     console.log("order created", foodOrder);
     NotificationRes.onSuccess({
@@ -26,23 +31,36 @@ const CreateOrder = ({ foodList, foodSection, status }) => {
 
   return (
     <>
-      <FoodLayout
-        status={status}
-        foodSection={foodSection}
-        foodList={foodList}
-        mode={EFoodMode.CREATE}
-        mainTitle="CREATE ORDER"
-        handleOrderCreate={handleOrderCreate}
-      />
+      <Head>
+        <title>{t("orders.head-create.title")}</title>
+        <meta name="description" content={t("orders.head-create.description")} />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      <body>
+        <FoodLayout
+          status={status}
+          foodSection={foodSection}
+          foodList={foodList}
+          mode={EFoodMode.CREATE}
+          mainTitle={t("orders.create-order")}
+          handleOrderCreate={handleOrderCreate}
+        />
+      </body>
     </>
   );
 };
 
 export default CreateOrder;
 
-export async function getServerSideProps() {
+export async function getServerSideProps({ locale, req }) {
+  const getLanguageValue = buildLanguage(locale, req);
   return {
-    props: { foodList: mockedFoodData, foodSection: foodSectionArray, status: "success" },
+    props: {
+      foodList: mockedFoodData,
+      foodSection: foodSectionArray,
+      status: "success",
+      ...(await serverSideTranslations(getLanguageValue, ["common"])),
+    },
   };
   // await axios
   //   .get("/api/foods", { params: { selectedSection: "all" } })

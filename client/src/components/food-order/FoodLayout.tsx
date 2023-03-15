@@ -1,4 +1,5 @@
 import { Col, Modal, Row, Typography } from "antd";
+import { useTranslation } from "next-i18next";
 import { useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import { Else, If, Then } from "react-if";
@@ -30,6 +31,7 @@ interface IFoodLayoutProps {
 const FoodLayout = ({ foodList, mode, foodSection, mainTitle, handleOrderCreate, status }: IFoodLayoutProps) => {
   const router = useRouter();
   const tableTaken = [1, 4, 5];
+  const { t } = useTranslation("");
 
   const { setStatus } = useContext(AppContext);
   const { foodOrder } = useFood();

@@ -1,4 +1,5 @@
 import { Alert, Divider, InputNumber, Typography } from "antd";
+import { useTranslation } from "next-i18next";
 import { ORANGE, RED } from "../../constants";
 import { useFood } from "../../contexts/food.context";
 import { calculateTotal } from "../../functions/order.fn";
@@ -11,6 +12,7 @@ import { RowCenter, RowCenterSp } from "../styling/grid.styled";
 import FoodOrderCard from "./FoodOrderCard";
 const { Title } = Typography;
 const OrderSection = ({ tableNumber, setTableNumber, mode, errorTable, handleSubmit, handleCancel }) => {
+  const { t } = useTranslation("");
   const { convertPrice } = useCurrency();
   const { foodOrder } = useFood();
   const isCreateMode = mode === EFoodMode.CREATE ? true : false;
@@ -20,7 +22,7 @@ const OrderSection = ({ tableNumber, setTableNumber, mode, errorTable, handleSub
   return (
     <>
       <RowCenter>
-        <Title level={5}>Table Number:</Title>
+        <Title level={5}>{t("orders.table-number")}:</Title>
         <InputNumber
           type="number"
           value={tableNumber}
@@ -38,16 +40,18 @@ const OrderSection = ({ tableNumber, setTableNumber, mode, errorTable, handleSub
           style={{ height: "50%", top: "0.5rem", marginLeft: "1rem" }}
           placeholder="Select a table number"
         />
-        {errorTable.alreadyInDb && <Alert type="error" message="This table number is already allocated" />}
-        {errorTable.missingValue && <Alert type="error" message="Please select a table number" />}
+        {errorTable.alreadyInDb && <Alert type="error" message={t("orders.error-type.allocated-table")} />}
+        {errorTable.missingValue && <Alert type="error" message={t("orders.error-type.missing-table")} />}
       </RowCenter>
       {mode === EFoodMode.EDIT && (
         <RowCenter>
-          <Title level={5}>Order #</Title>
+          <Title style={{ margin: 0 }} level={5}>
+            {t("orders.order")} #
+          </Title>
         </RowCenter>
       )}
-      <Divider style={{ border: `0.125rem solid ${ORANGE}` }} />
-      <CenteredTitle level={5}>Order List</CenteredTitle>
+      {mode !== EFoodMode.EDIT && <Divider style={{ border: `0.125rem solid ${ORANGE}` }} />}
+      <CenteredTitle level={5}>{t("orders.order-list")}</CenteredTitle>
       <Scroll>
         {foodOrder?.map((food) => (
           <FoodOrderCard key={food.itemId} food={food} />
@@ -63,11 +67,11 @@ const OrderSection = ({ tableNumber, setTableNumber, mode, errorTable, handleSub
           disabled={isDisabled}
           onClick={() => handleSubmit(foodOrder)}
         >
-          <b>Validate</b>
+          <b>{t("buttons.validate")}</b>
         </RediButton>
 
         <RediButton buttonType={EButtonType.ERROR} shape="round" onClick={() => handleCancel("/")}>
-          Cancel Order
+          {t("buttons.cancel-order")}
         </RediButton>
       </RowCenterSp>
     </>

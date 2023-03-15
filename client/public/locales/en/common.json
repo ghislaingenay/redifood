@@ -2,7 +2,10 @@
   "buttons": {
     "pay": "PAY",
     "create": "CREATE",
-    "edit": "EDIT"
+    "edit": "EDIT",
+    "validate": "VALIDATE",
+    "cancel-order": "CANCEL ORDER",
+    "view-order": "VIEW ORDER"
   },
 
   "glossary": {
@@ -30,8 +33,7 @@
       "from": "From",
       "to": "To"
     },
-    "order-number": "Order number",
-    "view-order": "VIEW ORDER"
+    "order-number": "Order number"
   },
 
   "settings": {
@@ -52,6 +54,7 @@
       "french": "French"
     }
   },
+
   "auth": {
     "email": "Email",
     "signin": "SIGN IN",
@@ -60,5 +63,29 @@
     "confirm-password": "Confirm password",
     "submit": "Submit",
     "forget-password": "Forget password ?"
+  },
+
+  "orders": {
+    "head-create": {
+      "title": "Create order",
+      "description": "You can create an order here"
+    },
+    "head-edit": {
+      "title": "Edit order",
+      "description": "You can edit an order here"
+    },
+    "head-view": {
+      "title": "View order",
+      "description": "You can view an order here"
+    },
+    "table-number": "Table number",
+    "create-order": "CREATE ORDER",
+    "edit-order": "EDIT ORDER",
+    "order": "Order",
+    "order-list": "Products list",
+    "error-type": {
+      "missing-table": "Please select a table number",
+      "allocated-table": "This table number is already allocated"
+    }
   }
 }
