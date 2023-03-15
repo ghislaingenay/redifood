@@ -5,7 +5,12 @@
     "edit": "EDIT",
     "validate": "VALIDATE",
     "cancel-order": "CANCEL ORDER",
-    "view-order": "VIEW ORDER"
+    "view-order": "VIEW ORDER",
+    "delete": "DELETE",
+    "remove-file": "REMOVE FILE",
+    "clear": "CLEAR",
+    "confirm": "CONFIRM",
+    "cancel": "CANCEL"
   },
 
   "glossary": {
@@ -87,5 +92,40 @@
       "missing-table": "Please select a table number",
       "allocated-table": "This table number is already allocated"
     }
+  },
+
+  "foods": {
+    "head": {
+      "title": "List of all foods",
+      "description": "Show the current foods"
+    },
+    "title": "FOOD SECTION",
+    "foodButton": "Create food",
+    "form-label": {
+      "upload-file-placeholder": "Upload file",
+      "drop-file": "Drop file here or click to upload",
+      "name": "Name",
+      "rules-name": "A name is required",
+      "description": "Description",
+      "rules-description": "A description is required",
+      "price": "Price",
+      "rules-price": "A price is required",
+      "picture": "Picture",
+      "rules-picture": "A picture is required",
+      "section": "Section",
+      "create-new-section": "Create a new section",
+      "add-section": "Add section",
+      "create-section": "Create section",
+      "delete-current-section": "Delete a existing section",
+      "delete-section": "Delete section",
+      "extra": "Extra",
+      "select": "Select ...",
+      "add-extra": "Add extra",
+      "delete-current-extra": "Delete a existing extra",
+      "delete-extra": "Delete extra",
+      "create-new-extra": "Create a new extra",
+      "create-extra": "Create extra"
+    },
+    "alert-no-food": "please select a food to update"
   }
 }

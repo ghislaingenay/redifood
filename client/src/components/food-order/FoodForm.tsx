@@ -2,12 +2,12 @@
 import { faBan, faFileCircleCheck, faFilePen, faSquarePlus, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Alert, Form, Select } from "antd";
+import { useTranslation } from "next-i18next";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Case, Default, Else, If, Switch, Then } from "react-if";
 import { GREY, ORANGE_DARK } from "../../constants";
-import { optionsCreateFood } from "../../constants/food.const";
 import { useFood } from "../../contexts/food.context";
 import { convertFoodToSection } from "../../functions/food.fn";
 import { capitalize } from "../../functions/global.fn";
@@ -21,6 +21,7 @@ import {
   LabelFormBlue,
   LabelFormRed,
   RoundedInput,
+  RoundedInputNum,
 } from "../../styles/styledComponents/typography.styled";
 import { RediButton, RediIconButton } from "../styling/Button.style";
 import { RowCenter, RowCenterSp } from "../styling/grid.styled";
@@ -59,6 +60,7 @@ enum EHandleType {
 // };
 
 const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
+  const { t } = useTranslation();
   const {
     foodOrder,
     setFoodOrder,
@@ -75,8 +77,8 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
   const [handleType, setHandleType] = useState<EHandleType>(EHandleType.NONE);
 
   const foodRadioOptions = [
-    { label: "EDIT", value: "true", icon: <FontAwesomeIcon icon={faFilePen} /> },
-    { label: "CREATE", value: "false", icon: <FontAwesomeIcon icon={faSquarePlus} /> },
+    { label: t("buttons.edit"), value: "true", icon: <FontAwesomeIcon icon={faFilePen} /> },
+    { label: t("buttons.create"), value: "false", icon: <FontAwesomeIcon icon={faSquarePlus} /> },
   ];
 
   const [sortedFood, setSortedFood] = useState<Record<string, string[]>>({});
@@ -102,6 +104,50 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
     extraValue === EHandleType.DELETEEXTRA
       ? true
       : false;
+
+  const styleNoM = { margin: 0 };
+  const optionsCreateFood = (fn: Function): IFormInterface[] => [
+    // {
+    //   label: "Picture",
+    //   name: "itemPhoto",
+    //   component: <RoundedInput style={styleNoM} />,
+    //   rules: [{ required: true, message: "A picture is required" }],
+    // },
+    {
+      label: t("foods.form-label.name"),
+      name: "itemName",
+      component: (
+        <RoundedInput maxLength={30} placeholder={t("foods.form-label.name")} style={styleNoM} aria-label="itemName" />
+      ),
+      rules: [{ required: true, message: t("foods.form-label.rules-name") }],
+    },
+    {
+      label: t("foods.form-label.description"),
+      name: "itemDescription",
+      component: (
+        <RoundedInput
+          maxLength={40}
+          placeholder={t("foods.form-label.description")}
+          style={styleNoM}
+          aria-label="itemDescription"
+        />
+      ),
+      rules: [{ required: false, message: t("foods.form-label.rules-description") }],
+    },
+    {
+      label: t("foods.form-label.price"),
+      name: "itemPrice",
+      component: (
+        <RoundedInputNum
+          placeholder={t("foods.form-label.price")}
+          addonAfter={fn()}
+          style={styleNoM}
+          aria-label="itemPrice"
+        />
+      ),
+      rules: [{ required: true, message: t("foods.form-label.rules-price") }],
+    },
+  ];
 
   const { getRootProps, getInputProps } = useDropzone({
     accept: "image/.jpg",
@@ -197,6 +243,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
       setFiles([foodOrder[0].itemPhoto]);
       setSortedFood(convertFoodToSection(foodList, foodSection));
     } else {
+      setFiles([]);
       form.setFieldsValue({
         itemSection: EHandleType.NONE,
         itemExtra: EHandleType.NONE,
@@ -231,7 +278,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
           <Alert
             type="warning"
             style={{ fontWeight: 700, height: "80vh", textAlign: "center", fontSize: "1rem", marginTop: "1.5rem" }}
-            message="Please a select a food to update"
+            message={t("foods.alert-no-food")}
           />
         </Case>
         <Default>
@@ -242,8 +289,13 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                   style={{ border: `1px solid ${ORANGE_DARK}`, width: "100%", borderRadius: "2rem" }}
                   {...getRootProps()}
                 >
-                  <input name="file" placeholder="Upload an image" type="file" {...getInputProps()} />
-                  <CenteredP>Drop a file here</CenteredP>
+                  <input
+                    name="file"
+                    placeholder={t('foods.form-label."upload-file-placeholder"')}
+                    type="file"
+                    {...getInputProps()}
+                  />
+                  <CenteredP>{t("foods.form-label.drop-file")}</CenteredP>
                 </div>
               </RowCenter>
             </Then>
@@ -270,12 +322,12 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                   }}
                   loading={uploading}
                 >
-                  Remove file
+                  {t("buttons.remove-file")}
                 </RediIconButton>
               </RowCenter>
             </Else>
           </If>
-          {error && <Alert type="error" message="A picture is required" />}
+          {error && <Alert type="error" message={t("foodSection.form-label.rules-picture")} />}
 
           <Form
             form={form}
@@ -310,7 +362,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
               );
             })}
             <LabelFormBlack htmlFor="itemSection">
-              Section <RedSpan>*</RedSpan>
+              {t("foods.form-label.section")} <RedSpan>*</RedSpan>
             </LabelFormBlack>
             <Form.Item name="itemSection" id="itemSection" style={{ fontWeight: 700, marginBottom: "0.5rem" }}>
               <Select
@@ -320,20 +372,20 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                   form.setFieldValue("itemExtra", "none");
                 }}
               >
-                <Option value={EHandleType.NONE}>Select ...</Option>
+                <Option value={EHandleType.NONE}>{t("foods.form-label.select")}</Option>
                 {foodSection.map((section, index) => (
                   <Option key={index} value={section}>
                     {capitalize(section)}
                   </Option>
                 ))}
-                <Option value={EHandleType.ADDSECTION}>Add Section</Option>
-                <Option value={EHandleType.DELETESECTION}>Delete Section</Option>
+                <Option value={EHandleType.ADDSECTION}>{t("foods.form-label.add-section")}</Option>
+                <Option value={EHandleType.DELETESECTION}>{t("foods.form-label.delete-section")}</Option>
               </Select>
             </Form.Item>
             <Switch>
               <Case condition={sectionValue === EHandleType.ADDSECTION}>
                 <>
-                  <LabelFormBlue>Create a new section</LabelFormBlue>
+                  <LabelFormBlue>{t("foods.form-label.create-new-section")}</LabelFormBlue>
                   <RowCenterSp>
                     <RoundedInput value={inputSection} onChange={(e) => setInputSection(e.target.value)} />
                     <RediButton
@@ -347,14 +399,14 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                         console.log("new section clicked", inputSection);
                       }}
                     >
-                      Create Section
+                      {t("foods.form-label.create-section")}
                     </RediButton>
                   </RowCenterSp>
                 </>
               </Case>
               <Case condition={sectionValue === EHandleType.DELETESECTION}>
                 <>
-                  <LabelFormRed>Delete a section</LabelFormRed>
+                  <LabelFormRed>{t("foods.form-label.delete-current-section")}</LabelFormRed>
                   <RowCenterSp>
                     <Select value={delSection} style={{ marginBottom: "0.5rem" }} onChange={(e) => setDelSection(e)}>
                       <Option value="">Select ...</Option>
@@ -374,7 +426,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                         form.submit();
                       }}
                     >
-                      Create Section
+                      {t("foods.form-label.delete-section")}
                     </RediButton>
                   </RowCenterSp>
                 </>
@@ -382,24 +434,24 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
               <Case condition={sectionValue !== "all" && sectionValue !== EHandleType.NONE}>
                 <>
                   <LabelFormBlack htmlFor="itemExtra">
-                    Extra <RedSpan>*</RedSpan>
+                    {t("foods.form-label.extra")} <RedSpan>*</RedSpan>
                   </LabelFormBlack>
                   <Form.Item name="itemExtra" id="itemExtra" style={{ fontWeight: 700, marginBottom: "0.5rem" }}>
                     <Select>
-                      <Option value={EHandleType.NONE}>Select ...</Option>
+                      <Option value={EHandleType.NONE}> {t("foods.form-label.select")}</Option>
                       {sortedFood[sectionValue]?.map((extra, index) => (
                         <Option key={index} value={extra}>
                           {capitalize(extra)}
                         </Option>
                       ))}
-                      <Option value={EHandleType.ADDEXTRA}>Add Extra</Option>
-                      <Option value={EHandleType.DELETEEXTRA}>Delete Extra</Option>
+                      <Option value={EHandleType.ADDEXTRA}>{t("foods.form-label.add-extra")}</Option>
+                      <Option value={EHandleType.DELETEEXTRA}>{t("foods.form-label.delete-extra")}</Option>
                     </Select>
                   </Form.Item>
                 </>
                 {extraValue === EHandleType.ADDEXTRA && (
                   <>
-                    <LabelFormBlue>Create a new extra</LabelFormBlue>
+                    <LabelFormBlue>{t("foods.form-label.create-new-extra")}</LabelFormBlue>
                     <RowCenterSp>
                       <RoundedInput value={inputExtra} onChange={(e) => setInputExtra(e.target.value)} />
                       <RediButton
@@ -412,17 +464,17 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                           form.submit();
                         }}
                       >
-                        Create Extra
+                        {t("foods.form-label.create-extra")}
                       </RediButton>
                     </RowCenterSp>
                   </>
                 )}
                 {extraValue === EHandleType.DELETEEXTRA && (
                   <>
-                    <LabelFormRed>Delete extra</LabelFormRed>
+                    <LabelFormRed>{t("foods.form-label.delete-current-extra")}</LabelFormRed>
                     <RowCenterSp style={{ marginBottom: 0 }}>
                       <Select value={delExtra} onChange={(e) => setDelExtra(e)}>
-                        <Option value="">Select ...</Option>
+                        <Option value="">{t("foods.form-label.select")}</Option>
                         {sortedFood[sectionValue]?.map((section, index) => (
                           <Option key={index} value={section}>
                             {capitalize(section)}
@@ -439,7 +491,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                           form.submit();
                         }}
                       >
-                        Delete Extra
+                        {t("foods.form-label.delete-extra")}
                       </RediButton>
                     </RowCenterSp>
                   </>
@@ -453,10 +505,10 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                 iconFt={faFileCircleCheck}
                 onClick={() => form.submit()}
               >
-                Confirm
+                {t("buttons.confirm")}
               </RediIconButton>
               <RediIconButton buttonType={EButtonType.ERROR} iconFt={faBan}>
-                Cancel
+                {t("buttons.cancel")}
               </RediIconButton>
             </RowCenterSp>
           </Form>
