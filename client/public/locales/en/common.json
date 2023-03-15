@@ -2,8 +2,7 @@
   "buttons": {
     "pay": "PAY",
     "create": "CREATE",
-    "edit": "EDIT",
-    "view-order": "VIEW ORDER"
+    "edit": "EDIT"
   },
 
   "glossary": {
@@ -32,7 +31,8 @@
       "from": "From",
       "to": "To"
     },
-    "order-number": "Order number"
+    "order-number": "Order number",
+    "view-order": "VIEW ORDER"
   },
 
   "settings": {

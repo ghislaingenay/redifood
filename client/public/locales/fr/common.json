@@ -2,8 +2,7 @@
   "buttons": {
     "pay": "PAYER",
     "create": "CREER",
-    "edit": "MODIFIER",
-    "view-order": "VOIR COMMANDE"
+    "edit": "MODIFIER"
   },
 
   "glossary": {
@@ -31,7 +30,8 @@
       "from": "De",
       "to": "A"
     },
-    "order-number": "Commande No."
+    "order-number": "Commande No.",
+    "view-order": "VOIR COMMANDE"
   },
 
   "settings": {
