@@ -5,6 +5,7 @@
       "description": "Voici les différentes commandes"
     },
     "title": "Liste des commandes",
-    "orderButton": "Creer une commande"
+    "orderButton": "Creer une commande",
+    "all": "TOUS"
   }
 }

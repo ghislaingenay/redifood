@@ -4,16 +4,6 @@
     "create": "CREER",
     "edit": "MODIFIER"
   },
-  "variables": {
-    "all": "TOUS",
-    "amount": "Montant"
-  },
-  "index": {
-    "head": {
-      "title": "Liste des commandes",
-      "description": "Voici les différentes commandes"
-    },
-    "title": "Liste des commandes",
-    "orderButton": "Creer une commande"
-  }
+  "all": "TOUS",
+  "amount": "Montant"
 }

@@ -5,6 +5,7 @@
       "description": "Show the current orders"
     },
     "title": "List of all orders",
-    "orderButton": "Create order"
+    "orderButton": "Create order",
+    "all": "ALL"
   }
 }
