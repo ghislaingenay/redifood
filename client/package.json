@@ -23,6 +23,7 @@
     "@types/testing-library__cypress": "^5.0.9",
     "antd": "^5.1.2",
     "axios": "^1.2.2",
+    "framer-motion": "^10.3.2",
     "husky": "^8.0.0",
     "i18next": "^22.4.10",
     "js-cookie": "^3.0.1",
