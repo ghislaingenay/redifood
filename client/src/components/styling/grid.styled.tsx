@@ -1,4 +1,4 @@
-import { Row, Space } from "antd";
+import { Col, Row, Space } from "antd";
 
 export const RowCenter = ({ children, ...props }: any) => {
   return (
@@ -28,5 +28,13 @@ export const RowSpaceBetween = ({ children, ...props }: any) => {
     <Row {...props} align="middle" justify="space-between">
       {children}
     </Row>
+  );
+};
+
+export const CenteredCol = ({ children, ...props }: any) => {
+  return (
+    <Col {...props} style={{ textAlign: "center" }}>
+      {children}
+    </Col>
   );
 };
