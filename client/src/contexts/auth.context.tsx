@@ -26,7 +26,8 @@ export function AuthProvider({ children }: IAuthProvider) {
   useEffect(() => {
     // setSpinLoading(true);
     // setTimeout(() => {
-    setCurrentUser({ username: "pit" });
+    // setCurrentUser({ username: "pit" });
+    console.log("currentUser", currentUser);
     setSpinLoading(false);
     // }, 1000);
     // new Promise((resolve, reject) => {

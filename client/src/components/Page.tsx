@@ -1,6 +1,6 @@
 import { Layout } from "antd";
 import Image from "next/image";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import RediWhiteLogo from "../../public/redifood-logo-white.png";
 import { navRoutes } from "../../src/constants/routes.const";
 import { RedisMenu } from "../../src/styles";
