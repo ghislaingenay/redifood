@@ -1,13 +1,14 @@
 import { DeleteOutlined, MinusSquareOutlined, PlusSquareOutlined } from "@ant-design/icons";
-import { Col, Typography } from "antd";
+import { Col, Space, Typography } from "antd";
 import { GREY } from "../../constants";
 import { useFood } from "../../contexts/food.context";
+import { useWindowSize } from "../../hooks/useWindowSIze.hook";
 import { EButtonType } from "../../interfaces";
 import { IFood } from "../../interfaces/food.interface";
 import { OrderCardStyled } from "../../styles/styledComponents/div.styled";
 import { CenteredTitle } from "../../styles/styledComponents/typography.styled";
 import { RediButton } from "../styling/Button.style";
-import { RowSpaceAround, RowSpaceBetween } from "../styling/grid.styled";
+import { RowCenterSp, RowSpaceAround, RowSpaceBetween } from "../styling/grid.styled";
 const { Title } = Typography;
 
 interface IFoodOrderCard {
@@ -19,50 +20,72 @@ const FoodOrderCard = ({ food }: IFoodOrderCard) => {
     functions: { deleteFood, addFood, removeFood },
   } = useFood();
   const isDisabled = food.itemQuantity === 1 ? true : false;
+
+  const [width] = useWindowSize();
+  const widthBreakPoint = 992;
+  const isLargeScreen = width && width > widthBreakPoint;
+
+  const renderText = () => {
+    return (
+      <>
+        <Title level={5} style={{ margin: 0, padding: "0 auto 1rem" }}>
+          <b>{food.itemName}</b>
+        </Title>
+        <RediButton
+          buttonType={EButtonType.ERROR}
+          name={`Delete ${food.itemName}`}
+          shape="round"
+          size="large"
+          onClick={() => deleteFood(food.itemId)}
+        >
+          <DeleteOutlined aria-label={`delete ${food.itemName}`} />
+        </RediButton>
+      </>
+    );
+  };
+
+  const renderButtons = () => {
+    return (
+      <RowSpaceAround style={{ height: "3rem", margin: 0 }}>
+        <RediButton
+          buttonType={EButtonType.DISPLAY}
+          size="large"
+          shape="circle"
+          disabled={isDisabled}
+          onClick={() => removeFood(food.itemId)}
+        >
+          <MinusSquareOutlined aria-label={`remove ${food.itemName}`} />
+        </RediButton>
+        <CenteredTitle level={4} style={{ margin: 0 }}>
+          {food.itemQuantity}
+        </CenteredTitle>
+        <RediButton buttonType={EButtonType.SUCCESS} size="large" shape="circle" onClick={() => addFood(food.itemId)}>
+          <PlusSquareOutlined aria-label={`add ${food.itemName}`} />
+        </RediButton>
+      </RowSpaceAround>
+    );
+  };
   return (
     <OrderCardStyled key={food.itemId} role="card">
-      <RowSpaceBetween gutter={10} style={{ padding: "0 0.5rem" }}>
-        <Col lg={8} style={{ overflow: "ellipsis", textOverflow: "ellipsis" }}>
-          <Title level={5} style={{ margin: 0, padding: "0 auto 1rem" }}>
-            <b>{food.itemName}</b>
-          </Title>
-        </Col>
-        <Col lg={6}>
-          <RediButton
-            buttonType={EButtonType.ERROR}
-            name={`Delete ${food.itemName}`}
-            shape="round"
-            size="large"
-            onClick={() => deleteFood(food.itemId)}
-          >
-            <DeleteOutlined aria-label={`delete ${food.itemName}`} />
-          </RediButton>
-        </Col>
-        <Col lg={10} style={{ border: `1px solid ${GREY}`, borderRadius: "4rem" }}>
-          <RowSpaceAround style={{ height: "3rem", margin: 0 }}>
-            <RediButton
-              buttonType={EButtonType.DISPLAY}
-              size="large"
-              shape="circle"
-              disabled={isDisabled}
-              onClick={() => removeFood(food.itemId)}
-            >
-              <MinusSquareOutlined aria-label={`remove ${food.itemName}`} />
-            </RediButton>
-            <CenteredTitle level={4} style={{ margin: 0 }}>
-              {food.itemQuantity}
-            </CenteredTitle>
-            <RediButton
-              buttonType={EButtonType.SUCCESS}
-              size="large"
-              shape="circle"
-              onClick={() => addFood(food.itemId)}
-            >
-              <PlusSquareOutlined aria-label={`add ${food.itemName}`} />
-            </RediButton>
-          </RowSpaceAround>
-        </Col>
-      </RowSpaceBetween>
+      {isLargeScreen ? (
+        <>
+          <RowCenterSp size={20} gutter={10} style={{ padding: "0 0.5rem", marginBottom: "0.25rem" }}>
+            {renderText()}
+          </RowCenterSp>
+          <RowSpaceBetween>
+            <Col lg={24} style={{ border: `1px solid ${GREY}`, borderRadius: "4rem" }}>
+              {renderButtons()}
+            </Col>
+          </RowSpaceBetween>
+        </>
+      ) : (
+        <RowSpaceAround>
+          <Col span={12}>
+            <Space size="middle">{renderText()}</Space>
+          </Col>
+          <Col span={12}>{renderButtons()}</Col>
+        </RowSpaceAround>
+      )}
     </OrderCardStyled>
   );
 };

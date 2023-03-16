@@ -7,10 +7,10 @@ export const RowCenter = ({ children, ...props }: any) => {
     </Row>
   );
 };
-export const RowCenterSp = ({ children, ...props }: any) => {
+export const RowCenterSp = ({ children, size, ...props }: any) => {
   return (
     <Row {...props} align="middle" justify="center">
-      <Space>{children}</Space>
+      <Space size={size}>{children}</Space>
     </Row>
   );
 };

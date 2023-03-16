@@ -13,7 +13,7 @@ interface IRediHeaderProps {
 }
 const RediHeader = ({ bgColor, color }: IRediHeaderProps) => {
   const [width] = useWindowSize();
-  const isCollapsible = width && width < 992 ? true : false;
+  const isCollapsible = width && width < 1200 ? true : false;
   const pictureHeight = isCollapsible ? 50 : 100;
   const marginValue = isCollapsible ? 14 : 50;
   const router = useRouter();

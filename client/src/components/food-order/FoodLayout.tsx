@@ -7,9 +7,11 @@ import AppContext from "../../contexts/app.context";
 import { useFood } from "../../contexts/food.context";
 import { getOptions } from "../../functions/global.fn";
 import { checkIfArrayAreTheSame, sendErrorTableInput } from "../../functions/order.fn";
+import { useWindowSize } from "../../hooks/useWindowSIze.hook";
 import { IErrorTableInput } from "../../interfaces";
 import { EFoodMode, IFood } from "../../interfaces/food.interface";
 import { LGCard } from "../../styles";
+import { RowCenter } from "../styling/grid.styled";
 import RediRadioButton from "../styling/RediRadioButton";
 import FoodCard from "./FoodCard";
 import FoodForm from "./FoodForm";
@@ -33,6 +35,10 @@ const FoodLayout = ({ foodList, mode, foodSection, mainTitle, handleOrderCreate,
 
   const { setStatus } = useContext(AppContext);
   const { foodOrder } = useFood();
+
+  const [width] = useWindowSize();
+  const widthBreakPoint = 768;
+  const isLargeScreen = width && width > widthBreakPoint;
 
   const [sortedFoods, setSortedFoods] = useState(foodList);
   const [selectedSection, setSelectedSection] = useState("all");
@@ -85,6 +91,28 @@ const FoodLayout = ({ foodList, mode, foodSection, mainTitle, handleOrderCreate,
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const renderLGCard = () => {
+    return (
+      <LGCard style={{ height: "100vh", width: "100%" }}>
+        <If condition={mode !== EFoodMode.ALTER}>
+          <Then>
+            <OrderSection
+              tableNumber={tableNumberValue}
+              setTableNumber={setTableNumberValue}
+              mode={mode}
+              errorTable={errorTable}
+              handleSubmit={handleSubmit}
+              handleCancel={handleCancel}
+            />
+          </Then>
+          <Else>
+            <FoodForm foodSection={foodSection} foodList={foodList} />
+          </Else>
+        </If>
+      </LGCard>
+    );
+  };
+
   const ariaLabelMainTitle =
     mode === EFoodMode.ALTER ? "FOOD SECTION" : mode === EFoodMode.CREATE ? "CREATE ORDER" : "EDIT ORDER";
 
@@ -93,8 +121,8 @@ const FoodLayout = ({ foodList, mode, foodSection, mainTitle, handleOrderCreate,
       <Title level={2} aria-label={ariaLabelMainTitle}>
         {mainTitle}
       </Title>
-      <Row gutter={[0, 40]} justify="space-between">
-        <Col lg={15}>
+      <Row gutter={[0, 20]} justify="space-between" style={{ width: "100%" }}>
+        <Col md={24} lg={15}>
           <RediRadioButton
             fontSize="1rem"
             padding="0.5rem 0.5rem"
@@ -108,39 +136,26 @@ const FoodLayout = ({ foodList, mode, foodSection, mainTitle, handleOrderCreate,
           />
           <Row gutter={[5, 10]}>
             {sortedFoods.map((food, index) => (
-              <Col key={index} lg={6}>
+              <Col key={index} sm={12} md={8} lg={8} xl={6}>
                 <FoodCard foodList={foodList} food={food} mode={mode} />
               </Col>
             ))}
           </Row>
         </Col>
 
-        <Col lg={8}>
-          <LGCard style={{ height: "100vh" }}>
-            <If condition={mode !== EFoodMode.ALTER}>
-              <Then>
-                <OrderSection
-                  tableNumber={tableNumberValue}
-                  setTableNumber={setTableNumberValue}
-                  mode={mode}
-                  errorTable={errorTable}
-                  handleSubmit={handleSubmit}
-                  handleCancel={handleCancel}
-                />
-              </Then>
-              <Else>
-                <FoodForm foodSection={foodSection} foodList={foodList} />
-              </Else>
-            </If>
-          </LGCard>
-          <Modal
-            title="Are u sure you want to cancel?"
-            open={cancelOrderModal}
-            onOk={() => router.push("/")}
-            onCancel={() => setCancelOrderModal(!cancelOrderModal)}
-          />
-        </Col>
+        {isLargeScreen && (
+          <Col md={24} lg={8}>
+            {renderLGCard()}
+          </Col>
+        )}
       </Row>
+      {!isLargeScreen && <RowCenter style={{ marginTop: "1rem" }}>{renderLGCard()}</RowCenter>}
+      <Modal
+        title="Are u sure you want to cancel?"
+        open={cancelOrderModal}
+        onOk={() => router.push("/")}
+        onCancel={() => setCancelOrderModal(!cancelOrderModal)}
+      />
     </>
   );
 };
