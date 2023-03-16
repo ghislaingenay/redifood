@@ -1,4 +1,5 @@
 import { Col, Form, Radio, Typography } from "antd";
+import { FormLabelAlign } from "antd/es/form/interface";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
@@ -55,6 +56,13 @@ const Settings = ({ language }: ISettingsProps) => {
   const handleSettingsInfo = (values: Omit<ISettings, "email">) => {
     console.log(values);
   };
+
+  const colSettingsSpan = { xs: 24, sm: 24, md: 24, lg: 12, xl: 12, xxl: 12 };
+  const formItemLayout = {
+    labelCol: { span: 12 },
+    wrapperCol: { span: 12 },
+    labelAlign: "left" as FormLabelAlign,
+  };
   return (
     <>
       <Head>
@@ -70,6 +78,8 @@ const Settings = ({ language }: ISettingsProps) => {
         </CenteredTitle>
         <NoSpacingDivider />
         <Form
+          labelWrap={false}
+          layout="horizontal"
           style={{ margin: "2rem auto" }}
           form={userForm}
           onValuesChange={(e, all) => {
@@ -97,8 +107,8 @@ const Settings = ({ language }: ISettingsProps) => {
           }}
         >
           <RowSpaceAround>
-            <Col span={11}>
-              <Form.Item label="Language" name="language">
+            <Col {...colSettingsSpan}>
+              <Form.Item label="Language" name="language" {...formItemLayout}>
                 <Radio.Group
                   buttonStyle="solid"
                   onChange={(e) => {
@@ -113,8 +123,8 @@ const Settings = ({ language }: ISettingsProps) => {
                 </Radio.Group>
               </Form.Item>
             </Col>
-            <Col span={11}>
-              <Form.Item label={t("settings.form-label.currency")} name="currency">
+            <Col {...colSettingsSpan}>
+              <Form.Item label={t("settings.form-label.currency")} name="currency" {...formItemLayout}>
                 <Radio.Group
                   buttonStyle="solid"
                   onChange={(e) => {
@@ -127,24 +137,28 @@ const Settings = ({ language }: ISettingsProps) => {
                 </Radio.Group>
               </Form.Item>
             </Col>
-            <Col span={11}>
-              <Form.Item label={t("settings.form-label.show-image")} name="haveFoodPicture">
+            <Col {...colSettingsSpan}>
+              <Form.Item label={t("settings.form-label.show-image")} name="haveFoodPicture" {...formItemLayout}>
                 <Radio.Group buttonStyle="solid" onChange={(e) => setHaveFoodPicture(e.target.value as boolean)}>
                   <Radio.Button value={true}>{t("glossary.yes")}</Radio.Button>
                   <Radio.Button value={false}>{t("glossary.no")}</Radio.Button>
                 </Radio.Group>
               </Form.Item>
             </Col>
-            <Col span={11}>
-              <Form.Item label={t("settings.form-label.show-image-description")} name="haveFoodDescription">
+            <Col {...colSettingsSpan}>
+              <Form.Item
+                label={t("settings.form-label.show-image-description")}
+                name="haveFoodDescription"
+                {...formItemLayout}
+              >
                 <Radio.Group buttonStyle="solid" onChange={(e) => setHaveFoodDescription(e.target.value as boolean)}>
                   <Radio.Button value={true}>{t("glossary.yes")}</Radio.Button>
                   <Radio.Button value={false}>{t("glossary.no")}</Radio.Button>
                 </Radio.Group>
               </Form.Item>
             </Col>
-            <Col span={11}>
-              <Form.Item label={t("settings.form-label.vat")} name="vat">
+            <Col {...colSettingsSpan}>
+              <Form.Item label={t("settings.form-label.vat")} name="vat" {...formItemLayout}>
                 <RoundedInputNum
                   onChange={(e) => {
                     console.log(e);
@@ -161,6 +175,7 @@ const Settings = ({ language }: ISettingsProps) => {
                 />
               </Form.Item>
             </Col>
+            <Col {...colSettingsSpan}></Col>
           </RowSpaceAround>
         </Form>
       </main>
