@@ -4,6 +4,7 @@ import { ButtonProps, Space } from "antd";
 import { BLUE, GREEN_A, GREY, ORANGE, PURPLE, RED } from "../../constants";
 import { EButtonType } from "../../interfaces";
 import { BtnHover } from "../../styles";
+import { AnimButton } from "../../styles/animations/buttons.anim";
 
 interface IRediButtonProps extends ButtonProps {
   buttonType: EButtonType;
@@ -53,10 +54,12 @@ interface IRediIconButtonProps extends ButtonProps {
 export const RediIconButton = ({ buttonType, children, iconFt, square, ...props }: IRediIconButtonProps) => {
   const isSquare = square ? { borderRadius: 0 } : {};
   return (
-    <RediButton buttonType={buttonType} {...props} style={isSquare}>
-      <Space size={4}>
-        <FontAwesomeIcon icon={iconFt as IconProp} /> {children}
-      </Space>
-    </RediButton>
+    <AnimButton>
+      <RediButton buttonType={buttonType} {...props} style={isSquare}>
+        <Space size={4}>
+          <FontAwesomeIcon icon={iconFt as IconProp} /> {children}
+        </Space>
+      </RediButton>
+    </AnimButton>
   );
 };
