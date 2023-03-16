@@ -8,7 +8,7 @@ import { RowSpaceAround } from "../src/components/styling/grid.styled";
 import AppContext from "../src/contexts/app.context";
 import { useFood } from "../src/contexts/food.context";
 import { ECurrency, ELanguage } from "../src/interfaces";
-import { CenteredTitle, NoSpacingDivider, RediDivider, RoundedInput } from "../src/styles";
+import { CenteredTitle, NoSpacingDivider, RediDivider, RoundedInput, RoundedInputNum } from "../src/styles";
 import { buildLanguage, setCookieInformation } from "./api/build-language";
 const { Title } = Typography;
 
@@ -21,7 +21,8 @@ const Settings = ({ language }) => {
   const {
     setCurrency,
     setLanguage,
-    state: { currency },
+    setVaT,
+    state: { currency, vat },
   } = useContext(AppContext);
   const [userForm] = Form.useForm();
   const [settingsForm] = Form.useForm();
@@ -32,6 +33,7 @@ const Settings = ({ language }) => {
       haveFoodPicture,
       currency,
       language,
+      vat,
     });
   }, []);
 
@@ -41,6 +43,7 @@ const Settings = ({ language }) => {
     displayFoodImage: boolean;
     language: string;
     currency: ECurrency;
+    vat: number;
   }
   const handleUserInfo = (values: Pick<ISettings, "email">) => {
     console.log(values);
@@ -135,6 +138,24 @@ const Settings = ({ language }) => {
                   <Radio.Button value={true}>{t("glossary.yes")}</Radio.Button>
                   <Radio.Button value={false}>{t("glossary.no")}</Radio.Button>
                 </Radio.Group>
+              </Form.Item>
+            </Col>
+            <Col span={11}>
+              <Form.Item label={t("settings.form-label.vat")} name="vat">
+                <RoundedInputNum
+                  onChange={(e) => {
+                    console.log(e);
+                    if (e && typeof e !== "undefined") {
+                      setVaT(Number(e));
+                    } else {
+                      setVaT(0);
+                    }
+                  }}
+                  type="number"
+                  minLength={1}
+                  aria-label="vat"
+                  style={{ width: "50%" }}
+                />
               </Form.Item>
             </Col>
           </RowSpaceAround>

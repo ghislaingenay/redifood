@@ -1,6 +1,8 @@
 import { Col } from "antd";
 import { useTranslation } from "next-i18next";
+import { useContext } from "react";
 import { BACKGROUND_COLOR, GREY, ORANGE_DARK } from "../../constants";
+import AppContext from "../../contexts/app.context";
 import { hexToRgba } from "../../functions/global.fn";
 import useCurrency from "../../hooks/useCurrency.hook";
 import { IFood, IOrder } from "../../interfaces";
@@ -18,16 +20,19 @@ interface ISummaryTable {
 const SummaryTable = ({ order, xSize, sSize, mSize, lSize }: ISummaryTable) => {
   const noMP = { margin: 0, padding: 0 };
   const { t } = useTranslation("");
+  const {
+    state: { vat },
+  } = useContext(AppContext);
   const { convertPrice } = useCurrency();
   const lgValue = lSize || 5;
   const mdValue = mSize || 5;
   const sValue = sSize || 5;
   const xsValue = xSize || 5;
   const headerColumns = [
-    t("orders.summary-table.food"),
-    t("orders.summary-table.quantity"),
-    t("orders.summary-table.price"),
-    t("orders.summary-table.total"),
+    { key: t("orders.summary-table.food"), label: "FOOD" },
+    { key: t("orders.summary-table.quantity"), label: "QTY" },
+    { key: t("orders.summary-table.price"), label: "PRICE" },
+    { key: t("orders.summary-table.total"), label: "TOTAL" },
   ];
   const { orderItems, orderTotal } = order;
   const sizeProps = { lg: lgValue, xs: xsValue, sm: sValue, md: mdValue };
@@ -38,11 +43,11 @@ const SummaryTable = ({ order, xSize, sSize, mSize, lSize }: ISummaryTable) => {
           role="rowheader"
           style={{ ...noMP, backgroundColor: hexToRgba(BACKGROUND_COLOR, 1), color: "white" }}
         >
-          {headerColumns.map((item: string, index: number) => {
+          {headerColumns.map(({ key, label }, index: number) => {
             return (
               <Col {...sizeProps} key={index} role="columnheader">
-                <CenteredTitle style={{ ...noMP, color: "white" }} level={5}>
-                  {item}
+                <CenteredTitle style={{ ...noMP, color: "white" }} level={5} aria-label={label}>
+                  {key}
                 </CenteredTitle>
               </Col>
             );
@@ -77,7 +82,7 @@ const SummaryTable = ({ order, xSize, sSize, mSize, lSize }: ISummaryTable) => {
           <Col {...sizeProps} role="gridcell"></Col>
           <Col {...sizeProps} role="gridcell"></Col>
           <Col {...sizeProps} role="gridcell">
-            <CenteredP>{t("orders.summary-table.tot-before-vat")}</CenteredP>
+            <CenteredP aria-label="Total before VAT">{t("orders.summary-table.tot-before-vat")}</CenteredP>
           </Col>
           <Col {...sizeProps} role="gridcell">
             <CenteredP>{convertPrice(orderTotal, "backToFront", true)}</CenteredP>
@@ -87,20 +92,20 @@ const SummaryTable = ({ order, xSize, sSize, mSize, lSize }: ISummaryTable) => {
           <Col {...sizeProps} role="gridcell"></Col>
           <Col {...sizeProps} role="gridcell"></Col>
           <Col {...sizeProps} role="gridcell">
-            <CenteredP>{t("orders.summary-table.vat")}</CenteredP>
+            <CenteredP aria-label="VAT (%)">{t("orders.summary-table.vat")}</CenteredP>
           </Col>
           <Col {...sizeProps} role="gridcell">
-            <CenteredP>7</CenteredP>
+            <CenteredP>{vat}</CenteredP>
           </Col>
         </RowSpaceAround>
         <RowSpaceAround role="row" style={{ backgroundColor: hexToRgba(BACKGROUND_COLOR, 1), color: "white" }}>
           <Col {...sizeProps} role="gridcell"></Col>
           <Col {...sizeProps} role="gridcell"></Col>
           <Col {...sizeProps} role="gridcell">
-            <CenteredP>{t("orders.summary-table.total-price")}</CenteredP>
+            <CenteredP aria-label="Total for payment">{t("orders.summary-table.total-price")}</CenteredP>
           </Col>
           <Col {...sizeProps} role="gridcell">
-            <CenteredP>{convertPrice(orderTotal * 1.07, "backToFront", true)}</CenteredP>
+            <CenteredP>{convertPrice(orderTotal * (1 + vat / 100), "backToFront", true)}</CenteredP>
           </Col>
         </RowSpaceAround>
       </div>

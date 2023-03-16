@@ -56,7 +56,8 @@
       "show-image": "Montrer image",
       "show-image-description": "Montrer la description de l'image",
       "currency": "Monnaie",
-      "Language": "Language"
+      "Language": "Language",
+      "vat": "TVA"
     },
     "form-values": {
       "english": "Anglais",
@@ -151,7 +152,7 @@
     },
     "transaction-amount": "Montant de la commande",
     "given-amount": "Montant donné",
-    "amount-to-give": "A rendre",
+    "amount-to-give": "Monnaie a rendre",
     "funds-error": "Pas assez d'argent"
   }
 }

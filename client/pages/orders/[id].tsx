@@ -28,8 +28,18 @@ const CurrentOrder = ({ currentOrder, status }: any) => {
 
   const isDisabled = paymentChoice === null ? true : false;
   const radioPaymentOptions = [
-    { label: EPaymentType.CASH, value: EPaymentType.CASH, icon: <FontAwesomeIcon icon={faCashRegister} /> },
-    { label: EPaymentType.CARD, value: EPaymentType.CARD, icon: <FontAwesomeIcon icon={faCreditCard} /> },
+    {
+      label: EPaymentType.CASH,
+      value: EPaymentType.CASH,
+      icon: <FontAwesomeIcon icon={faCashRegister} />,
+      ariaLabel: EPaymentType.CASH,
+    },
+    {
+      label: EPaymentType.CARD,
+      value: EPaymentType.CARD,
+      icon: <FontAwesomeIcon icon={faCreditCard} />,
+      ariaLabel: EPaymentType.CARD,
+    },
   ];
 
   const alertMessage = orderStatus === "COMPLETE" ? t("orders.paid") : t("orders.not-paid");
@@ -52,7 +62,7 @@ const CurrentOrder = ({ currentOrder, status }: any) => {
                 {orderId}
               </Col>
               <Col lg={8}>
-                <b>{t("glossary.table")}</b> {tableNumber}
+                <b aria-label="Table number">{t("glossary.table")}</b> {tableNumber}
               </Col>
               <Col lg={8}>
                 <b>{t("glossary.date")}</b> {orderDate}

@@ -10,18 +10,21 @@ interface IAppContext {
   state: {
     language: ELanguage;
     currency: ECurrency;
+    vat: number;
   };
-  setStatus: (status: "success" | "error") => void;
+  setStatus: (status: string) => void;
   setLanguage: (val: ELanguage) => void;
   setCurrency: (val: ECurrency) => void;
+  setVaT: (val: number) => void;
 }
 export default AppContext;
 
 export const AppProvider = ({ children }) => {
-  const [status, setStatus] = useState<"success" | "error">("success");
+  const [status, setStatus] = useState<string>("success");
   const [language, setLanguage] = useState<ELanguage>(ELanguage.ENGLISH);
   const [currency, setCurrency] = useState<ECurrency>(ECurrency.USD);
   const { retrieveCookie } = useLanguage(language);
+  const [vat, setVaT] = useState<number>(7);
 
   useEffect(() => {
     if (status === "error") {
@@ -41,9 +44,11 @@ export const AppProvider = ({ children }) => {
     <AppContext.Provider
       value={{
         state: {
+          vat: vat,
           language: language,
           currency: currency,
         },
+        setVaT: setVaT,
         setStatus: setStatus,
         setLanguage: setLanguage,
         setCurrency: setCurrency,
