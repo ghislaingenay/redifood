@@ -1,4 +1,4 @@
 {
-  "presets": ["next/babel", "@babel/preset-typescript"],
+  "presets": ["next/babel", "@babel/preset-typescript", "next", "next/core-web-vitals"],
   "plugins": [["styled-components", { "ssr": true }]]
 }
