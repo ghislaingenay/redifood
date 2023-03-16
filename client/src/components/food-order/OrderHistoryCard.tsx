@@ -8,7 +8,7 @@ import useCurrency from "../../hooks/useCurrency.hook";
 import { EButtonType, IOrder } from "../../interfaces";
 import { CenteredPBold, LGCard } from "../../styles";
 import { RediIconButton } from "../styling/Button.style";
-import { RowCenter, RowSpaceBetween } from "../styling/grid.styled";
+import { RowCenter } from "../styling/grid.styled";
 
 interface IOrderHistoryCard {
   foodOrder: IOrder;
@@ -22,32 +22,39 @@ const OrderHistoryCard = ({ foodOrder }: IOrderHistoryCard) => {
 
   const { convertPrice } = useCurrency();
   const router = useRouter();
+
+  const colSpan = {
+    xs: 24,
+    sm: 24,
+    md: 12,
+    lg: 12,
+  };
   return (
     <LGCard>
-      <RowSpaceBetween>
-        <Col span={15}>
+      <RowCenter>
+        <Col md={24} lg={15}>
           <RowCenter>
-            <Col span={12}>
+            <Col {...colSpan}>
               <CenteredPBold>
-                {t("history.order-number")}: {foodOrder?._id}
+                {t("history.order-number")}: {foodOrder?.orderNo}
               </CenteredPBold>
             </Col>
-            <Col span={12}>
-              <CenteredPBold>Date: </CenteredPBold>
-            </Col>
-            <Col span={12}>
+            <Col {...colSpan}>
               <CenteredPBold>
                 {t("glossary.amount")}: {convertPrice(foodOrder?.orderTotal, "backToFront", true)}
               </CenteredPBold>
             </Col>
-            <Col span={12}>
+            <Col {...colSpan}>
+              <CenteredPBold>Date: </CenteredPBold>
+            </Col>
+            <Col {...colSpan}>
               <CenteredPBold>
                 {t("glossary.amount")}: {foodOrder?.orderCurrency}
               </CenteredPBold>
             </Col>
           </RowCenter>
         </Col>
-        <Col span={7}>
+        <Col xs={24} lg={6} style={{ textAlign: "center" }}>
           <RediIconButton
             iconFt={faList}
             buttonType={EButtonType.EDIT}
@@ -56,7 +63,7 @@ const OrderHistoryCard = ({ foodOrder }: IOrderHistoryCard) => {
             {t("buttons.view-order")}
           </RediIconButton>
         </Col>
-      </RowSpaceBetween>
+      </RowCenter>
     </LGCard>
   );
 };

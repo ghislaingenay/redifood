@@ -11,7 +11,8 @@
     "clear": "CLEAR",
     "confirm": "CONFIRM",
     "cancel": "CANCEL",
-    "finalize-payment": "FINALIZE PAYMENT"
+    "finalize-payment": "FINALIZE PAYMENT",
+    "receipt": "RECEIPT"
   },
 
   "glossary": {

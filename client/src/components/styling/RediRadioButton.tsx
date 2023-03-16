@@ -118,7 +118,8 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
               role="radio"
               name={radioGroupName}
               value={value}
-              aria-checked={isSelected(value)}
+              // aria-checked={isSelected(value)}
+              aria-checked={isSelected(selectedValue)}
             >
               {haveIcon === "true" && <SpanBlockM02Y>{icon}</SpanBlockM02Y>}
               {label.toUpperCase()}

@@ -1,6 +1,6 @@
-import { faCartShopping, faCashRegister, faCreditCard } from "@fortawesome/free-solid-svg-icons";
+import { faCartShopping, faCashRegister, faCreditCard, faReceipt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Alert, Col, Space } from "antd";
+import { Alert, Space } from "antd";
 import { useState } from "react";
 
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import SummaryTable from "../../src/components/food-order/SummaryTable";
 import { RediIconButton } from "../../src/components/styling/Button.style";
-import { RowSpaceBetween } from "../../src/components/styling/grid.styled";
+import { CenteredCol, RowSpaceBetween } from "../../src/components/styling/grid.styled";
 import RediRadioButton from "../../src/components/styling/RediRadioButton";
 import { RED } from "../../src/constants";
 import { hexToRgba } from "../../src/functions/global.fn";
@@ -46,6 +46,7 @@ const CurrentOrder = ({ currentOrder, status }: any) => {
   const messageType = orderStatus === "COMPLETE" ? "success" : "error";
   const colorAlert = orderStatus !== "COMPLETE" && hexToRgba(RED, 0.7);
 
+  const colIdSpan = { xs: 12, sm: 12, md: 8, lg: 8 };
   return (
     <>
       <Head>
@@ -57,23 +58,23 @@ const CurrentOrder = ({ currentOrder, status }: any) => {
         <SpacingDiv5X>
           <LGCard style={{ padding: "0 1rem" }}>
             <RowSpaceBetween>
-              <Col lg={8}>
+              <CenteredCol {...colIdSpan}>
                 <b>{t("glossary.order")} #</b>
                 {orderId}
-              </Col>
-              <Col lg={8}>
+              </CenteredCol>
+              <CenteredCol {...colIdSpan}>
                 <b aria-label="Table number">{t("glossary.table")}</b> {tableNumber}
-              </Col>
-              <Col lg={8}>
+              </CenteredCol>
+              <CenteredCol {...colIdSpan}>
                 <b>{t("glossary.date")}</b> {orderDate}
-              </Col>
-              <Col lg={8}>
+              </CenteredCol>
+              <CenteredCol {...colIdSpan}>
                 <Alert
                   type={messageType}
                   message={alertMessage}
                   style={{ fontWeight: 700, color: colorAlert as string }}
                 />
-              </Col>
+              </CenteredCol>
             </RowSpaceBetween>
           </LGCard>
           <SummaryTable order={currentOrder} />
@@ -100,6 +101,16 @@ const CurrentOrder = ({ currentOrder, status }: any) => {
                 </RediIconButton>
               </Space>
             </>
+          )}
+          {orderStatus === "COMPLETE" && (
+            <RediIconButton
+              // onClick={() => router.push(`/orders/${orderId}/payment/${paymentChoice}`)}
+              iconFt={faReceipt}
+              buttonType={EButtonType.DISPLAY}
+              aria-label="RECEIPT"
+            >
+              {t("buttons.receipt")}
+            </RediIconButton>
           )}
         </SpacingDiv5X>
       </body>

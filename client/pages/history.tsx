@@ -44,12 +44,12 @@ const History = ({ FoodOrderList }: IHistoryProps) => {
         }}
       >
         <RowCenter style={{ margin: 0, height: "100%", padding: 0 }}>
-          <Col span={8} style={{ margin: 0, height: "100%", padding: 0 }}>
+          <Col span={11} style={{ margin: 0, height: "100%", padding: 0 }}>
             <Form.Item name="startDate" label={t("history.form-label.from")}>
               <DatePicker picker="date" />
             </Form.Item>
           </Col>
-          <Col span={8} style={{ margin: 0, height: "100%", padding: 0 }}>
+          <Col span={11} style={{ margin: 0, height: "100%", padding: 0 }}>
             <Form.Item name="endDate" label={t("history.form-label.to")}>
               <DatePicker picker="date" />
             </Form.Item>

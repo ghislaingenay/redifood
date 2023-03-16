@@ -72,7 +72,7 @@ const PaymentSystem = ({ paymentType, currentOrder }: IPaymentProps) => {
       <If condition={paymentType === EPaymentType.CASH}>
         <Then>
           <RowSpaceAround>
-            <Col span={11}>
+            <Col md={11}>
               <LGCard>
                 <RowCenter style={{ marginBottom: "1rem" }}>
                   <LRoundedInput readOnly={true} aria-label="select amount" value={renderedValue()} />
@@ -134,7 +134,7 @@ const PaymentSystem = ({ paymentType, currentOrder }: IPaymentProps) => {
                 </RowCenter>
               </LGCard>
             </Col>
-            <Col span={11}>
+            <Col md={11}>
               <RowCenter>
                 <CenteredLabel htmlFor="transactionAmount" aria-label="transaction amount">
                   {t("payments.transaction-amount")} ({displayCurrency()})
