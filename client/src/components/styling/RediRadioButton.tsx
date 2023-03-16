@@ -1,5 +1,5 @@
 import { ButtonProps, Col } from "antd";
-import { Dispatch, SetStateAction, useEffect } from "react";
+import { Dispatch, SetStateAction, useEffect, useMemo } from "react";
 import { BACKGROUND_COLOR, LIGHT_GREY, ORANGE_DARK, ORANGE_LIGHT } from "../../constants";
 import { hexToRgba } from "../../functions/global.fn";
 import { RadioButton } from "../../styles";
@@ -9,11 +9,13 @@ import { RowSpaceAround } from "./grid.styled";
 interface IRediRadio {
   value: string;
   label: string;
+  ariaLabel: string;
 }
 interface IRediRadioWithIcon extends IRediRadio {
   value: string;
   label: string;
   icon: JSX.Element;
+  ariaLabel: string;
 }
 export type TRadioIconType = keyof TIconDataMap;
 
@@ -54,7 +56,7 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
     return selectedButton === radioValue;
   };
 
-  const spanValue = (options) => {
+  const spanValue = (options: IRediRadio[] | IRediRadioWithIcon[]) => {
     switch (options.length) {
       case 2: {
         return 11;
@@ -68,7 +70,9 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
     }
   };
 
-  useEffect(() => {}, [selectedButton]);
+  const selectedValue = useMemo(() => {
+    return selectedButton;
+  }, [selectedButton]);
 
   const colorStyle = (currentButton: string) => {
     return {
@@ -85,26 +89,36 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
     };
   };
 
+  useEffect(() => {}, [selectedButton]);
+
   return (
     <RowSpaceAround>
-      {options.map(({ label, value, icon }: any, index) => (
+      {options.map(({ label, value, icon, ariaLabel }: any, index: number) => (
         <>
-          <Col span={spanValue(options)} style={{ width: "100%" }} key={index}>
+          <Col
+            xs={24}
+            sm={24}
+            md={spanValue(options)}
+            style={{ width: "100%" }}
+            key={index}
+            onClick={(e) => {
+              const target = e.target as HTMLButtonElement;
+              if (!target) {
+                console.log("ente");
+                return setSelectedButton(selectedValue);
+              }
+              if (clickedFn) clickedFn();
+
+              return setSelectedButton(target.value as any);
+            }}
+          >
             <RadioButton
+              aria-label={ariaLabel}
               style={{ ...colorStyle(value) }}
               role="radio"
-              aria-label={label}
               name={radioGroupName}
               value={value}
               aria-checked={isSelected(value)}
-              onClick={(e) => {
-                console.log("tg", e.target);
-                const target = e.target as HTMLButtonElement;
-                if (clickedFn) clickedFn();
-                console.log("target.value", target.value);
-                // @ts-ignore
-                return setSelectedButton(() => target.value as any);
-              }}
             >
               {haveIcon === "true" && <SpanBlockM02Y>{icon}</SpanBlockM02Y>}
               {label.toUpperCase()}

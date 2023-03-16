@@ -8,11 +8,11 @@ type SReg = RegExp | string;
 const user = userEvent.setup();
 
 export const typeIntoFormAuth = async (
-  user,
+  user: any,
   { email, password, confirmPassword }: IFormAuthFields,
 ): Promise<ITestUserAuth> => {
   let userKeys = ["emailElement", "passwordElement", "confirmPasswordElement"];
-  let finalData = {};
+  let finalData: Record<"emailElement" | "passwordElement" | "confirmPasswordElement", string> | any = {};
   if (email) {
     const emailInput = screen.getByRole("textbox", {
       name: /email/i,
@@ -38,7 +38,7 @@ export const typeIntoFormAuth = async (
   return finalData;
 };
 
-export const clickButton = async (reg: RegExp, user?) => {
+export const clickButton = async (reg: RegExp, user?: any) => {
   user = userEvent.setup();
   const clickButton: HTMLElement = screen.getByRole("button", {
     name: reg,

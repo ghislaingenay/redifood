@@ -1,11 +1,11 @@
 import { IErrorTableInput, IFood } from "../interfaces";
 
-export const sendErrorTableInput = (tableNumber: number, tableArray: number[]) => {
+export const sendErrorTableInput = (tableNumber: number | null, tableArray: number[]) => {
   let errorState: IErrorTableInput = { alreadyInDb: false, missingValue: false };
   if (tableNumber === null || tableNumber === 0) {
     errorState.missingValue = true;
   }
-  if (tableArray.includes(tableNumber)) {
+  if (tableNumber && tableArray.includes(tableNumber)) {
     errorState.alreadyInDb = true;
   }
   return errorState;

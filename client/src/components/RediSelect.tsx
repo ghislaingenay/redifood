@@ -5,12 +5,17 @@ interface RediSelectProps extends React.ComponentProps<typeof Select> {
     value: string;
     label: string;
   }[];
+  initialOption: {
+    value: string;
+    label: string;
+  };
 }
 
-export const RediSelect = ({ options, ...props }: RediSelectProps) => {
+export const RediSelect = ({ options, initialOption, ...props }: RediSelectProps) => {
   return (
     <>
-      <Select {...props}>
+      <Select {...props} defaultValue={initialOption.value}>
+        <Select.Option value={initialOption.value}>{initialOption.label}</Select.Option>
         {options.map((option) => (
           <Select.Option key={option.value} value={option.value}>
             {option.label}

@@ -1,19 +1,34 @@
 import { createContext, useEffect, useState } from "react";
+import useLanguage from "../../pages/api/useLanguage";
 import { NotificationRes } from "../../src/definitions/notification.class";
-import { TStatusProps } from "../interfaces/global.interface";
+import { storeCurrency } from "../functions/global.fn";
+import { ECurrency, ELanguage } from "../interfaces";
 
 // @ts-ignore
 const AppContext = createContext({} as IAppContext);
 interface IAppContext {
   state: {
-    status: "error" | "success";
+    language: ELanguage;
+    currency: ECurrency;
+    vat: number;
   };
-  setStatus: (status: TStatusProps) => void;
+  setStatus: (status: string) => void;
+  setLanguage: (val: ELanguage) => void;
+  setCurrency: (val: ECurrency) => void;
+  setVaT: (val: number) => void;
 }
 export default AppContext;
 
-export const AppProvider = ({ children }) => {
-  const [status, setStatus] = useState<TStatusProps>("success");
+interface IAppProvider {
+  children: React.ReactNode;
+}
+
+export const AppProvider = ({ children }: IAppProvider) => {
+  const [status, setStatus] = useState<string>("success");
+  const [language, setLanguage] = useState<ELanguage>(ELanguage.ENGLISH);
+  const [currency, setCurrency] = useState<ECurrency>(ECurrency.USD);
+  const { retrieveCookie } = useLanguage(language);
+  const [vat, setVaT] = useState<number>(7);
 
   useEffect(() => {
     if (status === "error") {
@@ -23,16 +38,24 @@ export const AppProvider = ({ children }) => {
         placement: "topRight",
       });
     }
+    setCurrency(storeCurrency());
+    setLanguage(retrieveCookie());
+    // localStorage.setItem('currency', )
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status]);
+  }, [currency]);
 
   return (
     <AppContext.Provider
       value={{
         state: {
-          status: status,
+          vat: vat,
+          language: language,
+          currency: currency,
         },
+        setVaT: setVaT,
         setStatus: setStatus,
+        setLanguage: setLanguage,
+        setCurrency: setCurrency,
       }}
     >
       {children}

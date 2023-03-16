@@ -1,7 +1,11 @@
 import { Card, Col, Divider, Row, Space, Table, Typography } from "antd";
+import { IOrder } from "../interfaces";
 const { Title } = Typography;
 
-const OrderCard = ({ order }) => {
+interface IOrderCardProps {
+  order: IOrder;
+}
+const OrderCard = ({ order }: IOrderCardProps) => {
   const currency = "$";
 
   const columns = [
@@ -32,7 +36,7 @@ const OrderCard = ({ order }) => {
       <Row justify="space-between" align="middle">
         <Col md={6}>
           <Title className="mt-0" level={5}>
-            Order ID: <em>{order.orderId}</em>
+            Order ID: <em>{order._id}</em>
           </Title>
         </Col>
         <Col md={6}>

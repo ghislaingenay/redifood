@@ -1,28 +1,41 @@
 import { faCartShopping, faPenToSquare, faPlusCircle, faUtensils } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Alert, Col, Row, Space, Table, Typography } from "antd";
+import { Col, Space, Table, Typography } from "antd";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useRouter } from "next/navigation";
 import { AlignType } from "rc-table/lib/interface";
 import { useContext, useEffect, useState } from "react";
 import { RediSelect } from "../src/components/RediSelect";
 import { RediIconButton } from "../src/components/styling/Button.style";
-import { RowSpaceAround } from "../src/components/styling/grid.styled";
+import { RowSpaceAround, RowSpaceBetween } from "../src/components/styling/grid.styled";
 import { BACKGROUND_COLOR } from "../src/constants";
 import AppContext from "../src/contexts/app.context";
 import { getOptions } from "../src/functions/global.fn";
-import { EButtonType, IOrder } from "../src/interfaces";
+import useCurrency from "../src/hooks/useCurrency.hook";
+import { EButtonType, IOrder, ServerInfo } from "../src/interfaces";
 import { allDataOrders, getListUnpaidOrders } from "../test/mocks/mockOrdersData";
+import { buildLanguage } from "./api/build-language";
 
-const AllOrdersPage = ({ allOrders, getList, status }) => {
-  const appValue = useContext(AppContext);
-  appValue.setStatus(status);
+interface IAllOrdersPageProps {
+  allOrders: IOrder[];
+  getList: string[];
+  status: string;
+}
+const AllOrdersPage = ({ allOrders, getList, status }: IAllOrdersPageProps) => {
+  const { t } = useTranslation("");
+  const { displayCurrency } = useCurrency();
+  const { setStatus } = useContext(AppContext);
+
   const router = useRouter();
   const [listAllOrders] = useState(allOrders);
   const [selectedOption, setSelectedOption] = useState("ALL");
-  const [filteredOrders, setFilteredOrders] = useState(allOrders);
+  const [filteredOrders, setFilteredOrders] = useState<IOrder[]>([]);
   const [spinLoading, setSpinLoading] = useState(true);
   const { Title } = Typography;
+
+  const renderAmount = (orderTotal: number) => (displayCurrency() === "$" ? orderTotal : 0.85 * orderTotal);
   const columns = [
     {
       title: "ID",
@@ -37,10 +50,11 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
       align: "center" as AlignType,
     },
     {
-      title: "Amount",
+      title: ` ${t("glossary.amount")} (${displayCurrency()})`,
       dataIndex: "orderTotal",
       key: "orderTotal",
       align: "center" as AlignType,
+      render: (item: number) => renderAmount(item).toFixed(2),
     },
     {
       title: "Action",
@@ -54,77 +68,85 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
             buttonType={EButtonType.EDIT}
             iconFt={faPenToSquare}
           >
-            EDIT
+            {t("buttons.edit")}
           </RediIconButton>
           <RediIconButton
             onClick={() => router.push(`/orders/${item._id}`)}
             iconFt={faCartShopping}
             buttonType={EButtonType.SUCCESS}
           >
-            PAY
+            {t("buttons.pay")}
           </RediIconButton>
         </Space>
       ),
     },
   ];
 
-  const showProperData = (option) => {
+  const showProperData = (option: string) => {
     // replace later by axios get
     setSelectedOption(option);
     if (option === "ALL") {
       return setFilteredOrders(listAllOrders);
     }
-    const newList = listAllOrders.filter((order) => order.orderId === option);
+    const newList = listAllOrders.filter((order) => order._id === option);
     if (newList) {
       return setFilteredOrders(newList);
     }
   };
 
   useEffect(() => {
+    setStatus(status);
+    // data coming from backend
+    const sortedData = allOrders.map((order: IOrder) => {
+      return {
+        ...order,
+        key: order._id,
+        orderTotal: renderAmount(order.orderTotal),
+      };
+    });
+    setFilteredOrders(sortedData);
     setSpinLoading(false);
-    appValue.setStatus(status);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status, appValue]);
+  }, [status, selectedOption]);
 
   return (
     <>
       <Head>
-        <title>List of all unpaid orders</title>
-        <meta name="description" content="List of all unpaid orders" />
+        <title>{t("index.head.title")}</title>
+        <meta name="description" content={t("index.head.description") as string} />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Title level={2}>List of all orders</Title>
-      <Row justify="space-between" align="middle" gutter={10} className="mb-5">
-        <Col>
+      <Title level={2} aria-label="List of all orders">
+        {t("index.title")}
+      </Title>
+      <RowSpaceBetween gutter={10} style={{ marginBottom: "1rem" }}>
+        <Col span={12}>
           <RediSelect
+            initialOption={{ value: "ALL", label: t("glossary.all") }}
             style={{ width: "8rem" }}
             value={selectedOption}
-            onChange={(e: string) => showProperData(e)}
+            onChange={(e: any) => showProperData(e)}
             options={getOptions(getList)}
           />
         </Col>
-        <Col className="text-right" lg={4}>
+        <Col span={11} style={{ textAlign: "right" }}>
           <RediIconButton
             shape="round"
             buttonType={EButtonType.CREATE}
+            aria-label="create order"
             iconFt={faPlusCircle}
             onClick={() => router.push("/orders/create")}
           >
-            Create Order
+            {t("index.orderButton")}
           </RediIconButton>
         </Col>
-      </Row>
-      <Alert
-        message="This is a warning message"
-        type="warning"
-        showIcon
-        style={{ fontWeight: 700, marginBottom: "0.5rem", border: "0.125rem solid" }}
-      />
+      </RowSpaceBetween>
       <Table
         loading={spinLoading}
         rowKey="_id"
         columns={columns}
-        dataSource={allOrders}
+        dataSource={filteredOrders}
         pagination={false}
         expandable={{
           expandedRowRender: (record: IOrder) => {
@@ -154,8 +176,16 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
 
 export default AllOrdersPage;
 
-export async function getServerSideProps() {
-  return { props: { allOrders: allDataOrders, getList: getListUnpaidOrders, status: "success" } };
+export async function getServerSideProps({ locale, req }: ServerInfo) {
+  const getLanguageValue = buildLanguage(locale, req);
+  return {
+    props: {
+      allOrders: allDataOrders,
+      getList: getListUnpaidOrders,
+      status: "success",
+      ...(await serverSideTranslations(getLanguageValue, ["common"])),
+    },
+  };
   // const url = "/api/orders";
   // await axios
   //   .get(url, { params: { selectedOption: "ALL" } })

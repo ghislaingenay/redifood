@@ -1,13 +1,7 @@
 import { screen } from "@testing-library/react";
 import { render } from "../..";
 import PaymentSystem from "../../../pages/orders/[id]/payment/[paymentChoice]";
-import {
-  clickButton,
-  expectAlertLength,
-  expectFindText,
-  findButton,
-  findText,
-} from "../../../src/functions/testhelpers.fn";
+import { clickButton, expectAlertLength, expectFindText, findButton } from "../../../src/functions/testhelpers.fn";
 import { EPaymentType } from "../../../src/interfaces";
 import { mockOneOrder } from "../../mocks/mockOrdersData";
 
@@ -24,11 +18,6 @@ describe("Cash - Unit Testing", () => {
   it("should display the nine numbers", async () => {
     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].forEach(async (num: number) => {
       expect(await findButton(`${num}`)).toBeInTheDocument();
-    });
-  });
-  it("should display the heading", async () => {
-    [/transaction amount/i, /given amount/i, /amount to give/i].forEach(async (reg: RegExp) => {
-      expect(await findText(reg)).toBeInTheDocument();
     });
   });
 

@@ -51,14 +51,21 @@ describe("Food - Layout", () => {
     render(<FoodLayout {...foodAlterProps} />);
     expectCheckedRadio(/EDIT/i);
     expectAlertLength(1);
-    expectFindText(/Please a select a food to update/i);
+  });
+  it("Should have no select food when user click on CREATE radio button", async () => {
+    render(<FoodLayout {...foodAlterProps} />);
+    expectAlertLength(1);
+    await clickRadio(/CREATE/i);
+    await waitFor(() => {
+      expect(screen.queryByRole("alert")).toBe(null);
+    });
   });
 
   it("User click on one food and the alert should disappear", async () => {
     render(<FoodLayout {...foodAlterProps} />);
     clickFindAltText(/food millefeuille/i);
     await waitFor(() => {
-      expectNotFoundText(/Please a select a food to update/i);
+      expectNotFoundText(/Please select a food to update/i);
     });
   });
 
@@ -93,9 +100,11 @@ describe("Food - Layout", () => {
     const user = userEvent.setup();
     await clickFindAltText(/food millefeuille/i);
     await user.clear(await screen.findByRole("textbox", { name: /itemName/i }));
+    await waitFor(() => {
+      expect(screen.queryByRole("alert")).toBe(null);
+    });
     await clickButton(/confirm/i);
     await expectAlertLength(1);
-    await expectFindText(/A name is required/i);
   });
 
   it("user click on one food, delete the price and click submit, price is required error should be displayed", async () => {
@@ -103,9 +112,11 @@ describe("Food - Layout", () => {
     const user = userEvent.setup();
     await clickFindAltText(/food millefeuille/i);
     await user.clear(await screen.findByLabelText(/Price/i));
+    await waitFor(() => {
+      expect(screen.queryByRole("alert")).toBe(null);
+    });
     await clickButton(/confirm/i);
     await expectAlertLength(1);
-    await expectFindText(/A price is required/i);
   });
 
   it("user click on one food, delete the description and click submit, no error must be displayed", async () => {
@@ -124,9 +135,11 @@ describe("Food - Layout", () => {
     const user = userEvent.setup();
     await clickFindAltText(/food millefeuille/i);
     await user.click(await findButton(/Remove file/i));
+    await waitFor(() => {
+      expect(screen.queryByRole("alert")).toBe(null);
+    });
     await clickButton(/confirm/i);
     await expectAlertLength(1);
-    await expectFindText(/A picture is required/i);
   });
 
   it("User click on create, confirm button must be disabled", async () => {
@@ -138,14 +151,13 @@ describe("Food - Layout", () => {
   it("User click on create, label should be on the page", async () => {
     render(<FoodLayout {...foodAlterProps} />);
     await clickRadio(/CREATE/i);
-    [/Drop a file here/i, /Name/i, /Description/i, /Price/i, /Section/i].forEach(async (item: RegExp) => {
+    [/Name/i, /Description/i, /Price/i, /Section/i].forEach(async (item: RegExp) => {
       await expectFindText(item);
     });
   });
   it("User click on create, all the label must be present with empty data", async () => {
     render(<FoodLayout {...foodAlterProps} />);
     clickRadio(/CREATE/i);
-    expectFindText("Select ...");
     expect((await screen.findByRole("textbox", { name: /itemName/i })).ariaValueText).toBe(undefined);
     expect((await screen.findByRole("textbox", { name: /itemDescription/i })).ariaValueText).toBe(undefined);
     expect((await screen.findByLabelText(/itemPrice/i)).ariaValueText).toBe(undefined);

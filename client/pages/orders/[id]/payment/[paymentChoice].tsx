@@ -1,56 +1,68 @@
 import { faBan, faCartShopping } from "@fortawesome/free-solid-svg-icons";
 import { Alert, Col } from "antd";
-import { useCallback, useState } from "react";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useCallback, useContext, useState } from "react";
 import { Else, If, Then } from "react-if";
 import { RediButton, RediIconButton } from "../../../../src/components/styling/Button.style";
 import { RowCenter, RowCenterSp, RowSpaceAround } from "../../../../src/components/styling/grid.styled";
-import { EButtonType, EPaymentType } from "../../../../src/interfaces";
+import AppContext from "../../../../src/contexts/app.context";
+import useCurrency from "../../../../src/hooks/useCurrency.hook";
+import { EButtonType, EPaymentType, IOrder } from "../../../../src/interfaces";
 import { CenteredLabel, LGCard, LRoundedInput } from "../../../../src/styles";
 import { mockOneOrder } from "../../../../test/mocks/mockOrdersData";
+import { buildLanguage } from "../../../api/build-language";
 
-type TStrNull = string | null;
+type TStrNum = string | number;
 
-const PaymentSystem = ({ paymentType, currentOrder }) => {
+interface IPaymentProps {
+  paymentType: EPaymentType;
+  currentOrder: IOrder;
+}
+const PaymentSystem = ({ paymentType, currentOrder }: IPaymentProps) => {
+  const { t } = useTranslation();
+  const {
+    state: { vat },
+  } = useContext(AppContext);
+  const { convertPrice, displayCurrency, convertAmount } = useCurrency();
   const { orderTotal } = currentOrder;
   console.log(orderTotal);
 
-  const [selectAmount, setSelectAmount] = useState<TStrNull>("");
-  const [selectedAmount, setSelectedAmount] = useState<TStrNull>("");
+  const [selectAmount, setSelectAmount] = useState<TStrNum>("");
+  const [selectedAmount, setSelectedAmount] = useState<TStrNum>("");
 
-  const onAdd = (val: string) => setSelectAmount((prevValue: string) => prevValue + val);
+  const onAdd = (val: string) => setSelectAmount((prevValue: TStrNum) => prevValue + val);
   const onConfirm = () => {
-    setSelectedAmount(() => selectAmount);
+    setSelectedAmount(() => convertAmount(selectAmount));
     setSelectAmount("");
   };
 
   const havePoint = (str: string) => {
-    if (selectAmount?.includes(".")) {
+    if (typeof selectAmount === "string" && selectAmount?.includes(".")) {
       return str.indexOf(".") === str.lastIndexOf(".");
     }
     return true;
   };
   const haveValueSeparated = (str: string) => {
-    if (selectAmount?.includes(".")) {
+    if (typeof selectAmount === "string" && selectAmount?.includes(".")) {
       return /(\d+).(\d+)/i.test(str);
     }
     return true;
   };
 
-  const diffAmount = Number(selectedAmount) - orderTotal;
-  const amountToGive = diffAmount === orderTotal || diffAmount < 0 ? 0 : diffAmount;
+  const totalAmount = orderTotal * (1 + vat / 100);
+
+  const diffAmount = Number(selectedAmount) - totalAmount;
+  const amountToGive = diffAmount === totalAmount || diffAmount < 0 ? 0 : diffAmount;
   const isDisabled = selectedAmount && selectedAmount >= orderTotal && diffAmount > 0 ? false : true;
   const confirmDisabled =
-    selectAmount === "" || selectAmount === "." || !havePoint(selectAmount) || !haveValueSeparated(selectAmount)
-      ? // !(selectAmount.includes(".") && selectAmount.split(".").length !== 1)
-        true
+    selectAmount === "" ||
+    selectAmount === "." ||
+    !havePoint(selectAmount as string) ||
+    !haveValueSeparated(selectAmount as string)
+      ? true
       : false;
-  const clearDisabled =
-    selectAmount === ""
-      ? // ||
-        // (selectAmount.includes(".") && selectAmount.length === 1) ||
-        // selectAmount.match(/./g).length === 1
-        true
-      : false;
+  const clearDisabled = selectAmount === "" ? true : false;
 
   const renderedValue = useCallback(() => {
     return selectAmount;
@@ -72,7 +84,10 @@ const PaymentSystem = ({ paymentType, currentOrder }) => {
                         <RediButton
                           value={`${String(num)}`}
                           buttonType={EButtonType.INFO}
-                          onClick={(e) => onAdd(e.target.value)}
+                          onClick={(e) => {
+                            const target = e.target as HTMLButtonElement;
+                            onAdd(target.value!);
+                          }}
                           style={{ width: "100%", padding: "1rem 3rem", fontSize: "2rem" }}
                           aria-label={`${String(num)}`}
                         >
@@ -86,7 +101,7 @@ const PaymentSystem = ({ paymentType, currentOrder }) => {
                     <RediButton
                       buttonType={EButtonType.INFO}
                       aria-label="0"
-                      onClick={() => setSelectAmount((prevValue: string) => prevValue + "0")}
+                      onClick={() => setSelectAmount((prevValue: TStrNum) => prevValue + "0")}
                       value="0"
                     >
                       0
@@ -96,23 +111,24 @@ const PaymentSystem = ({ paymentType, currentOrder }) => {
                     <RediButton
                       buttonType={EButtonType.INFO}
                       aria-label="point"
-                      value={`.`}
-                      onClick={() => setSelectAmount((prevValue: string) => prevValue + ".")}
+                      value={"."}
+                      onClick={() => setSelectAmount((prevValue: TStrNum) => prevValue + ".")}
                     >
                       .
                     </RediButton>
                   </Col>
                   <RowCenterSp>
                     <RediButton buttonType={EButtonType.SUCCESS} disabled={confirmDisabled} onClick={() => onConfirm()}>
-                      Confirm
+                      {t("buttons.confirm")}
                     </RediButton>
                     <RediIconButton
                       buttonType={EButtonType.ERROR}
                       iconFt={faBan}
+                      aria-label="Clear"
                       disabled={clearDisabled}
                       onClick={() => setSelectAmount("")}
                     >
-                      Clear
+                      {t("buttons.clear")}
                     </RediIconButton>
                   </RowCenterSp>
                 </RowCenter>
@@ -120,16 +136,20 @@ const PaymentSystem = ({ paymentType, currentOrder }) => {
             </Col>
             <Col span={11}>
               <RowCenter>
-                <CenteredLabel htmlFor="transactionAmount">Transaction amount ($)</CenteredLabel>
+                <CenteredLabel htmlFor="transactionAmount" aria-label="transaction amount">
+                  {t("payments.transaction-amount")} ({displayCurrency()})
+                </CenteredLabel>
                 <LRoundedInput
                   readOnly={true}
                   aria-label="transactionAmount"
                   id="transactionAmount"
-                  value={currentOrder.orderTotal}
+                  value={convertPrice(totalAmount, "backToFront", false)}
                 />
               </RowCenter>
               <RowCenter>
-                <CenteredLabel htmlFor="selected amount">Given amount</CenteredLabel>
+                <CenteredLabel htmlFor="selected amount" aria-label="given amount">
+                  {t("payments.given-amount")} ({displayCurrency()})
+                </CenteredLabel>
                 <LRoundedInput
                   readOnly={true}
                   aria-label="selected amount"
@@ -138,16 +158,23 @@ const PaymentSystem = ({ paymentType, currentOrder }) => {
                 />
               </RowCenter>
               <RowCenter>
-                <CenteredLabel htmlFor="render">Amount to give</CenteredLabel>
-                <LRoundedInput readOnly={true} aria-label="render" id="render" value={amountToGive} />
+                <CenteredLabel htmlFor="render" aria-label="amount to give">
+                  {t("payments.amount-to-give")} ({displayCurrency()})
+                </CenteredLabel>
+                <LRoundedInput readOnly={true} aria-label="render" id="render" value={convertAmount(amountToGive)} />
               </RowCenter>
               <RowCenter style={{ marginTop: "2rem" }}>
                 {isDisabled && selectedAmount !== "" && (
-                  <Alert type="error" style={{ margin: "1rem 2rem" }} message="Not enough funds" />
+                  <Alert type="error" style={{ margin: "1rem 2rem" }} message={t("payments.funds-error")} />
                 )}
-                <RediIconButton iconFt={faCartShopping} buttonType={EButtonType.SUCCESS} disabled={isDisabled}>
+                <RediIconButton
+                  iconFt={faCartShopping}
+                  aria-label="finalize payment"
+                  buttonType={EButtonType.SUCCESS}
+                  disabled={isDisabled}
+                >
                   {" "}
-                  Finalize payment
+                  {t("buttons.finalize-payment")}
                 </RediIconButton>
               </RowCenter>
             </Col>
@@ -162,6 +189,8 @@ const PaymentSystem = ({ paymentType, currentOrder }) => {
 };
 export default PaymentSystem;
 export async function getServerSideProps(context: any) {
+  const { locale, req } = context;
+  const getLanguageValue = buildLanguage(locale, req);
   console.log("connected");
   // const id: string = context.query['id'];
   const paymentChoice: string = context.query["paymentChoice"];
@@ -169,6 +198,7 @@ export async function getServerSideProps(context: any) {
     props: {
       paymentType: paymentChoice,
       currentOrder: mockOneOrder,
+      ...(await serverSideTranslations(getLanguageValue, ["common"])),
     },
   };
   // const url = String(`${process.env.BACK_END}/payment/${id}`)

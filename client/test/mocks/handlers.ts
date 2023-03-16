@@ -31,13 +31,14 @@ export const handlers = [
     if (!filter) {
       return res.once(ctx.status(200), ctx.json({ allDataOrders, getListUnpaidOrders }));
     } else {
-      let res: any = allDataOrders.find((item) => item.orderId === filter);
+      let res: any = allDataOrders.find((item) => item._id === filter);
       return res.once(ctx.status(200), ctx.json({ allDataOrders: res, getListUnpaidOrders }));
     }
   }),
 
   rest.get("/api/foods", async (req, res, ctx) => {
-    const response = await req.json();
+    console.log(req);
+    // const response = await req.json();
     return res.once(ctx.status(200), ctx.json({ foodList: mockedFoodData, status: "success" }));
     // const response = await req.json();
     // console.log("rerererer", response.params);

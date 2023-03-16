@@ -3,7 +3,7 @@ import { hexToRgba } from "../functions/global.fn";
 
 const rcBg = 0.2;
 const rcBorder = 0.35;
-const rcHover = 0.5;
+// const rcHover = 0.5;
 const rcNormal = 0.7;
 const rcActive = 1;
 
@@ -42,7 +42,6 @@ export const tokenProvider = {
   borderRadiusXS: 4,
   colorBgContainer: "#ffffff",
   colorBgElevated: "#ffffff",
-  colorBgLayout: "#f5f5f5",
   colorBgMask: "rgba(0, 0, 0, 0.45)", //The background color of the mask,
   //used to cover the content below the mask, Modal, Drawer and other components use this token
   colorBgSpotlight: "rgba(0, 0, 0, 0.85)",
