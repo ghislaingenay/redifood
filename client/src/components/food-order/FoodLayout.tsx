@@ -11,6 +11,7 @@ import { useWindowSize } from "../../hooks/useWindowSIze.hook";
 import { IErrorTableInput } from "../../interfaces";
 import { EFoodMode, IFood } from "../../interfaces/food.interface";
 import { LGCard } from "../../styles";
+import { AnimToTop } from "../../styles/animations/global.anim";
 import { RowCenter } from "../styling/grid.styled";
 import RediRadioButton from "../styling/RediRadioButton";
 import FoodCard from "./FoodCard";
@@ -118,44 +119,46 @@ const FoodLayout = ({ foodList, mode, foodSection, mainTitle, handleOrderCreate,
 
   return (
     <>
-      <Title level={2} aria-label={ariaLabelMainTitle}>
-        {mainTitle}
-      </Title>
-      <Row gutter={[0, 20]} justify="space-between" style={{ width: "100%" }}>
-        <Col md={24} lg={15}>
-          <RediRadioButton
-            fontSize="1rem"
-            padding="0.5rem 0.5rem"
-            disabled={isDisabled}
-            options={getOptions(foodSection) as any}
-            radioGroupName="food"
-            haveIcon="false"
-            selectedButton={selectedSection}
-            setSelectedButton={setSelectedSection}
-            clickedFn={() => changeActiveButton(selectedSection)}
-          />
-          <Row gutter={[5, 10]}>
-            {sortedFoods.map((food, index) => (
-              <Col key={index} sm={12} md={8} lg={8} xl={6}>
-                <FoodCard foodList={foodList} food={food} mode={mode} />
-              </Col>
-            ))}
-          </Row>
-        </Col>
-
-        {isLargeScreen && (
-          <Col md={24} lg={8}>
-            {renderLGCard()}
+      <AnimToTop>
+        <Title level={2} aria-label={ariaLabelMainTitle}>
+          {mainTitle}
+        </Title>
+        <Row gutter={[0, 20]} justify="space-between" style={{ width: "100%" }}>
+          <Col md={24} lg={15}>
+            <RediRadioButton
+              fontSize="1rem"
+              padding="0.5rem 0.5rem"
+              disabled={isDisabled}
+              options={getOptions(foodSection) as any}
+              radioGroupName="food"
+              haveIcon="false"
+              selectedButton={selectedSection}
+              setSelectedButton={setSelectedSection}
+              clickedFn={() => changeActiveButton(selectedSection)}
+            />
+            <Row gutter={[5, 10]}>
+              {sortedFoods.map((food, index) => (
+                <Col key={index} sm={12} md={8} lg={8} xl={6}>
+                  <FoodCard foodList={foodList} food={food} mode={mode} />
+                </Col>
+              ))}
+            </Row>
           </Col>
-        )}
-      </Row>
-      {!isLargeScreen && <RowCenter style={{ marginTop: "1rem" }}>{renderLGCard()}</RowCenter>}
-      <Modal
-        title="Are u sure you want to cancel?"
-        open={cancelOrderModal}
-        onOk={() => router.push("/")}
-        onCancel={() => setCancelOrderModal(!cancelOrderModal)}
-      />
+
+          {isLargeScreen && (
+            <Col md={24} lg={8}>
+              {renderLGCard()}
+            </Col>
+          )}
+        </Row>
+        {!isLargeScreen && <RowCenter style={{ marginTop: "1rem" }}>{renderLGCard()}</RowCenter>}
+        <Modal
+          title="Are u sure you want to cancel?"
+          open={cancelOrderModal}
+          onOk={() => router.push("/")}
+          onCancel={() => setCancelOrderModal(!cancelOrderModal)}
+        />
+      </AnimToTop>
     </>
   );
 };

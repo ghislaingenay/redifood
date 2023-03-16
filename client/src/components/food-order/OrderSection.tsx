@@ -1,14 +1,15 @@
-import { Alert, Divider, InputNumber, Typography } from "antd";
+import { Alert, Divider, InputNumber, Space, Typography } from "antd";
 import { useTranslation } from "next-i18next";
 import { ORANGE, RED } from "../../constants";
 import { useFood } from "../../contexts/food.context";
 import { calculateTotal } from "../../functions/order.fn";
 import useCurrency from "../../hooks/useCurrency.hook";
 import { EButtonType, EFoodMode, IFood } from "../../interfaces";
+import { AnimButton } from "../../styles/animations/styled.anim";
 import { Scroll } from "../../styles/styledComponents/div.styled";
 import { CenteredTitle } from "../../styles/styledComponents/typography.styled";
 import { RediButton } from "../styling/Button.style";
-import { RowCenter, RowCenterSp } from "../styling/grid.styled";
+import { RowCenter } from "../styling/grid.styled";
 import FoodOrderCard from "./FoodOrderCard";
 const { Title } = Typography;
 
@@ -81,26 +82,30 @@ const OrderSection = ({
       <CenteredTitle level={5} style={{ color: RED, visibility: isVisible }}>
         Total: {convertPrice(Number(calculateTotal(foodOrder)), "backToFront", true)}
       </CenteredTitle>
-      <RowCenterSp style={{ marginTop: "1rem" }}>
-        <RediButton
-          buttonType={EButtonType.SUCCESS}
-          shape="round"
-          aria-label="Validate"
-          disabled={isDisabled}
-          onClick={() => handleSubmit(foodOrder)}
-        >
-          <b>{t("buttons.validate")}</b>
-        </RediButton>
+      <RowCenter style={{ marginTop: "1rem" }}>
+        <AnimButton>
+          <Space>
+            <RediButton
+              buttonType={EButtonType.SUCCESS}
+              shape="round"
+              aria-label="Validate"
+              disabled={isDisabled}
+              onClick={() => handleSubmit(foodOrder)}
+            >
+              <b>{t("buttons.validate")}</b>
+            </RediButton>
 
-        <RediButton
-          buttonType={EButtonType.ERROR}
-          shape="round"
-          onClick={() => handleCancel("/")}
-          aria-label="cancel order"
-        >
-          {t("buttons.cancel-order")}
-        </RediButton>
-      </RowCenterSp>
+            <RediButton
+              buttonType={EButtonType.ERROR}
+              shape="round"
+              onClick={() => handleCancel("/")}
+              aria-label="cancel order"
+            >
+              {t("buttons.cancel-order")}
+            </RediButton>
+          </Space>
+        </AnimButton>
+      </RowCenter>
     </>
   );
 };

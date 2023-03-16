@@ -118,11 +118,11 @@ const AllOrdersPage = ({ allOrders, getList, status }: IAllOrdersPageProps) => {
         <meta name="description" content={t("index.head.description") as string} />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Title level={2} aria-label="List of all orders">
-        {t("index.title")}
-      </Title>
       <main>
         <AnimToTop>
+          <Title level={2} aria-label="List of all orders">
+            {t("index.title")}
+          </Title>
           <RowSpaceBetween gutter={10} style={{ marginBottom: "1rem" }}>
             <Col span={12}>
               <RediSelect

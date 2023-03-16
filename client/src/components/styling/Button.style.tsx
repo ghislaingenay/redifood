@@ -4,7 +4,7 @@ import { ButtonProps, Space } from "antd";
 import { BLUE, GREEN_A, GREY, ORANGE, PURPLE, RED } from "../../constants";
 import { EButtonType } from "../../interfaces";
 import { BtnHover } from "../../styles";
-import { AnimButton } from "../../styles/animations/buttons.anim";
+import { AnimButton } from "../../styles/animations/styled.anim";
 
 interface IRediButtonProps extends ButtonProps {
   buttonType: EButtonType;

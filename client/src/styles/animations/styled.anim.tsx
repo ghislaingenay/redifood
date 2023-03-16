@@ -4,6 +4,7 @@ export const AnimButton = ({ children }: any) => {
   return (
     <motion.div
       initial={{ opacity: 0.5, scale: 0.8 }}
+      whileHover={{ scale: 1.03, transition: { duration: 0.1 } }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ ease: "easeOut", duration: 0.4 }}
     >
