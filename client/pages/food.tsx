@@ -1,11 +1,21 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import Head from "next/head";
 import { useEffect } from "react";
 import FoodLayout from "../src/components/food-order/FoodLayout";
 import { useFood } from "../src/contexts/food.context";
-import { EFoodMode } from "../src/interfaces";
+import { EFoodMode, IFood, ServerInfo } from "../src/interfaces";
 import { foodSectionArray, mockedFoodData } from "../test/mocks/mockFoodData";
+import { buildLanguage } from "./api/build-language";
 
-const FoodPage = ({ foodList, foodSection, status }) => {
+interface IFoodProps {
+  foodList: IFood[];
+  foodSection: string[];
+  status: string;
+}
+const FoodPage = ({ foodList, foodSection, status }: IFoodProps) => {
+  const { t } = useTranslation("");
   const { setFoodOrder } = useFood();
 
   useEffect(() => {
@@ -13,21 +23,34 @@ const FoodPage = ({ foodList, foodSection, status }) => {
   }, []);
 
   return (
-    <FoodLayout
-      status={status}
-      foodSection={foodSection}
-      foodList={foodList}
-      mode={EFoodMode.ALTER}
-      mainTitle="FOOD SECTION"
-    />
+    <>
+      <Head>
+        <title>{t("foods.head.title")}</title>
+        <meta name="description" content={t("foods.head.description") as string} />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      <FoodLayout
+        status={status}
+        foodSection={foodSection}
+        foodList={foodList}
+        mode={EFoodMode.ALTER}
+        mainTitle={t("foods.title")}
+      />
+    </>
   );
 };
 
 export default FoodPage;
 
-export async function getServerSideProps() {
+export async function getServerSideProps({ locale, req }: ServerInfo) {
+  const getLanguageValue = buildLanguage(locale, req);
   return {
-    props: { foodList: mockedFoodData, foodSection: foodSectionArray, status: "success" },
+    props: {
+      foodList: mockedFoodData,
+      foodSection: foodSectionArray,
+      status: "success",
+      ...(await serverSideTranslations(getLanguageValue, ["common"])),
+    },
   };
   // await axios
   //   .get("/api/foods", { params: { selectedSection: "all" } })

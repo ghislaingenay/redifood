@@ -1,15 +1,36 @@
 import { Alert, Divider, InputNumber, Typography } from "antd";
+import { useTranslation } from "next-i18next";
 import { ORANGE, RED } from "../../constants";
 import { useFood } from "../../contexts/food.context";
 import { calculateTotal } from "../../functions/order.fn";
-import { EButtonType, EFoodMode } from "../../interfaces";
+import useCurrency from "../../hooks/useCurrency.hook";
+import { EButtonType, EFoodMode, IFood } from "../../interfaces";
 import { Scroll } from "../../styles/styledComponents/div.styled";
 import { CenteredTitle } from "../../styles/styledComponents/typography.styled";
 import { RediButton } from "../styling/Button.style";
 import { RowCenter, RowCenterSp } from "../styling/grid.styled";
 import FoodOrderCard from "./FoodOrderCard";
 const { Title } = Typography;
-const OrderSection = ({ tableNumber, setTableNumber, mode, errorTable, handleSubmit, handleCancel }) => {
+
+interface IOrderSectionProps {
+  tableNumber: number | null;
+  setTableNumber: (value: number | null) => void;
+  mode: EFoodMode;
+  errorTable: { alreadyInDb: boolean; missingValue: boolean };
+  handleSubmit: (foodOrder: IFood[]) => void;
+  handleCancel: (url: string) => void;
+}
+
+const OrderSection = ({
+  tableNumber,
+  setTableNumber,
+  mode,
+  errorTable,
+  handleSubmit,
+  handleCancel,
+}: IOrderSectionProps) => {
+  const { t } = useTranslation("");
+  const { convertPrice } = useCurrency();
   const { foodOrder } = useFood();
   const isCreateMode = mode === EFoodMode.CREATE ? true : false;
   const isVisible = foodOrder.length > 0 ? "visible" : "hidden";
@@ -18,7 +39,9 @@ const OrderSection = ({ tableNumber, setTableNumber, mode, errorTable, handleSub
   return (
     <>
       <RowCenter>
-        <Title level={5}>Table Number:</Title>
+        <Title level={5} aria-label="Table number">
+          {t("orders.table-number")}:
+        </Title>
         <InputNumber
           type="number"
           value={tableNumber}
@@ -36,36 +59,46 @@ const OrderSection = ({ tableNumber, setTableNumber, mode, errorTable, handleSub
           style={{ height: "50%", top: "0.5rem", marginLeft: "1rem" }}
           placeholder="Select a table number"
         />
-        {errorTable.alreadyInDb && <Alert type="error" message="This table number is already allocated" />}
-        {errorTable.missingValue && <Alert type="error" message="Please select a table number" />}
+        {errorTable.alreadyInDb && <Alert type="error" message={t("orders.error-type.allocated-table")} />}
+        {errorTable.missingValue && <Alert type="error" message={t("orders.error-type.missing-table")} />}
       </RowCenter>
       {mode === EFoodMode.EDIT && (
         <RowCenter>
-          <Title level={5}>Order #</Title>
+          <Title style={{ margin: 0 }} level={5} aria-label="Order #">
+            {t("orders.order")} #
+          </Title>
         </RowCenter>
       )}
-      <Divider style={{ border: `0.125rem solid ${ORANGE}` }} />
-      <CenteredTitle level={5}>Order List</CenteredTitle>
+      {mode !== EFoodMode.EDIT && <Divider style={{ border: `0.125rem solid ${ORANGE}` }} />}
+      <CenteredTitle level={5} aria-label="Order List">
+        {t("orders.order-list")}
+      </CenteredTitle>
       <Scroll>
         {foodOrder?.map((food) => (
           <FoodOrderCard key={food.itemId} food={food} />
         ))}
       </Scroll>
       <CenteredTitle level={5} style={{ color: RED, visibility: isVisible }}>
-        Total: {calculateTotal(foodOrder).toFixed(2)} $
+        Total: {convertPrice(Number(calculateTotal(foodOrder)), "backToFront", true)}
       </CenteredTitle>
       <RowCenterSp style={{ marginTop: "1rem" }}>
         <RediButton
           buttonType={EButtonType.SUCCESS}
           shape="round"
+          aria-label="Validate"
           disabled={isDisabled}
           onClick={() => handleSubmit(foodOrder)}
         >
-          <b>Validate</b>
+          <b>{t("buttons.validate")}</b>
         </RediButton>
 
-        <RediButton buttonType={EButtonType.ERROR} shape="round" onClick={() => handleCancel("/")}>
-          Cancel Order
+        <RediButton
+          buttonType={EButtonType.ERROR}
+          shape="round"
+          onClick={() => handleCancel("/")}
+          aria-label="cancel order"
+        >
+          {t("buttons.cancel-order")}
         </RediButton>
       </RowCenterSp>
     </>

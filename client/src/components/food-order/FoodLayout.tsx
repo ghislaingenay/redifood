@@ -17,7 +17,7 @@ import OrderSection from "./OrderSection";
 
 const { Title } = Typography;
 interface IFoodLayoutProps {
-  status: string;
+  status?: string;
   foodList: IFood[];
   mode: EFoodMode;
   handleOrderCreate?: (foodOrder: IFood[]) => any;
@@ -45,7 +45,6 @@ const FoodLayout = ({ foodList, mode, foodSection, mainTitle, handleOrderCreate,
   const [cancelOrderModal, setCancelOrderModal] = useState(false);
 
   const changeActiveButton = (sectionName: string) => {
-    console.log("section", sectionName);
     if (sectionName === "all") {
       return setSortedFoods(foodList);
     }
@@ -56,9 +55,9 @@ const FoodLayout = ({ foodList, mode, foodSection, mainTitle, handleOrderCreate,
   const handleSubmit = (foodOrder: IFood[]) => {
     switch (mode) {
       case EFoodMode.CREATE: {
-        const result = sendErrorTableInput(tableNumberValue, tableTaken);
+        const result = sendErrorTableInput(tableNumberValue as number, tableTaken);
         if (result === noErrorInTable) {
-          handleOrderCreate(foodOrder);
+          if (handleOrderCreate) handleOrderCreate(foodOrder);
         } else {
           setErrorTable(result);
         }
@@ -78,7 +77,7 @@ const FoodLayout = ({ foodList, mode, foodSection, mainTitle, handleOrderCreate,
   };
 
   const loadData = async () => {
-    setStatus(status);
+    setStatus(status as string);
     setCurrentOrder(foodOrder);
   };
   useEffect(() => {
@@ -86,16 +85,21 @@ const FoodLayout = ({ foodList, mode, foodSection, mainTitle, handleOrderCreate,
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const ariaLabelMainTitle =
+    mode === EFoodMode.ALTER ? "FOOD SECTION" : mode === EFoodMode.CREATE ? "CREATE ORDER" : "EDIT ORDER";
+
   return (
     <>
-      <Title level={2}>{mainTitle}</Title>
+      <Title level={2} aria-label={ariaLabelMainTitle}>
+        {mainTitle}
+      </Title>
       <Row gutter={[0, 40]} justify="space-between">
         <Col lg={15}>
           <RediRadioButton
             fontSize="1rem"
             padding="0.5rem 0.5rem"
             disabled={isDisabled}
-            options={getOptions(foodSection)}
+            options={getOptions(foodSection) as any}
             radioGroupName="food"
             haveIcon="false"
             selectedButton={selectedSection}

@@ -144,14 +144,14 @@ export const mockOrderEdit = [
   },
 ];
 
-export const editSuccessProps = {
+export const editSuccessProps: any = {
   foodList: mockedFoodData,
   foodSection: foodSectionArray,
   currentFoodOrder: mockOrderEdit,
   status: "success",
 };
 
-export const foodAlterProps = {
+export const foodAlterProps: any = {
   foodList: mockedFoodData,
   foodSection: foodSectionArray,
   currentFoodOrder: mockOrderEdit,

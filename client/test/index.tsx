@@ -1,6 +1,6 @@
 import { render as baseRender, RenderOptions, RenderResult } from "@testing-library/react";
-import { ComponentType, ReactElement, useState } from "react";
-import AppContext from "../src/contexts/app.context";
+import { ComponentType, ReactElement } from "react";
+import { AppProvider } from "../src/contexts/app.context";
 
 import { AuthContext } from "../src/contexts/auth.context";
 import { FoodProvider } from "../src/contexts/food.context";
@@ -14,7 +14,7 @@ import { FoodProvider } from "../src/contexts/food.context";
  */
 export const AllTheProviders = ({ children }: { children: any }) => {
   // STATE
-  const [status, setStatus] = useState<"success" | "error">("success");
+  // const [status, setStatus] = useState<"success" | "error">("success");
 
   // RECOVER CONTEXT
 
@@ -29,18 +29,11 @@ export const AllTheProviders = ({ children }: { children: any }) => {
   // RENDER
   return (
     <>
-      <AppContext.Provider
-        value={{
-          setStatus: setStatus,
-          state: {
-            status: status,
-          },
-        }}
-      >
+      <AppProvider>
         <FoodProvider>
           <AuthContext.Provider value={userValue}>{children}</AuthContext.Provider>
         </FoodProvider>
-      </AppContext.Provider>
+      </AppProvider>
     </>
   );
 };

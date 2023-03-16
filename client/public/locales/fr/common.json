@@ -1,0 +1,158 @@
+{
+  "buttons": {
+    "pay": "PAYER",
+    "create": "CREER",
+    "edit": "MODIFIER",
+    "validate": "VALIDER",
+    "cancel-order": "ANNULER COMMANDE",
+    "view-order": "VOIR COMMANDE",
+    "delete": "SUPPRIMER",
+    "remove-file": "ENLEVER FICHIER",
+    "clear": "EFFACER",
+    "confirm": "CONFIRMER",
+    "cancel": "ANNULER",
+    "finalize-payment": "TERMINER PAIMENT"
+  },
+
+  "glossary": {
+    "all": "TOUS",
+    "amount": "Montant",
+    "yes": "Oui",
+    "no": "Non",
+    "order": "Commande",
+    "table": "Table",
+    "date": "Date"
+  },
+
+  "index": {
+    "head": {
+      "title": "Liste des commandes",
+      "description": "Voici les différentes commandes"
+    },
+    "title": "Liste des commandes",
+    "orderButton": "Creer une commande"
+  },
+
+  "history": {
+    "head": {
+      "title": "Commandes payées",
+      "description": "Voici l'historique de toutes les différentes commandes payées"
+    },
+    "form-label": {
+      "from": "De",
+      "to": "A"
+    },
+    "order-number": "Commande No."
+  },
+
+  "settings": {
+    "head": {
+      "title": "Paramètres",
+      "description": "Paramètres de la page"
+    },
+    "user-info": "Information concernant l'utilisateur",
+    "global-settings": "Paramètres globaux",
+    "form-label": {
+      "show-image": "Montrer image",
+      "show-image-description": "Montrer la description de l'image",
+      "currency": "Monnaie",
+      "Language": "Language",
+      "vat": "TVA"
+    },
+    "form-values": {
+      "english": "Anglais",
+      "french": "Français"
+    }
+  },
+
+  "auth": {
+    "email": "Email",
+    "signin": "SE CONNECTER",
+    "register": "S'INSCRIRE",
+    "password": "Mot de passe",
+    "confirm-password": "Confirmer le mot de passe",
+    "submit": "Envoyer",
+    "forget-password": "Mot de passe oublié ?"
+  },
+
+  "orders": {
+    "head-create": {
+      "title": "Creer une commande",
+      "description": "vous pouvez creer une commande ici"
+    },
+    "head-edit": {
+      "title": "Modifier une commande",
+      "description": "Tu peux modifier une commande ici"
+    },
+    "head-view": {
+      "title": "Voir commande",
+      "description": "Vous pouvez voir le detail de la commande ici"
+    },
+    "paid": "PAID",
+    "not-paid": "NOT PAID",
+    "summary-table": {
+      "food": "PRODUIT",
+      "quantity": "QTE",
+      "price": "PRIX (ua)",
+      "total": "TOTAL",
+      "tot-before-vat": "Total avant TVA",
+      "vat": "TVA (%)",
+      "total-price": "Prix total"
+    },
+    "table-number": "No. de table",
+    "create-order": "CREER UNE COMMANDE",
+    "edit-order": "MODIFIER UNE COMMANDE",
+    "order": "Commande",
+    "order-list": "List des products",
+    "error-type": {
+      "missing-table": "Veuillez entrer un numero de table",
+      "allocated-table": "Ce numero de table est deja utilise"
+    }
+  },
+
+  "foods": {
+    "head": {
+      "title": "Liste de nourriture",
+      "description": "Presentation de la liste de nourriture"
+    },
+    "title": "PRODUITS",
+    "foodButton": "Creer un produit",
+    "form-label": {
+      "upload-file-placeholder": "Upload un fichier",
+      "drop-file": "Drop un fichier ici ou click pour upload",
+      "name": "Nom",
+      "rules-name": "Un nom est obligatoire",
+      "description": "Description",
+      "rules-description": "Une description est obligatoire",
+      "price": "Prix",
+      "rules-price": "Un price doit être indiqué ",
+      "picture": "Picture",
+      "rules-picture": "A picture is required",
+      "section": "Section",
+      "create-new-section": "Créer une nouvelle section",
+      "add-section": "Ajouter une section",
+      "create-section": "Créer une section",
+      "delete-current-section": "Supprimer une section existante",
+      "delete-section": "Supprimer section",
+      "extra": "Extra",
+      "select": "Selectionnez ...",
+      "add-extra": "Ajouter un extra",
+      "delete-current-extra": "Supprimer un extra existant",
+      "delete-extra": "Supprimer extra",
+      "create-new-extra": "Créer un nouvel extra",
+      "create-extra": "Créer extra"
+    },
+    "alert-no-food": "Veuillez choisir un produit a modifier"
+  },
+
+  "payments": {
+    "head": {
+      "title": "Paiement de la commande",
+      "description": "Paiement par carte ou cash"
+    },
+    "transaction-amount": "Montant de la commande",
+    "given-amount": "Montant donné",
+    "amount-to-give": "Monnaie a rendre",
+    "funds-error": "Pas assez d'argent"
+  }
+}

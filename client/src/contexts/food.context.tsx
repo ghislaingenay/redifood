@@ -14,6 +14,12 @@ interface IFoodContext {
     addToCart: (item: IFood["itemId"], foodList: IFood[]) => void;
     selectFood: (item: IFood["itemId"], foodList: IFood[]) => void;
   };
+  foodPictures: {
+    haveFoodDescription: boolean;
+    setHaveFoodDescription: (val: boolean) => void;
+    haveFoodPicture: boolean;
+    setHaveFoodPicture: (val: boolean) => void;
+  };
 }
 export function useFood() {
   const foodElement = useContext(FoodContext);
@@ -23,8 +29,14 @@ export function useFood() {
   return foodElement as IFoodContext;
 }
 
-export function FoodProvider({ children }) {
+interface IFoodProvider {
+  children: React.ReactNode;
+}
+
+export function FoodProvider({ children }: IFoodProvider) {
   const [foodOrder, setFoodOrder] = useState<IFood[]>([]);
+  const [haveFoodDescription, setHaveFoodDescription] = useState(true);
+  const [haveFoodPicture, setHaveFoodPicture] = useState(true);
 
   const deleteFood = (itemId: IFood["itemId"]) => {
     const updatedOrder = [...foodOrder].filter((food) => food.itemId !== itemId);
@@ -73,7 +85,7 @@ export function FoodProvider({ children }) {
       setFoodOrder(currentOrder);
     } else {
       let newFood = foodList.find((food) => food.itemId === foodId);
-      newFood.itemQuantity = 1;
+      if (newFood) newFood.itemQuantity = 1;
       const currentOrder: any = [...foodOrder];
       currentOrder.push(newFood);
       setFoodOrder(currentOrder);
@@ -89,6 +101,12 @@ export function FoodProvider({ children }) {
       addFood: addFood,
       addToCart: addToCart,
       selectFood: selectFood,
+    },
+    foodPictures: {
+      haveFoodDescription: haveFoodDescription,
+      setHaveFoodDescription: setHaveFoodDescription,
+      haveFoodPicture: haveFoodPicture,
+      setHaveFoodPicture: setHaveFoodPicture,
     },
   };
 

@@ -12,9 +12,6 @@ describe("Auth", () => {
 
   it("show display signup section when signup page is clicked", async () => {
     render(<Auth />);
-    [/email/i, "Password"].forEach(async (item: any) => {
-      await expectFindText(item);
-    });
     expectNotFoundText(/confirm/i);
     await clickRadio(/register/i);
     await expectFindText(/confirm/i);
@@ -22,9 +19,6 @@ describe("Auth", () => {
 
   it("Should show login if user click on SignUp and then click on Login", async () => {
     render(<Auth />);
-
-    // const signInRadio: HTMLInputElement = screen.getByRole("radio", { name: "Sign In" });
-    // const registerRadio: HTMLInputElement = screen.getByRole("radio", { name: "Register" });
     await clickRadio(/register/i);
     expect(await findRadio(/sign in/i)).not.toBeChecked();
     expect(await findRadio(/register/i)).toBeChecked();

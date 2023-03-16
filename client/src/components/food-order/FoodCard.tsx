@@ -12,6 +12,7 @@ interface IFoodCard {
 const FoodCard = ({ food, foodList, mode }: IFoodCard) => {
   const {
     functions: { addToCart, selectFood },
+    foodPictures: { haveFoodDescription, haveFoodPicture },
   } = useFood();
   return (
     <>
@@ -30,19 +31,21 @@ const FoodCard = ({ food, foodList, mode }: IFoodCard) => {
         }}
         role="card"
       >
-        <Image
-          style={{
-            textAlign: "center",
-            marginBottom: "0.5rem",
-            borderRadius: "50%",
-            margin: "0 auto",
-            boxShadow: "0 0 10px 0px rgba(0,0,0,0.2)",
-          }}
-          alt={`Food ${food.itemName}`}
-          src={food.itemPhoto}
-          width={120}
-          height={120}
-        />
+        {haveFoodPicture && (
+          <Image
+            style={{
+              textAlign: "center",
+              marginBottom: "0.5rem",
+              borderRadius: "50%",
+              margin: "0 auto",
+              boxShadow: "0 0 10px 0px rgba(0,0,0,0.2)",
+            }}
+            alt={`Food ${food.itemName}`}
+            src={food.itemPhoto}
+            width={120}
+            height={120}
+          />
+        )}
         <div
           style={{
             fontWeight: "bold",
@@ -54,19 +57,21 @@ const FoodCard = ({ food, foodList, mode }: IFoodCard) => {
         >
           {food.itemName}
         </div>
-        <div
-          style={{
-            height: "2rem",
-            fontSize: "0.75rem",
-            overflow: "clip",
-            marginTop: "0.25rem",
-            alignContent: "center",
-            justifyContent: "center",
-            color: BACKGROUND_COLOR,
-          }}
-        >
-          {food.itemDescription}
-        </div>
+        {haveFoodDescription && (
+          <div
+            style={{
+              height: "2rem",
+              fontSize: "0.75rem",
+              overflow: "clip",
+              marginTop: "0.25rem",
+              alignContent: "center",
+              justifyContent: "center",
+              color: BACKGROUND_COLOR,
+            }}
+          >
+            {food.itemDescription}
+          </div>
+        )}
       </Card>
     </>
   );

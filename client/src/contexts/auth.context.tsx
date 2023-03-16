@@ -1,6 +1,5 @@
 import { Skeleton } from "antd";
 import React, { useContext, useEffect, useState } from "react";
-import { AxiosFunction } from "../../pages/api/axios-request";
 import Auth from "../../src/components/Auth";
 
 // @ts-ignore
@@ -15,25 +14,34 @@ export function useAuth() {
   return userValue;
 }
 
-export function AuthProvider({ children }) {
-  const [currentUser, setCurrentUser] = useState(null);
+interface IAuthProvider {
+  children: React.ReactNode;
+}
+
+export function AuthProvider({ children }: IAuthProvider) {
+  // const [currentUser, setCurrentUser] = useState({ username: "pit" });
+  const [currentUser, setCurrentUser] = useState({ username: "pit" });
   const [spinLoading, setSpinLoading] = useState(true);
 
   useEffect(() => {
-    setSpinLoading(true);
-    new Promise((resolve, reject) => {
-      AxiosFunction({ url: "/api/auth/currentuser", method: "get", body: {}, params: {} })
-        .then((res) => {
-          setCurrentUser(res.data.currentUser);
-          setSpinLoading(true);
-          resolve(res);
-        })
-        .catch((err) => {
-          setCurrentUser(null);
-          setSpinLoading(false);
-          reject(err);
-        });
-    });
+    // setSpinLoading(true);
+    // setTimeout(() => {
+    setCurrentUser({ username: "pit" });
+    setSpinLoading(false);
+    // }, 1000);
+    // new Promise((resolve, reject) => {
+    //   AxiosFunction({ url: "/api/auth/currentuser", method: "get", body: {}, queryParams: {} })
+    //     .then((res) => {
+    //       setCurrentUser(res.data.currentUser);
+    //       setSpinLoading(true);
+    //       resolve(res);
+    //     })
+    //     .catch((err) => {
+    //       setCurrentUser(null);
+    //       setSpinLoading(false);
+    //       reject(err);
+    //     });
+    // });
   }, [currentUser]);
 
   if (spinLoading) {

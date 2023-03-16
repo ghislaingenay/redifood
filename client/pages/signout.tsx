@@ -1,7 +1,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { NotificationRes } from "../../../../src/definitions/notification.class";
-import { AxiosFunction } from "./pages/api/axios.function";
+import { NotificationRes } from "../src/definitions/notification.class";
+import { AxiosFunction } from "./api/axios-request";
 
 const SignOut = () => {
   const router = useRouter();
@@ -11,7 +11,7 @@ const SignOut = () => {
       url: "/api/auth/signout",
       method: "post",
       body: {},
-      params: {},
+      queryParams: {},
     })
       .then(() => {
         console.log("success");

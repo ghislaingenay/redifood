@@ -1,3 +1,5 @@
+import { ECurrency } from "../interfaces";
+
 // function that convert hex to rgb
 const hexToRgb = (hex: string) => {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -14,9 +16,7 @@ const rgbToRgba = (rgb: { r: number; g: number; b: number }, opacity: number) =>
   return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${opacity})`;
 };
 
-export const hexToRgba = (hex: string, opacity: number) => {
-  return rgbToRgba(hexToRgb(hex), opacity);
-};
+export const hexToRgba = (hex: string, opacity: number) => rgbToRgba(hexToRgb(hex)!, opacity);
 
 export const checkDigit = (value: string) => /\d/.test(value);
 export const checkLength = (value: string) => (value.length >= 8 && value.length <= 20 ? true : false);
@@ -31,11 +31,34 @@ export const capitalize = (value: string) => {
 };
 
 export const getOptions = (array: string[]) => {
-  const newArray = array.map((item) => {
-    return {
+  const newArray = [];
+  for (let i = 0; i < array.length; i++) {
+    const item = array[i];
+    newArray.push({
       value: item,
       label: capitalize(item),
-    };
-  });
+    });
+  }
   return newArray;
 };
+export const convertStringToEnumCurrency = (str: string): ECurrency => {
+  if (!Object.values(ECurrency).includes(str as ECurrency)) {
+    localStorage.setItem("currency", ECurrency.USD);
+    return ECurrency.USD;
+  }
+  switch (str) {
+    case "USD": {
+      return ECurrency.USD;
+    }
+
+    case "EUR": {
+      return ECurrency.EUR;
+    }
+
+    default: {
+      return ECurrency.USD;
+    }
+  }
+};
+
+export const storeCurrency = () => convertStringToEnumCurrency(localStorage.getItem("currency") || ECurrency.USD);

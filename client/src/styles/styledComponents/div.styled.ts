@@ -1,3 +1,4 @@
+import { Divider } from "antd";
 import styled from "styled-components";
 import { GREY, ORANGE_DARK, RED } from "../../../src/constants/colors.const";
 
@@ -45,4 +46,13 @@ export const Scroll = styled.div`
   height: 60vh;
   overflow-y: scroll;
   scrollbar-color: gray rgb(105, 105, 105);
+`;
+
+export const RediDivider = styled(Divider)`
+  margin: 2rem 0;
+  border: 0.01rem solid ${GREY};
+`;
+export const NoSpacingDivider = styled(Divider)`
+  margin: 0.5rem 0;
+  padding: 0;
 `;

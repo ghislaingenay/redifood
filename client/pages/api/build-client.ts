@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const buildClient = ({ req }) => {
+const buildClient = ({ req }: { req: any }) => {
   if (typeof window === "undefined") {
     // We are on the server
 

@@ -1,0 +1,158 @@
+{
+  "buttons": {
+    "pay": "PAY",
+    "create": "CREATE",
+    "edit": "EDIT",
+    "validate": "VALIDATE",
+    "cancel-order": "CANCEL ORDER",
+    "view-order": "VIEW ORDER",
+    "delete": "DELETE",
+    "remove-file": "REMOVE FILE",
+    "clear": "CLEAR",
+    "confirm": "CONFIRM",
+    "cancel": "CANCEL",
+    "finalize-payment": "FINALIZE PAYMENT"
+  },
+
+  "glossary": {
+    "all": "ALL",
+    "amount": "Amount",
+    "yes": "Yes",
+    "no": "No",
+    "order": "Order",
+    "table": "Table",
+    "date": "Date"
+  },
+
+  "index": {
+    "head": {
+      "title": "List of all orders",
+      "description": "Show the current orders"
+    },
+    "title": "List of all orders",
+    "orderButton": "Create order"
+  },
+
+  "history": {
+    "head": {
+      "title": "Paid orders",
+      "description": "Here are the paid orders history"
+    },
+    "form-label": {
+      "from": "From",
+      "to": "To"
+    },
+    "order-number": "Order number"
+  },
+
+  "settings": {
+    "head": {
+      "title": "Settings",
+      "description": "Settings page"
+    },
+    "user-info": "User information",
+    "global-settings": "Global settings",
+    "form-label": {
+      "show-image": "Show image",
+      "show-image-description": "Show image description",
+      "currency": "Currency",
+      "Language": "Language",
+      "vat": "VAT"
+    },
+    "form-values": {
+      "english": "English",
+      "french": "French"
+    }
+  },
+
+  "auth": {
+    "email": "Email",
+    "signin": "SIGN IN",
+    "register": "REGISTER",
+    "password": "Password",
+    "confirm-password": "Confirm password",
+    "submit": "Submit",
+    "forget-password": "Forget password ?"
+  },
+
+  "orders": {
+    "head-create": {
+      "title": "Create order",
+      "description": "You can create an order here"
+    },
+    "head-edit": {
+      "title": "Edit order",
+      "description": "You can edit an order here"
+    },
+    "head-view": {
+      "title": "View order",
+      "description": "You can view an order here"
+    },
+    "paid": "PAID",
+    "not-paid": "NOT PAID",
+    "summary-table": {
+      "food": "FOOD",
+      "quantity": "QTY",
+      "price": "PRICE (ua)",
+      "total": "TOTAL",
+      "tot-before-vat": "Total before VAT",
+      "vat": "VAT (%)",
+      "total-price": "Total for payment"
+    },
+    "table-number": "Table number",
+    "create-order": "CREATE ORDER",
+    "edit-order": "EDIT ORDER",
+    "order": "Order",
+    "order-list": "Products list",
+    "error-type": {
+      "missing-table": "Please select a table number",
+      "allocated-table": "This table number is already allocated"
+    }
+  },
+
+  "foods": {
+    "head": {
+      "title": "List of all foods",
+      "description": "Show the current foods"
+    },
+    "title": "FOOD SECTION",
+    "foodButton": "Create food",
+    "form-label": {
+      "upload-file-placeholder": "Upload file",
+      "drop-file": "Drop file here or click to upload",
+      "name": "Name",
+      "rules-name": "A name is required",
+      "description": "Description",
+      "rules-description": "A description is required",
+      "price": "Price",
+      "rules-price": "A price is required",
+      "picture": "Picture",
+      "rules-picture": "A picture is required",
+      "section": "Section",
+      "create-new-section": "Create a new section",
+      "add-section": "Add section",
+      "create-section": "Create section",
+      "delete-current-section": "Delete a existing section",
+      "delete-section": "Delete section",
+      "extra": "Extra",
+      "select": "Select ...",
+      "add-extra": "Add extra",
+      "delete-current-extra": "Delete a existing extra",
+      "delete-extra": "Delete extra",
+      "create-new-extra": "Create a new extra",
+      "create-extra": "Create extra"
+    },
+    "alert-no-food": "please select a food to update"
+  },
+
+  "payments": {
+    "head": {
+      "title": "Order payment",
+      "description": "Payment by cash or credit card"
+    },
+    "transaction-amount": "Transaction Amount",
+    "given-amount": "Given amount",
+    "amount-to-give": "Amount to give",
+    "funds-error": "Not enough funds"
+  }
+}

@@ -1,6 +1,10 @@
 import { Col } from "antd";
+import { useTranslation } from "next-i18next";
+import { useContext } from "react";
 import { BACKGROUND_COLOR, GREY, ORANGE_DARK } from "../../constants";
+import AppContext from "../../contexts/app.context";
 import { hexToRgba } from "../../functions/global.fn";
+import useCurrency from "../../hooks/useCurrency.hook";
 import { IFood, IOrder } from "../../interfaces";
 import { CenteredP, CenteredTitle } from "../../styles";
 import { RowSpaceAround } from "../styling/grid.styled";
@@ -13,15 +17,23 @@ interface ISummaryTable {
   lSize?: number;
 }
 
-const noMP = { margin: 0, padding: 0 };
-
-const headerColumns = ["FOOD", "QTY", "PRICE (ua)", "TOTAL"];
-
 const SummaryTable = ({ order, xSize, sSize, mSize, lSize }: ISummaryTable) => {
+  const noMP = { margin: 0, padding: 0 };
+  const { t } = useTranslation("");
+  const {
+    state: { vat },
+  } = useContext(AppContext);
+  const { convertPrice } = useCurrency();
   const lgValue = lSize || 5;
   const mdValue = mSize || 5;
   const sValue = sSize || 5;
   const xsValue = xSize || 5;
+  const headerColumns = [
+    { key: t("orders.summary-table.food"), label: "FOOD" },
+    { key: t("orders.summary-table.quantity"), label: "QTY" },
+    { key: t("orders.summary-table.price"), label: "PRICE" },
+    { key: t("orders.summary-table.total"), label: "TOTAL" },
+  ];
   const { orderItems, orderTotal } = order;
   const sizeProps = { lg: lgValue, xs: xsValue, sm: sValue, md: mdValue };
   return (
@@ -31,11 +43,11 @@ const SummaryTable = ({ order, xSize, sSize, mSize, lSize }: ISummaryTable) => {
           role="rowheader"
           style={{ ...noMP, backgroundColor: hexToRgba(BACKGROUND_COLOR, 1), color: "white" }}
         >
-          {headerColumns.map((item: string, index: number) => {
+          {headerColumns.map(({ key, label }, index: number) => {
             return (
               <Col {...sizeProps} key={index} role="columnheader">
-                <CenteredTitle style={{ ...noMP, color: "white" }} level={5}>
-                  {item}
+                <CenteredTitle style={{ ...noMP, color: "white" }} level={5} aria-label={label}>
+                  {key}
                 </CenteredTitle>
               </Col>
             );
@@ -58,10 +70,10 @@ const SummaryTable = ({ order, xSize, sSize, mSize, lSize }: ISummaryTable) => {
                 <CenteredP>{food.itemQuantity}</CenteredP>
               </Col>
               <Col {...sizeProps} role="gridcell">
-                <CenteredP>{food.itemPrice}</CenteredP>
+                <CenteredP>{convertPrice(food.itemPrice, "backToFront", false)}</CenteredP>
               </Col>
               <Col {...sizeProps} role="gridcell">
-                <CenteredP>{(food.itemPrice * food.itemQuantity).toFixed(2)}</CenteredP>
+                <CenteredP>{convertPrice(food.itemPrice * food.itemQuantity, "backToFront", false)}</CenteredP>
               </Col>
             </RowSpaceAround>
           );
@@ -70,30 +82,30 @@ const SummaryTable = ({ order, xSize, sSize, mSize, lSize }: ISummaryTable) => {
           <Col {...sizeProps} role="gridcell"></Col>
           <Col {...sizeProps} role="gridcell"></Col>
           <Col {...sizeProps} role="gridcell">
-            <CenteredP>Total before VAT</CenteredP>
+            <CenteredP aria-label="Total before VAT">{t("orders.summary-table.tot-before-vat")}</CenteredP>
           </Col>
           <Col {...sizeProps} role="gridcell">
-            <CenteredP>{orderTotal.toFixed(2)}$</CenteredP>
+            <CenteredP>{convertPrice(orderTotal, "backToFront", true)}</CenteredP>
           </Col>
         </RowSpaceAround>
         <RowSpaceAround role="row" style={{ backgroundColor: hexToRgba(BACKGROUND_COLOR, 0.5) }}>
           <Col {...sizeProps} role="gridcell"></Col>
           <Col {...sizeProps} role="gridcell"></Col>
           <Col {...sizeProps} role="gridcell">
-            <CenteredP>VAT(%)</CenteredP>
+            <CenteredP aria-label="VAT (%)">{t("orders.summary-table.vat")}</CenteredP>
           </Col>
           <Col {...sizeProps} role="gridcell">
-            <CenteredP>7</CenteredP>
+            <CenteredP>{vat}</CenteredP>
           </Col>
         </RowSpaceAround>
         <RowSpaceAround role="row" style={{ backgroundColor: hexToRgba(BACKGROUND_COLOR, 1), color: "white" }}>
           <Col {...sizeProps} role="gridcell"></Col>
           <Col {...sizeProps} role="gridcell"></Col>
           <Col {...sizeProps} role="gridcell">
-            <CenteredP>Total for payment</CenteredP>
+            <CenteredP aria-label="Total for payment">{t("orders.summary-table.total-price")}</CenteredP>
           </Col>
           <Col {...sizeProps} role="gridcell">
-            <CenteredP>{(orderTotal * 1.07).toFixed(2)}$</CenteredP>
+            <CenteredP>{convertPrice(orderTotal * (1 + vat / 100), "backToFront", true)}</CenteredP>
           </Col>
         </RowSpaceAround>
       </div>
