@@ -1,5 +1,5 @@
 import { ButtonProps, Col } from "antd";
-import { Dispatch, SetStateAction, useMemo } from "react";
+import { Dispatch, SetStateAction, useEffect, useMemo } from "react";
 import { BACKGROUND_COLOR, LIGHT_GREY, ORANGE_DARK, ORANGE_LIGHT } from "../../constants";
 import { hexToRgba } from "../../functions/global.fn";
 import { RadioButton } from "../../styles";
@@ -9,11 +9,13 @@ import { RowSpaceAround } from "./grid.styled";
 interface IRediRadio {
   value: string;
   label: string;
+  ariaLabel: string;
 }
 interface IRediRadioWithIcon extends IRediRadio {
   value: string;
   label: string;
   icon: JSX.Element;
+  ariaLabel: string;
 }
 export type TRadioIconType = keyof TIconDataMap;
 
@@ -87,9 +89,11 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
     };
   };
 
+  useEffect(() => {}, [selectedButton]);
+
   return (
     <RowSpaceAround>
-      {options.map(({ label, value, icon }: any, index) => (
+      {options.map(({ label, value, icon, ariaLabel }: any, index: number) => (
         <>
           <Col
             xs={24}
@@ -104,15 +108,14 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
                 return setSelectedButton(selectedValue);
               }
               if (clickedFn) clickedFn();
-              console.log("target", target.value);
 
               return setSelectedButton(target.value as any);
             }}
           >
             <RadioButton
+              aria-label={ariaLabel}
               style={{ ...colorStyle(value) }}
               role="radio"
-              aria-label={label}
               name={radioGroupName}
               value={value}
               aria-checked={isSelected(value)}

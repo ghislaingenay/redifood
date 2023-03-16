@@ -47,7 +47,6 @@ const FoodLayout = ({ foodList, mode, foodSection, mainTitle, handleOrderCreate,
   const [cancelOrderModal, setCancelOrderModal] = useState(false);
 
   const changeActiveButton = (sectionName: string) => {
-    console.log("section", sectionName);
     if (sectionName === "all") {
       return setSortedFoods(foodList);
     }
@@ -88,9 +87,14 @@ const FoodLayout = ({ foodList, mode, foodSection, mainTitle, handleOrderCreate,
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const ariaLabelMainTitle =
+    mode === EFoodMode.ALTER ? "FOOD SECTION" : mode === EFoodMode.CREATE ? "CREATE ORDER" : "EDIT ORDER";
+
   return (
     <>
-      <Title level={2}>{mainTitle}</Title>
+      <Title level={2} aria-label={ariaLabelMainTitle}>
+        {mainTitle}
+      </Title>
       <Row gutter={[0, 40]} justify="space-between">
         <Col lg={15}>
           <RediRadioButton

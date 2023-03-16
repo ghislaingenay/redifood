@@ -15,6 +15,7 @@ export function useAuth() {
 }
 
 export function AuthProvider({ children }) {
+  // const [currentUser, setCurrentUser] = useState({ username: "pit" });
   const [currentUser, setCurrentUser] = useState({ username: "pit" });
   const [spinLoading, setSpinLoading] = useState(true);
 

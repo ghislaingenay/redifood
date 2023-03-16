@@ -14,18 +14,6 @@ describe("Order - Unit Testing", () => {
     expect(true).toBe(true);
   });
 
-  it("should find a order # heading", () => {
-    const { getByText } = render(<CurrentOrder {...successPropsOrderId} />);
-    expect(getByText("Order #")).toBeInTheDocument();
-  });
-
-  // put all the text that is planned here
-  it("Should display the information regarding the order", () => {
-    render(<CurrentOrder {...successPropsOrderId} />);
-    [/order #/i, /date/i, /table/i].forEach(async (text: any) => {
-      expect(await findText(text)).toBeInTheDocument();
-    });
-  });
   it("should have a table with 6 rows (head + 2 food + total + taxes + total after taxes", async () => {
     render(<CurrentOrder {...successPropsOrderId} />);
     expect(await screen.findAllByRole("row")).toHaveLength(5);
@@ -81,7 +69,7 @@ describe("Order - Paid Order", () => {
   });
   it("should contains the order info", async () => {
     render(<CurrentOrder {...paidOrderProps} />);
-    [/order #/i, /date/i, /table/i].forEach(async (text: any) => {
+    [/order #/i, /date/i, /table number/i].forEach(async (text: any) => {
       expect(await findText(text)).toBeInTheDocument();
     });
   });

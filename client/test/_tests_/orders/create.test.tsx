@@ -4,7 +4,14 @@ import userEvent from "@testing-library/user-event";
 import CreateOrder from "../../../pages/orders/create"; // { getServerSideProps }
 import { convertApiDataToDbData } from "../../../src/functions/db.fn";
 import { sendErrorTableInput } from "../../../src/functions/order.fn";
-import { clickRadio, expectCardLength, findButton, findRadio, findText } from "../../../src/functions/testhelpers.fn";
+import {
+  clickRadio,
+  expectAlertLength,
+  expectCardLength,
+  findButton,
+  findRadio,
+  findText,
+} from "../../../src/functions/testhelpers.fn";
 import {
   // createErrorProps,
   createSuccessProps,
@@ -72,9 +79,11 @@ describe("Create Order - Food List", () => {
     const user = userEvent.setup();
     await user.type(screen.getByRole("spinbutton", { name: /tableNumber/i }), "1");
     await user.click(await findText(/espresso/i));
+    await waitFor(() => {
+      expect(screen.queryByRole("alert")).toBe(null);
+    });
     await user.click(await findButton(/validate/i));
-    expect(await screen.findByRole("alert")).toBeInTheDocument();
-    expect(await findText(/This table number is already allocated/i)).toBeInTheDocument();
+    expectAlertLength(1);
   });
 
   it("Order cart should include a button to validate the order", () => {

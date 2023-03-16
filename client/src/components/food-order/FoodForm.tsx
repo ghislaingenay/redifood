@@ -77,8 +77,8 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
   const [handleType, setHandleType] = useState<EHandleType>(EHandleType.NONE);
 
   const foodRadioOptions = [
-    { label: t("buttons.edit"), value: "true", icon: <FontAwesomeIcon icon={faFilePen} /> },
-    { label: t("buttons.create"), value: "false", icon: <FontAwesomeIcon icon={faSquarePlus} /> },
+    { label: t("buttons.edit"), value: "true", icon: <FontAwesomeIcon icon={faFilePen} />, ariaLabel: "EDIT" },
+    { label: t("buttons.create"), value: "false", icon: <FontAwesomeIcon icon={faSquarePlus} />, ariaLabel: "CREATE" },
   ];
 
   const [sortedFood, setSortedFood] = useState<Record<string, string[]>>({});
@@ -279,6 +279,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
             type="warning"
             style={{ fontWeight: 700, height: "80vh", textAlign: "center", fontSize: "1rem", marginTop: "1.5rem" }}
             message={t("foods.alert-no-food")}
+            aria-label="Please select a food to update"
           />
         </Case>
         <Default>
@@ -290,6 +291,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                   {...getRootProps()}
                 >
                   <input
+                    aria-label="Drop a file here"
                     name="file"
                     placeholder={t('foods.form-label."upload-file-placeholder"')}
                     type="file"
@@ -316,6 +318,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                 <RediIconButton
                   iconFt={faXmark}
                   buttonType={EButtonType.ERROR}
+                  aria-label="Remove file"
                   onClick={() => {
                     setFiles([]);
                     form.setFieldValue("itemPhoto", "");
@@ -369,7 +372,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                 style={{ borderRadius: "2rem" }}
                 // options={getOptions(foodSection).push({ label: "Add Section", value: "addSection" })}
                 onChange={() => {
-                  form.setFieldValue("itemExtra", "none");
+                  form.setFieldValue("itemExtra", EHandleType.NONE);
                 }}
               >
                 <Option value={EHandleType.NONE}>{t("foods.form-label.select")}</Option>
@@ -393,7 +396,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                       disabled={inputSection === "" ? true : false}
                       onClick={() => {
                         // ViewSectionModel
-                        form.setFieldValue("itemSection", "none");
+                        form.setFieldValue("itemSection", EHandleType.NONE);
                         setHandleType(EHandleType.ADDSECTION);
                         setInputSection("");
                         console.log("new section clicked", inputSection);
@@ -417,6 +420,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                       ))}
                     </Select>
                     <RediButton
+                      aria-label="Delete section"
                       buttonType={EButtonType.ERROR}
                       style={{ marginTop: "0.5rem" }}
                       disabled={delSection === "" || delSection === "all" ? true : false}
@@ -482,6 +486,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                         ))}
                       </Select>
                       <RediButton
+                        aria-label="Delete extra"
                         buttonType={EButtonType.ERROR}
                         disabled={delExtra === "" ? true : false}
                         onClick={() => {

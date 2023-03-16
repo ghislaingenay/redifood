@@ -22,7 +22,9 @@ const OrderSection = ({ tableNumber, setTableNumber, mode, errorTable, handleSub
   return (
     <>
       <RowCenter>
-        <Title level={5}>{t("orders.table-number")}:</Title>
+        <Title level={5} aria-label="Table number">
+          {t("orders.table-number")}:
+        </Title>
         <InputNumber
           type="number"
           value={tableNumber}
@@ -45,13 +47,15 @@ const OrderSection = ({ tableNumber, setTableNumber, mode, errorTable, handleSub
       </RowCenter>
       {mode === EFoodMode.EDIT && (
         <RowCenter>
-          <Title style={{ margin: 0 }} level={5}>
+          <Title style={{ margin: 0 }} level={5} aria-label="Order #">
             {t("orders.order")} #
           </Title>
         </RowCenter>
       )}
       {mode !== EFoodMode.EDIT && <Divider style={{ border: `0.125rem solid ${ORANGE}` }} />}
-      <CenteredTitle level={5}>{t("orders.order-list")}</CenteredTitle>
+      <CenteredTitle level={5} aria-label="Order List">
+        {t("orders.order-list")}
+      </CenteredTitle>
       <Scroll>
         {foodOrder?.map((food) => (
           <FoodOrderCard key={food.itemId} food={food} />
@@ -64,13 +68,19 @@ const OrderSection = ({ tableNumber, setTableNumber, mode, errorTable, handleSub
         <RediButton
           buttonType={EButtonType.SUCCESS}
           shape="round"
+          aria-label="Validate"
           disabled={isDisabled}
           onClick={() => handleSubmit(foodOrder)}
         >
           <b>{t("buttons.validate")}</b>
         </RediButton>
 
-        <RediButton buttonType={EButtonType.ERROR} shape="round" onClick={() => handleCancel("/")}>
+        <RediButton
+          buttonType={EButtonType.ERROR}
+          shape="round"
+          onClick={() => handleCancel("/")}
+          aria-label="cancel order"
+        >
           {t("buttons.cancel-order")}
         </RediButton>
       </RowCenterSp>

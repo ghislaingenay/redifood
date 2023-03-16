@@ -28,8 +28,18 @@ const Auth = () => {
   // ------------ STATE ---------
   const { t } = useTranslation("");
   const options = [
-    { value: EAuthChoice.SIGNIN, label: t("auth.signin"), icon: <FontAwesomeIcon icon={faSign} /> },
-    { value: EAuthChoice.REGISTER, label: t("auth.register"), icon: <FontAwesomeIcon icon={faRegistered} /> },
+    {
+      value: EAuthChoice.SIGNIN,
+      label: t("auth.signin"),
+      icon: <FontAwesomeIcon icon={faSign} />,
+      ariaLabel: "sign in",
+    },
+    {
+      value: EAuthChoice.REGISTER,
+      label: t("auth.register"),
+      icon: <FontAwesomeIcon icon={faRegistered} />,
+      ariaLabel: "register",
+    },
   ];
   const [selectedOption, setSelectedOption] = useState(options[0].value);
 
@@ -185,7 +195,7 @@ const Auth = () => {
                       </RediButton>
                     </Col>
                     <Col span={6}>
-                      <Button loading={clicked} type="link">
+                      <Button loading={clicked} type="link" aria-label="Forgot password">
                         {t("auth.forget-password")}
                       </Button>
                     </Col>
@@ -252,7 +262,12 @@ const Auth = () => {
                       </Form.Item>
                     </Col>
                   </RowSpaceBetween>
-                  <RediButton buttonType={EButtonType.SUCCESS} onClick={() => formSignUp.submit()} loading={clicked}>
+                  <RediButton
+                    aria-label="Submit"
+                    buttonType={EButtonType.SUCCESS}
+                    onClick={() => formSignUp.submit()}
+                    loading={clicked}
+                  >
                     Submit
                   </RediButton>
                 </Form>

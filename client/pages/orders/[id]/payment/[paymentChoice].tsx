@@ -2,10 +2,11 @@ import { faBan, faCartShopping } from "@fortawesome/free-solid-svg-icons";
 import { Alert, Col } from "antd";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useCallback, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { Else, If, Then } from "react-if";
 import { RediButton, RediIconButton } from "../../../../src/components/styling/Button.style";
 import { RowCenter, RowCenterSp, RowSpaceAround } from "../../../../src/components/styling/grid.styled";
+import AppContext from "../../../../src/contexts/app.context";
 import useCurrency from "../../../../src/hooks/useCurrency.hook";
 import { EButtonType, EPaymentType } from "../../../../src/interfaces";
 import { CenteredLabel, LGCard, LRoundedInput } from "../../../../src/styles";
@@ -16,6 +17,9 @@ type TStrNull = string | null;
 
 const PaymentSystem = ({ paymentType, currentOrder }) => {
   const { t } = useTranslation();
+  const {
+    state: { vat },
+  } = useContext(AppContext);
   const { convertPrice, displayCurrency, convertAmount } = useCurrency();
   const { orderTotal } = currentOrder;
   console.log(orderTotal);
@@ -42,8 +46,10 @@ const PaymentSystem = ({ paymentType, currentOrder }) => {
     return true;
   };
 
-  const diffAmount = Number(selectedAmount) - orderTotal;
-  const amountToGive = diffAmount === orderTotal || diffAmount < 0 ? 0 : diffAmount;
+  const totalAmount = orderTotal * (1 + vat / 100);
+
+  const diffAmount = Number(selectedAmount) - totalAmount;
+  const amountToGive = diffAmount === totalAmount || diffAmount < 0 ? 0 : diffAmount;
   const isDisabled = selectedAmount && selectedAmount >= orderTotal && diffAmount > 0 ? false : true;
   const confirmDisabled =
     selectAmount === "" || selectAmount === "." || !havePoint(selectAmount) || !haveValueSeparated(selectAmount)
@@ -108,6 +114,7 @@ const PaymentSystem = ({ paymentType, currentOrder }) => {
                     <RediIconButton
                       buttonType={EButtonType.ERROR}
                       iconFt={faBan}
+                      aria-label="Clear"
                       disabled={clearDisabled}
                       onClick={() => setSelectAmount("")}
                     >
@@ -119,18 +126,18 @@ const PaymentSystem = ({ paymentType, currentOrder }) => {
             </Col>
             <Col span={11}>
               <RowCenter>
-                <CenteredLabel htmlFor="transactionAmount">
+                <CenteredLabel htmlFor="transactionAmount" aria-label="transaction amount">
                   {t("payments.transaction-amount")} ({displayCurrency()})
                 </CenteredLabel>
                 <LRoundedInput
                   readOnly={true}
                   aria-label="transactionAmount"
                   id="transactionAmount"
-                  value={convertPrice(currentOrder.orderTotal, "backToFront", false)}
+                  value={convertPrice(totalAmount, "backToFront", false)}
                 />
               </RowCenter>
               <RowCenter>
-                <CenteredLabel htmlFor="selected amount">
+                <CenteredLabel htmlFor="selected amount" aria-label="given amount">
                   {t("payments.given-amount")} ({displayCurrency()})
                 </CenteredLabel>
                 <LRoundedInput
@@ -141,7 +148,7 @@ const PaymentSystem = ({ paymentType, currentOrder }) => {
                 />
               </RowCenter>
               <RowCenter>
-                <CenteredLabel htmlFor="render">
+                <CenteredLabel htmlFor="render" aria-label="amount to give">
                   {t("payments.amount-to-give")} ({displayCurrency()})
                 </CenteredLabel>
                 <LRoundedInput readOnly={true} aria-label="render" id="render" value={convertAmount(amountToGive)} />
@@ -150,7 +157,12 @@ const PaymentSystem = ({ paymentType, currentOrder }) => {
                 {isDisabled && selectedAmount !== "" && (
                   <Alert type="error" style={{ margin: "1rem 2rem" }} message={t("payments.funds-error")} />
                 )}
-                <RediIconButton iconFt={faCartShopping} buttonType={EButtonType.SUCCESS} disabled={isDisabled}>
+                <RediIconButton
+                  iconFt={faCartShopping}
+                  aria-label="finalize payment"
+                  buttonType={EButtonType.SUCCESS}
+                  disabled={isDisabled}
+                >
                   {" "}
                   {t("buttons.finalize-payment")}
                 </RediIconButton>

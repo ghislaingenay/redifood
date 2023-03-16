@@ -36,7 +36,7 @@ const CreateOrder = ({ foodList, foodSection, status }) => {
         <meta name="description" content={t("orders.head-create.description")} />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <body>
+      <main>
         <FoodLayout
           status={status}
           foodSection={foodSection}
@@ -45,7 +45,7 @@ const CreateOrder = ({ foodList, foodSection, status }) => {
           mainTitle={t("orders.create-order")}
           handleOrderCreate={handleOrderCreate}
         />
-      </body>
+      </main>
     </>
   );
 };
