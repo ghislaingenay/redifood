@@ -13,7 +13,7 @@ const useLanguage = (language: ELanguage) => {
   const retrieveCookie = () => {
     const cookieInfo = Cookies.get("lang");
     if (cookieInfo) {
-      return decodeCookie(Cookies.get("lang"));
+      return decodeCookie(Cookies.get("lang") as ELanguage);
     }
     setCookie();
     return ELanguage.ENGLISH;

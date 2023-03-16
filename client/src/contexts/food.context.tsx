@@ -29,7 +29,11 @@ export function useFood() {
   return foodElement as IFoodContext;
 }
 
-export function FoodProvider({ children }) {
+interface IFoodProvider {
+  children: React.ReactNode;
+}
+
+export function FoodProvider({ children }: IFoodProvider) {
   const [foodOrder, setFoodOrder] = useState<IFood[]>([]);
   const [haveFoodDescription, setHaveFoodDescription] = useState(true);
   const [haveFoodPicture, setHaveFoodPicture] = useState(true);
@@ -81,7 +85,7 @@ export function FoodProvider({ children }) {
       setFoodOrder(currentOrder);
     } else {
       let newFood = foodList.find((food) => food.itemId === foodId);
-      newFood.itemQuantity = 1;
+      if (newFood) newFood.itemQuantity = 1;
       const currentOrder: any = [...foodOrder];
       currentOrder.push(newFood);
       setFoodOrder(currentOrder);

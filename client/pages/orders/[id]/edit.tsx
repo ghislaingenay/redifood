@@ -5,11 +5,18 @@ import { useEffect } from "react";
 import FoodLayout from "../../../src/components/food-order/FoodLayout";
 import { useFood } from "../../../src/contexts/food.context";
 import { NotificationRes } from "../../../src/definitions/notification.class";
-import { EFoodMode, IFood } from "../../../src/interfaces";
+import { EFoodMode, IFood, ServerInfo } from "../../../src/interfaces";
 import { foodSectionArray, mockedFoodData, mockOrderEdit } from "../../../test/mocks/mockFoodData";
 import { buildLanguage } from "../../api/build-language";
 
-const EditOrder = ({ foodList, currentFoodOrder, foodSection, status }) => {
+interface IEditOrderProps {
+  foodList: IFood[];
+  currentFoodOrder: IFood[];
+  foodSection: string[];
+  status: string;
+}
+
+const EditOrder = ({ foodList, currentFoodOrder, foodSection, status }: IEditOrderProps) => {
   const { setFoodOrder } = useFood();
   const { t } = useTranslation("");
   const editOrder = (foodOrder: IFood[]) => {
@@ -33,7 +40,7 @@ const EditOrder = ({ foodList, currentFoodOrder, foodSection, status }) => {
     <>
       <Head>
         <title>{t("orders.head-edit.title")}</title>
-        <meta name="description" content={t("orders.head-edit.description")} />
+        <meta name="description" content={t("orders.head-edit.description") as string} />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <body>
@@ -52,7 +59,7 @@ const EditOrder = ({ foodList, currentFoodOrder, foodSection, status }) => {
 
 export default EditOrder;
 
-export async function getServerSideProps({ locale, req }) {
+export async function getServerSideProps({ locale, req }: ServerInfo) {
   const getLanguageValue = buildLanguage(locale, req);
   return {
     props: {

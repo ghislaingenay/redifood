@@ -19,7 +19,11 @@ interface IAppContext {
 }
 export default AppContext;
 
-export const AppProvider = ({ children }) => {
+interface IAppProvider {
+  children: React.ReactNode;
+}
+
+export const AppProvider = ({ children }: IAppProvider) => {
   const [status, setStatus] = useState<string>("success");
   const [language, setLanguage] = useState<ELanguage>(ELanguage.ENGLISH);
   const [currency, setCurrency] = useState<ECurrency>(ECurrency.USD);

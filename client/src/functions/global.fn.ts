@@ -16,9 +16,7 @@ const rgbToRgba = (rgb: { r: number; g: number; b: number }, opacity: number) =>
   return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${opacity})`;
 };
 
-export const hexToRgba = (hex: string, opacity: number) => {
-  return rgbToRgba(hexToRgb(hex), opacity);
-};
+export const hexToRgba = (hex: string, opacity: number) => rgbToRgba(hexToRgb(hex)!, opacity);
 
 export const checkDigit = (value: string) => /\d/.test(value);
 export const checkLength = (value: string) => (value.length >= 8 && value.length <= 20 ? true : false);
@@ -63,4 +61,4 @@ export const convertStringToEnumCurrency = (str: string): ECurrency => {
   }
 };
 
-export const storeCurrency = () => convertStringToEnumCurrency(localStorage.getItem("currency"));
+export const storeCurrency = () => convertStringToEnumCurrency(localStorage.getItem("currency") || ECurrency.USD);

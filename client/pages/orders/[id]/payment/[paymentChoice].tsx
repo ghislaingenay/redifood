@@ -8,14 +8,18 @@ import { RediButton, RediIconButton } from "../../../../src/components/styling/B
 import { RowCenter, RowCenterSp, RowSpaceAround } from "../../../../src/components/styling/grid.styled";
 import AppContext from "../../../../src/contexts/app.context";
 import useCurrency from "../../../../src/hooks/useCurrency.hook";
-import { EButtonType, EPaymentType } from "../../../../src/interfaces";
+import { EButtonType, EPaymentType, IOrder } from "../../../../src/interfaces";
 import { CenteredLabel, LGCard, LRoundedInput } from "../../../../src/styles";
 import { mockOneOrder } from "../../../../test/mocks/mockOrdersData";
 import { buildLanguage } from "../../../api/build-language";
 
-type TStrNull = string | null;
+type TStrNum = string | number;
 
-const PaymentSystem = ({ paymentType, currentOrder }) => {
+interface IPaymentProps {
+  paymentType: EPaymentType;
+  currentOrder: IOrder;
+}
+const PaymentSystem = ({ paymentType, currentOrder }: IPaymentProps) => {
   const { t } = useTranslation();
   const {
     state: { vat },
@@ -24,23 +28,23 @@ const PaymentSystem = ({ paymentType, currentOrder }) => {
   const { orderTotal } = currentOrder;
   console.log(orderTotal);
 
-  const [selectAmount, setSelectAmount] = useState<TStrNull>("");
-  const [selectedAmount, setSelectedAmount] = useState<TStrNull>("");
+  const [selectAmount, setSelectAmount] = useState<TStrNum>("");
+  const [selectedAmount, setSelectedAmount] = useState<TStrNum>("");
 
-  const onAdd = (val: string) => setSelectAmount((prevValue: string) => prevValue + val);
+  const onAdd = (val: string) => setSelectAmount((prevValue: TStrNum) => prevValue + val);
   const onConfirm = () => {
     setSelectedAmount(() => convertAmount(selectAmount));
     setSelectAmount("");
   };
 
   const havePoint = (str: string) => {
-    if (selectAmount?.includes(".")) {
+    if (typeof selectAmount === "string" && selectAmount?.includes(".")) {
       return str.indexOf(".") === str.lastIndexOf(".");
     }
     return true;
   };
   const haveValueSeparated = (str: string) => {
-    if (selectAmount?.includes(".")) {
+    if (typeof selectAmount === "string" && selectAmount?.includes(".")) {
       return /(\d+).(\d+)/i.test(str);
     }
     return true;
@@ -52,7 +56,10 @@ const PaymentSystem = ({ paymentType, currentOrder }) => {
   const amountToGive = diffAmount === totalAmount || diffAmount < 0 ? 0 : diffAmount;
   const isDisabled = selectedAmount && selectedAmount >= orderTotal && diffAmount > 0 ? false : true;
   const confirmDisabled =
-    selectAmount === "" || selectAmount === "." || !havePoint(selectAmount) || !haveValueSeparated(selectAmount)
+    selectAmount === "" ||
+    selectAmount === "." ||
+    !havePoint(selectAmount as string) ||
+    !haveValueSeparated(selectAmount as string)
       ? true
       : false;
   const clearDisabled = selectAmount === "" ? true : false;
@@ -77,7 +84,10 @@ const PaymentSystem = ({ paymentType, currentOrder }) => {
                         <RediButton
                           value={`${String(num)}`}
                           buttonType={EButtonType.INFO}
-                          onClick={(e) => onAdd(e.target.value)}
+                          onClick={(e) => {
+                            const target = e.target as HTMLButtonElement;
+                            onAdd(target.value!);
+                          }}
                           style={{ width: "100%", padding: "1rem 3rem", fontSize: "2rem" }}
                           aria-label={`${String(num)}`}
                         >
@@ -91,7 +101,7 @@ const PaymentSystem = ({ paymentType, currentOrder }) => {
                     <RediButton
                       buttonType={EButtonType.INFO}
                       aria-label="0"
-                      onClick={() => setSelectAmount((prevValue: string) => prevValue + "0")}
+                      onClick={() => setSelectAmount((prevValue: TStrNum) => prevValue + "0")}
                       value="0"
                     >
                       0
@@ -102,7 +112,7 @@ const PaymentSystem = ({ paymentType, currentOrder }) => {
                       buttonType={EButtonType.INFO}
                       aria-label="point"
                       value={"."}
-                      onClick={() => setSelectAmount((prevValue: string) => prevValue + ".")}
+                      onClick={() => setSelectAmount((prevValue: TStrNum) => prevValue + ".")}
                     >
                       .
                     </RediButton>

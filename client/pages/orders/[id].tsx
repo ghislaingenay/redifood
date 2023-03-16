@@ -13,7 +13,7 @@ import { RowSpaceBetween } from "../../src/components/styling/grid.styled";
 import RediRadioButton from "../../src/components/styling/RediRadioButton";
 import { RED } from "../../src/constants";
 import { hexToRgba } from "../../src/functions/global.fn";
-import { EButtonType, EPaymentType } from "../../src/interfaces";
+import { EButtonType, EPaymentType, ServerInfo } from "../../src/interfaces";
 import { LGCard } from "../../src/styles";
 import { SpacingDiv5X } from "../../src/styles/styledComponents/div.styled";
 import { mockOneOrder } from "../../test/mocks/mockOrdersData";
@@ -50,7 +50,7 @@ const CurrentOrder = ({ currentOrder, status }: any) => {
     <>
       <Head>
         <title>{t("orders.head-view.title")}</title>
-        <meta name="description" content={t("orders.head-view.description")} />
+        <meta name="description" content={t("orders.head-view.description") as string} />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <body>
@@ -68,7 +68,11 @@ const CurrentOrder = ({ currentOrder, status }: any) => {
                 <b>{t("glossary.date")}</b> {orderDate}
               </Col>
               <Col lg={8}>
-                <Alert type={messageType} message={alertMessage} style={{ fontWeight: 700, color: colorAlert }} />
+                <Alert
+                  type={messageType}
+                  message={alertMessage}
+                  style={{ fontWeight: 700, color: colorAlert as string }}
+                />
               </Col>
             </RowSpaceBetween>
           </LGCard>
@@ -104,7 +108,7 @@ const CurrentOrder = ({ currentOrder, status }: any) => {
 };
 export default CurrentOrder;
 
-export async function getServerSideProps({ locale, req }) {
+export async function getServerSideProps({ locale, req }: ServerInfo) {
   const getLanguageValue = buildLanguage(locale, req);
   // context: any
   // const id: string = context.query["id"];

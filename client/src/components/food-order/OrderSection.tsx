@@ -4,14 +4,31 @@ import { ORANGE, RED } from "../../constants";
 import { useFood } from "../../contexts/food.context";
 import { calculateTotal } from "../../functions/order.fn";
 import useCurrency from "../../hooks/useCurrency.hook";
-import { EButtonType, EFoodMode } from "../../interfaces";
+import { EButtonType, EFoodMode, IFood } from "../../interfaces";
 import { Scroll } from "../../styles/styledComponents/div.styled";
 import { CenteredTitle } from "../../styles/styledComponents/typography.styled";
 import { RediButton } from "../styling/Button.style";
 import { RowCenter, RowCenterSp } from "../styling/grid.styled";
 import FoodOrderCard from "./FoodOrderCard";
 const { Title } = Typography;
-const OrderSection = ({ tableNumber, setTableNumber, mode, errorTable, handleSubmit, handleCancel }) => {
+
+interface IOrderSectionProps {
+  tableNumber: number | null;
+  setTableNumber: (value: number | null) => void;
+  mode: EFoodMode;
+  errorTable: { alreadyInDb: boolean; missingValue: boolean };
+  handleSubmit: (foodOrder: IFood[]) => void;
+  handleCancel: (url: string) => void;
+}
+
+const OrderSection = ({
+  tableNumber,
+  setTableNumber,
+  mode,
+  errorTable,
+  handleSubmit,
+  handleCancel,
+}: IOrderSectionProps) => {
   const { t } = useTranslation("");
   const { convertPrice } = useCurrency();
   const { foodOrder } = useFood();

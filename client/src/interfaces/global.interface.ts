@@ -1,3 +1,5 @@
+import { RequestContext } from "next/dist/server/base-server";
+
 export interface IGetServerSideProps {
   props: {
     data: Record<string, any>;
@@ -30,4 +32,9 @@ export interface IGlobalOptions {
 export enum ELanguage {
   ENGLISH = "en",
   FRENCH = "fr",
+}
+
+export interface ServerInfo {
+  locale: any;
+  req: RequestContext;
 }

@@ -56,7 +56,7 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
     return selectedButton === radioValue;
   };
 
-  const spanValue = (options) => {
+  const spanValue = (options: IRediRadio[] | IRediRadioWithIcon[]) => {
     switch (options.length) {
       case 2: {
         return 11;

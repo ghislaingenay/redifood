@@ -12,7 +12,7 @@ export const decodeCookie = (str: string | ELanguage) => {
 };
 
 export const recoverCookie = () => {
-  const buff = decodeCookie(Cookies.get("lang"));
+  const buff = decodeCookie(Cookies.get("lang") as ELanguage);
   let value: ELanguage | undefined = undefined;
   if (Object.values(ELanguage).includes(buff as ELanguage)) {
     value = buff as ELanguage | undefined;
@@ -35,7 +35,7 @@ export const setCookieInformation = (lang: ELanguage) => {
   console.log("lang choice", lang);
   Cookies.set("lang", encodeCookie(lang));
 };
-export const buildLanguage = (locale, req) => {
+export const buildLanguage = (locale: any, req: any) => {
   const cookies = req?.cookies;
   const lang = cookies?.lang;
 

@@ -21,7 +21,12 @@ import { FoodProvider } from "../src/contexts/food.context";
 import "../i18n.ts";
 
 config.autoAddCss = false;
-const AppComponent = ({ Component, pageProps }) => {
+
+interface IAppProps {
+  Component: any;
+  pageProps: any;
+}
+const AppComponent = ({ Component, pageProps }: IAppProps) => {
   return (
     <>
       <AppProvider>
@@ -53,7 +58,7 @@ const AppComponent = ({ Component, pageProps }) => {
   );
 };
 
-AppComponent.getInitialProps = async (appContext) => {
+AppComponent.getInitialProps = async (appContext: any) => {
   // return {
   // currentUser: null,
   //   currentUser: { username: "pit" },

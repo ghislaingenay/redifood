@@ -1,5 +1,4 @@
 import { Col, Modal, Row, Typography } from "antd";
-import { useTranslation } from "next-i18next";
 import { useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import { Else, If, Then } from "react-if";
@@ -31,7 +30,6 @@ interface IFoodLayoutProps {
 const FoodLayout = ({ foodList, mode, foodSection, mainTitle, handleOrderCreate, status }: IFoodLayoutProps) => {
   const router = useRouter();
   const tableTaken = [1, 4, 5];
-  const { t } = useTranslation("");
 
   const { setStatus } = useContext(AppContext);
   const { foodOrder } = useFood();
@@ -57,9 +55,9 @@ const FoodLayout = ({ foodList, mode, foodSection, mainTitle, handleOrderCreate,
   const handleSubmit = (foodOrder: IFood[]) => {
     switch (mode) {
       case EFoodMode.CREATE: {
-        const result = sendErrorTableInput(tableNumberValue, tableTaken);
+        const result = sendErrorTableInput(tableNumberValue as number, tableTaken);
         if (result === noErrorInTable) {
-          handleOrderCreate(foodOrder);
+          if (handleOrderCreate) handleOrderCreate(foodOrder);
         } else {
           setErrorTable(result);
         }
@@ -79,7 +77,7 @@ const FoodLayout = ({ foodList, mode, foodSection, mainTitle, handleOrderCreate,
   };
 
   const loadData = async () => {
-    setStatus(status);
+    setStatus(status as string);
     setCurrentOrder(foodOrder);
   };
   useEffect(() => {
@@ -101,7 +99,7 @@ const FoodLayout = ({ foodList, mode, foodSection, mainTitle, handleOrderCreate,
             fontSize="1rem"
             padding="0.5rem 0.5rem"
             disabled={isDisabled}
-            options={getOptions(foodSection)}
+            options={getOptions(foodSection) as any}
             radioGroupName="food"
             haveIcon="false"
             selectedButton={selectedSection}

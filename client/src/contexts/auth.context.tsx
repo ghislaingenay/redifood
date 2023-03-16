@@ -14,7 +14,11 @@ export function useAuth() {
   return userValue;
 }
 
-export function AuthProvider({ children }) {
+interface IAuthProvider {
+  children: React.ReactNode;
+}
+
+export function AuthProvider({ children }: IAuthProvider) {
   // const [currentUser, setCurrentUser] = useState({ username: "pit" });
   const [currentUser, setCurrentUser] = useState({ username: "pit" });
   const [spinLoading, setSpinLoading] = useState(true);
@@ -22,6 +26,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     // setSpinLoading(true);
     // setTimeout(() => {
+    setCurrentUser({ username: "pit" });
     setSpinLoading(false);
     // }, 1000);
     // new Promise((resolve, reject) => {

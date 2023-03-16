@@ -7,12 +7,15 @@ import { useContext, useEffect } from "react";
 import { RowSpaceAround } from "../src/components/styling/grid.styled";
 import AppContext from "../src/contexts/app.context";
 import { useFood } from "../src/contexts/food.context";
-import { ECurrency, ELanguage } from "../src/interfaces";
+import { ECurrency, ELanguage, ServerInfo } from "../src/interfaces";
 import { CenteredTitle, NoSpacingDivider, RediDivider, RoundedInput, RoundedInputNum } from "../src/styles";
 import { buildLanguage, setCookieInformation } from "./api/build-language";
 const { Title } = Typography;
 
-const Settings = ({ language }) => {
+interface ISettingsProps {
+  language: ELanguage;
+}
+const Settings = ({ language }: ISettingsProps) => {
   const { t } = useTranslation("");
   const router = useRouter();
   const {
@@ -56,7 +59,7 @@ const Settings = ({ language }) => {
     <>
       <Head>
         <title>{t("settings.head.title")}</title>
-        <meta name="description" content={t("settings.head.description")} />
+        <meta name="description" content={t("settings.head.description") as string} />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
@@ -88,7 +91,7 @@ const Settings = ({ language }) => {
           style={{ margin: "2rem 0" }}
           form={settingsForm}
           layout="horizontal"
-          onValuesChange={(e: any, all: any) => {
+          onValuesChange={(_, all: any) => {
             console.log("all", all);
             handleSettingsInfo(all);
           }}
@@ -167,7 +170,7 @@ const Settings = ({ language }) => {
 
 export default Settings;
 
-export async function getStaticProps({ locale, req }) {
+export async function getStaticProps({ locale, req }: ServerInfo) {
   const getLanguageValue = buildLanguage(locale, req);
   return {
     props: { language: getLanguageValue, ...(await serverSideTranslations(getLanguageValue, ["common"])) }, // will be passed to the page component as props

@@ -14,11 +14,16 @@ import { BACKGROUND_COLOR } from "../src/constants";
 import AppContext from "../src/contexts/app.context";
 import { getOptions } from "../src/functions/global.fn";
 import useCurrency from "../src/hooks/useCurrency.hook";
-import { EButtonType, IOrder } from "../src/interfaces";
+import { EButtonType, IOrder, ServerInfo } from "../src/interfaces";
 import { allDataOrders, getListUnpaidOrders } from "../test/mocks/mockOrdersData";
 import { buildLanguage } from "./api/build-language";
 
-const AllOrdersPage = ({ allOrders, getList, status }) => {
+interface IAllOrdersPageProps {
+  allOrders: IOrder[];
+  getList: string[];
+  status: string;
+}
+const AllOrdersPage = ({ allOrders, getList, status }: IAllOrdersPageProps) => {
   const { t } = useTranslation("");
   const { displayCurrency } = useCurrency();
   const { setStatus } = useContext(AppContext);
@@ -26,7 +31,7 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
   const router = useRouter();
   const [listAllOrders] = useState(allOrders);
   const [selectedOption, setSelectedOption] = useState("ALL");
-  const [filteredOrders, setFilteredOrders] = useState([]);
+  const [filteredOrders, setFilteredOrders] = useState<IOrder[]>([]);
   const [spinLoading, setSpinLoading] = useState(true);
   const { Title } = Typography;
 
@@ -77,13 +82,13 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
     },
   ];
 
-  const showProperData = (option) => {
+  const showProperData = (option: string) => {
     // replace later by axios get
     setSelectedOption(option);
     if (option === "ALL") {
       return setFilteredOrders(listAllOrders);
     }
-    const newList = listAllOrders.filter((order) => order.orderId === option);
+    const newList = listAllOrders.filter((order) => order._id === option);
     if (newList) {
       return setFilteredOrders(newList);
     }
@@ -109,7 +114,7 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
     <>
       <Head>
         <title>{t("index.head.title")}</title>
-        <meta name="description" content={t("index.head.description")} />
+        <meta name="description" content={t("index.head.description") as string} />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Title level={2} aria-label="List of all orders">
@@ -121,7 +126,7 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
             initialOption={{ value: "ALL", label: t("glossary.all") }}
             style={{ width: "8rem" }}
             value={selectedOption}
-            onChange={(e: string) => showProperData(e)}
+            onChange={(e: any) => showProperData(e)}
             options={getOptions(getList)}
           />
         </Col>
@@ -171,7 +176,7 @@ const AllOrdersPage = ({ allOrders, getList, status }) => {
 
 export default AllOrdersPage;
 
-export async function getServerSideProps({ locale, req }) {
+export async function getServerSideProps({ locale, req }: ServerInfo) {
   const getLanguageValue = buildLanguage(locale, req);
   return {
     props: {

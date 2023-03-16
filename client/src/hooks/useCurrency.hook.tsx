@@ -39,10 +39,10 @@ const useCurrency = () => {
   const convertPrice = (price: number, direction: "backToFront" | "frontToBack", currBool: boolean) => {
     if (direction === "backToFront") {
       const stock = stocks.find((stock) => stock.currencyValue === currencyChoice);
-      return convertFormat(price * stock.value, currBool);
+      if (stock) return convertFormat(price * stock.value, currBool);
     } else {
       const stock = stocks.find((stock) => stock.currencyValue === currencyChoice);
-      return convertFormat(price / stock.value, currBool);
+      if (stock) return convertFormat(price / stock.value, currBool);
     }
   };
 

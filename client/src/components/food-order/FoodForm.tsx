@@ -93,7 +93,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
 
   const [uploading, setUploading] = useState(false);
 
-  const [files, setFiles] = useState([]);
+  const [files, setFiles] = useState<any[]>([]);
 
   const isDisabled =
     sectionValue === EHandleType.NONE ||
@@ -117,7 +117,12 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
       label: t("foods.form-label.name"),
       name: "itemName",
       component: (
-        <RoundedInput maxLength={30} placeholder={t("foods.form-label.name")} style={styleNoM} aria-label="itemName" />
+        <RoundedInput
+          maxLength={30}
+          placeholder={t("foods.form-label.name") as string}
+          style={styleNoM}
+          aria-label="itemName"
+        />
       ),
       rules: [{ required: true, message: t("foods.form-label.rules-name") }],
     },
@@ -127,7 +132,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
       component: (
         <RoundedInput
           maxLength={40}
-          placeholder={t("foods.form-label.description")}
+          placeholder={t("foods.form-label.description") as string}
           style={styleNoM}
           aria-label="itemDescription"
         />
@@ -139,7 +144,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
       name: "itemPrice",
       component: (
         <RoundedInputNum
-          placeholder={t("foods.form-label.price")}
+          placeholder={t("foods.form-label.price") as string}
           addonAfter={fn()}
           style={styleNoM}
           aria-label="itemPrice"
@@ -150,7 +155,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
   ];
 
   const { getRootProps, getInputProps } = useDropzone({
-    accept: "image/.jpg",
+    accept: "image/.jpg" as any,
     minSize: 0,
     maxFiles: 1,
     onDrop: async (acceptedFiles) => {
@@ -160,7 +165,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
           Object.assign(file, {
             preview: URL.createObjectURL(file),
           }),
-        ),
+        ) as any,
       );
       const formData = new FormData();
 
@@ -180,7 +185,10 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
     },
   });
 
+  const checkFood = () => currentFood === newFoodData;
+
   const onFinish = (values: any) => {
+    console.log(checkFood());
     console.log("validated");
     if (files.length === 0) {
       return setError(true);
@@ -293,7 +301,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                   <input
                     aria-label="Drop a file here"
                     name="file"
-                    placeholder={t('foods.form-label."upload-file-placeholder"')}
+                    placeholder={t('foods.form-label."upload-file-placeholder"') as string}
                     type="file"
                     {...getInputProps()}
                   />

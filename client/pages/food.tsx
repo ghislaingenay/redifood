@@ -5,11 +5,16 @@ import Head from "next/head";
 import { useEffect } from "react";
 import FoodLayout from "../src/components/food-order/FoodLayout";
 import { useFood } from "../src/contexts/food.context";
-import { EFoodMode } from "../src/interfaces";
+import { EFoodMode, IFood, ServerInfo } from "../src/interfaces";
 import { foodSectionArray, mockedFoodData } from "../test/mocks/mockFoodData";
 import { buildLanguage } from "./api/build-language";
 
-const FoodPage = ({ foodList, foodSection, status }) => {
+interface IFoodProps {
+  foodList: IFood[];
+  foodSection: string[];
+  status: string;
+}
+const FoodPage = ({ foodList, foodSection, status }: IFoodProps) => {
   const { t } = useTranslation("");
   const { setFoodOrder } = useFood();
 
@@ -21,7 +26,7 @@ const FoodPage = ({ foodList, foodSection, status }) => {
     <>
       <Head>
         <title>{t("foods.head.title")}</title>
-        <meta name="description" content={t("foods.head.description")} />
+        <meta name="description" content={t("foods.head.description") as string} />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <FoodLayout
@@ -37,7 +42,7 @@ const FoodPage = ({ foodList, foodSection, status }) => {
 
 export default FoodPage;
 
-export async function getServerSideProps({ locale, req }) {
+export async function getServerSideProps({ locale, req }: ServerInfo) {
   const getLanguageValue = buildLanguage(locale, req);
   return {
     props: {

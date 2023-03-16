@@ -5,11 +5,17 @@ import { useEffect } from "react";
 import FoodLayout from "../../src/components/food-order/FoodLayout";
 import { useFood } from "../../src/contexts/food.context";
 import { NotificationRes } from "../../src/definitions/notification.class";
+import { ServerInfo } from "../../src/interfaces";
 import { EFoodMode, IFood } from "../../src/interfaces/food.interface";
 import { foodSectionArray, mockedFoodData } from "../../test/mocks/mockFoodData";
 import { buildLanguage } from "../api/build-language";
 
-const CreateOrder = ({ foodList, foodSection, status }) => {
+interface ICreateOrderProps {
+  foodList: IFood[];
+  foodSection: string[];
+  status: string;
+}
+const CreateOrder = ({ foodList, foodSection, status }: ICreateOrderProps) => {
   const { setFoodOrder } = useFood();
   const { t } = useTranslation("");
   const handleOrderCreate = (foodOrder: IFood[]) => {
@@ -33,7 +39,7 @@ const CreateOrder = ({ foodList, foodSection, status }) => {
     <>
       <Head>
         <title>{t("orders.head-create.title")}</title>
-        <meta name="description" content={t("orders.head-create.description")} />
+        <meta name="description" content={t("orders.head-create.description") as string} />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
@@ -52,7 +58,7 @@ const CreateOrder = ({ foodList, foodSection, status }) => {
 
 export default CreateOrder;
 
-export async function getServerSideProps({ locale, req }) {
+export async function getServerSideProps({ locale, req }: ServerInfo) {
   const getLanguageValue = buildLanguage(locale, req);
   return {
     props: {

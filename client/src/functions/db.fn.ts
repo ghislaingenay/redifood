@@ -3,8 +3,8 @@ export const convertApiDataToDbData = (data: any, type: "sql" | "db", direction:
     return data;
   }
 
+  let newObj: Record<string, any> = {};
   if (direction === "dbToApi") {
-    let newObj = {};
     let newKey: string;
     for (let key in data) {
       newKey = key.replace(/([-_][a-z])/gi, ($1) => {
@@ -14,7 +14,6 @@ export const convertApiDataToDbData = (data: any, type: "sql" | "db", direction:
     }
     return newObj;
   } else {
-    let newObj = {};
     let newKey: string;
     for (let key in data) {
       newKey = key.replace(/([A-Z])/g, ($1) => {

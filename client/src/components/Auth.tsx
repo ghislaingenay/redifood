@@ -104,7 +104,7 @@ const Auth = () => {
       message: "Please input your password!",
     },
     () => ({
-      validator(_, value) {
+      validator(_: any, value: string) {
         if (checkLength(value) && checkSpecials(value)) {
           return Promise.resolve();
         } else {
@@ -117,7 +117,7 @@ const Auth = () => {
       },
     }),
     () => ({
-      validator(_, value) {
+      validator(_: any, value: string) {
         if (checkUpper(value) && checkLower(value) && checkDigit(value)) {
           return Promise.resolve();
         } else {
