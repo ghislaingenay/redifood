@@ -11,7 +11,8 @@
     "clear": "EFFACER",
     "confirm": "CONFIRMER",
     "cancel": "ANNULER",
-    "finalize-payment": "TERMINER PAIMENT"
+    "finalize-payment": "TERMINER PAIMENT",
+    "receipt": "RECU"
   },
 
   "glossary": {
