@@ -1,7 +1,7 @@
 {
   "root": true,
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint", "testing-library", "jest-dom", "prettier", "jsx-a11y"],
+  "plugins": ["@typescript-eslint", "testing-library", "jest-dom", "prettier", "jsx-a11y", "next/babel"],
   "overrides": [
     {
       "files": ["*.js", "*.ts", "*.tsx"],
@@ -39,6 +39,9 @@
     "plugin:jest-dom/recommended",
     "eslint:recommended",
     "plugin:prettier/recommended",
+    "next",
+    "next/babel",
+    "next/core-web-vitals",
     "plugin:jsx-a11y/recommended"
   ]
 }
