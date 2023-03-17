@@ -3,6 +3,7 @@ import { Dispatch, SetStateAction, useEffect, useMemo } from "react";
 import { BACKGROUND_COLOR, LIGHT_GREY, ORANGE_DARK, ORANGE_LIGHT } from "../../constants";
 import { hexToRgba } from "../../functions/global.fn";
 import { RadioButton } from "../../styles";
+import { AnimRadioButton } from "../../styles/animations/styled.anim";
 import { SpanBlockM02Y } from "../../styles/styledComponents/span.styled";
 import { RowSpaceAround } from "./grid.styled";
 
@@ -112,18 +113,20 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
               return setSelectedButton(target.value as any);
             }}
           >
-            <RadioButton
-              aria-label={ariaLabel}
-              style={{ ...colorStyle(value) }}
-              role="radio"
-              name={radioGroupName}
-              value={value}
-              // aria-checked={isSelected(value)}
-              aria-checked={isSelected(selectedValue)}
-            >
-              {haveIcon === "true" && <SpanBlockM02Y>{icon}</SpanBlockM02Y>}
-              {label.toUpperCase()}
-            </RadioButton>
+            <AnimRadioButton>
+              <RadioButton
+                aria-label={ariaLabel}
+                style={{ ...colorStyle(value) }}
+                role="radio"
+                name={radioGroupName}
+                value={value}
+                // aria-checked={isSelected(value)}
+                aria-checked={isSelected(selectedValue)}
+              >
+                {haveIcon === "true" && <SpanBlockM02Y>{icon}</SpanBlockM02Y>}
+                {label.toUpperCase()}
+              </RadioButton>
+            </AnimRadioButton>
           </Col>
         </>
       ))}

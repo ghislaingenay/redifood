@@ -6,7 +6,8 @@ import { useEffect } from "react";
 import { recoverCookie } from "../../../pages/api/build-language";
 import useCurrency from "../../hooks/useCurrency.hook";
 import { EButtonType, IOrder } from "../../interfaces";
-import { CenteredPBold, LGCard } from "../../styles";
+import { CenteredPBold } from "../../styles";
+import { AnimCard } from "../../styles/animations/global.anim";
 import { RediIconButton } from "../styling/Button.style";
 import { RowCenter } from "../styling/grid.styled";
 
@@ -30,7 +31,7 @@ const OrderHistoryCard = ({ foodOrder }: IOrderHistoryCard) => {
     lg: 12,
   };
   return (
-    <LGCard>
+    <AnimCard>
       <RowCenter>
         <Col md={24} lg={15}>
           <RowCenter>
@@ -64,7 +65,7 @@ const OrderHistoryCard = ({ foodOrder }: IOrderHistoryCard) => {
           </RediIconButton>
         </Col>
       </RowCenter>
-    </LGCard>
+    </AnimCard>
   );
 };
 

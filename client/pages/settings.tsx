@@ -10,6 +10,7 @@ import AppContext from "../src/contexts/app.context";
 import { useFood } from "../src/contexts/food.context";
 import { ECurrency, ELanguage, ServerInfo } from "../src/interfaces";
 import { CenteredTitle, NoSpacingDivider, RediDivider, RoundedInput, RoundedInputNum } from "../src/styles";
+import { AnimToTop } from "../src/styles/animations/global.anim";
 import { buildLanguage, setCookieInformation } from "./api/build-language";
 const { Title } = Typography;
 
@@ -71,113 +72,115 @@ const Settings = ({ language }: ISettingsProps) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <Title level={2}>{t("settings.head.title")}</Title>
-        <NoSpacingDivider />
-        <CenteredTitle style={{ marginTop: 0 }} level={4}>
-          {t("settings.user-info")}
-        </CenteredTitle>
-        <NoSpacingDivider />
-        <Form
-          labelWrap={false}
-          layout="horizontal"
-          style={{ margin: "2rem auto" }}
-          form={userForm}
-          onValuesChange={(e, all) => {
-            console.log(e);
-            handleUserInfo(all);
-          }}
-        >
-          <Form.Item name="email" id="email" label="Email">
-            <RoundedInput type="text" aria-label="email" style={{ width: "50%" }} />
-          </Form.Item>
-        </Form>
-        <RediDivider />
-        <NoSpacingDivider />
-        <CenteredTitle style={{ marginTop: 0 }} level={4}>
-          {t("settings.global-settings")}
-        </CenteredTitle>
-        <NoSpacingDivider />
-        <Form
-          style={{ margin: "2rem 0" }}
-          form={settingsForm}
-          layout="horizontal"
-          onValuesChange={(_, all: any) => {
-            console.log("all", all);
-            handleSettingsInfo(all);
-          }}
-        >
-          <RowSpaceAround>
-            <Col {...colSettingsSpan}>
-              <Form.Item label="Language" name="language" {...formItemLayout}>
-                <Radio.Group
-                  buttonStyle="solid"
-                  onChange={(e) => {
-                    console.log(e);
-                    setLanguage(e.target.value as ELanguage);
-                    setCookieInformation(e.target.value as ELanguage);
-                    router.replace(`/${e.target.value}/settings`);
-                  }}
+        <AnimToTop>
+          <Title level={2}>{t("settings.head.title")}</Title>
+          <NoSpacingDivider />
+          <CenteredTitle style={{ marginTop: 0 }} level={4}>
+            {t("settings.user-info")}
+          </CenteredTitle>
+          <NoSpacingDivider />
+          <Form
+            labelWrap={false}
+            layout="horizontal"
+            style={{ margin: "2rem auto" }}
+            form={userForm}
+            onValuesChange={(e, all) => {
+              console.log(e);
+              handleUserInfo(all);
+            }}
+          >
+            <Form.Item name="email" id="email" label="Email">
+              <RoundedInput type="text" aria-label="email" style={{ width: "50%" }} />
+            </Form.Item>
+          </Form>
+          <RediDivider />
+          <NoSpacingDivider />
+          <CenteredTitle style={{ marginTop: 0 }} level={4}>
+            {t("settings.global-settings")}
+          </CenteredTitle>
+          <NoSpacingDivider />
+          <Form
+            style={{ margin: "2rem 0" }}
+            form={settingsForm}
+            layout="horizontal"
+            onValuesChange={(_, all: any) => {
+              console.log("all", all);
+              handleSettingsInfo(all);
+            }}
+          >
+            <RowSpaceAround>
+              <Col {...colSettingsSpan}>
+                <Form.Item label="Language" name="language" {...formItemLayout}>
+                  <Radio.Group
+                    buttonStyle="solid"
+                    onChange={(e) => {
+                      console.log(e);
+                      setLanguage(e.target.value as ELanguage);
+                      setCookieInformation(e.target.value as ELanguage);
+                      router.replace(`/${e.target.value}/settings`);
+                    }}
+                  >
+                    <Radio.Button value={ELanguage.ENGLISH}>{t("settings.form-values.english")}</Radio.Button>
+                    <Radio.Button value={ELanguage.FRENCH}>{t("settings.form-values.french")}</Radio.Button>
+                  </Radio.Group>
+                </Form.Item>
+              </Col>
+              <Col {...colSettingsSpan}>
+                <Form.Item label={t("settings.form-label.currency")} name="currency" {...formItemLayout}>
+                  <Radio.Group
+                    buttonStyle="solid"
+                    onChange={(e) => {
+                      setCurrency(e.target.value as ECurrency);
+                      localStorage.setItem("currency", e.target.value);
+                    }}
+                  >
+                    <Radio.Button value={ECurrency.USD}>$</Radio.Button>
+                    <Radio.Button value={ECurrency.EUR}>€</Radio.Button>
+                  </Radio.Group>
+                </Form.Item>
+              </Col>
+              <Col {...colSettingsSpan}>
+                <Form.Item label={t("settings.form-label.show-image")} name="haveFoodPicture" {...formItemLayout}>
+                  <Radio.Group buttonStyle="solid" onChange={(e) => setHaveFoodPicture(e.target.value as boolean)}>
+                    <Radio.Button value={true}>{t("glossary.yes")}</Radio.Button>
+                    <Radio.Button value={false}>{t("glossary.no")}</Radio.Button>
+                  </Radio.Group>
+                </Form.Item>
+              </Col>
+              <Col {...colSettingsSpan}>
+                <Form.Item
+                  label={t("settings.form-label.show-image-description")}
+                  name="haveFoodDescription"
+                  {...formItemLayout}
                 >
-                  <Radio.Button value={ELanguage.ENGLISH}>{t("settings.form-values.english")}</Radio.Button>
-                  <Radio.Button value={ELanguage.FRENCH}>{t("settings.form-values.french")}</Radio.Button>
-                </Radio.Group>
-              </Form.Item>
-            </Col>
-            <Col {...colSettingsSpan}>
-              <Form.Item label={t("settings.form-label.currency")} name="currency" {...formItemLayout}>
-                <Radio.Group
-                  buttonStyle="solid"
-                  onChange={(e) => {
-                    setCurrency(e.target.value as ECurrency);
-                    localStorage.setItem("currency", e.target.value);
-                  }}
-                >
-                  <Radio.Button value={ECurrency.USD}>$</Radio.Button>
-                  <Radio.Button value={ECurrency.EUR}>€</Radio.Button>
-                </Radio.Group>
-              </Form.Item>
-            </Col>
-            <Col {...colSettingsSpan}>
-              <Form.Item label={t("settings.form-label.show-image")} name="haveFoodPicture" {...formItemLayout}>
-                <Radio.Group buttonStyle="solid" onChange={(e) => setHaveFoodPicture(e.target.value as boolean)}>
-                  <Radio.Button value={true}>{t("glossary.yes")}</Radio.Button>
-                  <Radio.Button value={false}>{t("glossary.no")}</Radio.Button>
-                </Radio.Group>
-              </Form.Item>
-            </Col>
-            <Col {...colSettingsSpan}>
-              <Form.Item
-                label={t("settings.form-label.show-image-description")}
-                name="haveFoodDescription"
-                {...formItemLayout}
-              >
-                <Radio.Group buttonStyle="solid" onChange={(e) => setHaveFoodDescription(e.target.value as boolean)}>
-                  <Radio.Button value={true}>{t("glossary.yes")}</Radio.Button>
-                  <Radio.Button value={false}>{t("glossary.no")}</Radio.Button>
-                </Radio.Group>
-              </Form.Item>
-            </Col>
-            <Col {...colSettingsSpan}>
-              <Form.Item label={t("settings.form-label.vat")} name="vat" {...formItemLayout}>
-                <RoundedInputNum
-                  onChange={(e) => {
-                    console.log(e);
-                    if (e && typeof e !== "undefined") {
-                      setVaT(Number(e));
-                    } else {
-                      setVaT(0);
-                    }
-                  }}
-                  type="number"
-                  minLength={1}
-                  aria-label="vat"
-                  style={{ width: "50%" }}
-                />
-              </Form.Item>
-            </Col>
-            <Col {...colSettingsSpan}></Col>
-          </RowSpaceAround>
-        </Form>
+                  <Radio.Group buttonStyle="solid" onChange={(e) => setHaveFoodDescription(e.target.value as boolean)}>
+                    <Radio.Button value={true}>{t("glossary.yes")}</Radio.Button>
+                    <Radio.Button value={false}>{t("glossary.no")}</Radio.Button>
+                  </Radio.Group>
+                </Form.Item>
+              </Col>
+              <Col {...colSettingsSpan}>
+                <Form.Item label={t("settings.form-label.vat")} name="vat" {...formItemLayout}>
+                  <RoundedInputNum
+                    onChange={(e) => {
+                      console.log(e);
+                      if (e && typeof e !== "undefined") {
+                        setVaT(Number(e));
+                      } else {
+                        setVaT(0);
+                      }
+                    }}
+                    type="number"
+                    minLength={1}
+                    aria-label="vat"
+                    style={{ width: "50%" }}
+                  />
+                </Form.Item>
+              </Col>
+              <Col {...colSettingsSpan}></Col>
+            </RowSpaceAround>
+          </Form>
+        </AnimToTop>
       </main>
     </>
   );
