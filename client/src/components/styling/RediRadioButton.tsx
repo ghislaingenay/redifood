@@ -1,5 +1,5 @@
 import { ButtonProps, Col } from "antd";
-import { Dispatch, SetStateAction, useEffect, useMemo } from "react";
+import { Dispatch, SetStateAction, useCallback, useEffect, useMemo } from "react";
 import { BACKGROUND_COLOR, LIGHT_GREY, ORANGE_DARK, ORANGE_LIGHT } from "../../constants";
 import { hexToRgba } from "../../functions/global.fn";
 import { RadioButton } from "../../styles";
@@ -53,9 +53,12 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
     fontSize,
   }: IRediRadioButtonProps<Booleanish> = props;
 
-  const isSelected = (radioValue: string) => {
-    return selectedButton === radioValue;
-  };
+  const isSelected = useCallback(
+    (radioValue: string) => {
+      return selectedButton === radioValue;
+    },
+    [selectedButton],
+  );
 
   const spanValue = (options: IRediRadio[] | IRediRadioWithIcon[]) => {
     switch (options.length) {
