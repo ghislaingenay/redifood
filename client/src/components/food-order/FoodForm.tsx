@@ -18,6 +18,7 @@ import { SpacingDiv5X } from "../../styles/styledComponents/div.styled";
 import { RedSpan } from "../../styles/styledComponents/span.styled";
 import {
   CenteredP,
+  CenteredTitle,
   LabelFormBlack,
   LabelFormBlue,
   LabelFormRed,
@@ -32,6 +33,8 @@ interface IFoodForm {
   foodSection: string[];
   foodList: IFood[];
 }
+
+type PartialFood = Partial<IFood>;
 
 enum EHandleType {
   NONE = "NONE",
@@ -76,16 +79,25 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
   const extraValue = Form.useWatch("itemExtra", form);
   const [editMode, setEditMode] = useState<Booleanish>("true");
 
-  const [handleType, setHandleType] = useState<EHandleType>(EHandleType.NONE);
-
   const foodRadioOptions = [
     { label: t("buttons.edit"), value: "true", icon: <FontAwesomeIcon icon={faFilePen} />, ariaLabel: "EDIT" },
     { label: t("buttons.create"), value: "false", icon: <FontAwesomeIcon icon={faSquarePlus} />, ariaLabel: "CREATE" },
   ];
 
+  const initialFormValues: PartialFood = {
+    itemName: undefined,
+    itemPrice: undefined,
+    itemSection: EHandleType.NONE,
+    itemExtra: EHandleType.NONE,
+    itemPhoto: undefined,
+    itemDescription: undefined,
+    itemQuantity: undefined,
+    itemId: undefined,
+  };
+
+  const [handleType, setHandleType] = useState<EHandleType>(EHandleType.NONE);
   const [sortedFood, setSortedFood] = useState<Record<string, string[]>>({});
 
-  const [currentFood, setCurrentFood] = useState<IFood>(foodOrder[0]);
   const [newFoodData, setNewFoodData] = useState<IFood | null>(null);
   const [inputSection, setInputSection] = useState<string>("");
   const [delSection, setDelSection] = useState<string>("");
@@ -98,6 +110,8 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
   const [confirmModal, setConfirmModal] = useState(false);
   const [cancelModal, setCancelModal] = useState(false);
 
+  const [currentFood, setCurrentFood] = useState<PartialFood>(foodOrder[0]);
+  const [modifiedFood, setModifiedFood] = useState<PartialFood>(null);
   // const {
   //   res: resImage,
   //   doRequest: doRequestUpload,
@@ -327,10 +341,8 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
       setSortedFood(convertFoodToSection(foodList, foodSection));
     } else {
       setFiles([]);
-      form.setFieldsValue({
-        itemSection: EHandleType.NONE,
-        itemExtra: EHandleType.NONE,
-      });
+      form.setFieldsValue(initialFormValues);
+      setCurrentFood(initialFormValues);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectFood, editMode]);
@@ -480,11 +492,8 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                         disabled={inputSection === "" ? true : false}
                         onClick={() => {
                           // ViewSectionModel
-                          form.setFieldValue("itemSection", EHandleType.NONE);
                           setHandleType(EHandleType.ADDSECTION);
                           setConfirmModal(true);
-                          setInputSection("");
-                          console.log("new section clicked", inputSection);
                         }}
                       >
                         {t("foods.form-label.create-section")}
@@ -497,7 +506,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                     <LabelFormRed>{t("foods.form-label.delete-current-section")}</LabelFormRed>
                     <RowCenterSp>
                       <Select value={delSection} style={{ marginBottom: "0.5rem" }} onChange={(e) => setDelSection(e)}>
-                        <Option value="">Select ...</Option>
+                        <Option value={EHandleType.NONE}>Select ...</Option>
                         {Object.keys(sortedFood).map((section, index) => (
                           <Option key={index} value={section}>
                             {capitalize(section)}
@@ -513,7 +522,6 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                           // ViewSectionModel
                           setHandleType(EHandleType.DELETESECTION);
                           setConfirmModal(true);
-                          form.submit();
                         }}
                       >
                         {t("foods.form-label.delete-section")}
@@ -549,10 +557,8 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                           disabled={inputExtra === "" ? true : false}
                           onClick={() => {
                             // ViewExtraModel
-                            form.setFieldValue("itemExtra", "none");
                             setHandleType(EHandleType.ADDEXTRA);
                             setConfirmModal(true);
-                            form.submit();
                           }}
                         >
                           {t("foods.form-label.create-extra")}
@@ -578,7 +584,6 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                           disabled={delExtra === "" ? true : false}
                           onClick={() => {
                             // ViewExtraModel
-                            form.setFieldValue("itemExtra", "none");
                             setHandleType(EHandleType.DELETEEXTRA);
                             setConfirmModal(true);
                           }}
@@ -636,7 +641,9 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
               <p>Do you want to delete {delSection} section ?</p>
               <p>These foods will be deleted</p>
               {foodList
-                .filter((food) => food.itemSection === delSection)
+                .filter((food) => {
+                  return food.itemSection === delSection;
+                })
                 .map((food: IFood) => {
                   return <p key={food.itemId}>{food.itemName}</p>;
                 })}
@@ -659,12 +666,9 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
       <Modal
         open={cancelModal}
         onCancel={() => setCancelModal((prevValue: boolean) => !prevValue)}
-        onOk={() => router.replace("/")}
+        onOk={() => router.refresh()}
       >
-        <Switch>
-          <Case condition={editMode === "false"}>Are you sure to cancel ?</Case>
-          <Case condition={editMode === "true"}>Some changes was made to the food. Are you sure to cancel ?</Case>
-        </Switch>
+        <CenteredTitle level={4}>Are you sure to cancel ?</CenteredTitle>
       </Modal>
     </>
   );
