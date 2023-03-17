@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useAuth } from "../../src/contexts/auth.context";
 
@@ -17,7 +17,7 @@ interface IUseRequestRes<T = any> {
 }
 
 interface IGetServerSideData<T = any, K = any> {
-  data: T | null;
+  results: T | null;
   message: string;
   params?: K;
 }
@@ -66,15 +66,15 @@ const useRequest = (data: IAxiosReq) => {
     }
   };
 
-  const doRequest = async <T, K>(): Promise<any> => {
+  const doRequest = useCallback(async <T, K>(): Promise<any> => {
     console.log("data", data);
     setLoading(true);
     getAxios()!
       .then((res: AxiosResponse<IGetServerSideData<T, K>>) => {
         const {
-          data: { data, message },
+          data: { results, message },
         } = res;
-        setResponse(data);
+        setResponse(results);
         toast.success(message);
         setLoading(false);
       })
@@ -86,7 +86,7 @@ const useRequest = (data: IAxiosReq) => {
         toast.error(message);
         setLoading(false);
       });
-  };
+  }, []);
 
   useEffect(() => {
     if (!verifyUser) {
@@ -96,8 +96,8 @@ const useRequest = (data: IAxiosReq) => {
 
   return [
     response as IUseRequestRes["response"],
-    loading as IUseRequestRes["loading"],
     doRequest as IUseRequestRes["doRequest"],
+    loading as IUseRequestRes["loading"],
   ];
 };
 

@@ -33,25 +33,25 @@ export function AuthProvider({ children }: IAuthProvider) {
   const [spinLoading, setSpinLoading] = useState(true);
 
   useEffect(() => {
-    setSpinLoading(true);
-    setTimeout(() => {
-      setCurrentUser({ username: "pit" });
-      console.log("currentUser", currentUser);
-      setSpinLoading(false);
-    }, 1000);
-    new Promise((resolve, reject) => {
-      AxiosFunction({ url: "/api/auth/currentuser", method: "get", body: {}, queryParams: {} })
-        .then((res) => {
-          setCurrentUser(res.data.currentUser);
-          setSpinLoading(false);
-          resolve(res);
-        })
-        .catch((err) => {
-          setCurrentUser(null);
-          setSpinLoading(false);
-          reject(err);
-        });
-    });
+    setSpinLoading(false);
+    // setTimeout(() => {
+    //   setCurrentUser({ username: "pit" });
+    //   // console.log("currentUser", currentUser);
+    //   // setSpinLoading(false);
+    // }, 1000);
+    // new Promise((resolve, reject) => {
+    //   AxiosFunction({ url: "/api/auth/currentuser", method: "get", body: {}, queryParams: {} })
+    //     .then((res) => {
+    //       setCurrentUser(res.data.currentUser);
+    //       setSpinLoading(false);
+    //       resolve(res);
+    //     })
+    //     .catch((err) => {
+    //       setCurrentUser(null);
+    //       setSpinLoading(false);
+    //       reject(err);
+    //     });
+    // });
   }, [currentUser]);
 
   const verifyUser = () => {
