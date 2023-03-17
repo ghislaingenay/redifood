@@ -21,21 +21,24 @@ import OrderSection from "./OrderSection";
 const { Title } = Typography;
 interface IFoodLayoutProps {
   status?: string;
-  foodList: IFood[];
+  foods: IFood[];
   mode: EFoodMode;
   handleOrderCreate?: (foodOrder: IFood[]) => any;
   editOrder?: (foodOrder: IFood[]) => any;
   updateFood?: (food: IFood) => any;
-  foodSection: string[];
+  sectionList: string[];
   mainTitle: string;
 }
 
-const FoodLayout = ({ foodList, mode, foodSection, mainTitle, handleOrderCreate, status }: IFoodLayoutProps) => {
+const FoodLayout = ({ foods, mode, sectionList, mainTitle, handleOrderCreate, status }: IFoodLayoutProps) => {
   const router = useRouter();
   const tableTaken = [1, 4, 5];
 
   const { setStatus } = useContext(AppContext);
   const { foodOrder } = useFood();
+
+  const [foodSection] = useState<string[]>(sectionList);
+  const [foodList] = useState(foods);
 
   const [width] = useWindowSize();
   const widthBreakPoint = 768;
