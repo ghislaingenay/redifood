@@ -83,8 +83,8 @@ const OrderSection = ({
         Total: {convertPrice(Number(calculateTotal(foodOrder)), "backToFront", true)}
       </CenteredTitle>
       <RowCenter style={{ marginTop: "1rem" }}>
-        <AnimButton>
-          <Space>
+        <Space>
+          <AnimButton>
             <RediButton
               buttonType={EButtonType.SUCCESS}
               shape="round"
@@ -94,7 +94,9 @@ const OrderSection = ({
             >
               <b>{t("buttons.validate")}</b>
             </RediButton>
+          </AnimButton>
 
+          <AnimButton>
             <RediButton
               buttonType={EButtonType.ERROR}
               shape="round"
@@ -103,8 +105,8 @@ const OrderSection = ({
             >
               {t("buttons.cancel-order")}
             </RediButton>
-          </Space>
-        </AnimButton>
+          </AnimButton>
+        </Space>
       </RowCenter>
     </>
   );

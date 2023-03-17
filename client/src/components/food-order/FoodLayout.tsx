@@ -108,7 +108,7 @@ const FoodLayout = ({
 
   const renderLGCard = () => {
     return (
-      <LGCard style={{ height: "100vh", width: "100%" }}>
+      <LGCard style={{ height: "100%", width: "100%" }}>
         <If condition={mode !== EFoodMode.ALTER}>
           <Then>
             <OrderSection
@@ -152,7 +152,7 @@ const FoodLayout = ({
             />
             <Row gutter={[5, 10]}>
               {sortedFoods.map((food, index) => (
-                <Col key={index} sm={12} md={8} lg={8} xl={6}>
+                <Col key={index} xs={12} sm={12} md={8} lg={8} xl={6}>
                   <FoodCard foodList={foodList} food={food} mode={mode} />
                 </Col>
               ))}
