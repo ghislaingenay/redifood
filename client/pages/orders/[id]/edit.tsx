@@ -70,7 +70,7 @@ export async function getServerSideProps({ locale, req }: ServerInfo) {
       ...(await serverSideTranslations(getLanguageValue, ["common"])),
     },
   };
-  // const url = "/api/orders/:id";
+  // const url = "/api/orders/:id/foods";
   // await axios
   //   .get(url })
   //   .then(async (res) => {

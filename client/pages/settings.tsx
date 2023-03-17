@@ -58,6 +58,26 @@ const Settings = ({ language }: ISettingsProps) => {
     console.log(values);
   };
 
+  // const [settingsParams, setSettingsParams] = useState<Partial<Omit<ISettings, "email">>>(
+  //   settingsForm.getFieldsValue(),
+  // );
+
+  // const { res, doRequest, loading } = useRequest<Omit<ISettings, "email">>({
+  //   url: "/api/settings",
+  //   method: "post",
+  //   body: {},
+  //   queryParams: {},
+  // });
+
+  // const loadData = async () => {
+  //   await doRequest();
+  //   settingsForm.setFieldsValue(res);
+  // };
+
+  // useEffect(() => {
+  //   loadData();
+  // }, [settingsParams]);
+
   const colSettingsSpan = { xs: 24, sm: 24, md: 24, lg: 12, xl: 12, xxl: 12 };
   const formItemLayout = {
     labelCol: { span: 12 },
@@ -99,6 +119,9 @@ const Settings = ({ language }: ISettingsProps) => {
             {t("settings.global-settings")}
           </CenteredTitle>
           <NoSpacingDivider />
+          {/* {loading ? (
+            <Spin />
+          ) : ( */}
           <Form
             style={{ margin: "2rem 0" }}
             form={settingsForm}
@@ -106,6 +129,7 @@ const Settings = ({ language }: ISettingsProps) => {
             onValuesChange={(_, all: any) => {
               console.log("all", all);
               handleSettingsInfo(all);
+              // setSettingsParams(all);
             }}
           >
             <RowSpaceAround>
@@ -180,6 +204,7 @@ const Settings = ({ language }: ISettingsProps) => {
               <Col {...colSettingsSpan}></Col>
             </RowSpaceAround>
           </Form>
+          {/* )} */}
         </AnimToTop>
       </main>
     </>
@@ -193,4 +218,23 @@ export async function getStaticProps({ locale, req }: ServerInfo) {
   return {
     props: { language: getLanguageValue, ...(await serverSideTranslations(getLanguageValue, ["common"])) }, // will be passed to the page component as props
   };
+  // const url = "/api/settings/:userid";
+  // await axios
+  //   .get(url)
+  //   .then(async (res) => {
+  //     const {
+  //       data: { results: {settingsInfo} },
+  //     } = res;
+  //     return {
+  //       props: {  settings: settingsInfo,  status: "success", ...(await serverSideTranslations(getLanguageValue, ["common"])) },
+  //     };
+  //   })
+  //   .catch((err) => {
+  //     console.log("erre", err);
+  //   });
+  // return {
+  //   props: {  settings: {},status: "error", ...(await serverSideTranslations(getLanguageValue, ["common"])) },
+  // };
 }
+
+// /api/auth/currentuser
