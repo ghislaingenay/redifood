@@ -45,8 +45,8 @@ const CreateOrder = ({ foodList, foodSection, status }: ICreateOrderProps) => {
       <main>
         <FoodLayout
           status={status}
-          foodSection={foodSection}
-          foodList={foodList}
+          sectionList={foodSection}
+          foods={foodList}
           mode={EFoodMode.CREATE}
           mainTitle={t("orders.create-order")}
           handleOrderCreate={handleOrderCreate}
@@ -68,20 +68,21 @@ export async function getServerSideProps({ locale, req }: ServerInfo) {
       ...(await serverSideTranslations(getLanguageValue, ["common"])),
     },
   };
+  // const url = "/api/foods/all";
   // await axios
-  //   .get("/api/foods", { params: { selectedSection: "all" } })
-  //   .then((res: any) => {
+  //   .get(url })
+  //   .then(async (res) => {
   //     const {
-  //       data: { foodList, foodSection },
+  //       data: { results: {foodList, foodSectionList} },
   //     } = res;
   //     return {
-  //       props: { foodList, foodSection, status: "success" },
+  //       props: { foodList: foodList, foodSectionList: foodSectionList, status: "success", ...(await serverSideTranslations(getLanguageValue, ["common"])) },
   //     };
   //   })
   //   .catch((err) => {
-  //     console.log(err);
+  //     console.log("erre", err);
   //   });
   // return {
-  //   props: { foodList: [], foodSection: [], status: "error" },
+  //   props: { foodList: [], foodSectionList: [], status: "error", ...(await serverSideTranslations(getLanguageValue, ["common"])) },
   // };
 }

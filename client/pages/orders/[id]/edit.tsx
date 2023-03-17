@@ -46,8 +46,8 @@ const EditOrder = ({ foodList, currentFoodOrder, foodSection, status }: IEditOrd
       <body>
         <FoodLayout
           status={status}
-          foodSection={foodSection}
-          foodList={foodList}
+          sectionList={foodSection}
+          foods={foodList}
           mode={EFoodMode.EDIT}
           mainTitle={t("orders.edit-order")}
           editOrder={editOrder}
@@ -70,20 +70,21 @@ export async function getServerSideProps({ locale, req }: ServerInfo) {
       ...(await serverSideTranslations(getLanguageValue, ["common"])),
     },
   };
+  // const url = "/api/orders/:id";
   // await axios
-  //   .get("/api/foods", { params: { selectedSection: "all" } })
-  //   .then((res: any) => {
+  //   .get(url })
+  //   .then(async (res) => {
   //     const {
-  //       data: { foodList, foodSection },
+  //       data: { results: {foodList, foodSectionList, currentOrder} },
   //     } = res;
   //     return {
-  //       props: { foodList, foodSection, status: "success" },
+  //       props: { foodList: foodList, foodSectionList: foodSectionList, currentOrder: currentOrder,  status: "success", ...(await serverSideTranslations(getLanguageValue, ["common"])) },
   //     };
   //   })
   //   .catch((err) => {
-  //     console.log(err);
+  //     console.log("erre", err);
   //   });
   // return {
-  //   props: { foodList: [], foodSection: [], status: "error" },
+  //   props: { foodList: [], foodSectionList: [],  currentOrder: [],status: "error", ...(await serverSideTranslations(getLanguageValue, ["common"])) },
   // };
 }
