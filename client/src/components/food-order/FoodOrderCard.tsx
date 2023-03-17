@@ -5,7 +5,7 @@ import { useFood } from "../../contexts/food.context";
 import { useWindowSize } from "../../hooks/useWindowSIze.hook";
 import { EButtonType } from "../../interfaces";
 import { IFood } from "../../interfaces/food.interface";
-import { OrderCardStyled } from "../../styles/styledComponents/div.styled";
+import { AnimFoodCard } from "../../styles/animations/global.anim";
 import { CenteredTitle } from "../../styles/styledComponents/typography.styled";
 import { RediButton } from "../styling/Button.style";
 import { RowCenterSp, RowSpaceAround, RowSpaceBetween } from "../styling/grid.styled";
@@ -66,7 +66,7 @@ const FoodOrderCard = ({ food }: IFoodOrderCard) => {
     );
   };
   return (
-    <OrderCardStyled key={food.itemId} role="card">
+    <AnimFoodCard key={food.itemId} role="card">
       {isLargeScreen ? (
         <>
           <RowCenterSp size={20} gutter={10} style={{ padding: "0 0.5rem", marginBottom: "0.25rem" }}>
@@ -86,7 +86,7 @@ const FoodOrderCard = ({ food }: IFoodOrderCard) => {
           <Col span={12}>{renderButtons()}</Col>
         </RowSpaceAround>
       )}
-    </OrderCardStyled>
+    </AnimFoodCard>
   );
 };
 
