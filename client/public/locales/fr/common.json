@@ -22,7 +22,8 @@
     "no": "Non",
     "order": "Commande",
     "table": "Table",
-    "date": "Date"
+    "date": "Date",
+    "loading": "Chargement ..."
   },
 
   "index": {
@@ -43,7 +44,8 @@
       "from": "De",
       "to": "A"
     },
-    "order-number": "Commande No."
+    "order-number": "Commande No.",
+    "alert-no-orders": "Aucune commande trouvee"
   },
 
   "settings": {
