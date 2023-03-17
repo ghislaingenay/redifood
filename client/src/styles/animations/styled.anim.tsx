@@ -20,8 +20,6 @@ export const AnimRadioButton = ({ children }: any) => {
         scale: 1.05,
         transition: { duration: 0.2 },
       }}
-      // animate={{ scale: 1, opacity: 1 }}
-      // transition={{ ease: "easeOut", duration: 0.4 }}
     >
       {children}
     </motion.div>
