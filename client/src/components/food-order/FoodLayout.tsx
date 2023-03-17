@@ -30,7 +30,15 @@ interface IFoodLayoutProps {
   mainTitle: string;
 }
 
-const FoodLayout = ({ foods, mode, sectionList, mainTitle, handleOrderCreate, status }: IFoodLayoutProps) => {
+const FoodLayout = ({
+  foods,
+  mode,
+  sectionList,
+  mainTitle,
+  handleOrderCreate,
+  status,
+  editOrder,
+}: IFoodLayoutProps) => {
   const router = useRouter();
   const tableTaken = [1, 4, 5];
 
@@ -71,6 +79,9 @@ const FoodLayout = ({ foods, mode, sectionList, mainTitle, handleOrderCreate, st
         } else {
           setErrorTable(result);
         }
+      }
+      case EFoodMode.EDIT: {
+        if (editOrder) editOrder(foodOrder);
       }
       default: {
       }
