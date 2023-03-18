@@ -16,7 +16,7 @@ export const RediSelect = ({ options, initialOption, ...props }: RediSelectProps
     <>
       <Select {...props} defaultValue={initialOption.value}>
         <Select.Option value={initialOption.value}>{initialOption.label}</Select.Option>
-        {options.map((option) => (
+        {options?.map((option) => (
           <Select.Option key={option.value} value={option.value}>
             {option.label}
           </Select.Option>

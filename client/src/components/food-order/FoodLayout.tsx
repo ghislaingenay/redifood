@@ -151,7 +151,7 @@ const FoodLayout = ({
               clickedFn={() => changeActiveButton(selectedSection)}
             />
             <Row gutter={[5, 10]}>
-              {sortedFoods.map((food, index) => (
+              {sortedFoods?.map((food, index) => (
                 <Col key={index} xs={12} sm={12} md={8} lg={8} xl={6}>
                   <FoodCard foodList={foodList} food={food} mode={mode} />
                 </Col>

@@ -227,7 +227,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
     maxFiles: 1,
     onDrop: async (acceptedFiles) => {
       setFiles(
-        acceptedFiles.map((file) =>
+        acceptedFiles?.map((file) =>
           Object.assign(file, {
             preview: URL.createObjectURL(file),
           }),
@@ -442,7 +442,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
               }}
             >
               <Form.Item style={{ display: "none" }} name="itemPhoto" />
-              {optionsCreateFood(displayCurrency).map(({ label, name, component, rules }: IFormInterface) => {
+              {optionsCreateFood(displayCurrency)?.map(({ label, name, component, rules }: IFormInterface) => {
                 return (
                   <>
                     <LabelFormBlack htmlFor={name}>
@@ -466,17 +466,17 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
               <Form.Item name="itemSection" id="itemSection" style={{ fontWeight: 700, marginBottom: "0.5rem" }}>
                 <Select
                   style={{ borderRadius: "2rem" }}
-                  // options={getOptions(foodSection).push({ label: "Add Section", value: "addSection" })}
                   onChange={() => {
                     form.setFieldValue("itemExtra", EHandleType.NONE);
                   }}
                 >
                   <Option value={EHandleType.NONE}>{t("foods.form-label.select")}</Option>
-                  {foodSection.map((section, index) => (
-                    <Option key={index} value={section}>
-                      {capitalize(section)}
-                    </Option>
-                  ))}
+                  {foodSection &&
+                    foodSection.map((section, index) => (
+                      <Option key={index} value={section}>
+                        {capitalize(section)}
+                      </Option>
+                    ))}
                   <Option value={EHandleType.ADDSECTION}>{t("foods.form-label.add-section")}</Option>
                   <Option value={EHandleType.DELETESECTION}>{t("foods.form-label.delete-section")}</Option>
                 </Select>
@@ -507,7 +507,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                     <RowCenterSp>
                       <Select value={delSection} style={{ marginBottom: "0.5rem" }} onChange={(e) => setDelSection(e)}>
                         <Option value={EHandleType.NONE}>Select ...</Option>
-                        {Object.keys(sortedFood).map((section, index) => (
+                        {Object.keys(sortedFood)?.map((section, index) => (
                           <Option key={index} value={section}>
                             {capitalize(section)}
                           </Option>
@@ -640,13 +640,14 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
             <>
               <p>Do you want to delete {delSection} section ?</p>
               <p>These foods will be deleted</p>
-              {foodList
-                .filter((food) => {
-                  return food.itemSection === delSection;
-                })
-                .map((food: IFood) => {
-                  return <p key={food.itemId}>{food.itemName}</p>;
-                })}
+              {foodList &&
+                foodList
+                  .filter((food) => {
+                    return food.itemSection === delSection;
+                  })
+                  .map((food: IFood) => {
+                    return <p key={food.itemId}>{food.itemName}</p>;
+                  })}
             </>
           </Case>
           <Case condition={handleType === EHandleType.ADDEXTRA}>Do you want to create {inputExtra} section ?</Case>
@@ -654,11 +655,12 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
             <>
               <p>Do you want to delete {delExtra} extra ?</p>
               <p>These foods will be deleted</p>
-              {foodList
-                .filter((food) => food.itemExtra === delExtra)
-                .map((food: IFood) => {
-                  return <p key={food.itemId}>{food.itemName}</p>;
-                })}
+              {foodList &&
+                foodList
+                  .filter((food) => food.itemExtra === delExtra)
+                  .map((food: IFood) => {
+                    return <p key={food.itemId}>{food.itemName}</p>;
+                  })}
             </>
           </Case>
         </Switch>
