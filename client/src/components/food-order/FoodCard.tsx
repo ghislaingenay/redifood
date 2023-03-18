@@ -1,8 +1,8 @@
-import { Card } from "antd";
 import Image from "next/image";
-import { BACKGROUND_COLOR, LIGHT_GREY } from "../../constants";
+import { BACKGROUND_COLOR } from "../../constants";
 import { useFood } from "../../contexts/food.context";
 import { EFoodMode, IFood } from "../../interfaces";
+import { AnimCard } from "../../styles/animations/global.anim";
 
 interface IFoodCard {
   food: IFood;
@@ -16,12 +16,7 @@ const FoodCard = ({ food, foodList, mode }: IFoodCard) => {
   } = useFood();
   return (
     <>
-      <Card
-        style={{
-          textAlign: "center",
-          backgroundColor: LIGHT_GREY,
-          boxShadow: "0 0 10px 0 rgba(0,0,0,0.2)",
-        }}
+      <AnimCard
         onClick={() => {
           if (mode === EFoodMode.ALTER) {
             selectFood(food.itemId, foodList);
@@ -72,7 +67,7 @@ const FoodCard = ({ food, foodList, mode }: IFoodCard) => {
             {food.itemDescription}
           </div>
         )}
-      </Card>
+      </AnimCard>
     </>
   );
 };

@@ -31,6 +31,9 @@ export const capitalize = (value: string) => {
 };
 
 export const getOptions = (array: string[]) => {
+  if (!array) {
+    return [];
+  }
   const newArray = [];
   for (let i = 0; i < array.length; i++) {
     const item = array[i];

@@ -1,6 +1,6 @@
 import { Layout } from "antd";
 import Image from "next/image";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import RediWhiteLogo from "../../public/redifood-logo-white.png";
 import { navRoutes } from "../../src/constants/routes.const";
 import { RedisMenu } from "../../src/styles";
@@ -13,7 +13,7 @@ interface IRediHeaderProps {
 }
 const RediHeader = ({ bgColor, color }: IRediHeaderProps) => {
   const [width] = useWindowSize();
-  const isCollapsible = width && width < 992 ? true : false;
+  const isCollapsible = width && width < 1200 ? true : false;
   const pictureHeight = isCollapsible ? 50 : 100;
   const marginValue = isCollapsible ? 14 : 50;
   const router = useRouter();

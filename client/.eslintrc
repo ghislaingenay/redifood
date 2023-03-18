@@ -40,8 +40,8 @@
     "eslint:recommended",
     "plugin:prettier/recommended",
     "next",
+    "next/babel",
     "next/core-web-vitals",
-    "plugin:jsx-a11y/recommended",
-    "next/babel"
+    "plugin:jsx-a11y/recommended"
   ]
 }

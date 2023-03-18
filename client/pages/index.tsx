@@ -15,6 +15,7 @@ import AppContext from "../src/contexts/app.context";
 import { getOptions } from "../src/functions/global.fn";
 import useCurrency from "../src/hooks/useCurrency.hook";
 import { EButtonType, IOrder, ServerInfo } from "../src/interfaces";
+import { AnimToTop } from "../src/styles/animations/global.anim";
 import { allDataOrders, getListUnpaidOrders } from "../test/mocks/mockOrdersData";
 import { buildLanguage } from "./api/build-language";
 
@@ -34,6 +35,13 @@ const AllOrdersPage = ({ allOrders, getList, status }: IAllOrdersPageProps) => {
   const [filteredOrders, setFilteredOrders] = useState<IOrder[]>([]);
   const [spinLoading, setSpinLoading] = useState(true);
   const { Title } = Typography;
+
+  // const [response, doRequest, loading] = useRequest({
+  //   url: "/api/orders/all",
+  //   method: "get",
+  //   queryParams: {selectedOption},
+  //   body: {},
+  // });
 
   const renderAmount = (orderTotal: number) => (displayCurrency() === "$" ? orderTotal : 0.85 * orderTotal);
   const columns = [
@@ -117,59 +125,63 @@ const AllOrdersPage = ({ allOrders, getList, status }: IAllOrdersPageProps) => {
         <meta name="description" content={t("index.head.description") as string} />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Title level={2} aria-label="List of all orders">
-        {t("index.title")}
-      </Title>
-      <RowSpaceBetween gutter={10} style={{ marginBottom: "1rem" }}>
-        <Col span={12}>
-          <RediSelect
-            initialOption={{ value: "ALL", label: t("glossary.all") }}
-            style={{ width: "8rem" }}
-            value={selectedOption}
-            onChange={(e: any) => showProperData(e)}
-            options={getOptions(getList)}
+      <main>
+        <AnimToTop>
+          <Title level={2} aria-label="List of all orders">
+            {t("index.title")}
+          </Title>
+          <RowSpaceBetween gutter={10} style={{ marginBottom: "1rem" }}>
+            <Col span={12}>
+              <RediSelect
+                initialOption={{ value: "ALL", label: t("glossary.all") }}
+                style={{ width: "8rem" }}
+                value={selectedOption}
+                onChange={(e: any) => showProperData(e)}
+                options={getOptions(getList)}
+              />
+            </Col>
+            <Col span={11} style={{ textAlign: "right" }}>
+              <RediIconButton
+                shape="round"
+                buttonType={EButtonType.CREATE}
+                aria-label="create order"
+                iconFt={faPlusCircle}
+                onClick={() => router.push("/orders/create")}
+              >
+                {t("index.orderButton")}
+              </RediIconButton>
+            </Col>
+          </RowSpaceBetween>
+          <Table
+            loading={spinLoading}
+            rowKey="_id"
+            columns={columns}
+            dataSource={filteredOrders}
+            pagination={false}
+            expandable={{
+              expandedRowRender: (record: IOrder) => {
+                return (
+                  <RowSpaceAround>
+                    {record.orderItems.map((item) => {
+                      return (
+                        <Col span={6} key={item.itemId} style={{ color: BACKGROUND_COLOR }}>
+                          <b>
+                            <Space>
+                              <FontAwesomeIcon icon={faUtensils} />
+                              {item.itemName}
+                            </Space>
+                          </b>{" "}
+                          (<em>{item.itemQuantity}</em>)
+                        </Col>
+                      );
+                    })}
+                  </RowSpaceAround>
+                );
+              },
+            }}
           />
-        </Col>
-        <Col span={11} style={{ textAlign: "right" }}>
-          <RediIconButton
-            shape="round"
-            buttonType={EButtonType.CREATE}
-            aria-label="create order"
-            iconFt={faPlusCircle}
-            onClick={() => router.push("/orders/create")}
-          >
-            {t("index.orderButton")}
-          </RediIconButton>
-        </Col>
-      </RowSpaceBetween>
-      <Table
-        loading={spinLoading}
-        rowKey="_id"
-        columns={columns}
-        dataSource={filteredOrders}
-        pagination={false}
-        expandable={{
-          expandedRowRender: (record: IOrder) => {
-            return (
-              <RowSpaceAround>
-                {record.orderItems.map((item) => {
-                  return (
-                    <Col span={6} key={item.itemId} style={{ color: BACKGROUND_COLOR }}>
-                      <b>
-                        <Space>
-                          <FontAwesomeIcon icon={faUtensils} />
-                          {item.itemName}
-                        </Space>
-                      </b>{" "}
-                      (<em>{item.itemQuantity}</em>)
-                    </Col>
-                  );
-                })}
-              </RowSpaceAround>
-            );
-          },
-        }}
-      />
+        </AnimToTop>
+      </main>
     </>
   );
 };
@@ -186,21 +198,21 @@ export async function getServerSideProps({ locale, req }: ServerInfo) {
       ...(await serverSideTranslations(getLanguageValue, ["common"])),
     },
   };
-  // const url = "/api/orders";
+  // const url = "/api/orders/all";
   // await axios
   //   .get(url, { params: { selectedOption: "ALL" } })
-  // .then((res) => {
-  //   const {
-  //     data: { allDataOrders, getListUnpaidOrders },
-  //   } = res;
-  //   return {
-  //     props: { allOrders: allDataOrders, getList: getListUnpaidOrders, status: "success" },
-  //   };
-  // })
-  // .catch((err) => {
-  //   console.log("erre", err);
-  // });
+  //   .then(async (res) => {
+  //     const {
+  //       data: { results: {allDataOrders, getListUnpaidOrders} },
+  //     } = res;
+  //     return {
+  //       props: { allOrders: allDataOrders, getList: getListUnpaidOrders, status: "success", ...(await serverSideTranslations(getLanguageValue, ["common"])) },
+  //     };
+  //   })
+  //   .catch((err) => {
+  //     console.log("erre", err);
+  //   });
   // return {
-  //   props: { allOrders: [], getList: [], status: "error" },
+  //   props: { allOrders: [], getList: [], status: "error", ...(await serverSideTranslations(getLanguageValue, ["common"])) },
   // };
 }
