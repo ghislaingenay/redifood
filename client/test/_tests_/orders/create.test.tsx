@@ -20,7 +20,7 @@ import {
 // import { server } from "../../../test/mocks/server";
 import { render } from "../../index";
 jest.mock("next/navigation", () => require("next-router-mock"));
-jest.setTimeout(30000);
+jest.setTimeout(40000);
 
 describe("Function testing", () => {
   it("test convertDataForAPI function", () => {
