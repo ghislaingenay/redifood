@@ -2,7 +2,7 @@ import { render as baseRender, RenderOptions, RenderResult } from "@testing-libr
 import { ComponentType, ReactElement } from "react";
 import { AppProvider } from "../src/contexts/app.context";
 
-import { AuthContext } from "../src/contexts/auth.context";
+import { AuthProvider } from "../src/contexts/auth.context";
 import { FoodProvider } from "../src/contexts/food.context";
 
 /**
@@ -19,19 +19,13 @@ export const AllTheProviders = ({ children }: { children: any }) => {
   // RECOVER CONTEXT
 
   // VALUES
-  const userValue = {
-    authorization: {
-      id: "5f9f1b9b0b5b9c0017b5b1a5",
-      email: "",
-    },
-  };
 
   // RENDER
   return (
     <>
       <AppProvider>
         <FoodProvider>
-          <AuthContext.Provider value={userValue}>{children}</AuthContext.Provider>
+          <AuthProvider>{children}</AuthProvider>
         </FoodProvider>
       </AppProvider>
     </>
