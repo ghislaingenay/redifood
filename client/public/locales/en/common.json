@@ -22,7 +22,8 @@
     "no": "No",
     "order": "Order",
     "table": "Table",
-    "date": "Date"
+    "date": "Date",
+    "loading": "Loading ..."
   },
 
   "index": {
@@ -43,7 +44,8 @@
       "from": "From",
       "to": "To"
     },
-    "order-number": "Order number"
+    "order-number": "Order number",
+    "alert-no-orders": "No orders found"
   },
 
   "settings": {

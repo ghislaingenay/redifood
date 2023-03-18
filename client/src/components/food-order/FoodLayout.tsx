@@ -21,21 +21,32 @@ import OrderSection from "./OrderSection";
 const { Title } = Typography;
 interface IFoodLayoutProps {
   status?: string;
-  foodList: IFood[];
+  foods: IFood[];
   mode: EFoodMode;
   handleOrderCreate?: (foodOrder: IFood[]) => any;
   editOrder?: (foodOrder: IFood[]) => any;
   updateFood?: (food: IFood) => any;
-  foodSection: string[];
+  sectionList: string[];
   mainTitle: string;
 }
 
-const FoodLayout = ({ foodList, mode, foodSection, mainTitle, handleOrderCreate, status }: IFoodLayoutProps) => {
+const FoodLayout = ({
+  foods,
+  mode,
+  sectionList,
+  mainTitle,
+  handleOrderCreate,
+  status,
+  editOrder,
+}: IFoodLayoutProps) => {
   const router = useRouter();
   const tableTaken = [1, 4, 5];
 
   const { setStatus } = useContext(AppContext);
   const { foodOrder } = useFood();
+
+  const [foodSection] = useState<string[]>(sectionList);
+  const [foodList] = useState(foods);
 
   const [width] = useWindowSize();
   const widthBreakPoint = 768;
@@ -69,6 +80,9 @@ const FoodLayout = ({ foodList, mode, foodSection, mainTitle, handleOrderCreate,
           setErrorTable(result);
         }
       }
+      case EFoodMode.EDIT: {
+        if (editOrder) editOrder(foodOrder);
+      }
       default: {
       }
     }
@@ -94,7 +108,7 @@ const FoodLayout = ({ foodList, mode, foodSection, mainTitle, handleOrderCreate,
 
   const renderLGCard = () => {
     return (
-      <LGCard style={{ height: "100vh", width: "100%" }}>
+      <LGCard style={{ height: "100%", width: "100%" }}>
         <If condition={mode !== EFoodMode.ALTER}>
           <Then>
             <OrderSection
@@ -138,7 +152,7 @@ const FoodLayout = ({ foodList, mode, foodSection, mainTitle, handleOrderCreate,
             />
             <Row gutter={[5, 10]}>
               {sortedFoods.map((food, index) => (
-                <Col key={index} sm={12} md={8} lg={8} xl={6}>
+                <Col key={index} xs={12} sm={12} md={8} lg={8} xl={6}>
                   <FoodCard foodList={foodList} food={food} mode={mode} />
                 </Col>
               ))}

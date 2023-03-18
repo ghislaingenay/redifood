@@ -36,6 +36,13 @@ const AllOrdersPage = ({ allOrders, getList, status }: IAllOrdersPageProps) => {
   const [spinLoading, setSpinLoading] = useState(true);
   const { Title } = Typography;
 
+  // const [response, doRequest, loading] = useRequest({
+  //   url: "/api/orders/all",
+  //   method: "get",
+  //   queryParams: {selectedOption},
+  //   body: {},
+  // });
+
   const renderAmount = (orderTotal: number) => (displayCurrency() === "$" ? orderTotal : 0.85 * orderTotal);
   const columns = [
     {
@@ -191,21 +198,21 @@ export async function getServerSideProps({ locale, req }: ServerInfo) {
       ...(await serverSideTranslations(getLanguageValue, ["common"])),
     },
   };
-  // const url = "/api/orders";
+  // const url = "/api/orders/all";
   // await axios
   //   .get(url, { params: { selectedOption: "ALL" } })
-  // .then((res) => {
-  //   const {
-  //     data: { allDataOrders, getListUnpaidOrders },
-  //   } = res;
-  //   return {
-  //     props: { allOrders: allDataOrders, getList: getListUnpaidOrders, status: "success" },
-  //   };
-  // })
-  // .catch((err) => {
-  //   console.log("erre", err);
-  // });
+  //   .then(async (res) => {
+  //     const {
+  //       data: { results: {allDataOrders, getListUnpaidOrders} },
+  //     } = res;
+  //     return {
+  //       props: { allOrders: allDataOrders, getList: getListUnpaidOrders, status: "success", ...(await serverSideTranslations(getLanguageValue, ["common"])) },
+  //     };
+  //   })
+  //   .catch((err) => {
+  //     console.log("erre", err);
+  //   });
   // return {
-  //   props: { allOrders: [], getList: [], status: "error" },
+  //   props: { allOrders: [], getList: [], status: "error", ...(await serverSideTranslations(getLanguageValue, ["common"])) },
   // };
 }

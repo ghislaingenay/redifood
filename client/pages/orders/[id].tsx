@@ -133,4 +133,21 @@ export async function getServerSideProps({ locale, req }: ServerInfo) {
       ...(await serverSideTranslations(getLanguageValue, ["common"])),
     },
   };
+  // const url = "/api/orders/:id/info";
+  // await axios
+  //   .get(url)
+  //   .then(async (res) => {
+  //     const {
+  //       data: { results: {currentOrder} },
+  //     } = res;
+  //     return {
+  //       props: {  currentOrder: currentOrder,  status: "success", ...(await serverSideTranslations(getLanguageValue, ["common"])) },
+  //     };
+  //   })
+  //   .catch((err) => {
+  //     console.log("erre", err);
+  //   });
+  // return {
+  //   props: {  currentOrder: [],status: "error", ...(await serverSideTranslations(getLanguageValue, ["common"])) },
+  // };
 }
