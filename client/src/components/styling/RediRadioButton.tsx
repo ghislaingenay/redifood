@@ -1,5 +1,5 @@
 import { ButtonProps, Col } from "antd";
-import { Dispatch, SetStateAction, useCallback, useEffect, useMemo } from "react";
+import { Dispatch, SetStateAction, useMemo } from "react";
 import { BACKGROUND_COLOR, LIGHT_GREY, ORANGE_DARK, ORANGE_LIGHT } from "../../constants";
 import { hexToRgba } from "../../functions/global.fn";
 import { RadioButton } from "../../styles";
@@ -53,12 +53,16 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
     fontSize,
   }: IRediRadioButtonProps<Booleanish> = props;
 
-  const isSelected = useCallback(
-    (radioValue: string) => {
-      return selectedButton === radioValue;
-    },
-    [selectedButton],
-  );
+  const isSelected = (radioValue: string) => {
+    return selectedButton === radioValue;
+  };
+
+  // const isSelected = useCallback(
+  //   (radioValue: string) => {
+  //     return selectedButton === radioValue;
+  //   },
+  //   [selectedButton],
+  // );
 
   const spanValue = (options: IRediRadio[] | IRediRadioWithIcon[]) => {
     switch (options.length) {
@@ -93,8 +97,6 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
     };
   };
 
-  useEffect(() => {}, [selectedButton]);
-
   return (
     <RowSpaceAround>
       {options.map(({ label, value, icon, ariaLabel }: any, index: number) => (
@@ -124,7 +126,7 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
                 name={radioGroupName}
                 value={value}
                 // aria-checked={isSelected(value)}
-                aria-checked={isSelected(selectedValue)}
+                aria-checked={isSelected(value)}
               >
                 {haveIcon === "true" && <SpanBlockM02Y>{icon}</SpanBlockM02Y>}
                 {label.toUpperCase()}
