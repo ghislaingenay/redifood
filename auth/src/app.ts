@@ -5,6 +5,7 @@ import express from "express";
 import "express-async-errors";
 import { authRouter } from "./controllers/auth.controller";
 import { currentUserRouter } from "./controllers/currentuser.controller";
+import { settingsRouter } from "./controllers/settings.controller";
 import { NotFoundError } from "./errors/not-found.err";
 import { EMessageErrors, EStatusCodes } from "./interfaces/err.interface";
 import { errorHandler } from "./middlewares/error-handler.mdwr";
@@ -28,6 +29,7 @@ app.use(
 // routes
 app.use(currentUserRouter);
 app.use(authRouter);
+app.use(settingsRouter);
 
 app.all("*", async (req, res) => {
   res.status(EStatusCodes.NOT_FOUND).send({ errors: [{ message: EMessageErrors.NOT_FOUND }] });
