@@ -1,4 +1,5 @@
 import request from "supertest";
+import { ECurrency } from "../../../../common/auth-settings/settings.intfc";
 import { app } from "../../app";
 import { EMessageErrors } from "../../interfaces/err.interface";
 import { ISettings } from "../../interfaces/settings.interface";
@@ -96,5 +97,37 @@ describe("GET /api/settings/:userid", () => {
 });
 
 describe("PUT /api/settings/:userid", () => {
-  it("Fails whe value from w");
+  it("Fails if the userid is not valid", async () => {
+    const signUpRes = await request(app)
+      .post("/api/auth/signup")
+      .send({
+        email: emailValid,
+        password: "Fyu89*_vhhvgh",
+      })
+      .expect(201);
+    const response = await request(app)
+      .put(`/api/settings/${signUpRes.body.id}`)
+      .send({ ...settingsObject, haveFoodDescription: true })
+      .expect(400);
+    expect(response.body.message).toEqual(EMessageErrors.INVALID_CREDENTIALS);
+  });
+
+  it("Fails when a new value sent is undefined", async () => {
+    const response = await request(app)
+      .put(`/api/settings/undefined`)
+      .send({ ...settingsObject, haveFoodDescription: true })
+      .expect(400);
+    expect(response.body.message).toEqual(EMessageErrors.INVALID_CREDENTIALS);
+  });
+  it("Succesfully update the settings", async () => {
+    const signUpRes = await request(app).post("/api/auth/signup").send({
+      email: emailValid,
+      password: "Fyu89*_vhhvgh",
+    });
+    const response = await request(app)
+      .put(`/api/settings/${signUpRes.body.id}`)
+      .send({ ...settingsObject, userId: signUpRes.body.id, haveFoodDescription: true, currency: ECurrency.EUR })
+      .expect(200);
+    expect(response.body.message).toEqual("Settings succesfully updated");
+  });
 });
