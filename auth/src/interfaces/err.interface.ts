@@ -11,4 +11,5 @@ export enum EMessageErrors {
   INVALID_CREDENTIALS = "Invalid credentials",
   NOT_AUTHORIZED = "Not authorized",
   NOT_FOUND = "Not found",
+  MISSING_ATTRIBUTES = "Missing attributes",
 }
