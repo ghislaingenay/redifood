@@ -1,14 +1,14 @@
 import request from "supertest";
 import { ECurrency } from "../../../../common/auth-settings/settings.intfc";
 import { app } from "../../app";
-import { EMessageErrors } from "../../interfaces/err.interface";
+import { EMessageErrors, EMessageSuccess } from "../../interfaces/err.interface";
 import { ISettings } from "../../interfaces/settings.interface";
 
 const emailValid = "test@test.com";
 const fakeUserId = "dndsnfkdg";
 
 const settingsObject: Partial<ISettings> = {
-  userId: fakeUserId,
+  user: fakeUserId,
   currency: "USD",
   vat: 7,
   language: "en",
@@ -17,6 +17,10 @@ const settingsObject: Partial<ISettings> = {
 };
 
 describe("POST /api/settings", () => {
+  it("Fails when no bodu is sent", async () => {
+    const response = await request(app).post("/api/settings").send({}).expect(400);
+    expect(response.body.message).toEqual(EMessageErrors.EMPTY_ATTRIBUTES);
+  });
   it("Fails when userid is incorrect", async () => {
     const response = await request(app).post("/api/settings").send(settingsObject).expect(400);
     expect(response.body.message).toEqual(EMessageErrors.INVALID_CREDENTIALS);
@@ -24,7 +28,7 @@ describe("POST /api/settings", () => {
 
   it("Fails when userid is not provided", async () => {
     const updatedObject = { ...settingsObject };
-    updatedObject.userId = undefined;
+    updatedObject.user = undefined;
     const response = await request(app).post("/api/settings").send(updatedObject).expect(400);
     expect(response.body.message).toEqual(EMessageErrors.MISSING_ATTRIBUTES);
   });
@@ -73,9 +77,9 @@ describe("POST /api/settings", () => {
       })
       .expect(201);
     const updatedObject = { ...settingsObject };
-    updatedObject.userId = signUpRes.body.id;
+    updatedObject.user = signUpRes.body.id;
     const response = await request(app).post("/api/settings").send(updatedObject).expect(201);
-    expect(response.body.message).toEqual("Settings succesfully created");
+    expect(response.body.message).toEqual(EMessageSuccess.SETTINGS_CREATED);
   });
 });
 describe("GET /api/settings/:userid", () => {
@@ -88,11 +92,12 @@ describe("GET /api/settings/:userid", () => {
       })
       .expect(201);
     const updatedObject = { ...settingsObject };
-    updatedObject.userId = signUpRes.body.id;
+    updatedObject.user = signUpRes.body.id;
     const response = await request(app).post("/api/settings").send(updatedObject).expect(201);
-    expect(response.body.message).toEqual("Settings succesfully created");
-    const getResponse = await request(app).get("/api/settings").query({ userId: updatedObject.userId }).expect(200);
+    expect(response.body.message).toEqual(EMessageSuccess.SETTINGS_CREATED);
+    const getResponse = await request(app).get("/api/settings").query({ userId: updatedObject.user }).expect(200);
     expect(getResponse.body.results).toEqual(updatedObject);
+    expect(getResponse.body.message).toEqual(EMessageSuccess.SETTINGS_RETRIEVED);
   });
 });
 
@@ -128,6 +133,6 @@ describe("PUT /api/settings/:userid", () => {
       .put(`/api/settings/${signUpRes.body.id}`)
       .send({ ...settingsObject, userId: signUpRes.body.id, haveFoodDescription: true, currency: ECurrency.EUR })
       .expect(200);
-    expect(response.body.message).toEqual("Settings succesfully updated");
+    expect(response.body.message).toEqual(EMessageSuccess.SETTINGS_UPDATED);
   });
 });
