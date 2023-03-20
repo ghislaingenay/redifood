@@ -4,7 +4,7 @@ import { UserDoc } from "./users.model";
 const ObjectId = mongoose.Schema.Types.ObjectId;
 
 interface SettingsAttrs {
-  user: UserDoc;
+  user: UserDoc | string;
   haveFoodDescription: boolean;
   haveFoodImage: boolean;
   vat: number;
