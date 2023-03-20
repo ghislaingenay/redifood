@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { ECurrency, ELanguage } from "../../../common/auth-settings/settings.intfc";
+import { ECurrency, ELanguage } from "../../redifood-module/src/interfaces";
 import { UserDoc } from "./users.model";
 const ObjectId = mongoose.Schema.Types.ObjectId;
 
