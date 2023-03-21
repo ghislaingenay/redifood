@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: foods-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: foods
+  template:
+    metadata:
+      labels:
+        app: foods
+    spec:
+      containers:
+        - name: foods
+          image: ghislaingenay/redifood-foods
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: foods-srv
+spec:
+  selector:
+    app: foods
+  ports:
+    - name: foods
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
