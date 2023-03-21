@@ -1,8 +1,8 @@
 import { createContext, useEffect, useState } from "react";
 import useLanguage from "../../pages/api/useLanguage";
+import { ECurrency, ELanguage } from "../../redifood-module/src/interfaces";
 import { NotificationRes } from "../../src/definitions/notification.class";
 import { storeCurrency } from "../functions/global.fn";
-import { ECurrency, ELanguage } from "../interfaces";
 
 // @ts-ignore
 const AppContext = createContext({} as IAppContext);

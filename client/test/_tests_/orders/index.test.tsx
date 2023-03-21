@@ -3,8 +3,8 @@ import { fireEvent, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { render } from "../..";
 import AllOrdersPage from "../../../pages/index";
+import { ELanguage } from "../../../redifood-module/src/interfaces";
 import { getOptions } from "../../../src/functions/global.fn";
-import { ELanguage } from "../../../src/interfaces";
 import { allDataOrders, getListUnpaidOrders } from "../../mocks/mockOrdersData";
 
 jest.mock("next/navigation", () => require("next-router-mock"));
