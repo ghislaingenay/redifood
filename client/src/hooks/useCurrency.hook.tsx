@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
+import { ECurrency, ELanguage } from "../../redifood-module/src/interfaces";
 import AppContext from "../contexts/app.context";
 import { storeCurrency } from "../functions/global.fn";
-import { ECurrency, ELanguage } from "../interfaces";
 
 interface IUseCurrency {
   convertPrice: (price: number, direction: "backToFront" | "frontToBack", currBool: boolean) => string;

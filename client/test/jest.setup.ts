@@ -5,6 +5,13 @@ import JestMock from "jest-mock";
 import "next-router-mock";
 import { server } from "./mocks/server";
 
+global.console = {
+  ...console,
+  log: jest.fn(),
+  // info: jest.fn(),
+  error: jest.fn(),
+  warn: jest.fn(),
+};
 beforeAll(() => {
   jest.setTimeout(60000);
 

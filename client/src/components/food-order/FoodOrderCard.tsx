@@ -1,10 +1,10 @@
 import { DeleteOutlined, MinusSquareOutlined, PlusSquareOutlined } from "@ant-design/icons";
 import { Col, Space, Typography } from "antd";
+import { IFoodApi } from "../../../redifood-module/src/interfaces";
 import { GREY } from "../../constants";
 import { useFood } from "../../contexts/food.context";
 import { useWindowSize } from "../../hooks/useWindowSIze.hook";
 import { EButtonType } from "../../interfaces";
-import { IFood } from "../../interfaces/food.interface";
 import { AnimFoodCard } from "../../styles/animations/global.anim";
 import { CenteredTitle } from "../../styles/styledComponents/typography.styled";
 import { RediButton } from "../styling/Button.style";
@@ -12,7 +12,7 @@ import { RowCenterSp, RowSpaceAround, RowSpaceBetween } from "../styling/grid.st
 const { Title } = Typography;
 
 interface IFoodOrderCard {
-  food: IFood;
+  food: IFoodApi;
 }
 
 const FoodOrderCard = ({ food }: IFoodOrderCard) => {

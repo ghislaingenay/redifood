@@ -8,12 +8,13 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Case, Default, Else, If, Switch, Then } from "react-if";
+import { IFoodApi } from "../../../redifood-module/src/interfaces";
 import { GREY, ORANGE_DARK } from "../../constants";
 import { useFood } from "../../contexts/food.context";
 import { convertFoodToSection } from "../../functions/food.fn";
 import { capitalize } from "../../functions/global.fn";
 import useCurrency from "../../hooks/useCurrency.hook";
-import { EButtonType, IFood, IFormInterface } from "../../interfaces";
+import { EButtonType, IFormInterface } from "../../interfaces";
 import { SpacingDiv5X } from "../../styles/styledComponents/div.styled";
 import { RedSpan } from "../../styles/styledComponents/span.styled";
 import {
@@ -31,10 +32,10 @@ import RediRadioButton, { Booleanish } from "../styling/RediRadioButton";
 const { Option } = Select;
 interface IFoodForm {
   foodSection: string[];
-  foodList: IFood[];
+  foodList: IFoodApi[];
 }
 
-type PartialFood = Partial<IFood>;
+type PartialFood = Partial<IFoodApi> | null;
 
 enum EHandleType {
   NONE = "NONE",
@@ -98,7 +99,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
   const [handleType, setHandleType] = useState<EHandleType>(EHandleType.NONE);
   const [sortedFood, setSortedFood] = useState<Record<string, string[]>>({});
 
-  const [newFoodData, setNewFoodData] = useState<IFood | null>(null);
+  const [newFoodData, setNewFoodData] = useState<IFoodApi | null>(null);
   const [inputSection, setInputSection] = useState<string>("");
   const [delSection, setDelSection] = useState<string>("");
   const [inputExtra, setInputExtra] = useState<string>("");
@@ -111,7 +112,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
   const [cancelModal, setCancelModal] = useState(false);
 
   const [currentFood, setCurrentFood] = useState<PartialFood>(foodOrder[0]);
-  const [modifiedFood, setModifiedFood] = useState<PartialFood>(null);
+  // const [modifiedFood, setModifiedFood] = useState<PartialFood>(null);
   // const {
   //   res: resImage,
   //   doRequest: doRequestUpload,
@@ -645,7 +646,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                   .filter((food) => {
                     return food.itemSection === delSection;
                   })
-                  .map((food: IFood) => {
+                  .map((food: IFoodApi) => {
                     return <p key={food.itemId}>{food.itemName}</p>;
                   })}
             </>
@@ -658,7 +659,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
               {foodList &&
                 foodList
                   .filter((food) => food.itemExtra === delExtra)
-                  .map((food: IFood) => {
+                  .map((food: IFoodApi) => {
                     return <p key={food.itemId}>{food.itemName}</p>;
                   })}
             </>

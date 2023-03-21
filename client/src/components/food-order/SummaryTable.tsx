@@ -1,16 +1,16 @@
 import { Col } from "antd";
 import { useTranslation } from "next-i18next";
 import { useContext } from "react";
+import { IFoodApi, IOrderApi } from "../../../redifood-module/src/interfaces";
 import { BACKGROUND_COLOR, GREY, ORANGE_DARK } from "../../constants";
 import AppContext from "../../contexts/app.context";
 import { hexToRgba } from "../../functions/global.fn";
 import useCurrency from "../../hooks/useCurrency.hook";
-import { IFood, IOrder } from "../../interfaces";
 import { CenteredP, CenteredTitle } from "../../styles";
 import { RowSpaceAround } from "../styling/grid.styled";
 
 interface ISummaryTable {
-  order: IOrder;
+  order: IOrderApi;
   xSize?: number;
   sSize?: number;
   mSize?: number;
@@ -19,7 +19,7 @@ interface ISummaryTable {
 
 const SummaryTable = ({ order, xSize, sSize, mSize, lSize }: ISummaryTable) => {
   const noMP = { margin: 0, padding: 0 };
-  const { t } = useTranslation("");
+  const { t } = useTranslation("common");
   const {
     state: { vat },
   } = useContext(AppContext);
@@ -55,7 +55,7 @@ const SummaryTable = ({ order, xSize, sSize, mSize, lSize }: ISummaryTable) => {
         </RowSpaceAround>
       </div>
       <div role="rowgroup">
-        {orderItems.map((food: IFood, index: number) => {
+        {orderItems.map((food: IFoodApi, index: number) => {
           const indexEven = index % 2 === 0 ? hexToRgba(ORANGE_DARK, 0.3) : hexToRgba(ORANGE_DARK, 0.5);
           return (
             <RowSpaceAround

@@ -1,10 +1,11 @@
 import { Alert, Divider, InputNumber, Space, Typography } from "antd";
 import { useTranslation } from "next-i18next";
+import { IFoodApi } from "../../../redifood-module/src/interfaces";
 import { ORANGE, RED } from "../../constants";
 import { useFood } from "../../contexts/food.context";
 import { calculateTotal } from "../../functions/order.fn";
 import useCurrency from "../../hooks/useCurrency.hook";
-import { EButtonType, EFoodMode, IFood } from "../../interfaces";
+import { EButtonType, EFoodMode } from "../../interfaces";
 import { AnimButton } from "../../styles/animations/styled.anim";
 import { Scroll } from "../../styles/styledComponents/div.styled";
 import { CenteredTitle } from "../../styles/styledComponents/typography.styled";
@@ -18,7 +19,7 @@ interface IOrderSectionProps {
   setTableNumber: (value: number | null) => void;
   mode: EFoodMode;
   errorTable: { alreadyInDb: boolean; missingValue: boolean };
-  handleSubmit: (foodOrder: IFood[]) => void;
+  handleSubmit: (foodOrder: IFoodApi[]) => void;
   handleCancel: (url: string) => void;
 }
 
@@ -30,7 +31,7 @@ const OrderSection = ({
   handleSubmit,
   handleCancel,
 }: IOrderSectionProps) => {
-  const { t } = useTranslation("");
+  const { t } = useTranslation("common");
   const { convertPrice } = useCurrency();
   const { foodOrder } = useFood();
   const isCreateMode = mode === EFoodMode.CREATE ? true : false;

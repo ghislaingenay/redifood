@@ -7,6 +7,7 @@ import Head from "next/head";
 import { useRouter } from "next/navigation";
 import { AlignType } from "rc-table/lib/interface";
 import { useContext, useEffect, useState } from "react";
+import { IOrderApi } from "../redifood-module/src/interfaces";
 import { RediSelect } from "../src/components/RediSelect";
 import { RediIconButton } from "../src/components/styling/Button.style";
 import { RowSpaceAround, RowSpaceBetween } from "../src/components/styling/grid.styled";
@@ -14,25 +15,25 @@ import { BACKGROUND_COLOR } from "../src/constants";
 import AppContext from "../src/contexts/app.context";
 import { getOptions } from "../src/functions/global.fn";
 import useCurrency from "../src/hooks/useCurrency.hook";
-import { EButtonType, IOrder, ServerInfo } from "../src/interfaces";
+import { EButtonType, ServerInfo } from "../src/interfaces";
 import { AnimToTop } from "../src/styles/animations/global.anim";
 import { allDataOrders, getListUnpaidOrders } from "../test/mocks/mockOrdersData";
 import { buildLanguage } from "./api/build-language";
 
 interface IAllOrdersPageProps {
-  allOrders: IOrder[];
+  allOrders: IOrderApi[];
   getList: string[];
   status: string;
 }
 const AllOrdersPage = ({ allOrders, getList, status }: IAllOrdersPageProps) => {
-  const { t } = useTranslation("");
+  const { t } = useTranslation("common");
   const { displayCurrency } = useCurrency();
   const { setStatus } = useContext(AppContext);
 
   const router = useRouter();
   const [listAllOrders] = useState(allOrders);
   const [selectedOption, setSelectedOption] = useState("ALL");
-  const [filteredOrders, setFilteredOrders] = useState<IOrder[]>([]);
+  const [filteredOrders, setFilteredOrders] = useState<IOrderApi[]>([]);
   const [spinLoading, setSpinLoading] = useState(true);
   const { Title } = Typography;
 
@@ -69,7 +70,7 @@ const AllOrdersPage = ({ allOrders, getList, status }: IAllOrdersPageProps) => {
       dataIndex: "_id",
       align: "center" as AlignType,
       key: "_id",
-      render: (item: IOrder) => (
+      render: (item: IOrderApi) => (
         <Space>
           <RediIconButton
             onClick={() => router.push(`/orders/${item._id}/edit`)}
@@ -105,7 +106,7 @@ const AllOrdersPage = ({ allOrders, getList, status }: IAllOrdersPageProps) => {
   useEffect(() => {
     setStatus(status);
     // data coming from backend
-    const sortedData = allOrders.map((order: IOrder) => {
+    const sortedData = allOrders.map((order: IOrderApi) => {
       return {
         ...order,
         key: order._id,
@@ -159,7 +160,7 @@ const AllOrdersPage = ({ allOrders, getList, status }: IAllOrdersPageProps) => {
             dataSource={filteredOrders}
             pagination={false}
             expandable={{
-              expandedRowRender: (record: IOrder) => {
+              expandedRowRender: (record: IOrderApi) => {
                 return (
                   <RowSpaceAround>
                     {record.orderItems.map((item) => {

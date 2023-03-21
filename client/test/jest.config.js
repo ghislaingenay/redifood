@@ -9,6 +9,7 @@ const createJestConfig = nextJest({
 // Add any custom config to be passed to Jest
 /** @type {import('jest').Config} */
 const customJestConfig = {
+  verbose: true,
   rootDir: "../",
   // Add more setup options before each test is run
   setupFilesAfterEnv: ["<rootDir>/test/jest.setup.ts"],
@@ -23,7 +24,6 @@ const customJestConfig = {
     "^.+\\.(js|jsx|mjs)$": "<rootDir>/node_modules/babel-jest",
     "^.+\\.tsx?$": "ts-jest",
   },
-  
 };
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async

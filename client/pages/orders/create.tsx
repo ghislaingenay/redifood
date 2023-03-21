@@ -2,23 +2,24 @@ import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useEffect } from "react";
+import { IFoodApi } from "../../redifood-module/src/interfaces";
 import FoodLayout from "../../src/components/food-order/FoodLayout";
 import { useFood } from "../../src/contexts/food.context";
 import { NotificationRes } from "../../src/definitions/notification.class";
 import { ServerInfo } from "../../src/interfaces";
-import { EFoodMode, IFood } from "../../src/interfaces/food.interface";
+import { EFoodMode } from "../../src/interfaces/food.interface";
 import { foodSectionArray, mockedFoodData } from "../../test/mocks/mockFoodData";
 import { buildLanguage } from "../api/build-language";
 
 interface ICreateOrderProps {
-  foodList: IFood[];
+  foodList: IFoodApi[];
   foodSection: string[];
   status: string;
 }
 const CreateOrder = ({ foodList, foodSection, status }: ICreateOrderProps) => {
   const { setFoodOrder } = useFood();
-  const { t } = useTranslation("");
-  const handleOrderCreate = (foodOrder: IFood[]) => {
+  const { t } = useTranslation("common");
+  const handleOrderCreate = (foodOrder: IFoodApi[]) => {
     console.log("order created", foodOrder);
     NotificationRes.onSuccess({
       title: "Order was succesfully created",
