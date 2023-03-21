@@ -19,7 +19,7 @@ interface ISettingsProps {
   language: ELanguage;
 }
 const Settings = ({ language }: ISettingsProps) => {
-  const { t } = useTranslation("");
+  const { t } = useTranslation("common");
   const router = useRouter();
   const {
     foodPictures: { setHaveFoodDescription, setHaveFoodPicture, haveFoodDescription, haveFoodPicture },

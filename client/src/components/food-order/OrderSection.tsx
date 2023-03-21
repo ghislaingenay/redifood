@@ -31,7 +31,7 @@ const OrderSection = ({
   handleSubmit,
   handleCancel,
 }: IOrderSectionProps) => {
-  const { t } = useTranslation("");
+  const { t } = useTranslation("common");
   const { convertPrice } = useCurrency();
   const { foodOrder } = useFood();
   const isCreateMode = mode === EFoodMode.CREATE ? true : false;

@@ -19,7 +19,7 @@ interface ISummaryTable {
 
 const SummaryTable = ({ order, xSize, sSize, mSize, lSize }: ISummaryTable) => {
   const noMP = { margin: 0, padding: 0 };
-  const { t } = useTranslation("");
+  const { t } = useTranslation("common");
   const {
     state: { vat },
   } = useContext(AppContext);

@@ -16,7 +16,7 @@ interface IHistoryProps {
   FoodOrderList: IOrderApi[];
 }
 const History = ({ FoodOrderList }: IHistoryProps) => {
-  const { t } = useTranslation("");
+  const { t } = useTranslation("common");
   const [form] = Form.useForm();
   const [params, setParams] = useState({ startDate: undefined, endDate: undefined });
 

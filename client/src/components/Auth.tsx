@@ -26,7 +26,7 @@ const Auth = () => {
   const [formSignUp] = Form.useForm();
   const router = useRouter();
   // ------------ STATE ---------
-  const { t } = useTranslation("");
+  const { t } = useTranslation("common");
   const options = [
     {
       value: EAuthChoice.SIGNIN,

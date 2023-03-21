@@ -18,7 +18,7 @@ interface ICreateOrderProps {
 }
 const CreateOrder = ({ foodList, foodSection, status }: ICreateOrderProps) => {
   const { setFoodOrder } = useFood();
-  const { t } = useTranslation("");
+  const { t } = useTranslation("common");
   const handleOrderCreate = (foodOrder: IFoodApi[]) => {
     console.log("order created", foodOrder);
     NotificationRes.onSuccess({

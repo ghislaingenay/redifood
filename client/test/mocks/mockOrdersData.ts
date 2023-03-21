@@ -1,4 +1,4 @@
-import { ECurrency } from "../../src/interfaces";
+import { ECurrency } from "../../redifood-module/src/interfaces";
 
 export const allDataOrders = [
   {
