@@ -1,6 +1,6 @@
 import Cookies from "js-cookie";
 import { useEffect } from "react";
-import { ELanguage } from "../../src/interfaces";
+import { ELanguage } from "../../redifood-module/src/interfaces";
 import { decodeCookie, encodeCookie } from "./build-language";
 
 const useLanguage = (language: ELanguage) => {

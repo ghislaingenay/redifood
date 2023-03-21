@@ -1,4 +1,5 @@
-import { ECurrency, EFoodMode } from "../../src/interfaces";
+import { ECurrency } from "../../redifood-module/src/interfaces";
+import { EFoodMode } from "../../src/interfaces";
 
 export const mockedFoodData = [
   {

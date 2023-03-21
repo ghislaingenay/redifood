@@ -16,7 +16,7 @@ interface IOrderHistoryCard {
   foodOrder: IOrderApi;
 }
 const OrderHistoryCard = ({ foodOrder }: IOrderHistoryCard) => {
-  const { t, i18n } = useTranslation("");
+  const { t, i18n } = useTranslation("common");
 
   useEffect(() => {
     i18n.changeLanguage(recoverCookie());

@@ -18,7 +18,7 @@ interface IEditOrderProps {
 
 const EditOrder = ({ foodList, currentFoodOrder, foodSection, status }: IEditOrderProps) => {
   const { setFoodOrder } = useFood();
-  const { t } = useTranslation("");
+  const { t } = useTranslation("common");
   const editOrder = (foodOrder: IFood[]) => {
     console.log("order edites", foodOrder);
     NotificationRes.onSuccess({

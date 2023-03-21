@@ -16,7 +16,7 @@ interface IFoodProps {
   status: string;
 }
 const FoodPage = ({ foodList, foodSection, status }: IFoodProps) => {
-  const { t } = useTranslation("");
+  const { t } = useTranslation("common");
   const { setFoodOrder } = useFood();
 
   useEffect(() => {

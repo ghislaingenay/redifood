@@ -22,7 +22,7 @@ import { buildLanguage } from "../api/build-language";
 import { EPaymentType } from "../../redifood-module/src/interfaces";
 
 const CurrentOrder = ({ currentOrder, status }: any) => {
-  const { t } = useTranslation("");
+  const { t } = useTranslation("common");
   const router = useRouter();
   console.log(status);
   const { orderDate, orderId, tableNumber, orderStatus } = currentOrder;

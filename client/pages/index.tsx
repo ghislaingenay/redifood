@@ -26,7 +26,7 @@ interface IAllOrdersPageProps {
   status: string;
 }
 const AllOrdersPage = ({ allOrders, getList, status }: IAllOrdersPageProps) => {
-  const { t } = useTranslation("");
+  const { t } = useTranslation("common");
   const { displayCurrency } = useCurrency();
   const { setStatus } = useContext(AppContext);
 
