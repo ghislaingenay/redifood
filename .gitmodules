@@ -1,0 +1,6 @@
+[submodule "auth/redifood-module"]
+	path = auth/redifood-module
+	url = https://github.com/ghislaingenay/redifood-module
+[submodule "client/redifood-module"]
+	path = client/redifood-module
+	url = https://github.com/ghislaingenay/redifood-module
