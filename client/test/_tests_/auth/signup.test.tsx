@@ -27,7 +27,7 @@ describe("Signup - Validation", () => {
     const confirmPasswordInput = screen.queryByLabelText(/confirm/i);
     expect(emailInput.ariaValueText).toEqual(undefined);
     expect(passwordInput.ariaValueText).toEqual(undefined);
-    expect(confirmPasswordInput.ariaValueText).toEqual(undefined);
+    expect(confirmPasswordInput?.ariaValueText).toEqual(undefined);
     expect(emailInput).toBeRequired();
     expect(confirmPasswordInput).toBeRequired();
     expect(passwordInput).toBeRequired();
@@ -150,10 +150,10 @@ describe("Signup - Validation", () => {
         /password should contains between 8 to 20 characters and must contains at least one special character/i,
       ),
     ).toBeInTheDocument();
-    await user.clear(confirmPasswordElement);
-    await user.clear(passwordElement);
-    await user.type(passwordElement, "FHTU*vn9H_");
-    await user.type(confirmPasswordElement, "FHTU*vn9H_");
+    await user.clear(confirmPasswordElement!);
+    await user.clear(passwordElement!);
+    await user.type(passwordElement!, "FHTU*vn9H_");
+    await user.type(confirmPasswordElement!, "FHTU*vn9H_");
     console.log("data", passwordElement, confirmPasswordElement);
     await clickButton(/submit/i, user);
     // expect(await screen.findByRole("heading", { name: /Account succesfully created/i })).toBeInTheDocument();
@@ -232,8 +232,8 @@ describe("Signup - Validation", () => {
       await screen.findByText(/password must contain at least one digit, one lowercase and uppercase letter/i),
     ).toBeInTheDocument();
     await user.clear(screen.getByLabelText("Password"));
-    await user.type(passwordElement, "FHTU*vn9H_");
-    await user.type(confirmPasswordElement, "FHTU*vn9H_");
+    await user.type(passwordElement!, "FHTU*vn9H_");
+    await user.type(confirmPasswordElement!, "FHTU*vn9H_");
     await clickButton(/submit/i, user);
     await waitFor(async () => {
       expect(screen.queryByText(/password must contain at least one digit, one lowercase and uppercase letter/i)).toBe(
@@ -257,13 +257,13 @@ describe("Signup - Validation", () => {
       confirmPassword: "fhtubv9*a_",
     });
     await clickButton(/submit/i, user);
-    await user.clear(confirmPasswordElement);
+    await user.clear(confirmPasswordElement!);
     expect(
       await screen.findByText(/password must contain at least one digit, one lowercase and uppercase letter/i),
     ).toBeInTheDocument();
-    await user.clear(passwordElement);
-    await user.type(passwordElement, "FHTU*vn9H_");
-    await user.type(confirmPasswordElement, "FHTU*vn9H_");
+    await user.clear(passwordElement!);
+    await user.type(passwordElement!, "FHTU*vn9H_");
+    await user.type(confirmPasswordElement!, "FHTU*vn9H_");
     await clickButton(/submit/i, user);
     // expect(await screen.findByRole("heading", { name: /Account succesfully created/i })).toBeInTheDocument();
     await waitFor(async () => {
@@ -289,15 +289,15 @@ describe("Signup - Validation", () => {
       confirmPassword: "FHTUvn9H",
     });
     await clickButton(/submit/i, user);
-    await user.clear(confirmPasswordElement);
+    await user.clear(confirmPasswordElement!);
     expect(
       await screen.findByText(
         /password should contains between 8 to 20 characters and must contains at least one special character/i,
       ),
     ).toBeInTheDocument();
-    await user.clear(passwordElement);
-    await user.type(passwordElement, "FHTU*vn9H_");
-    await user.type(confirmPasswordElement, "FHTU*vn9H_");
+    await user.clear(passwordElement!);
+    await user.type(passwordElement!, "FHTU*vn9H_");
+    await user.type(confirmPasswordElement!, "FHTU*vn9H_");
     await clickButton(/submit/i, user);
     // expect(await screen.findByRole("heading", { name: /Account succesfully created/i })).toBeInTheDocument();
     await waitFor(async () => {
@@ -321,14 +321,14 @@ describe("Signup - Validation", () => {
       confirmPassword: "FHTUvgjnH*",
     });
     await clickButton(/submit/i, user);
-    await user.clear(confirmPasswordElement);
+    await user.clear(confirmPasswordElement!);
     expect(screen.queryByRole("heading", { name: /Account succesfully created/i })).toBe(null);
     expect(
       await screen.findByText(/password must contain at least one digit, one lowercase and uppercase letter/i),
     ).toBeInTheDocument();
-    await user.clear(passwordElement);
-    await user.type(passwordElement, "FHTU*vn9H_");
-    await user.type(confirmPasswordElement, "FHTU*vn9H_");
+    await user.clear(passwordElement!);
+    await user.type(passwordElement!, "FHTU*vn9H_");
+    await user.type(confirmPasswordElement!, "FHTU*vn9H_");
     await clickButton(/submit/i, user);
     // expect(await screen.findByRole("heading", { name: /Account succesfully created/i })).toBeInTheDocument();
     await waitFor(() => {
@@ -351,8 +351,8 @@ describe("Signup - Validation", () => {
     });
     await clickButton(/submit/i, user);
     expect(await screen.findByText(/passwords do not match/i)).toBeInTheDocument();
-    await user.clear(confirmPasswordElement);
-    await user.type(confirmPasswordElement, "FHTU*vn9H_");
+    await user.clear(confirmPasswordElement!);
+    await user.type(confirmPasswordElement!, "FHTU*vn9H_");
     await clickButton(/submit/i, user);
     await waitFor(() => {
       expect(screen.queryByText(/passwords do not match/i)).toBe(null);

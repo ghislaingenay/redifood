@@ -3,16 +3,17 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { IOrderApi } from "../redifood-module/src/interfaces";
 import OrderHistoryCard from "../src/components/food-order/OrderHistoryCard";
 import { RowCenter } from "../src/components/styling/grid.styled";
-import { IOrder, ServerInfo } from "../src/interfaces";
+import { ServerInfo } from "../src/interfaces";
 import { AnimToTop } from "../src/styles/animations/global.anim";
 import { mockOneOrder } from "../test/mocks/mockOrdersData";
 import { buildLanguage } from "./api/build-language";
 // import useRequest from "./api/useRequest";
 
 interface IHistoryProps {
-  FoodOrderList: IOrder[];
+  FoodOrderList: IOrderApi[];
 }
 const History = ({ FoodOrderList }: IHistoryProps) => {
   const { t } = useTranslation("");
@@ -91,7 +92,7 @@ const History = ({ FoodOrderList }: IHistoryProps) => {
               <Alert message={t("history.alert-no-orders")} type="info" />
             </Case>
             <Case condition={!loading && paidOrdersList.length > 0}> */}
-          {paidOrdersList.map((foodOrder: IOrder, index: number) => {
+          {paidOrdersList.map((foodOrder: IOrderApi, index: number) => {
             return <OrderHistoryCard key={index} foodOrder={foodOrder} />;
           })}
           {/* </Case>

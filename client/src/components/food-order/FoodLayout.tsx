@@ -2,6 +2,7 @@ import { Col, Modal, Row, Typography } from "antd";
 import { useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import { Else, If, Then } from "react-if";
+import { IFoodApi } from "../../../redifood-module/src/interfaces";
 import { noErrorInTable } from "../../constants";
 import AppContext from "../../contexts/app.context";
 import { useFood } from "../../contexts/food.context";
@@ -9,7 +10,7 @@ import { getOptions } from "../../functions/global.fn";
 import { checkIfArrayAreTheSame, sendErrorTableInput } from "../../functions/order.fn";
 import { useWindowSize } from "../../hooks/useWindowSIze.hook";
 import { IErrorTableInput } from "../../interfaces";
-import { EFoodMode, IFood } from "../../interfaces/food.interface";
+import { EFoodMode } from "../../interfaces/food.interface";
 import { LGCard } from "../../styles";
 import { AnimToTop } from "../../styles/animations/global.anim";
 import { RowCenter } from "../styling/grid.styled";
@@ -21,11 +22,11 @@ import OrderSection from "./OrderSection";
 const { Title } = Typography;
 interface IFoodLayoutProps {
   status?: string;
-  foods: IFood[];
+  foods: IFoodApi[];
   mode: EFoodMode;
-  handleOrderCreate?: (foodOrder: IFood[]) => any;
-  editOrder?: (foodOrder: IFood[]) => any;
-  updateFood?: (food: IFood) => any;
+  handleOrderCreate?: (foodOrder: IFoodApi[]) => any;
+  editOrder?: (foodOrder: IFoodApi[]) => any;
+  updateFood?: (food: IFoodApi) => any;
   sectionList: string[];
   mainTitle: string;
 }
@@ -59,7 +60,7 @@ const FoodLayout = ({
   const [errorTable, setErrorTable] = useState<IErrorTableInput>({ alreadyInDb: false, missingValue: false });
   const isDisabled = foodOrder.length === 0 ? true : false;
 
-  const [currentOrder, setCurrentOrder] = useState<IFood[]>([]);
+  const [currentOrder, setCurrentOrder] = useState<IFoodApi[]>([]);
   const [cancelOrderModal, setCancelOrderModal] = useState(false);
 
   const changeActiveButton = (sectionName: string) => {
@@ -70,7 +71,7 @@ const FoodLayout = ({
     setSortedFoods(filteredfoods);
   };
 
-  const handleSubmit = (foodOrder: IFood[]) => {
+  const handleSubmit = (foodOrder: IFoodApi[]) => {
     switch (mode) {
       case EFoodMode.CREATE: {
         const result = sendErrorTableInput(tableNumberValue as number, tableTaken);

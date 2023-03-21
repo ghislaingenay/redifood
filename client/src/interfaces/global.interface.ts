@@ -29,11 +29,6 @@ export interface IGlobalOptions {
   label: string;
 }
 
-export enum ELanguage {
-  ENGLISH = "en",
-  FRENCH = "fr",
-}
-
 export interface ServerInfo {
   locale: any;
   req: RequestContext;

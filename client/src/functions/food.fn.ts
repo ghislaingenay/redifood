@@ -1,6 +1,6 @@
-import { IFood } from "../interfaces";
+import { IFoodApi } from "../../redifood-module/src/interfaces";
 
-export const convertFoodToSection = (foodList: IFood[], foodSection: string[]) => {
+export const convertFoodToSection = (foodList: IFoodApi[], foodSection: string[]) => {
   let foodObject: Record<string, string[]> = {};
   foodSection.forEach((section: string) => {
     foodObject[section] = Array.from(

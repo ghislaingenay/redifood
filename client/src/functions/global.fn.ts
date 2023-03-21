@@ -1,4 +1,4 @@
-import { ECurrency } from "../interfaces";
+import { ECurrency } from "../../redifood-module/src/interfaces";
 
 // function that convert hex to rgb
 const hexToRgb = (hex: string) => {

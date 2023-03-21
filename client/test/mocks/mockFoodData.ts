@@ -114,8 +114,8 @@ export const mockedFoodData = [
 
 export const foodSectionArray = ["all", "pizza", "dessert", "drink"];
 
-export const createErrorProps = { foodList: [], foodSection: [], status: "error" };
-export const createSuccessProps = {
+export const createErrorProps: any = { foodList: [], foodSection: [], status: "error" };
+export const createSuccessProps: any = {
   foodList: mockedFoodData,
   foodSection: foodSectionArray,
   status: "success",

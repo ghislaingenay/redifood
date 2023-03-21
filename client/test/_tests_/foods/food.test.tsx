@@ -19,7 +19,7 @@ import { foodAlterProps, mockedFoodData } from "../../mocks/mockFoodData";
 
 describe("FoodForm - Functions", () => {
   it("should return section and extra sorted", () => {
-    expect(convertFoodToSection(mockedFoodData, ["pizza", "dessert", "drink"])).toStrictEqual({
+    expect(convertFoodToSection(mockedFoodData as any, ["pizza", "dessert", "drink"])).toStrictEqual({
       pizza: ["tomato", "cream"],
       dessert: ["pastry", "cake"],
       drink: ["hot drink", "soda", "beer"],

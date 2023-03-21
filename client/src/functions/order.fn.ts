@@ -1,4 +1,5 @@
-import { IErrorTableInput, IFood } from "../interfaces";
+import { IFoodApi } from "../../redifood-module/src/interfaces";
+import { IErrorTableInput } from "../interfaces";
 
 export const sendErrorTableInput = (tableNumber: number | null, tableArray: number[]) => {
   let errorState: IErrorTableInput = { alreadyInDb: false, missingValue: false };
@@ -11,14 +12,14 @@ export const sendErrorTableInput = (tableNumber: number | null, tableArray: numb
   return errorState;
 };
 
-export const calculateTotal = (array: IFood[]) => {
+export const calculateTotal = (array: IFoodApi[]) => {
   if (array.length === 0) {
     return 0;
   }
   return [...array].map((food) => food.itemQuantity * food.itemPrice).reduce((t, e) => t + e);
 };
 
-export const checkIfArrayAreTheSame = (array1: IFood[], array2: IFood[]) => {
+export const checkIfArrayAreTheSame = (array1: IFoodApi[], array2: IFoodApi[]) => {
   if (array1.length !== array2.length) {
     return false;
   }

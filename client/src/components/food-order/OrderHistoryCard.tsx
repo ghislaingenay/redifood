@@ -4,15 +4,16 @@ import { useTranslation } from "next-i18next";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { recoverCookie } from "../../../pages/api/build-language";
+import { IOrderApi } from "../../../redifood-module/src/interfaces";
 import useCurrency from "../../hooks/useCurrency.hook";
-import { EButtonType, IOrder } from "../../interfaces";
+import { EButtonType } from "../../interfaces";
 import { CenteredPBold } from "../../styles";
 import { AnimCard } from "../../styles/animations/global.anim";
 import { RediIconButton } from "../styling/Button.style";
 import { RowCenter } from "../styling/grid.styled";
 
 interface IOrderHistoryCard {
-  foodOrder: IOrder;
+  foodOrder: IOrderApi;
 }
 const OrderHistoryCard = ({ foodOrder }: IOrderHistoryCard) => {
   const { t, i18n } = useTranslation("");

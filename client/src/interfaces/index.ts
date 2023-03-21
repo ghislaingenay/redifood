@@ -3,7 +3,6 @@ export * from "./class.interface";
 export * from "./food.interface";
 export * from "./global.interface";
 export * from "./hook.interface";
-export * from "./nav.interface";
 export * from "./order.interface";
 export * from "./payment.interface";
 export * from "./settings.interface";
