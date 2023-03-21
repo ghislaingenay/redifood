@@ -1,16 +1,7 @@
-export interface IFood {
-  itemId?: number | string;
-  itemName: string;
-  itemPhoto: string;
-  itemPrice: number;
-  itemDescription: string;
-  itemSection: string;
-  itemExtra: string;
-  itemQuantity: number;
-}
+import { IFoodApi } from "../../redifood-module/src/interfaces";
 
 export type TFoodSection = string[];
-export type TFoodOrder = IFood[];
+export type TFoodOrder = IFoodApi[];
 
 export enum EFoodMode {
   CREATE = "create",
