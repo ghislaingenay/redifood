@@ -5,7 +5,7 @@ import { EPaymentType } from "../../../redifood-module/src/interfaces";
 import { clickButton, expectAlertLength, expectFindText, findButton } from "../../../src/functions/testhelpers.fn";
 import { mockOneOrder } from "../../mocks/mockOrdersData";
 
-const paymentCashProps = {
+const paymentCashProps: any = {
   currentOrder: mockOneOrder,
   paymentType: EPaymentType.CASH,
 };

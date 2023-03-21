@@ -5,11 +5,12 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useCallback, useContext, useState } from "react";
 import { Else, If, Then } from "react-if";
+import { EPaymentType, IOrderApi } from "../../../../redifood-module/src/interfaces";
 import { RediButton, RediIconButton } from "../../../../src/components/styling/Button.style";
 import { RowCenter, RowCenterSp, RowSpaceAround } from "../../../../src/components/styling/grid.styled";
 import AppContext from "../../../../src/contexts/app.context";
 import useCurrency from "../../../../src/hooks/useCurrency.hook";
-import { EButtonType, EPaymentType, IOrder } from "../../../../src/interfaces";
+import { EButtonType } from "../../../../src/interfaces";
 import { CenteredLabel, LGCard, LRoundedInput } from "../../../../src/styles";
 import { AnimToTop } from "../../../../src/styles/animations/global.anim";
 import { mockOneOrder } from "../../../../test/mocks/mockOrdersData";
@@ -19,7 +20,7 @@ type TStrNum = string | number;
 
 interface IPaymentProps {
   paymentType: EPaymentType;
-  currentOrder: IOrder;
+  currentOrder: IOrderApi;
 }
 const PaymentSystem = ({ paymentType, currentOrder }: IPaymentProps) => {
   const { t } = useTranslation();
