@@ -1,8 +1,8 @@
 import { screen } from "@testing-library/react";
 import { render } from "../..";
 import PaymentSystem from "../../../pages/orders/[id]/payment/[paymentChoice]";
+import { EPaymentType } from "../../../redifood-module/src/interfaces";
 import { clickButton, expectAlertLength, expectFindText, findButton } from "../../../src/functions/testhelpers.fn";
-import { EPaymentType } from "../../../src/interfaces";
 import { mockOneOrder } from "../../mocks/mockOrdersData";
 
 const paymentCashProps = {
