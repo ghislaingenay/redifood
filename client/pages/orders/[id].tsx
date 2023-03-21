@@ -13,12 +13,13 @@ import { CenteredCol, RowSpaceBetween } from "../../src/components/styling/grid.
 import RediRadioButton from "../../src/components/styling/RediRadioButton";
 import { RED } from "../../src/constants";
 import { hexToRgba } from "../../src/functions/global.fn";
-import { EButtonType, EPaymentType, ServerInfo } from "../../src/interfaces";
+import { EButtonType, ServerInfo } from "../../src/interfaces";
 import { LGCard } from "../../src/styles";
 import { AnimToTop } from "../../src/styles/animations/global.anim";
 import { SpacingDiv5X } from "../../src/styles/styledComponents/div.styled";
 import { mockOneOrder } from "../../test/mocks/mockOrdersData";
 import { buildLanguage } from "../api/build-language";
+import { EPaymentType } from "../../redifood-module/src/interfaces";
 
 const CurrentOrder = ({ currentOrder, status }: any) => {
   const { t } = useTranslation("");

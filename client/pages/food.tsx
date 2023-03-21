@@ -3,14 +3,15 @@ import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useEffect } from "react";
+import { IFoodApi } from "../redifood-module/src/interfaces";
 import FoodLayout from "../src/components/food-order/FoodLayout";
 import { useFood } from "../src/contexts/food.context";
-import { EFoodMode, IFood, ServerInfo } from "../src/interfaces";
+import { EFoodMode, ServerInfo } from "../src/interfaces";
 import { foodSectionArray, mockedFoodData } from "../test/mocks/mockFoodData";
 import { buildLanguage } from "./api/build-language";
 
 interface IFoodProps {
-  foodList: IFood[];
+  foodList: IFoodApi[];
   foodSection: string[];
   status: string;
 }

@@ -1,9 +1,9 @@
 import { Card, Col, Divider, Row, Space, Table, Typography } from "antd";
-import { IOrder } from "../interfaces";
+import { IOrderApi } from "../../redifood-module/src/interfaces";
 const { Title } = Typography;
 
 interface IOrderCardProps {
-  order: IOrder;
+  order: IOrderApi;
 }
 const OrderCard = ({ order }: IOrderCardProps) => {
   const currency = "$";
