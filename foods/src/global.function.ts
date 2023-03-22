@@ -1,4 +1,6 @@
-export const createQuery = <T extends Record<any, any>>(data: T | T[]) => {
+type RecordAny = Record<string, any>;
+
+export const createQuery = <T extends RecordAny>(data: T | T[]) => {
   let insertQuery = '';
   let valuesQuery = '';
   // The data should have a type of DB and should be convert
@@ -24,11 +26,38 @@ export const createQuery = <T extends Record<any, any>>(data: T | T[]) => {
   return `${insertQuery} ${valuesQuery}`;
 };
 
-interface Keys<T, K> {
+interface IKeys<T, K> {
   dbKeys: T;
   apiKeys: K;
 }
 
-type RecordAny = Record<string, any>
+type TDirection = 'apiToDb' | 'dbToApi';
 
-export const convertKeys = (data: any, keys: Keys<T extends  ) => {};
+export const convertKeys = <T extends RecordAny, K extends RecordAny>(
+  data: TDirection extends 'apiToDb' ? K : T,
+  direction: TDirection,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  keys?: IKeys<T, K>,
+) => {
+  const keyValuePairs = Object.entries(data).map(([key, value]) => {
+    if (direction === 'dbToApi') {
+      if (key === 'id') {
+        return [key, value];
+      }
+      return [
+        (key as string).replace(/([_][a-z])/g, ($1) =>
+          $1.toUpperCase().replace('_', ''),
+        ),
+        value,
+      ];
+    } else {
+      return [
+        (key as string).replace(/([a-z][A-Z]])/g, ($1) =>
+          $1.toLowerCase().split('').splice(1, 0, '_').join(''),
+        ),
+        value,
+      ];
+    }
+  });
+  return Object.fromEntries(keyValuePairs);
+};

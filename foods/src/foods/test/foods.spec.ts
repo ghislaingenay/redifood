@@ -25,7 +25,6 @@ describe('FoodController', () => {
 describe('createQuery function test from data in DB format', () => {
   it.todo('should loop in one food and display the proper query');
   it.todo('should loop in several foods and display the proper query');
-  it.todo('should convert null price and display the proper querys');
 });
 
 describe('convertKeys test function', () => {
@@ -44,3 +43,5 @@ describe('createQuery function test from data in Api format', () => {
   it.todo('should loop in several foods and display the proper query');
   it.todo('should convert null price and display the proper querys');
 });
+
+it.todo('createQuery with APi keys');
