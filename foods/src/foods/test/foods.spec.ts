@@ -31,12 +31,12 @@ describe('createQuery function test from data in DB format', () => {
       `INSERT INTO foods (item_name,item_photo,item_price,item_description,item_section,item_extra,item_quantity) VALUES ('Pizza Mediterranean','ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8',12.5,'Soo good',2,4,0)`,
     );
   });
-  // it('should loop in several foods and display the proper query', () => {
-  //   const foods = [foodListMockDB[0], foodListMockDB[1], foodListMockDB[2]];
-  //   expect(createQuery(foods, 'foods')).toStrictEqual(
-  //     `INSERT INTO foods (item_name,item_photo,item_price,item_description,item_section,item_extra,item_quantity) VALUES ('Pizza Mediterranean','ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8',12.5,'Soo good',2,4,0), ('Pizza Cheesy','photo-1520201163981-8cc95007dd2a?',13.99,'Gorgonzola, gouda, mozzarella, blue cheese', 2, 3, 0), ('Millefeuille', 'images.unsplash.com/photo-1587122569949-ae6e755c6bdc?', 4.25, 'The traditional French Millefeuille', 1, 2, 0)`,
-  //   );
-  // });
+  it('should loop in several foods and display the proper query', () => {
+    const foods = [foodListMockDB[0], foodListMockDB[1], foodListMockDB[2]];
+    expect(createQuery(foods, 'foods')).toStrictEqual(
+      `INSERT INTO foods (item_name,item_photo,item_price,item_description,item_section,item_extra,item_quantity) VALUES ('Pizza Mediterranean','ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8',12.5,'Soo good',2,4,0), ('Pizza Cheesy','photo-1520201163981-8cc95007dd2a?',13.99,'Gorgonzola, gouda, mozzarella, blue cheese',2,3,0), ('Millefeuille','images.unsplash.com/photo-1587122569949-ae6e755c6bdc?',4.25,'The traditional French Millefeuille',1,2,0)`,
+    );
+  });
 });
 
 // describe('convertKeys test function', () => {

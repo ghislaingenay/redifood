@@ -41,9 +41,10 @@ export const createQuery = <T extends RecordAny>(
     const keyArray = Object.keys(data[0]);
     insertQuery = `INSERT INTO ${tableName} (${keyArray.join(',')})`;
     const cleanData = (data as T[]).map((item: T) => {
-      return `(${Object.keys(item).join(',')})`;
+      const { values } = buildInsertIntoKeyValuePair(item);
+      return `(${values})`;
     });
-    valuesQuery = ` VALUES ${cleanData.join(',')}`;
+    valuesQuery = `VALUES ${cleanData.join(', ')}`;
   } else {
     const { keys, values } = buildInsertIntoKeyValuePair(data);
     insertQuery = `INSERT INTO ${tableName} (${keys})`;
