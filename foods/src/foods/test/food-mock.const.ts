@@ -43,8 +43,8 @@ export const wrongFoodMockDB = {
 export const wrongFoodMockApi1 = {
   itemName: 'Pizza Cheesy',
   itemPhoto: 'photo-1520201163981-8cc95007dd2a?',
-  item_price: 13.99,
   hello: 'world',
+  item_price: 13.99,
   itemDescription: 'Gorgonzola, gouda, mozzarella, blue cheese',
   itemSection: 2,
   item_extra: 3,

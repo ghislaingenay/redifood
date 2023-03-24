@@ -1,11 +1,12 @@
 type RecordAny = Record<string, any>;
 
-export function buildInsertIntoKeyValuePair(
-  data: Record<string, string | number | null>,
-): {
+export function buildInsertIntoKeyValuePair(data: RecordAny): {
   keys: string;
   values: string;
 } {
+  if (!data || Object.keys(data).length === 0 || data === null) {
+    throw new Error('data should be defined');
+  }
   const keys = Object.keys(data).join(',');
   const values = Object.values(data)
     .map((val) => {
@@ -27,6 +28,7 @@ export const createQuery = <T extends RecordAny>(
 ) => {
   let insertQuery = '';
   let valuesQuery = '';
+  // console.log('dtata', data);
   // The data should have a type of DB and should be convert
   const foundUpperCase = Object.keys(data).find(
     (key: string) => /[A-Z]/.test(key) || /id/.test(key),
@@ -50,7 +52,9 @@ export const createQuery = <T extends RecordAny>(
     insertQuery = `INSERT INTO ${tableName} (${keys})`;
     valuesQuery = `VALUES (${values})`;
   }
-  return `${insertQuery} ${valuesQuery}`;
+  const query = `${insertQuery} ${valuesQuery}`;
+  // console.log('query', query);
+  return query;
 };
 
 interface IKeys<T, K> {
@@ -71,24 +75,27 @@ export const convertKeys = <T extends RecordAny, K extends RecordAny>(
       if (key === 'id') {
         return [key, value];
       }
+      if (!/([_][a-z])/g.test(key)) {
+        console.log('not valid', key);
+        throw new Error(`${key} should be snake case and not be null`);
+      }
+
       return [
         (key as string).replace(/([_][a-z])/g, ($1) => {
-          if ($1) {
-            return $1.toUpperCase().replace('_', '');
-          } else {
-            throw new Error(`${key} should be snake case and not be null`);
-          }
+          return $1.toUpperCase().replace('_', '');
         }),
         value,
       ];
     } else {
+      if (key === 'id') {
+        return [key, value];
+      }
+      if (!/([a-z][A-Z])/g.test(key)) {
+        throw new Error(`${key} should be camel case and not be null`);
+      }
       return [
-        (key as string).replace(/([a-z][A-Z]])/g, ($1) => {
-          if ($1) {
-            return $1.toLowerCase().split('').splice(1, 0, '_').join('');
-          } else {
-            throw new Error(`${key} should be camel case and not be null`);
-          }
+        (key as string).replace(/([a-z][A-Z])/g, ($1) => {
+          return `${$1[0]}_${$1[1].toLowerCase()}`;
         }),
         value,
       ];

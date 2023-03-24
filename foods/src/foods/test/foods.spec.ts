@@ -1,8 +1,20 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { FoodController } from '../../foods/foods.controller';
 import { FoodService } from '../../foods/foods.service';
-import { createQuery } from '../../global.function';
-import { foodListMockDB } from './food-mock.const';
+import {
+  buildInsertIntoKeyValuePair,
+  convertKeys,
+  createQuery,
+} from '../../global.function';
+import {
+  foodListMockAPI,
+  foodListMockDB,
+  goodFoodMockApi,
+  goodFoodMockDb,
+  wrongFoodMockApi1,
+  wrongFoodMockApi2,
+  wrongFoodMockDB,
+} from './food-mock.const';
 
 describe('FoodController', () => {
   let foodController: FoodController;
@@ -39,60 +51,79 @@ describe('createQuery function test from data in DB format', () => {
   });
 });
 
-// describe('convertKeys test function', () => {
-//   it('should convert api to db if all keys are inside', () => {
-//     expect(convertKeys(foodListMockDB[0], 'dbToApi')).toStrictEqual(
-//       foodListMockAPI[0],
-//     );
-//     expect(convertKeys(foodListMockDB[1], 'dbToApi')).toStrictEqual(
-//       foodListMockAPI[1],
-//     );
-//     expect(convertKeys(foodListMockDB[2], 'dbToApi')).toStrictEqual(
-//       foodListMockAPI[2],
-//     );
-//   });
-//   it('should convert db to api if all keys are inside', () => {
-//     expect(convertKeys(foodListMockAPI[0], 'apiToDb')).toStrictEqual(
-//       foodListMockDB[0],
-//     );
-//     expect(convertKeys(foodListMockAPI[1], 'apiToDb')).toStrictEqual(
-//       foodListMockDB[1],
-//     );
-//     expect(convertKeys(foodListMockAPI[2], 'apiToDb')).toStrictEqual(
-//       foodListMockDB[2],
-//     );
-//   });
-//   it('should throw an error if not convert api to db if all keys are inside', () => {
-//     expect(convertKeys(wrongFoodMockDB, 'dbToApi')).toThrowError(
-//       'itemDescription should be snake case and not be null',
-//     );
-//   });
-//   it('should throw an error if not convert db to api if all keys are inside', () => {
-//     expect(convertKeys(wrongFoodMockApi1, 'apiToDb')).toThrowError(
-//       'hello should be camel case and not be null',
-//     );
-//   });
-//   it('should throw an error if not convert db to api if all keys are inside', () => {
-//     expect(convertKeys(wrongFoodMockApi2, 'apiToDb')).toThrowError(
-//       'item_extra should be camel case and not be null',
-//     );
-//   });
-//   it('should not throw an error if convert db to api if on ekey is id', () => {
-//     expect(convertKeys(goodFoodMockDb, 'dbToApi')).toStrictEqual(
-//       goodFoodMockApi,
-//     );
-//   });
-//   it('should not throw an error if convert api to db if on ekey is id', () => {
-//     expect(convertKeys(goodFoodMockApi, 'apiToDb')).toStrictEqual(
-//       goodFoodMockDb,
-//     );
-//   });
-// });
+describe('convertKeys test function', () => {
+  it('should convert api to db if all keys are inside', () => {
+    expect(convertKeys(foodListMockDB[0], 'dbToApi')).toStrictEqual(
+      foodListMockAPI[0],
+    );
+    expect(convertKeys(foodListMockDB[1], 'dbToApi')).toStrictEqual(
+      foodListMockAPI[1],
+    );
+    expect(convertKeys(foodListMockDB[2], 'dbToApi')).toStrictEqual(
+      foodListMockAPI[2],
+    );
+  });
+  it('should convert db to api if all keys are inside', () => {
+    expect(convertKeys(foodListMockAPI[0], 'apiToDb')).toStrictEqual(
+      foodListMockDB[0],
+    );
+    expect(convertKeys(foodListMockAPI[1], 'apiToDb')).toStrictEqual(
+      foodListMockDB[1],
+    );
+    expect(convertKeys(foodListMockAPI[2], 'apiToDb')).toStrictEqual(
+      foodListMockDB[2],
+    );
+  });
+  it('should throw an error if not convert api to db if all keys are inside', () => {
+    expect(() => convertKeys(wrongFoodMockDB, 'dbToApi')).toThrow(
+      new Error('itemDescription should be snake case and not be null'),
+    );
+  });
+  it('should throw an error if not convert db to api if all keys are inside', () => {
+    expect(() => convertKeys(wrongFoodMockApi1, 'apiToDb')).toThrow(
+      new Error('hello should be camel case and not be null'),
+    );
+  });
+  it('should throw an error if not convert db to api if all keys are inside', () => {
+    expect(() => convertKeys(wrongFoodMockApi2, 'apiToDb')).toThrow(
+      new Error('item_extra should be camel case and not be null'),
+    );
+  });
+  it('should not throw an error if convert db to api if on ekey is id', () => {
+    expect(convertKeys(goodFoodMockDb, 'dbToApi')).toStrictEqual(
+      goodFoodMockApi,
+    );
+  });
+  it('should not throw an error if convert api to db if on ekey is id', () => {
+    expect(convertKeys(goodFoodMockApi, 'apiToDb')).toStrictEqual(
+      goodFoodMockDb,
+    );
+  });
+});
+
+describe('Create keys-pairs function test', () => {
+  it('should create keys-pairs from one food', () => {
+    const data = {
+      item_price: 7,
+      item_name: 'Pizza',
+      item_quantity: null,
+      id: undefined,
+    };
+    expect(buildInsertIntoKeyValuePair(data)).toStrictEqual({
+      keys: 'item_price,item_name,item_quantity,id',
+      values: "7,'Pizza',NULL,NULL",
+    });
+  });
+
+  it('should throw an error if no data is sent', () => {
+    expect(() => buildInsertIntoKeyValuePair({})).toThrow(
+      new Error('data should be defined'),
+    );
+  });
+});
 
 // describe('createQuery function test from data in Api format', () => {
 //   it.todo('should loop in one food and display the proper query');
 //   it.todo('should loop in several foods and display the proper query');
 //   it.todo('should convert null price and display the proper querys');
 // });
-
-it.todo('createQuery with APi keys');
