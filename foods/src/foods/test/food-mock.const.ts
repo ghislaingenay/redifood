@@ -30,6 +30,10 @@ export const foodListMockDB: IFoodDB[] = [
   },
 ];
 
+export const foodListDB = foodListMockDB.map((item: IFoodDB, index: number) => {
+  return { ...item, id: index };
+});
+
 export const wrongFoodMockDB = {
   item_name: 'Millefeuille',
   item_photo: undefined,

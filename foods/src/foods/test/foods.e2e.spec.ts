@@ -3,10 +3,12 @@ import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { Test, TestingModule } from '@nestjs/testing';
 import { default as migrate } from 'node-pg-migrate';
+import { IFoodDB } from 'redifood-module/src/interfaces';
+import * as request from 'supertest';
 import { AppModule } from '../../app.module';
 import { pool } from '../../pool.pg';
 import { FoodService } from '../foods.service';
-// import { foodListDB } from './food-mock.const';
+import { foodListDB } from './food-mock.const';
 
 const testOptionsDb = {
   user: process.env.POSTGRES_USER_TEST,
@@ -17,7 +19,17 @@ const testOptionsDb = {
 };
 describe('FoodController (integration)', () => {
   let app: INestApplication;
-  // const foodService = { getFoods: () => foodListDB };
+  const foodService = {
+    getFoods: () => foodListDB,
+    getFoodById: (id: number) =>
+      foodListDB.filter((food: IFoodDB) => food.id === id), // id = 1
+    getFoodBySectionId: (id: number) => {
+      if (id === 0) {
+        return foodListDB;
+      }
+      foodListDB.filter((food: IFoodDB) => food.item_section === id);
+    }, //sectionId = 1
+  };
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -30,17 +42,27 @@ describe('FoodController (integration)', () => {
     app = moduleFixture.createNestApplication();
     await app.init();
   });
-
-  // it('/foods (GET)', () => {
-  //   return request(app.getHttpServer())
-  //     .get('/foods')
-  //     .query({ selectedOption: 'all' })
-  //     .expect(200)
-  //     .expect({
-  //       results: foodService.getFoods(),
-  //     });
-  // });
   it('db connection test', () => expect(1 + 1).toBe(2));
+
+  it('/foods/all (GET) -> all foods', () => {
+    return request(app.getHttpServer())
+      .get('/api/foods/all')
+      .query({ selectedOption: 0 })
+      .expect(200)
+      .expect({
+        results: foodService.getFoods(),
+      });
+  });
+
+  it('/foods by section (GET)', () => {
+    return request(app.getHttpServer())
+      .get('/api/foods')
+      .query({ selectedOption: 1 })
+      .expect(200)
+      .expect({
+        results: foodService.getFoodBySectionId(1),
+      });
+  });
 
   afterAll(async () => {
     await app.close();
@@ -75,6 +97,7 @@ describe('FoodController (e2e)', () => {
   });
 
   it('db connection test', () => expect(1 + 1).toBe(2));
+
   afterAll(async () => {
     await migrate({
       schema: 'public',
