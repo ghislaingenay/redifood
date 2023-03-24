@@ -15,7 +15,8 @@ exports.up = (pgm) => {
     id SERIAL PRIMARY KEY,
     extra_name VARCHAR NOT NULL,
     extra_order SMALLINT NOT NULL,
-    extra_description VARCHAR(50) DEFAULT ''
+    extra_description VARCHAR(50) DEFAULT '',
+    section_id INTEGER REFERENCES food_section(id)
   );
 
   CREATE TABLE foods (
@@ -27,10 +28,7 @@ exports.up = (pgm) => {
     item_created_at DATE DEFAULT NOW(),
     section_id INTEGER REFERENCES food_section(id),
     extra_id INTEGER REFERENCES food_extra(id)
-  )
-
-    
-    `);
+  )`);
 };
 
 exports.down = (pgm) => {
