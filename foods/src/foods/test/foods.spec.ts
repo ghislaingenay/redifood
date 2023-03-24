@@ -122,8 +122,28 @@ describe('Create keys-pairs function test', () => {
   });
 });
 
-// describe('createQuery function test from data in Api format', () => {
-//   it.todo('should loop in one food and display the proper query');
-//   it.todo('should loop in several foods and display the proper query');
-//   it.todo('should convert null price and display the proper querys');
-// });
+describe('createQuery function test from data in Api format', () => {
+  it('should loop in one food (api) and display the proper query', () => {
+    const foodDB = convertKeys(foodListMockAPI[0], 'apiToDb');
+    expect(createQuery(foodDB, 'foods')).toStrictEqual(
+      `INSERT INTO foods (item_name,item_photo,item_price,item_description,item_section,item_extra,item_quantity) VALUES ('Pizza Mediterranean','ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8',12.5,'Soo good',2,4,0)`,
+    );
+  });
+  it('should loop in several foods (api) and display the proper query', () => {
+    const foodList = [
+      foodListMockAPI[0],
+      foodListMockAPI[1],
+      foodListMockAPI[2],
+    ];
+    const foodListDB = foodList.map((food) => convertKeys(food, 'apiToDb'));
+    expect(createQuery(foodListDB, 'foods')).toStrictEqual(
+      `INSERT INTO foods (item_name,item_photo,item_price,item_description,item_section,item_extra,item_quantity) VALUES ('Pizza Mediterranean','ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8',12.5,'Soo good',2,4,0), ('Pizza Cheesy','photo-1520201163981-8cc95007dd2a?',13.99,'Gorgonzola, gouda, mozzarella, blue cheese',2,3,0), ('Millefeuille','images.unsplash.com/photo-1587122569949-ae6e755c6bdc?',4.25,'The traditional French Millefeuille',1,2,0)`,
+    );
+  });
+
+  it('should loop in one food (db) and display the proper query', () => {
+    expect(() =>
+      createQuery(convertKeys(foodListMockDB[0], 'apiToDb'), 'foods'),
+    ).toThrow(new Error('item_name should be camel case and not be null'));
+  });
+});
