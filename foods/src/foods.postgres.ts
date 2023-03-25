@@ -52,11 +52,12 @@ class Foods {
     return query;
   }
 
-  // static async getSectionList() {
-  //   const response = await pool.query(
-  //     `SELECT * FROM food_extra INNER JOIN food_section ON food_section.id = food.extra.section_id`,
-  //   );
-  // }
+  static async getSectionList() {
+    const response = await pool.query(
+      `SELECT * FROM food_extra INNER JOIN food_section ON food_section.id = food.extra.section_id`,
+    );
+    return response;
+  }
 
   // static getSectionAndExtraList() {}
 }

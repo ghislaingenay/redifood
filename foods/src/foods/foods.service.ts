@@ -1,10 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import {
+  EStatusCodes,
   IFoodGetApi,
   IGetServerSideData,
 } from 'redifood-module/src/interfaces';
+import { SectionApiDto } from 'src/foods.dto';
 import { EFoodMessage } from 'src/foods.interface';
 import Foods from 'src/foods.postgres';
+import { createQuery } from 'src/global.function';
 
 @Injectable()
 export class FoodService {
@@ -15,7 +18,7 @@ export class FoodService {
       //empty
     }
     return {
-      statusCode: 200,
+      statusCode: EStatusCodes.SUCCESS,
       results: foodResults,
       message: EFoodMessage.FOOD_RECOVERED,
     };
@@ -30,9 +33,24 @@ export class FoodService {
       //empty
     }
     return {
-      statusCode: 200,
+      statusCode: EStatusCodes.SUCCESS,
       results: foodResults,
       message: EFoodMessage.FOOD_RECOVERED,
+    };
+  }
+
+  // @Post('/section')
+  async createSection(
+    body: SectionApiDto,
+  ): Promise<IGetServerSideData<{ created: true }>> {
+    const postgresQuery = createQuery(body, 'food_section');
+    const response = await Foods.createRows(postgresQuery);
+    if (!response) {
+      //
+    }
+    return {
+      statusCode: EStatusCodes.CREATED,
+      message: EFoodMessage.SECTION_CREATED,
     };
   }
 }
