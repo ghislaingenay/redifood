@@ -35,7 +35,7 @@ class Foods {
     return updatedResponse;
   }
 
-  static async findBySectionId(id: number): Promise<IFoodGetApi> {
+  static async findBySectionId(id: number): Promise<IFoodGetApi[]> {
     const response = await pool.query(
       `${this.find_foods_query} WHERE item_section = $1`,
       [id],

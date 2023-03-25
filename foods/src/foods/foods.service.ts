@@ -15,6 +15,22 @@ export class FoodService {
       //empty
     }
     return {
+      statusCode: 200,
+      results: foodResults,
+      message: EFoodMessage.FOOD_RECOVERED,
+    };
+  }
+
+  // @Get('section/:id')
+  async getFoodBySectionId(
+    id: number,
+  ): Promise<IGetServerSideData<IFoodGetApi[]>> {
+    const foodResults = await Foods.findBySectionId(id);
+    if (!foodResults) {
+      //empty
+    }
+    return {
+      statusCode: 200,
       results: foodResults,
       message: EFoodMessage.FOOD_RECOVERED,
     };

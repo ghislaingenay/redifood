@@ -1,8 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
-import {
-  IFoodGetApi,
-  IGetServerSideData,
-} from 'redifood-module/src/interfaces';
+import { Controller, Get, Param } from '@nestjs/common';
 import { FoodService } from './foods.service';
 
 @Controller('foods')
@@ -12,5 +8,10 @@ export class FoodController {
   @Get('all')
   async getAllFoods() {
     return await this.foodService.getAllFoods();
+  }
+
+  @Get('section/:id')
+  async getFoodBySectionId(@Param('id') id: number) {
+    return await this.foodService.getFoodBySectionId(id);
   }
 }
