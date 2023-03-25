@@ -29,7 +29,7 @@ class Foods {
     //   throw new DatabaseError();
     // }
 
-    const updatedResponse = response.map((item: any) => {
+    const updatedResponse: IFoodGetApi[] = response.map((item: any) => {
       return this.convertFoodResponseToFoodGet(item);
     });
     return updatedResponse;
@@ -44,6 +44,12 @@ class Foods {
       return this.convertFoodResponseToFoodGet(item);
     });
     return updatedResponse;
+  }
+
+  static async createRows(queryString: string): Promise<any> {
+    const query = await pool.query(queryString);
+    console.log('res', query);
+    return query;
   }
 
   // static async getSectionList() {
