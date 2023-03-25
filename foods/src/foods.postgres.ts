@@ -2,42 +2,57 @@ import { IFoodGetApi } from 'redifood-module/src/interfaces';
 import { pool } from './pool.pg';
 
 class Foods {
+  private static convertFoodResponseToFoodGet = (food: any): IFoodGetApi => {
+    return {
+      id: food.id,
+      itemName: food.item_name,
+      itemPhoto: food.item_photo,
+      itemDescription: food.item_description,
+      itemPrice: food.item_price,
+      itemQuantity: 0,
+      itemExtra: {
+        id: food.item_extra,
+        extraName: food.extra_name,
+      },
+      itemSection: {
+        id: food.item_section,
+        sectionName: food.section_name,
+      },
+    };
+  };
+
+  private static find_foods_query = `SELECT * FROM foods INNER JOIN section_food ON food_section.id = foods.item_section INNER JOIN food_extra ON foods.item_extra = food_extra.id`;
   static async findAll(): Promise<IFoodGetApi[]> {
-    const response = pool.query(
-      `SELECT * FROM foods INNER JOIN section_food ON food_section.id = foods.item_section INNER JOIN food_extra ON foods.item_extra = food_extra.id`,
-    );
+    const response = await pool.query(this.find_foods_query);
+
+    // if (!response) {
+    //   throw new DatabaseError();
+    // }
 
     const updatedResponse = response.map((item: any) => {
-      return {
-        id: item.id,
-        itemName: item.item_name,
-        itemPhoto: item.item_photo,
-        itemDescription: item.item_description,
-        itemPrice: item.item_price,
-        itemQuantity: 0,
-        itemExtra: {
-          id: item.item_extra,
-          extraName: item.extra_name,
-        },
-        itemSection: {
-          id: item.item_section,
-          sectionName: item.section_name,
-        },
-      } as IFoodGetApi;
+      return this.convertFoodResponseToFoodGet(item);
     });
     return updatedResponse;
   }
 
-  static findBySectionId() {
-    // id: number
-    // empty
+  static async findBySectionId(id: number): Promise<IFoodGetApi> {
+    const response = await pool.query(
+      `${this.find_foods_query} WHERE item_section = $1`,
+      [id],
+    );
+    const updatedResponse = response.map((item: any) => {
+      return this.convertFoodResponseToFoodGet(item);
+    });
+    return updatedResponse;
   }
 
-  static getSectionList() {
-    //empty
-  }
+  // static async getSectionList() {
+  //   const response = await pool.query(
+  //     `SELECT * FROM food_extra INNER JOIN food_section ON food_section.id = food.extra.section_id`,
+  //   );
+  // }
 
-  static getSectionAndExtraList() {}
+  // static getSectionAndExtraList() {}
 }
 
 export default Foods;
