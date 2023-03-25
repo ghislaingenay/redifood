@@ -13,7 +13,7 @@ exports.up = (pgm) => {
 
   CREATE TABLE food_extra (
     id SERIAL PRIMARY KEY,
-    extra_name VARCHAR NOT NULL,
+    extra_name VARCHAR(30) NOT NULL,
     extra_order SMALLINT AUTO_INCREMENT NOT NULL,
     extra_description VARCHAR(50) DEFAULT '',
     section_id INTEGER REFERENCES food_section(id)
@@ -24,7 +24,7 @@ exports.up = (pgm) => {
     item_name VARCHAR(20) NOT NULL,
     item_description VARCHAR(50) DEFAULT '',
     item_price NUMERIC NOT NULL CHECK (item_price > 0),
-    item_picture VARCHAR NOT NULL,
+    item_photo VARCHAR NOT NULL,
     item_created_at DATE DEFAULT NOW(),
     section_id INTEGER REFERENCES food_section(id),
     extra_id INTEGER REFERENCES food_extra(id)
