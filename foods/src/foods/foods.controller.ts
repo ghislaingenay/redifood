@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { ExtraApiDto, SectionApiDto } from 'src/foods.dto';
+import { ExtraApiDto, FoodApiDto, SectionApiDto } from 'src/foods.dto';
 import { FoodService } from './foods.service';
 
 @Controller('foods')
@@ -26,8 +26,8 @@ export class FoodController {
     return await this.foodService.createExtra(extraDto);
   }
 
-  // @Post()
-  // async createFood(@Body() foodDto: FoodApiDto) {
-  //   return await this.foodService.createFood(foodDto);
-  // }
+  @Post()
+  async createFood(@Body() foodDto: FoodApiDto) {
+    return await this.foodService.createFood(foodDto);
+  }
 }
