@@ -4,7 +4,7 @@ import {
   IFoodGetApi,
   IGetServerSideData,
 } from 'redifood-module/src/interfaces';
-import { SectionApiDto } from 'src/foods.dto';
+import { ExtraApiDto, SectionApiDto } from 'src/foods.dto';
 import { EFoodMessage } from 'src/foods.interface';
 import Foods from 'src/foods.postgres';
 import { createQuery } from 'src/global.function';
@@ -40,15 +40,27 @@ export class FoodService {
   }
 
   // @Post('/section')
-  async createSection(
-    body: SectionApiDto,
-  ): Promise<IGetServerSideData<{ created: true }>> {
+  async createSection(body: SectionApiDto): Promise<IGetServerSideData<any>> {
     const postgresQuery = createQuery(body, 'food_section');
     const response = await Foods.createRows(postgresQuery);
     if (!response) {
       //
     }
     return {
+      results: response,
+      statusCode: EStatusCodes.CREATED,
+      message: EFoodMessage.SECTION_CREATED,
+    };
+  }
+
+  async createExtra(body: ExtraApiDto): Promise<IGetServerSideData<any>> {
+    const postgresQuery = createQuery(body, 'food_extra');
+    const response = await Foods.createRows(postgresQuery);
+    if (!response) {
+      //
+    }
+    return {
+      results: response,
       statusCode: EStatusCodes.CREATED,
       message: EFoodMessage.SECTION_CREATED,
     };
