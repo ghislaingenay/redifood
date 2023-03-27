@@ -5,6 +5,7 @@ import {
   buildInsertIntoKeyValuePair,
   convertKeys,
   createQuery,
+  updateQuery,
 } from '../../global.function';
 import {
   foodListMockAPI,
@@ -145,5 +146,18 @@ describe('createQuery function test from data in Api format', () => {
     expect(() =>
       createQuery(convertKeys(foodListMockDB[0], 'apiToDb'), 'foods'),
     ).toThrow(new Error('item_name should be camel case and not be null'));
+  });
+
+  describe('update query function test', () => {
+    it('should loop in one food (db) and display the proper query', () => {
+      expect(updateQuery(foodListMockDB[0], 'foods')).toStrictEqual(
+        `UPDATE foods SET item_name = 'Pizza Mediterranean', item_photo = 'ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8', item_price = 12.5, item_description = 'Soo good', item_section = 2, item_extra = 4, item_quantity = 0`,
+      );
+    });
+    it('should loop in several foods (db) and display the proper query', () => {
+      expect(updateQuery(foodListMockDB[1], 'foods')).toStrictEqual(
+        `UPDATE foods SET item_name = 'Pizza Cheesy', item_photo = 'photo-1520201163981-8cc95007dd2a?', item_price = 13.99, item_description = 'Gorgonzola, gouda, mozzarella, blue cheese', item_section = 2, item_extra = 3, item_quantity = 0`,
+      );
+    });
   });
 });

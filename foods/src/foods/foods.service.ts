@@ -3,7 +3,7 @@ import {
   EStatusCodes,
   IFoodGetApi,
   IGetServerSideData,
-} from 'redifood-module/src/interfaces';
+} from '../../redifood-module/src/interfaces';
 import { ExtraApiDto, FoodApiDto, SectionApiDto } from '../foods.dto';
 import { EFoodMessage } from '../foods.interface';
 import Foods from '../foods.postgres';
