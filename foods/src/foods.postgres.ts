@@ -101,14 +101,18 @@ class Foods {
 
   static async countSection(): Promise<number> {
     const res = pool.query(`SELECT COUNT(*) FROM food_section`);
+    console.log('res count', res, 'res');
+    if (!res) throw new DatabaseError();
     return res;
   }
   static async countExtra(): Promise<number> {
     const res = pool.query(`SELECT COUNT(*) FROM food_extra`);
+    if (!res) throw new DatabaseError();
     return res;
   }
   static async countFoods(): Promise<number> {
     const res = pool.query(`SELECT COUNT(*) FROM foods`);
+    if (!res) throw new DatabaseError();
     return res;
   }
   // static getSectionAndExtraList() {}
