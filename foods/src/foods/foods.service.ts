@@ -3,11 +3,12 @@ import {
   EStatusCodes,
   IFoodGetApi,
   IGetServerSideData,
+  ISectionFoodApi,
 } from '../../redifood-module/src/interfaces';
 import { ExtraApiDto, FoodApiDto, SectionApiDto } from '../foods.dto';
 import { EFoodMessage } from '../foods.interface';
 import Foods from '../foods.postgres';
-import { createQuery, updateQuery } from '../global.function';
+import { convertKeys, createQuery, updateQuery } from '../global.function';
 import { DatabaseError } from '../handling/database-error.exception';
 
 @Injectable()
@@ -42,20 +43,30 @@ export class FoodService {
 
   // @Post('/section')
   async createSection(body: SectionApiDto): Promise<IGetServerSideData<any>> {
-    const postgresQuery = createQuery(body, 'food_section');
-    const response = await Foods.createRows(postgresQuery);
-    if (!response) {
-      throw new DatabaseError();
-    }
-    return {
-      results: response,
-      statusCode: EStatusCodes.CREATED,
-      message: EFoodMessage.SECTION_CREATED,
+    const bodyWithOrder: ISectionFoodApi = {
+      ...body,
+      sectionOrder: (await Foods.countSection()) + 1,
     };
+
+    const updatedData = convertKeys(bodyWithOrder, 'apiToDb');
+    console.log('upf', updatedData);
+    return { message: 'yes' };
+    // const postgresQuery = createQuery(updatedData, 'food_section');
+    // console.log(postgresQuery);
+    // const response = await Foods.createRows(postgresQuery);
+    // if (!response) {
+    //   throw new DatabaseError();
+    // }
+    // return {
+    //   results: response,
+    //   statusCode: EStatusCodes.CREATED,
+    //   message: EFoodMessage.SECTION_CREATED,
+    // };
   }
 
   async createExtra(body: ExtraApiDto): Promise<IGetServerSideData<any>> {
-    const postgresQuery = createQuery(body, 'food_extra');
+    const updatedData = convertKeys(body, 'apiToDb');
+    const postgresQuery = createQuery(updatedData, 'food_extra');
     const response = await Foods.createRows(postgresQuery);
     if (!response) {
       throw new DatabaseError();
@@ -68,7 +79,8 @@ export class FoodService {
   }
 
   async createFood(body: FoodApiDto) {
-    const postgresQuery = createQuery(body, 'foods');
+    const updatedData = convertKeys(body, 'apiToDb');
+    const postgresQuery = createQuery(updatedData, 'foods');
     const response = await Foods.createRows(postgresQuery);
     if (!response) {
       throw new DatabaseError();

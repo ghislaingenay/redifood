@@ -19,6 +19,8 @@ declare global {
 
 // Middleware that extract the JWT payload and set it on 'req.currentUser'
 export const currentUser = (req: Request, res: Response, next: NextFunction) => {
+  console.log("req.val", req.headers?.cookie);
+  console.log("req.session", req.session?.jwt);
   if (!req.session?.jwt) {
     return next();
   }

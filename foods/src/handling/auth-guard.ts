@@ -12,12 +12,13 @@ interface UserPayload {
   email: string;
 }
 @Injectable()
-export class RolesGuard implements CanActivate {
+export class AuthGuard implements CanActivate {
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     try {
-      const req = context.switchToHttp().getRequest();
+      const req: any = context.switchToHttp().getRequest();
+
       const payload = jwt.verify(
         req.session.jwt,
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

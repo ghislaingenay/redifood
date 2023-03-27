@@ -8,7 +8,9 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from 'src/handling/auth-guard';
 import { ExtraApiDto, FoodApiDto, SectionApiDto } from '../foods.dto';
 import { ValidationPipe } from '../handling/validation.pipe';
 import { FoodService } from './foods.service';
@@ -33,6 +35,7 @@ export class FoodController {
     return await this.foodService.getFoodBySectionId(id);
   }
 
+  @UseGuards(AuthGuard)
   @Post('section')
   async createSection(@Body(new ValidationPipe()) sectionDto: SectionApiDto) {
     return await this.foodService.createSection(sectionDto);
