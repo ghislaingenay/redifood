@@ -1,5 +1,14 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Param,
+  ParseIntPipe,
+  Post,
+} from '@nestjs/common';
 import { ExtraApiDto, FoodApiDto, SectionApiDto } from 'src/foods.dto';
+import { ValidationPipe } from 'src/handling/validation.pipe';
 import { FoodService } from './foods.service';
 
 @Controller('foods')
@@ -12,22 +21,28 @@ export class FoodController {
   }
 
   @Get('section/:id')
-  async getFoodBySectionId(@Param('id') id: number) {
+  async getFoodBySectionId(
+    @Param(
+      'id',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    id: number,
+  ) {
     return await this.foodService.getFoodBySectionId(id);
   }
 
   @Post('/section')
-  async createSection(@Body() sectionDto: SectionApiDto) {
+  async createSection(@Body(new ValidationPipe()) sectionDto: SectionApiDto) {
     return await this.foodService.createSection(sectionDto);
   }
 
   @Post('/extra')
-  async createExtra(@Body() extraDto: ExtraApiDto) {
+  async createExtra(@Body(new ValidationPipe()) extraDto: ExtraApiDto) {
     return await this.foodService.createExtra(extraDto);
   }
 
   @Post()
-  async createFood(@Body() foodDto: FoodApiDto) {
+  async createFood(@Body(new ValidationPipe()) foodDto: FoodApiDto) {
     return await this.foodService.createFood(foodDto);
   }
 }
