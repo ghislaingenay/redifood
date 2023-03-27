@@ -4,11 +4,11 @@ import {
   IFoodGetApi,
   IGetServerSideData,
 } from 'redifood-module/src/interfaces';
-import { ExtraApiDto, FoodApiDto, SectionApiDto } from 'src/foods.dto';
-import { EFoodMessage } from 'src/foods.interface';
-import Foods from 'src/foods.postgres';
-import { createQuery } from 'src/global.function';
-import { DatabaseError } from 'src/handling/database-error.exception';
+import { ExtraApiDto, FoodApiDto, SectionApiDto } from '../foods.dto';
+import { EFoodMessage } from '../foods.interface';
+import Foods from '../foods.postgres';
+import { createQuery, updateQuery } from '../global.function';
+import { DatabaseError } from '../handling/database-error.exception';
 
 @Injectable()
 export class FoodService {
@@ -63,7 +63,7 @@ export class FoodService {
     return {
       results: response,
       statusCode: EStatusCodes.CREATED,
-      message: EFoodMessage.SECTION_CREATED,
+      message: EFoodMessage.EXTRA_CREATED,
     };
   }
 
@@ -76,7 +76,20 @@ export class FoodService {
     return {
       results: response,
       statusCode: EStatusCodes.CREATED,
-      message: EFoodMessage.SECTION_CREATED,
+      message: EFoodMessage.FOOD_CREATED,
+    };
+  }
+
+  async updateFood(body: FoodApiDto) {
+    const postgresQuery = updateQuery(body, 'foods');
+    const response = await Foods.updateRow(postgresQuery);
+    if (!response) {
+      throw new DatabaseError();
+    }
+    return {
+      results: response,
+      statusCode: EStatusCodes.SUCCESS,
+      message: EFoodMessage.FOOD_UPDATED,
     };
   }
 }

@@ -6,9 +6,10 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Put,
 } from '@nestjs/common';
-import { ExtraApiDto, FoodApiDto, SectionApiDto } from 'src/foods.dto';
-import { ValidationPipe } from 'src/handling/validation.pipe';
+import { ExtraApiDto, FoodApiDto, SectionApiDto } from '../foods.dto';
+import { ValidationPipe } from '../handling/validation.pipe';
 import { FoodService } from './foods.service';
 
 @Controller('foods')
@@ -44,5 +45,10 @@ export class FoodController {
   @Post()
   async createFood(@Body(new ValidationPipe()) foodDto: FoodApiDto) {
     return await this.foodService.createFood(foodDto);
+  }
+
+  @Put()
+  async updateFood(@Body(new ValidationPipe()) foodDto: FoodApiDto) {
+    return await this.foodService.updateFood(foodDto);
   }
 }

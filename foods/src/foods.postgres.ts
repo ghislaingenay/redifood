@@ -53,6 +53,12 @@ class Foods {
     return query;
   }
 
+  static async updateRow(queryString: string): Promise<any> {
+    const query = await pool.query(queryString);
+    console.log('res', query);
+    return query;
+  }
+
   static async getSectionList() {
     const response = await pool.query(
       `SELECT * FROM food_extra INNER JOIN food_section ON food_section.id = food.extra.section_id`,
