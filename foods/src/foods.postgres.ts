@@ -59,6 +59,39 @@ class Foods {
     return response;
   }
 
+  static async deleteExtra(id: number) {
+    try {
+      await pool.query(`DELETE FROM food_extra WHERE id = $1`, [id]);
+      await pool.query(
+        `UPDATE foods SET item_extra = null WHERE item_extra = $1`,
+        [id],
+      );
+      return { deleted: true };
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async deleteSection(id: number) {
+    try {
+      await pool.query(`DELETE FROM food_section WHERE id = $1`, [id]);
+      await pool.query(`DELETE FROM foods WHERE item_section = $1`, [id]);
+      await pool.query(`DELETE FROM food_extra WHERE section_id = $1`, [id]);
+      return { deleted: true };
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  async deleteFood(id: number) {
+    try {
+      await pool.query(`DELETE FROM foods WHERE id = $1`, [id]);
+      return { deleted: true };
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   // static getSectionAndExtraList() {}
 }
 
