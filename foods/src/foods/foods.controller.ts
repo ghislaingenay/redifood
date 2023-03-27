@@ -13,7 +13,7 @@ import { ExtraApiDto, FoodApiDto, SectionApiDto } from '../foods.dto';
 import { ValidationPipe } from '../handling/validation.pipe';
 import { FoodService } from './foods.service';
 
-@Controller('foods')
+@Controller('api/foods')
 export class FoodController {
   constructor(private readonly foodService: FoodService) {}
 
@@ -33,12 +33,12 @@ export class FoodController {
     return await this.foodService.getFoodBySectionId(id);
   }
 
-  @Post('/section')
+  @Post('section')
   async createSection(@Body(new ValidationPipe()) sectionDto: SectionApiDto) {
     return await this.foodService.createSection(sectionDto);
   }
 
-  @Post('/extra')
+  @Post('extra')
   async createExtra(@Body(new ValidationPipe()) extraDto: ExtraApiDto) {
     return await this.foodService.createExtra(extraDto);
   }
