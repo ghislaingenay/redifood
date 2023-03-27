@@ -1,7 +1,8 @@
-import { NestFactory } from '@nestjs/core';
+import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
+import { AllExceptionsFilter } from './handling/catch-all.exception';
 import { pool } from './pool.pg';
 
 async function bootstrap() {
@@ -20,6 +21,7 @@ async function bootstrap() {
     });
   console.log('Postgres connected');
   console.log('Listening on port 3000');
+  app.useGlobalFilters(new AllExceptionsFilter(app.get(HttpAdapterHost)));
   await app.listen(3000);
 }
 bootstrap();
