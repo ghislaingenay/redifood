@@ -99,6 +99,18 @@ class Foods {
     }
   }
 
+  async countSection(): Promise<number> {
+    const res = pool.query(`SELECT COUNT(*) FROM food_section`);
+    return res;
+  }
+  async countExtra(): Promise<number> {
+    const res = pool.query(`SELECT COUNT(*) FROM food_extra`);
+    return res;
+  }
+  async countFoods(): Promise<number> {
+    const res = pool.query(`SELECT COUNT(*) FROM foods`);
+    return res;
+  }
   // static getSectionAndExtraList() {}
 }
 
