@@ -1,4 +1,5 @@
 import { IFoodGetApi } from 'redifood-module/src/interfaces';
+import { DatabaseError } from './handling/database-error.exception';
 import { pool } from './pool.pg';
 
 class Foods {
@@ -68,7 +69,7 @@ class Foods {
       );
       return { deleted: true };
     } catch (error) {
-      console.log(error);
+      throw new DatabaseError();
     }
   }
 
@@ -79,7 +80,7 @@ class Foods {
       await pool.query(`DELETE FROM food_extra WHERE section_id = $1`, [id]);
       return { deleted: true };
     } catch (err) {
-      console.log(err);
+      throw new DatabaseError();
     }
   }
 
@@ -88,7 +89,7 @@ class Foods {
       await pool.query(`DELETE FROM foods WHERE id = $1`, [id]);
       return { deleted: true };
     } catch (err) {
-      console.log(err);
+      throw new DatabaseError();
     }
   }
 

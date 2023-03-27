@@ -8,6 +8,7 @@ import { ExtraApiDto, FoodApiDto, SectionApiDto } from 'src/foods.dto';
 import { EFoodMessage } from 'src/foods.interface';
 import Foods from 'src/foods.postgres';
 import { createQuery } from 'src/global.function';
+import { DatabaseError } from 'src/handling/database-error.exception';
 
 @Injectable()
 export class FoodService {
@@ -15,7 +16,7 @@ export class FoodService {
   async getAllFoods(): Promise<IGetServerSideData<IFoodGetApi[]>> {
     const foodResults = await Foods.findAll();
     if (!foodResults) {
-      //empty
+      throw new DatabaseError();
     }
     return {
       statusCode: EStatusCodes.SUCCESS,
@@ -30,7 +31,7 @@ export class FoodService {
   ): Promise<IGetServerSideData<IFoodGetApi[]>> {
     const foodResults = await Foods.findBySectionId(id);
     if (!foodResults) {
-      //empty
+      throw new DatabaseError();
     }
     return {
       statusCode: EStatusCodes.SUCCESS,
@@ -44,7 +45,7 @@ export class FoodService {
     const postgresQuery = createQuery(body, 'food_section');
     const response = await Foods.createRows(postgresQuery);
     if (!response) {
-      //
+      throw new DatabaseError();
     }
     return {
       results: response,
@@ -57,7 +58,7 @@ export class FoodService {
     const postgresQuery = createQuery(body, 'food_extra');
     const response = await Foods.createRows(postgresQuery);
     if (!response) {
-      //
+      throw new DatabaseError();
     }
     return {
       results: response,
@@ -70,7 +71,7 @@ export class FoodService {
     const postgresQuery = createQuery(body, 'foods');
     const response = await Foods.createRows(postgresQuery);
     if (!response) {
-      //
+      throw new DatabaseError();
     }
     return {
       results: response,
