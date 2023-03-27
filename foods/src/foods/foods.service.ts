@@ -92,4 +92,40 @@ export class FoodService {
       message: EFoodMessage.FOOD_UPDATED,
     };
   }
+
+  async deleteExtra(id: number) {
+    const response = await Foods.deleteExtra(id);
+    if (!response) {
+      throw new DatabaseError();
+    }
+    return {
+      results: response,
+      statusCode: EStatusCodes.SUCCESS,
+      message: EFoodMessage.EXTRA_DELETED,
+    };
+  }
+
+  async deleteSection(id: number) {
+    const response = await Foods.deleteSection(id);
+    if (!response) {
+      throw new DatabaseError();
+    }
+    return {
+      results: response,
+      statusCode: EStatusCodes.SUCCESS,
+      message: EFoodMessage.SECTION_DELETED,
+    };
+  }
+
+  async deleteFood(id: number) {
+    const response = await Foods.deleteFood(id);
+    if (!response) {
+      throw new DatabaseError();
+    }
+    return {
+      results: response,
+      statusCode: EStatusCodes.SUCCESS,
+      message: EFoodMessage.FOOD_DELETED,
+    };
+  }
 }

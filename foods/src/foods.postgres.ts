@@ -79,7 +79,7 @@ class Foods {
     }
   }
 
-  async deleteSection(id: number) {
+  static async deleteSection(id: number) {
     try {
       await pool.query(`DELETE FROM food_section WHERE id = $1`, [id]);
       await pool.query(`DELETE FROM foods WHERE item_section = $1`, [id]);
@@ -90,7 +90,7 @@ class Foods {
     }
   }
 
-  async deleteFood(id: number) {
+  static async deleteFood(id: number) {
     try {
       await pool.query(`DELETE FROM foods WHERE id = $1`, [id]);
       return { deleted: true };

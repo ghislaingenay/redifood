@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpStatus,
   Param,
@@ -50,5 +51,38 @@ export class FoodController {
   @Put()
   async updateFood(@Body(new ValidationPipe()) foodDto: FoodApiDto) {
     return await this.foodService.updateFood(foodDto);
+  }
+
+  @Delete()
+  async deleteExtra(
+    @Param(
+      'id',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    id: number,
+  ) {
+    return await this.foodService.deleteExtra(id);
+  }
+
+  @Delete()
+  async deleteSection(
+    @Param(
+      'id',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    id: number,
+  ) {
+    return await this.foodService.deleteSection(id);
+  }
+
+  @Delete()
+  async deleteFood(
+    @Param(
+      'id',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    id: number,
+  ) {
+    return await this.foodService.deleteFood(id);
   }
 }
