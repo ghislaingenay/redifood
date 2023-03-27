@@ -1,5 +1,17 @@
 type RecordAny = Record<string, any>;
 
+const blockSQLInjection = (data: any) => {
+  return Object.values(data).map((val) => {
+    if (typeof val === 'number') {
+      return val;
+    }
+    if (val === null || val === undefined) {
+      return 'NULL';
+    }
+    return `'${val}'`;
+  });
+};
+
 export function buildInsertIntoKeyValuePair(data: RecordAny): {
   keys: string;
   values: string;
@@ -8,17 +20,7 @@ export function buildInsertIntoKeyValuePair(data: RecordAny): {
     throw new Error('data should be defined');
   }
   const keys = Object.keys(data).join(',');
-  const values = Object.values(data)
-    .map((val) => {
-      if (typeof val === 'number') {
-        return val;
-      }
-      if (val === null || val === undefined) {
-        return 'NULL';
-      }
-      return `'${val}'`;
-    })
-    .join(',');
+  const values = blockSQLInjection(data).join(',');
   return { keys, values };
 }
 
@@ -57,6 +59,28 @@ export const createQuery = <T extends RecordAny>(
   const query = `${insertQuery} ${valuesQuery}`;
   // console.log('query', query);
   return query;
+};
+
+export const updateQuery = <T extends RecordAny>(
+  data: T,
+  tableName: TTable,
+) => {
+  // Delete id from the data
+  delete data.id;
+  const keysEntries = Object.keys(data);
+  // Avoid SQL Injection
+  const values = blockSQLInjection(data);
+  const updateList = [];
+  const setQuery = `UPDATE ${tableName} SET`;
+  if (keysEntries.length !== values.length) {
+    throw new Error('keys and values should have the same length');
+  }
+
+  for (let i = 0; i < keysEntries.length; i++) {
+    updateList.push(`${keysEntries[i]} = ${values[i]}`);
+  }
+  const updateQuery = updateList.join(', ');
+  return `${setQuery} ${updateQuery}`;
 };
 
 interface IKeys<T, K> {
