@@ -94,9 +94,10 @@ export class FoodService {
     };
   }
 
-  async updateFood(body: FoodApiDto) {
-    const postgresQuery = updateQuery(body, 'foods');
-    const response = await Foods.updateRow(postgresQuery);
+  async updateFood(body: FoodApiDto, id: number) {
+    const postgresQuery = updateQuery(convertKeys(body, 'apiToDb'), 'foods');
+    console.log('postgresQuery', postgresQuery);
+    const response = await Foods.updateRow(postgresQuery, id);
     if (!response) {
       throw new DatabaseError();
     }

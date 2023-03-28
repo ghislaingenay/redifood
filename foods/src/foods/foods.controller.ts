@@ -63,7 +63,7 @@ export class FoodController {
     id: number,
     @Body(new ValidationPipe()) foodDto: FoodApiDto,
   ) {
-    return await this.foodService.updateFood(foodDto);
+    return await this.foodService.updateFood(foodDto, id);
   }
 
   @Delete('extra/:id')

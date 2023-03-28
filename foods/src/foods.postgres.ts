@@ -53,13 +53,11 @@ class Foods {
 
   static async createRows(queryString: string): Promise<any> {
     const query = await pool.query(queryString);
-    console.log('res', query);
     return query;
   }
 
-  static async updateRow(queryString: string): Promise<any> {
-    const query = await pool.query(queryString);
-    console.log('res', query);
+  static async updateRow(queryString: string, id: number): Promise<any> {
+    const query = await pool.query(`${queryString} WHERE id = $1`, [id]);
     return query;
   }
 
