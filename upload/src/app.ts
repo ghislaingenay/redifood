@@ -5,6 +5,7 @@ import express from "express";
 import "express-async-errors";
 import { EMessageErrors, EStatusCodes } from "../redifood-module/src/interfaces";
 import { errorHandler } from "../redifood-module/src/middlewares/error-handler.mdwr";
+import { foodPictureRouter } from "./controllers/food_picture.controller";
 
 const app = express();
 
@@ -23,9 +24,7 @@ app.use(
 );
 
 // routes
-// app.use(currentUserRouter);
-// app.use(authRouter);
-// app.use(settingsRouter);
+app.use(foodPictureRouter);
 
 app.all("*", async (req, res) => {
   res.status(EStatusCodes.NOT_FOUND).send({ message: EMessageErrors.NOT_FOUND, statusCode: EStatusCodes.NOT_FOUND });
