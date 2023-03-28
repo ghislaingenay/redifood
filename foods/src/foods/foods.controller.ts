@@ -10,7 +10,9 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
+import { TUser } from 'redifood-module/src/interfaces';
 import { AuthGuard } from 'src/handling/auth-guard';
+import { User } from 'src/handling/user-decorator';
 import { ExtraApiDto, FoodApiDto, SectionApiDto } from '../foods.dto';
 import { ValidationPipe } from '../handling/validation.pipe';
 import { FoodService } from './foods.service';
@@ -37,7 +39,11 @@ export class FoodController {
 
   @UseGuards(AuthGuard)
   @Post('section')
-  async createSection(@Body(new ValidationPipe()) sectionDto: SectionApiDto) {
+  async createSection(
+    @Body(new ValidationPipe()) sectionDto: SectionApiDto,
+    @User() userInfo: TUser,
+  ) {
+    console.log('user info', userInfo);
     return await this.foodService.createSection(sectionDto);
   }
 
