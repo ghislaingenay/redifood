@@ -17,23 +17,23 @@ class Foods {
       itemPrice: food.item_price,
       itemQuantity: 0,
       itemExtra: {
-        id: food.item_extra,
+        id: food.extra_id,
         extraName: food.extra_name,
       },
       itemSection: {
-        id: food.item_section,
+        id: food.section_id,
         sectionName: food.section_name,
       },
     };
   };
 
-  private static find_foods_query = `SELECT * FROM foods INNER JOIN section_food ON food_section.id = foods.item_section INNER JOIN food_extra ON foods.item_extra = food_extra.id`;
+  private static find_foods_query = `SELECT * FROM foods INNER JOIN food_section ON food_section.id = foods.section_id INNER JOIN food_extra ON foods.extra_id = food_extra.id`;
   static async findAll(): Promise<IFoodGetApi[]> {
-    const response = await pool.query(this.find_foods_query);
+    const response = (await pool.query(this.find_foods_query)).rows;
 
-    // if (!response) {
-    //   throw new DatabaseError();
-    // }
+    if (!response) {
+      throw new DatabaseError();
+    }
 
     const updatedResponse: IFoodGetApi[] = response.map((item: any) => {
       return this.convertFoodResponseToFoodGet(item);
