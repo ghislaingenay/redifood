@@ -1,4 +1,9 @@
-import { IFoodGetApi } from 'redifood-module/src/interfaces';
+import {
+  IExtraApi,
+  IFoodGetApi,
+  ISectionFoodApi,
+} from 'redifood-module/src/interfaces';
+import { convertKeys } from './global.function';
 import { DatabaseError } from './handling/database-error.exception';
 import { pool } from './pool.pg';
 
@@ -21,6 +26,9 @@ class Foods {
       },
     };
   };
+
+  private static getCountsFromQuery = async (query: string): Promise<number> =>
+    (await pool.query(query)).rows[0].count;
 
   private static find_foods_query = `SELECT * FROM foods INNER JOIN section_food ON food_section.id = foods.item_section INNER JOIN food_extra ON foods.item_extra = food_extra.id`;
   static async findAll(): Promise<IFoodGetApi[]> {
@@ -100,22 +108,48 @@ class Foods {
   }
 
   static async countSection(): Promise<number> {
-    const res = pool.query(`SELECT COUNT(*) FROM food_section`);
-    console.log('res count', res, 'res');
-    if (!res) throw new DatabaseError();
-    return res;
+    const count = await this.getCountsFromQuery(
+      `SELECT COUNT(*) FROM food_section`,
+    );
+    console.log('count', count);
+    if (!count) throw new DatabaseError();
+    return count;
   }
   static async countExtra(): Promise<number> {
-    const res = pool.query(`SELECT COUNT(*) FROM food_extra`);
+    const res = await await this.getCountsFromQuery(
+      `SELECT COUNT(*) FROM food_extra`,
+    );
     if (!res) throw new DatabaseError();
     return res;
   }
   static async countFoods(): Promise<number> {
-    const res = pool.query(`SELECT COUNT(*) FROM foods`);
+    const res = await await this.getCountsFromQuery(
+      `SELECT COUNT(*) FROM foods`,
+    );
     if (!res) throw new DatabaseError();
     return res;
   }
   // static getSectionAndExtraList() {}
+  static async getAllSectionName(): Promise<
+    Pick<ISectionFoodApi, 'sectionName'>[]
+  > {
+    const response = await pool.query(`SELECT * FROM food_section`);
+    const updatedResponseDB = response.map((item: any) => item.section_name);
+    const updatedResponseApi = updatedResponseDB.map((item: any) =>
+      convertKeys(item, 'dbToApi'),
+    );
+
+    return updatedResponseApi;
+  }
+  static async getAllExtraName(): Promise<Pick<IExtraApi, 'extraName'>[]> {
+    const response = await pool.query(`SELECT * FROM food_extra`);
+    const updatedResponseDB = response.map((item: any) => item.extra_name);
+    const updatedResponseApi = updatedResponseDB.map((item: any) =>
+      convertKeys(item, 'dbToApi'),
+    );
+
+    return updatedResponseApi;
+  }
 }
 
 export default Foods;
