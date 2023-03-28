@@ -24,12 +24,14 @@ export class AuthGuard implements CanActivate {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         process.env.JWT_TOKEN!,
       ) as UserPayload;
+      console.log('payload', payload);
       req.currentUser = payload;
       if (!req.currentUser) {
         throw new UnauthorizedException();
       }
       return true;
     } catch (err) {
+      console.log(err);
       throw new UnauthorizedException();
     }
   }
