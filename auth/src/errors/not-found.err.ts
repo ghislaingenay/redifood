@@ -1,4 +1,4 @@
-import { EStatusCodes } from "../interfaces/err.interface";
+import { EStatusCodes } from "../../redifood-module/src/interfaces";
 import { CustomError } from "./custom.err";
 
 export class NotFoundError extends CustomError {

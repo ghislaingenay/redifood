@@ -1,6 +1,6 @@
 // Able to carry class over using class (similar to interface)
 
-import { EStatusCodes } from "../interfaces/err.interface";
+import { EStatusCodes } from "../../redifood-module/src/interfaces";
 
 // abstract
 // Can't be instantiated directly (new CustomError())

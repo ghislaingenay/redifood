@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import { EMessageErrors, EStatusCodes } from "../../redifood-module/src/interfaces";
 import { BadRequestError } from "../errors/bad-request.err";
-import { EMessageErrors, EStatusCodes } from "../interfaces/err.interface";
 import { validateRequest } from "../middlewares/validationrequestnode.mdwr";
 import { User } from "../models/users.model";
 import { validationUsers } from "../services/auth.const";

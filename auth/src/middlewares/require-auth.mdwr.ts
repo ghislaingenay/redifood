@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
+import { EStatusCodes } from "../../redifood-module/src/interfaces";
+import { EMessageErrors } from "../../redifood-module/src/interfaces/msg.interface";
 import { NotAuthorizedError } from "../errors/forbidden.err";
-import { EMessageErrors, EStatusCodes } from "../interfaces/err.interface";
 
 // Middleware that reject the request if the user is not logged in
 export const requireAuth = (req: Request, res: Response, next: NextFunction) => {
