@@ -56,7 +56,7 @@ export class FoodController {
     return await this.foodService.updateFood(foodDto);
   }
 
-  @Delete()
+  @Delete('extra/:id')
   async deleteExtra(
     @Param(
       'id',
@@ -67,7 +67,7 @@ export class FoodController {
     return await this.foodService.deleteExtra(id);
   }
 
-  @Delete()
+  @Delete('section/:id')
   async deleteSection(
     @Param(
       'id',
@@ -78,7 +78,7 @@ export class FoodController {
     return await this.foodService.deleteSection(id);
   }
 
-  @Delete()
+  @Delete('food/:id')
   async deleteFood(
     @Param(
       'id',
