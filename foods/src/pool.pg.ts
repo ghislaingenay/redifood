@@ -5,7 +5,11 @@ class PGPool {
 
   connect(options: PoolConfig) {
     console.log('Connecting to Postgres...');
-    this._pool = new Pool(options);
+    this._pool = new Pool({
+      ...options,
+      connectionTimeoutMillis: 0,
+      idleTimeoutMillis: 0,
+    });
     this._pool.connect();
     return this._pool.query('SELECT 1 + 1');
   }
