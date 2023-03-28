@@ -45,23 +45,19 @@ export class FoodService {
   async createSection(body: SectionApiDto): Promise<IGetServerSideData<any>> {
     const bodyWithOrder: ISectionFoodApi = {
       ...body,
-      sectionOrder: (await Foods.countSection()) + 1,
+      sectionOrder: Number(await Foods.countSection()) + 1,
     };
-
     const updatedData = convertKeys(bodyWithOrder, 'apiToDb');
-    console.log('upf', updatedData);
-    return { message: 'yes' };
-    // const postgresQuery = createQuery(updatedData, 'food_section');
-    // console.log(postgresQuery);
-    // const response = await Foods.createRows(postgresQuery);
-    // if (!response) {
-    //   throw new DatabaseError();
-    // }
-    // return {
-    //   results: response,
-    //   statusCode: EStatusCodes.CREATED,
-    //   message: EFoodMessage.SECTION_CREATED,
-    // };
+    const postgresQuery = createQuery(updatedData, 'food_section');
+    const response = await Foods.createRows(postgresQuery);
+    if (!response) {
+      throw new DatabaseError();
+    }
+    return {
+      results: {},
+      statusCode: EStatusCodes.CREATED,
+      message: EFoodMessage.SECTION_CREATED,
+    };
   }
 
   async createExtra(body: ExtraApiDto): Promise<IGetServerSideData<any>> {
@@ -72,7 +68,7 @@ export class FoodService {
       throw new DatabaseError();
     }
     return {
-      results: response,
+      results: postgresQuery,
       statusCode: EStatusCodes.CREATED,
       message: EFoodMessage.EXTRA_CREATED,
     };
