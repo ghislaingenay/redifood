@@ -27,7 +27,8 @@ exports.up = (pgm) => {
     item_photo VARCHAR NOT NULL,
     item_created_at DATE DEFAULT NOW(),
     section_id INTEGER REFERENCES food_section(id),
-    extra_id INTEGER REFERENCES food_extra(id)
+    extra_id INTEGER REFERENCES food_extra(id),
+    item_quantity SMALLINT NOT NULL DEFAULT 0
   )`);
 };
 
