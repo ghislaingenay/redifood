@@ -27,9 +27,6 @@ class Foods {
     };
   };
 
-  private static getCountsFromQuery = async (query: string): Promise<number> =>
-    (await pool.query(query)).rows[0].count;
-
   private static find_foods_query = `SELECT * FROM foods INNER JOIN section_food ON food_section.id = foods.item_section INNER JOIN food_extra ON foods.item_extra = food_extra.id`;
   static async findAll(): Promise<IFoodGetApi[]> {
     const response = await pool.query(this.find_foods_query);
@@ -108,24 +105,20 @@ class Foods {
   }
 
   static async countSection(): Promise<number> {
-    const count = await this.getCountsFromQuery(
-      `SELECT COUNT(*) FROM food_section`,
-    );
-    console.log('count', count);
+    const count = (await pool.query(`SELECT COUNT(*) FROM food_section`))
+      .rows[0].count;
+
     if (!count) throw new DatabaseError();
     return count;
   }
   static async countExtra(): Promise<number> {
-    const res = await await this.getCountsFromQuery(
-      `SELECT COUNT(*) FROM food_extra`,
-    );
+    const res = (await pool.query(`SELECT COUNT(*) FROM food_extra`)).rows[0]
+      .count;
     if (!res) throw new DatabaseError();
     return res;
   }
   static async countFoods(): Promise<number> {
-    const res = await await this.getCountsFromQuery(
-      `SELECT COUNT(*) FROM foods`,
-    );
+    const res = (await pool.query(`SELECT COUNT(*) FROM foods`)).rows[0].count;
     if (!res) throw new DatabaseError();
     return res;
   }
