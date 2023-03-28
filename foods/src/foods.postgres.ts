@@ -72,11 +72,8 @@ class Foods {
 
   static async deleteExtra(id: number) {
     try {
+      await pool.query(`DELETE FROM foods WHERE extra_id = $1`, [id]);
       await pool.query(`DELETE FROM food_extra WHERE id = $1`, [id]);
-      await pool.query(
-        `UPDATE foods SET item_extra = null WHERE item_extra = $1`,
-        [id],
-      );
       return { deleted: true };
     } catch (error) {
       throw new DatabaseError();
@@ -85,9 +82,9 @@ class Foods {
 
   static async deleteSection(id: number) {
     try {
-      await pool.query(`DELETE FROM food_section WHERE id = $1`, [id]);
-      await pool.query(`DELETE FROM foods WHERE item_section = $1`, [id]);
+      await pool.query(`DELETE FROM foods WHERE section_id = $1`, [id]);
       await pool.query(`DELETE FROM food_extra WHERE section_id = $1`, [id]);
+      await pool.query(`DELETE FROM food_section WHERE id = $1`, [id]);
       return { deleted: true };
     } catch (err) {
       throw new DatabaseError();
@@ -130,7 +127,6 @@ class Foods {
     const updatedResponseApi = updatedResponseDB.map((item: any) =>
       convertKeys(item, 'dbToApi'),
     );
-
     return updatedResponseApi;
   }
   static async getAllExtraName(): Promise<Pick<IExtraApi, 'extraName'>[]> {
@@ -139,7 +135,6 @@ class Foods {
     const updatedResponseApi = updatedResponseDB.map((item: any) =>
       convertKeys(item, 'dbToApi'),
     );
-
     return updatedResponseApi;
   }
 }
