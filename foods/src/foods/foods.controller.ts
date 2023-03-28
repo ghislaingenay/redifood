@@ -8,11 +8,9 @@ import {
   ParseIntPipe,
   Post,
   Put,
-  UseGuards,
 } from '@nestjs/common';
-import { TUser } from 'redifood-module/src/interfaces';
-import { AuthGuard } from 'src/handling/auth-guard';
-import { User } from 'src/handling/user-decorator';
+import { TUser } from '../../redifood-module/src/interfaces';
+import { User } from '../../src/handling/user-decorator';
 import { ExtraApiDto, FoodApiDto, SectionApiDto } from '../foods.dto';
 import { ValidationPipe } from '../handling/validation.pipe';
 import { FoodService } from './foods.service';
@@ -37,7 +35,6 @@ export class FoodController {
     return await this.foodService.getFoodBySectionId(id);
   }
 
-  @UseGuards(AuthGuard)
   @Post('section')
   async createSection(
     @Body(new ValidationPipe()) sectionDto: SectionApiDto,
@@ -57,8 +54,15 @@ export class FoodController {
     return await this.foodService.createFood(foodDto);
   }
 
-  @Put()
-  async updateFood(@Body(new ValidationPipe()) foodDto: FoodApiDto) {
+  @Put(':id')
+  async updateFood(
+    @Param(
+      'id',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    id: number,
+    @Body(new ValidationPipe()) foodDto: FoodApiDto,
+  ) {
     return await this.foodService.updateFood(foodDto);
   }
 
@@ -84,7 +88,7 @@ export class FoodController {
     return await this.foodService.deleteSection(id);
   }
 
-  @Delete('food/:id')
+  @Delete(':id')
   async deleteFood(
     @Param(
       'id',

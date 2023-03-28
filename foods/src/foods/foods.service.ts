@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import {
   EStatusCodes,
+  IExtraApi,
   IFoodGetApi,
   IGetServerSideData,
   ISectionFoodApi,
@@ -61,14 +62,19 @@ export class FoodService {
   }
 
   async createExtra(body: ExtraApiDto): Promise<IGetServerSideData<any>> {
-    const updatedData = convertKeys(body, 'apiToDb');
+    const bodyWithOrder: IExtraApi = {
+      ...body,
+      extraOrder: Number(await Foods.countExtra()) + 1,
+    };
+    const updatedData = convertKeys(bodyWithOrder, 'apiToDb');
+    console.log('updatedData', updatedData);
     const postgresQuery = createQuery(updatedData, 'food_extra');
     const response = await Foods.createRows(postgresQuery);
     if (!response) {
       throw new DatabaseError();
     }
     return {
-      results: postgresQuery,
+      results: {},
       statusCode: EStatusCodes.CREATED,
       message: EFoodMessage.EXTRA_CREATED,
     };
@@ -82,7 +88,7 @@ export class FoodService {
       throw new DatabaseError();
     }
     return {
-      results: response,
+      results: {},
       statusCode: EStatusCodes.CREATED,
       message: EFoodMessage.FOOD_CREATED,
     };
@@ -95,7 +101,7 @@ export class FoodService {
       throw new DatabaseError();
     }
     return {
-      results: response,
+      results: {},
       statusCode: EStatusCodes.SUCCESS,
       message: EFoodMessage.FOOD_UPDATED,
     };
@@ -107,7 +113,7 @@ export class FoodService {
       throw new DatabaseError();
     }
     return {
-      results: response,
+      results: {},
       statusCode: EStatusCodes.SUCCESS,
       message: EFoodMessage.EXTRA_DELETED,
     };
