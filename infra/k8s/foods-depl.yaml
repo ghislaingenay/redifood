@@ -15,6 +15,57 @@ spec:
       containers:
         - name: foods
           image: ghislaingenay/redifood-foods
+          env:
+            - name: MONGO_URI
+              valueFrom:
+                secretKeyRef:
+                  name: dev-secret
+                  key: MONGO_URI
+            - name: JWT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: dev-secret
+                  key: JWT_TOKEN
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: dev-secret
+                  key: POSTGRES_USER
+            - name: POSTGRES_USER_TEST
+              valueFrom:
+                secretKeyRef:
+                  name: dev-secret
+                  key: POSTGRES_USER_TEST
+            - name: POSTGRES_DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: dev-secret
+                  key: POSTGRES_DB_NAME
+            - name: POSTGRES_DB_NAME_TEST
+              valueFrom:
+                secretKeyRef:
+                  name: dev-secret
+                  key: POSTGRES_DB_NAME_TEST
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: dev-secret
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_PASSWORD_TEST
+              valueFrom:
+                secretKeyRef:
+                  name: dev-secret
+                  key: POSTGRES_PASSWORD_TEST
+            - name: POSTGRES_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: dev-secret
+                  key: POSTGRES_HOST
+            - name: POSTGRES_HOST_TEST
+              valueFrom:
+                secretKeyRef:
+                  name: dev-secret
+                  key: POSTGRES_HOST
 ---
 apiVersion: v1
 kind: Service
