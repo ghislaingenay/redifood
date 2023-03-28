@@ -35,7 +35,7 @@ export const createQuery = <T extends RecordAny>(
   // console.log('dtata', data);
   // The data should have a type of DB and should be convert
   const foundUpperCase = Object.keys(data).find(
-    (key: string) => /[A-Z]/.test(key) || /id/.test(key),
+    (key: string) => /[A-Z]/.test(key) || /^id$/.test(key),
   );
   if (foundUpperCase) {
     throw new Error(

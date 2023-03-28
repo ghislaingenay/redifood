@@ -1,5 +1,4 @@
 import {
-  IsDate,
   IsInt,
   IsLowercase,
   IsNotEmpty,
@@ -23,8 +22,8 @@ export class SectionApiDto {
   @Length(3, 30)
   sectionName: string;
 
-  @IsString()
-  @Length(0, 50)
+  // @IsString()
+  // @Length(0, 50)
   sectionDescription?: string;
 }
 
@@ -35,8 +34,7 @@ export class ExtraApiDto {
   @IsString()
   extraName: string;
 
-  @IsString()
-  @Length(0, 50)
+  // @IsString()
   extraDescription?: string;
 
   @IsInt()
@@ -66,15 +64,13 @@ export class FoodApiDto {
 
   @IsInt()
   @IsNotEmpty()
-  itemSection: number;
+  sectionId: number;
 
   @IsInt()
   @IsNotEmpty()
-  itemExtra: number;
+  extraId: number;
 
-  @IsDate()
-  @IsNotEmpty()
-  itemCreated: Date;
+  itemCreated?: Date;
 
   @IsInt()
   @IsNotEmpty()

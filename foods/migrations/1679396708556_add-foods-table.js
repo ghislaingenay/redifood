@@ -6,7 +6,7 @@ exports.up = (pgm) => {
   pgm.sql(`
   CREATE TABLE food_section (
     id SERIAL PRIMARY KEY,
-    section_order SMALLINT AUTO_INCREMENT NOT NULL,
+    section_order SMALLINT NOT NULL,
     section_name VARCHAR(30) UNIQUE NOT NULL,
     section_description VARCHAR(50) DEFAULT ''
   );
@@ -14,7 +14,7 @@ exports.up = (pgm) => {
   CREATE TABLE food_extra (
     id SERIAL PRIMARY KEY,
     extra_name VARCHAR(30) UNIQUE NOT NULL,
-    extra_order SMALLINT AUTO_INCREMENT NOT NULL,
+    extra_order SMALLINT NOT NULL,
     extra_description VARCHAR(50) DEFAULT '',
     section_id INTEGER REFERENCES food_section(id)
   );

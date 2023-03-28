@@ -41,13 +41,13 @@ describe('createQuery function test from data in DB format', () => {
   it('should loop in one food and display the proper query', () => {
     const food = foodListMockDB[0];
     expect(createQuery(food, 'foods')).toStrictEqual(
-      `INSERT INTO foods (item_name,item_photo,item_price,item_description,item_section,item_extra,item_quantity) VALUES ('Pizza Mediterranean','ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8',12.5,'Soo good',2,4,0)`,
+      `INSERT INTO foods (item_name,item_photo,item_price,item_description,section_id,extra_id,item_quantity) VALUES ('Pizza Mediterranean','ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8',12.5,'Soo good',2,4,0)`,
     );
   });
   it('should loop in several foods and display the proper query', () => {
     const foods = [foodListMockDB[0], foodListMockDB[1], foodListMockDB[2]];
     expect(createQuery(foods, 'foods')).toStrictEqual(
-      `INSERT INTO foods (item_name,item_photo,item_price,item_description,item_section,item_extra,item_quantity) VALUES ('Pizza Mediterranean','ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8',12.5,'Soo good',2,4,0), ('Pizza Cheesy','photo-1520201163981-8cc95007dd2a?',13.99,'Gorgonzola, gouda, mozzarella, blue cheese',2,3,0), ('Millefeuille','images.unsplash.com/photo-1587122569949-ae6e755c6bdc?',4.25,'The traditional French Millefeuille',1,2,0)`,
+      `INSERT INTO foods (item_name,item_photo,item_price,item_description,section_id,extra_id,item_quantity) VALUES ('Pizza Mediterranean','ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8',12.5,'Soo good',2,4,0), ('Pizza Cheesy','photo-1520201163981-8cc95007dd2a?',13.99,'Gorgonzola, gouda, mozzarella, blue cheese',2,3,0), ('Millefeuille','images.unsplash.com/photo-1587122569949-ae6e755c6bdc?',4.25,'The traditional French Millefeuille',1,2,0)`,
     );
   });
 });
@@ -127,7 +127,7 @@ describe('createQuery function test from data in Api format', () => {
   it('should loop in one food (api) and display the proper query', () => {
     const foodDB = convertKeys(foodListMockAPI[0], 'apiToDb');
     expect(createQuery(foodDB, 'foods')).toStrictEqual(
-      `INSERT INTO foods (item_name,item_photo,item_price,item_description,item_section,item_extra,item_quantity) VALUES ('Pizza Mediterranean','ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8',12.5,'Soo good',2,4,0)`,
+      `INSERT INTO foods (item_name,item_photo,item_price,item_description,section_id,extra_id,item_quantity) VALUES ('Pizza Mediterranean','ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8',12.5,'Soo good',2,4,0)`,
     );
   });
   it('should loop in several foods (api) and display the proper query', () => {
@@ -138,7 +138,7 @@ describe('createQuery function test from data in Api format', () => {
     ];
     const foodListDB = foodList.map((food) => convertKeys(food, 'apiToDb'));
     expect(createQuery(foodListDB, 'foods')).toStrictEqual(
-      `INSERT INTO foods (item_name,item_photo,item_price,item_description,item_section,item_extra,item_quantity) VALUES ('Pizza Mediterranean','ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8',12.5,'Soo good',2,4,0), ('Pizza Cheesy','photo-1520201163981-8cc95007dd2a?',13.99,'Gorgonzola, gouda, mozzarella, blue cheese',2,3,0), ('Millefeuille','images.unsplash.com/photo-1587122569949-ae6e755c6bdc?',4.25,'The traditional French Millefeuille',1,2,0)`,
+      `INSERT INTO foods (item_name,item_photo,item_price,item_description,section_id,extra_id,item_quantity) VALUES ('Pizza Mediterranean','ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8',12.5,'Soo good',2,4,0), ('Pizza Cheesy','photo-1520201163981-8cc95007dd2a?',13.99,'Gorgonzola, gouda, mozzarella, blue cheese',2,3,0), ('Millefeuille','images.unsplash.com/photo-1587122569949-ae6e755c6bdc?',4.25,'The traditional French Millefeuille',1,2,0)`,
     );
   });
 
@@ -151,12 +151,12 @@ describe('createQuery function test from data in Api format', () => {
   describe('update query function test', () => {
     it('should loop in one food (db) and display the proper query', () => {
       expect(updateQuery(foodListMockDB[0], 'foods')).toStrictEqual(
-        `UPDATE foods SET item_name = 'Pizza Mediterranean', item_photo = 'ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8', item_price = 12.5, item_description = 'Soo good', item_section = 2, item_extra = 4, item_quantity = 0`,
+        `UPDATE foods SET item_name = 'Pizza Mediterranean', item_photo = 'ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8', item_price = 12.5, item_description = 'Soo good', section_id = 2, extra_id = 4, item_quantity = 0`,
       );
     });
     it('should loop in several foods (db) and display the proper query', () => {
       expect(updateQuery(foodListMockDB[1], 'foods')).toStrictEqual(
-        `UPDATE foods SET item_name = 'Pizza Cheesy', item_photo = 'photo-1520201163981-8cc95007dd2a?', item_price = 13.99, item_description = 'Gorgonzola, gouda, mozzarella, blue cheese', item_section = 2, item_extra = 3, item_quantity = 0`,
+        `UPDATE foods SET item_name = 'Pizza Cheesy', item_photo = 'photo-1520201163981-8cc95007dd2a?', item_price = 13.99, item_description = 'Gorgonzola, gouda, mozzarella, blue cheese', section_id = 2, extra_id = 3, item_quantity = 0`,
       );
     });
   });
