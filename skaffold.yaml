@@ -24,6 +24,14 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: .
+    - image: ghislaingenay/redifood-upload
+      context: upload
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .
 
     - image: ghislaingenay/redifood-client
       context: client
