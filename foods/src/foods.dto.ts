@@ -1,6 +1,7 @@
 import {
   IsDate,
   IsInt,
+  IsLowercase,
   IsNotEmpty,
   IsNumber,
   IsPositive,
@@ -18,6 +19,7 @@ export class SectionApiDto {
 
   @IsNotEmpty()
   @IsString()
+  @IsLowercase()
   @Length(3, 30)
   sectionName: string;
 
@@ -29,6 +31,7 @@ export class SectionApiDto {
 export class ExtraApiDto {
   @IsNotEmpty()
   @Length(3, 30)
+  @IsLowercase()
   @IsString()
   extraName: string;
 
