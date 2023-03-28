@@ -27,7 +27,7 @@ class Foods {
     };
   };
 
-  private static find_foods_query = `SELECT * FROM foods INNER JOIN food_section ON food_section.id = foods.section_id INNER JOIN food_extra ON foods.extra_id = food_extra.id`;
+  private static find_foods_query = `SELECT * FROM foods as f INNER JOIN food_section ON food_section.id = f.section_id INNER JOIN food_extra ON f.extra_id = food_extra.id`;
   static async findAll(): Promise<IFoodGetApi[]> {
     const response = (await pool.query(this.find_foods_query)).rows;
 
@@ -42,10 +42,9 @@ class Foods {
   }
 
   static async findBySectionId(id: number): Promise<IFoodGetApi[]> {
-    const response = await pool.query(
-      `${this.find_foods_query} WHERE item_section = $1`,
-      [id],
-    );
+    const response = (
+      await pool.query(`${this.find_foods_query} WHERE f.section_id = $1`, [id])
+    ).rows;
     const updatedResponse = response.map((item: any) => {
       return this.convertFoodResponseToFoodGet(item);
     });
