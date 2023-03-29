@@ -17,3 +17,5 @@ class Upload {
     return { deleted: true };
   }
 }
+
+export default Upload;
