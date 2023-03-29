@@ -7,10 +7,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: "Test env one"
-      - run: echo "Today is ${{ database.POSTGRES_PORT }}"
-      - name: "Test env two"
-      - run: echo "Today is $DAY_OF_WEEK!"
       - name: Checkout
         uses: actions/checkout@v3
         with:
