@@ -1,8 +1,8 @@
 import { INestApplication } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
-import { NestExpressApplication } from '@nestjs/platform-express';
+import { Test } from '@nestjs/testing';
 import { default as migrate } from 'node-pg-migrate';
 import request from 'supertest';
+import Foods from '../../../src/foods.postgres';
 import { AppModule } from '../../app.module';
 import { pool } from '../../pool.pg';
 import { foodListMockAPI } from './food-mock.const';
@@ -15,15 +15,18 @@ const testOptionsDb = {
   port: parseInt(process.env.POSTGRES_PORT),
 };
 
+const cookie = [
+  'session=eyJqd3QiOiJleUpoYkdjaU9pSklVekkxTmlJc0luUjVjQ0k2SWtwWFZDSjkuZXlKcFpDSTZJalkwTVdRMk5ESTFOVEk0WW1FeE16YzJNRFkyTmpJeVppSXNJbVZ0WVdsc0lqb2lkR1Z6ZEVCMFpYTjBMbU52YlNJc0ltbGhkQ0k2TVRZM09UWTBOemM0TVgwLk9HWU9xVjFTMHI0OF9YUHBBZ0xLQ0FEN202bzU0cHcxRVdERGRScjYtd2sifQ==; path=/; httponly',
+];
 describe('FoodController (e2e)', () => {
-  const cookie = [
-    'session=eyJqd3QiOiJleUpoYkdjaU9pSklVekkxTmlJc0luUjVjQ0k2SWtwWFZDSjkuZXlKcFpDSTZJalkwTVdRMk5ESTFOVEk0WW1FeE16YzJNRFkyTmpJeVppSXNJbVZ0WVdsc0lqb2lkR1Z6ZEVCMFpYTjBMbU52YlNJc0ltbGhkQ0k2TVRZM09UWTBOemM0TVgwLk9HWU9xVjFTMHI0OF9YUHBBZ0xLQ0FEN202bzU0cHcxRVdERGRScjYtd2sifQ==; path=/; httponly',
-  ];
   let app: INestApplication;
-  beforeAll(async () => {
-    const app: INestApplication =
-      await NestFactory.create<NestExpressApplication>(AppModule);
 
+  beforeAll(async () => {
+    const moduleRef = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile();
+    app = moduleRef.createNestApplication();
+    await app.init();
     // Run our migrations in new schema
     await migrate({
       schema: 'public',
@@ -44,25 +47,112 @@ describe('FoodController (e2e)', () => {
     await app.init();
   });
 
-  it.skip('db connection test', () => expect(1 + 1).toBe(2));
+  it.skip('DB is properly connected', () => expect(1 + 1).toBe(2));
 
   // no cookie sent
-  it.skip('POST /foods -> create food', async () => {
-    const response = await request(app.getHttpServer())
-      .post('/api/foods')
-      .send({ ...foodListMockAPI[0], item_section: 1, item_extra: 1 })
-      .expect(201);
-    expect(response.body.results).toEqual({
-      ...foodListMockAPI[0],
-      item_section: 1,
-      item_extra: 1,
-      id: 1,
+
+  // it('/foods/all (GET) - should not be able to access if not authenticated', async () => {
+  //   return request(app).get('/api/foods/all').send().expect(401);
+  // });
+
+  // it.skip('POST /foods -> create food', async () => {
+  //   const response = await request(app.getHttpServer())
+  //     .post('/api/foods')
+  //     .send({ ...foodListMockAPI[0], item_section: 1, item_extra: 1 })
+  //     .expect(401);
+  // });
+
+  describe('SECTION', () => {
+    it('POST create a section - show error if not authenticated', async () => {
+      console.log('app', request(app), request.agent(app));
+      await request(app)
+        .post('/api/foods/section')
+        .send({ sectionName: 'pizza', sectionDescription: 'Pizza' })
+        .expect(401);
+    });
+
+    it.skip('POST create a section fails if user don/t send data', async () => {
+      await request(app)
+        .post('/api/foods/section')
+        .set('Cookie', cookie)
+        .send()
+        .expect(400);
+    });
+
+    it.skip('POST create a section fails if user don/t send sectionName', async () => {
+      await request(app.getHttpServer())
+        .post('/api/foods/section')
+        .set('Cookie', cookie)
+        .send({ sectionDescription: 'Pizza' })
+        .expect(400);
+    });
+
+    it.skip('POST create a section fails if user don/t send section_name instead of sectionName', async () => {
+      await request(app.getHttpServer())
+        .post('/api/foods/section')
+        .set('Cookie', cookie)
+        .send({ section_name: 'pizza', sectionDescription: 'Pizza' })
+        .expect(400);
+    });
+
+    it.skip('POST create a section fails if user send a long sectionName', async () => {
+      await request(app.getHttpServer())
+        .post('/api/foods/section')
+        .set('Cookie', cookie)
+        .send({
+          sectionName: 'pizzafvfvvfergqrhergwrgwr',
+          sectionDescription: 'Pizza',
+        })
+        .expect(400);
+    });
+    it.skip('POST create a section successfully (name + description)', async () => {
+      await request(app.getHttpServer())
+        .post('/api/foods/section')
+        .set('Cookie', cookie)
+        .send({ sectionName: 'pizza', sectionDescription: 'Pizza' })
+        .expect(201);
+    });
+    it.skip('POST create a section successfully (only name)', async () => {
+      expect(await Foods.countSection()).toEqual(0);
+      await request(app.getHttpServer())
+        .post('/api/foods/section')
+        .set('Cookie', cookie)
+        .send({ sectionName: 'pizza' })
+        .expect(201);
+      expect(await Foods.countSection()).toEqual(1);
     });
   });
 
-  it.skip('/foods/all (GET) - should not be able to access if not authenticated', async () => {
-    return request(app).get('/api/foods/all').send().expect(401);
+  describe('EXTRA', () => {
+    it('POST create an extra - show error if not authenticated', async () => {
+      await request(app.getHttpServer())
+        .post('/api/foods/extra')
+        .set('Cookie', cookie)
+        .send({ extraName: 'extra', extraDescription: 'extra' })
+        .expect(401);
+    });
+    it.todo('POST create an extra fails if user don/t send data');
+    it.todo('POST create an extra fails if user don/t send extraName');
+    it.todo('POST create an extra fails if user send extraName too long');
+    it.todo('POST create an extra fails if not sectionId is sent');
+    it.todo('POST create an extra fails if not sectionId is not defined');
+    it.todo('POST create an extra success if not extraDescription is sent');
+    it.todo('POST create an extra fails if the same extra name is sent');
+    it.todo('POST create an extra success');
   });
+
+  // it.skip('POST /foods -> create food', async () => {
+  //   const response = await request(app.getHttpServer())
+  //     .post('/api/foods')
+  //     .send({ ...foodListMockAPI[0], item_section: 1, item_extra: 1 })
+  //     .set('Cookie', cookie)
+  //     .expect(201);
+  //   expect(response.body.results).toEqual({
+  //     ...foodListMockAPI[0],
+  //     item_section: 1,
+  //     item_extra: 1,
+  //     id: 1,
+  //   });
 
   it.skip('/foods/all (GET) - should be able to access if authenticated', async () => {
     const response = await request(app.getHttpServer())
