@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { json, urlencoded } from "body-parser";
 import cookieSession from "cookie-session";
-import express from "express";
+import express, { Request } from "express";
 import "express-async-errors";
 import { EMessageErrors, EStatusCodes } from "../redifood-module/src/interfaces";
 import { errorHandler } from "../redifood-module/src/middlewares/error-handler.mdwr";
@@ -31,7 +31,7 @@ app.use(currentUserRouter);
 app.use(authRouter);
 app.use(settingsRouter);
 
-app.all("*", async (req, res) => {
+app.all("*", async (req: Request, res) => {
   res.status(EStatusCodes.NOT_FOUND).send({ errors: [{ message: EMessageErrors.NOT_FOUND }] });
   throw new NotFoundError();
 });
