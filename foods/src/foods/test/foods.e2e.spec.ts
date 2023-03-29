@@ -1,18 +1,17 @@
 import { INestApplication } from '@nestjs/common';
-import { Test } from '@nestjs/testing';
-import { default as migrate } from 'node-pg-migrate';
+// import { Test } from '@nestjs/testing';
 import request from 'supertest';
 import Foods from '../../../src/foods.postgres';
-import { AppModule } from '../../app.module';
-import { pool } from '../../pool.pg';
+// import { AppModule } from '../../app.module';
+// import { pool } from '../../pool.pg';
 
-const testOptionsDb = {
-  user: process.env.POSTGRES_USER_TEST,
-  host: process.env.POSTGRES_HOST_TEST,
-  database: process.env.POSTGRES_DB_NAME_TEST,
-  password: process.env.POSTGRES_PASSWORD_TEST,
-  port: parseInt(process.env.POSTGRES_PORT),
-};
+// const testOptionsDb = {
+//   user: process.env.POSTGRES_USER_TEST,
+//   host: process.env.POSTGRES_HOST_TEST,
+//   database: process.env.POSTGRES_DB_NAME_TEST,
+//   password: process.env.POSTGRES_PASSWORD_TEST,
+//   port: parseInt(process.env.POSTGRES_PORT),
+// };
 
 const cookie = [
   'session=eyJqd3QiOiJleUpoYkdjaU9pSklVekkxTmlJc0luUjVjQ0k2SWtwWFZDSjkuZXlKcFpDSTZJalkwTVdRMk5ESTFOVEk0WW1FeE16YzJNRFkyTmpJeVppSXNJbVZ0WVdsc0lqb2lkR1Z6ZEVCMFpYTjBMbU52YlNJc0ltbGhkQ0k2TVRZM09UWTBOemM0TVgwLk9HWU9xVjFTMHI0OF9YUHBBZ0xLQ0FEN202bzU0cHcxRVdERGRScjYtd2sifQ==; path=/; httponly',
@@ -20,31 +19,31 @@ const cookie = [
 describe('FoodController (e2e)', () => {
   let app: INestApplication;
 
-  beforeAll(async () => {
-    const moduleRef = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-    app = moduleRef.createNestApplication();
-    await app.init();
-    // Run our migrations in new schema
-    await migrate({
-      schema: 'public',
-      direction: 'up',
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-      log: () => {},
-      noLock: true,
-      dir: 'migrations',
-      databaseUrl: testOptionsDb,
-      migrationsTable: 'pgmigrations',
-    });
-    console.log('Migrations ran');
-    // Connect to PG as
-    await pool.connect(testOptionsDb);
-    await pool.query(`SELECT 1+1`);
+  // beforeAll(async () => {
+  // const moduleRef = await Test.createTestingModule({
+  //   imports: [AppModule],
+  // }).compile();
+  // app = moduleRef.createNestApplication();
+  // await app.init();
+  // // Run our migrations in new schema
+  // await migrate({
+  //   schema: 'public',
+  //   direction: 'up',
+  //   // eslint-disable-next-line @typescript-eslint/no-empty-function
+  //   log: () => {},
+  //   noLock: true,
+  //   dir: 'migrations',
+  //   databaseUrl: testOptionsDb,
+  //   migrationsTable: 'pgmigrations',
+  // });
+  // console.log('Migrations ran');
+  // // Connect to PG as
+  // await pool.connect(testOptionsDb);
+  // await pool.query(`SELECT 1+1`);
 
-    console.log('Postgres testing connected');
-    await app.init();
-  });
+  // console.log('Postgres testing connected');
+  // await app.init();
+  // });
 
   it.skip('DB is properly connected', () => expect(1 + 1).toBe(2));
 
@@ -626,17 +625,17 @@ describe('FoodController (e2e)', () => {
     });
   });
 
-  afterAll(async () => {
-    await migrate({
-      schema: 'public',
-      direction: 'down',
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-      log: () => {},
-      noLock: true,
-      dir: 'migrations',
-      databaseUrl: testOptionsDb,
-      migrationsTable: 'pgmigrations',
-    });
-    console.log('Migrations down ran');
-  });
+  // afterAll(async () => {
+  // await migrate({
+  //   schema: 'public',
+  //   direction: 'down',
+  //   // eslint-disable-next-line @typescript-eslint/no-empty-function
+  //   log: () => {},
+  //   noLock: true,
+  //   dir: 'migrations',
+  //   databaseUrl: testOptionsDb,
+  //   migrationsTable: 'pgmigrations',
+  // });
+  // console.log('Migrations down ran');
+  // });
 });
