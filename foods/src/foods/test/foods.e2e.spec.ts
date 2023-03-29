@@ -5,7 +5,6 @@ import request from 'supertest';
 import Foods from '../../../src/foods.postgres';
 import { AppModule } from '../../app.module';
 import { pool } from '../../pool.pg';
-import { foodListMockAPI } from './food-mock.const';
 
 const testOptionsDb = {
   user: process.env.POSTGRES_USER_TEST,
@@ -220,7 +219,7 @@ describe('FoodController (e2e)', () => {
         .send({
           extraName: 'tomato',
           sectionId: 1,
-          extraDescriptiuon: 'extra',
+          extraDescription: 'extra',
         })
         .expect(201);
     });
@@ -236,7 +235,7 @@ describe('FoodController (e2e)', () => {
         .send({
           extraName: 'tomato',
           sectionId: 1,
-          extraDescriptiuon: 'extra',
+          extraDescription: 'extra',
         })
         .expect(201);
       await request(app.getHttpServer())
@@ -245,52 +244,399 @@ describe('FoodController (e2e)', () => {
         .send({
           extraName: 'tomato',
           sectionId: 1,
-          extraDescriptiuon: 'eegdg',
+          extraDescription: 'eegdg',
         })
         .expect(500);
     });
   });
 
-  // it.skip('POST /foods -> create food', async () => {
-  //   const response = await request(app.getHttpServer())
-  //     .post('/api/foods')
-  //     .send({ ...foodListMockAPI[0], item_section: 1, item_extra: 1 })
-  //     .set('Cookie', cookie)
-  //     .expect(201);
-  //   expect(response.body.results).toEqual({
-  //     ...foodListMockAPI[0],
-  //     item_section: 1,
-  //     item_extra: 1,
-  //     id: 1,
-  //   });
+  describe('DELETE SECTION EXTRA', () => {
+    it('DELETE /foods/section/:id -> delete section', async () => {
+      expect(await Foods.countSection()).toEqual(1);
+      await request(app.getHttpServer())
+        .post('/api/foods/section')
+        .set('Cookie', cookie)
+        .send({ sectionName: 'pizza' })
+        .expect(201);
+      expect(await Foods.countSection()).toEqual(1);
+      await request(app.getHttpServer())
+        .delete('/api/foods/section/1')
+        .set('Cookie', cookie)
+        .expect(200);
+      expect(await Foods.countSection()).toEqual(0);
+    });
 
-  it.skip('/foods/all (GET) - should be able to access if authenticated', async () => {
-    const response = await request(app.getHttpServer())
-      .get('/api/foods/all')
-      .set('Cookie', cookie)
-      .send()
-      .expect(200);
-    expect(response.body.results.length).toEqual(1);
+    it('DELETE /foods/extra/:id -> delete extra', async () => {
+      expect(await Foods.countExtra()).toEqual(0);
+      expect(await Foods.countSection()).toEqual(0);
+      await request(app.getHttpServer())
+        .post('/api/foods/section')
+        .set('Cookie', cookie)
+        .send({ sectionName: 'pizza' })
+        .expect(201);
+      await request(app.getHttpServer())
+        .post('/api/foods/extra')
+        .set('Cookie', cookie)
+        .send({
+          extraName: 'tomato',
+          sectionId: 1,
+          extraDescription: 'extra',
+        })
+        .expect(201);
+      expect(await Foods.countExtra()).toEqual(1);
+      await request(app.getHttpServer())
+        .post('/api/foods/extra')
+        .set('Cookie', cookie)
+        .send({
+          extraName: 'cream',
+          sectionId: 1,
+          extraDescription: 'extra',
+        })
+        .expect(201);
+      expect(await Foods.countExtra()).toEqual(2);
+
+      await request(app.getHttpServer())
+        .delete('/api/foods/extra/1')
+        .set('Cookie', cookie)
+        .expect(200);
+      expect(await Foods.countExtra()).toEqual(1);
+    });
+
+    it('DELETE /foods/section/:id -> delete extra', async () => {
+      expect(await Foods.countExtra()).toEqual(0);
+      expect(await Foods.countSection()).toEqual(0);
+      // Create a section
+      await request(app.getHttpServer())
+        .post('/api/foods/section')
+        .set('Cookie', cookie)
+        .send({ sectionName: 'pizza' })
+        .expect(201);
+      expect(await Foods.countSection()).toEqual(1);
+      // Create extra
+      await request(app.getHttpServer())
+        .post('/api/foods/extra')
+        .set('Cookie', cookie)
+        .send({
+          extraName: 'tomato',
+          sectionId: 1,
+          extraDescription: 'extra',
+        })
+        .expect(201);
+      expect(await Foods.countExtra()).toEqual(1);
+      await request(app.getHttpServer())
+        .post('/api/foods/extra')
+        .set('Cookie', cookie)
+        .send({
+          extraName: 'cream',
+          sectionId: 1,
+          extraDescription: 'extra',
+        })
+        .expect(201);
+      expect(await Foods.countExtra()).toEqual(2);
+
+      // Delete section
+      await request(app.getHttpServer())
+        .delete('/api/foods/section/1')
+        .set('Cookie', cookie)
+        .expect(200);
+      expect(await Foods.countExtra()).toEqual(0);
+      expect(await Foods.countSection()).toEqual(1);
+    });
   });
 
-  it.skip('POST /foods -> create several foods', async () => {
-    const response = await request(app.getHttpServer())
-      .post('/api/foods')
-      .send([foodListMockAPI[1], foodListMockAPI[2]])
-      .expect(201);
-    expect(response.body.results).toEqual([
-      { ...foodListMockAPI[1], id: 2 },
-      { ...foodListMockAPI[2], id: 3 },
-    ]);
-  });
+  describe('FOODS', () => {
+    const createBasicExtraSection = async () => {
+      await request(app.getHttpServer())
+        .post('/api/foods/section')
+        .set('Cookie', cookie)
+        .send({ sectionName: 'pizza' });
+      await request(app.getHttpServer())
+        .post('/api/foods/section')
+        .set('Cookie', cookie)
+        .send({ sectionName: 'drink' });
 
-  it.skip('/foods/all (GET) - should be able to access if authenticated', async () => {
-    const response = await request(app.getHttpServer())
-      .get('/api/foods/all')
-      .set('Cookie', cookie)
-      .send()
-      .expect(200);
-    expect(response.body.results.length).toEqual(3);
+      expect(await Foods.countSection()).toEqual(1);
+      // Create extra
+      await request(app.getHttpServer())
+        .post('/api/foods/extra')
+        .set('Cookie', cookie)
+        .send({
+          extraName: 'tomato',
+          sectionId: 1,
+          extraDescription: 'extra',
+        });
+      expect(await Foods.countExtra()).toEqual(1);
+      await request(app.getHttpServer())
+        .post('/api/foods/extra')
+        .set('Cookie', cookie)
+        .send({
+          extraName: 'cream',
+          sectionId: 1,
+          extraDescription: 'extra',
+        });
+      await request(app.getHttpServer())
+        .post('/api/foods/extra')
+        .set('Cookie', cookie)
+        .send({
+          extraName: 'beer',
+          sectionId: 2,
+          extraDescription: 'extra',
+        });
+    };
+
+    const createBasicFood = async () => {
+      await createBasicExtraSection();
+      await request(app.getHttpServer())
+        .post('/api/foods')
+        .set('Cookie', cookie)
+        .send({
+          itemName: 'pizza',
+          itemPrice: 1,
+          sectionId: 1,
+          extraId: 1,
+          itemQuantity: 0,
+          itemDescription: 'pizza',
+          itemPhoto: 'https://images.unsplash.com/photo-16800300',
+        });
+      await request(app.getHttpServer())
+        .post('/api/foods')
+        .set('Cookie', cookie)
+        .send({
+          itemName: 'creamm',
+          itemPrice: 1,
+          sectionId: 1,
+          extraId: 2,
+          itemQuantity: 0,
+          itemDescription: 'hello',
+          itemPhoto: 'https://images.unsplash.com/photo-1680dvdw0300',
+        });
+      await request(app.getHttpServer())
+        .post('/api/foods')
+        .set('Cookie', cookie)
+        .send({
+          itemName: 'berry',
+          itemPrice: 1,
+          sectionId: 2,
+          extraId: 1,
+          itemQuantity: 0,
+          itemDescription: 'alcohol',
+          itemPhoto: 'https://images.unsplash.com/photo-1680dvdw0300',
+        });
+    };
+
+    it.skip('POST /foods -> create food fails if not authenticated', async () => {
+      await request(app.getHttpServer()).post('/api/foods').send().expect(401);
+    });
+    it.skip('POST /foods -> create food fails if user didn/t sent body', async () => {
+      await request(app.getHttpServer()).post('/api/foods').send().expect(400);
+    });
+    it.skip('POST /foods -> create food fails if negative price or undefined or not present', async () => {
+      await createBasicExtraSection();
+      await request(app.getHttpServer())
+        .post('/api/foods')
+        .set('Cookie', cookie)
+        .send({
+          itemName: 'pizza',
+          itemPrice: -1,
+          sectionId: 1,
+          extraId: 1,
+          itemQuantity: 0,
+          itemDescription: 'pizza',
+          itemPhoto:
+            'https://images.unsplash.com/photo-1680030062888-e691d5992056?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80',
+        })
+        .expect(400);
+      await request(app.getHttpServer())
+        .post('/api/foods')
+        .set('Cookie', cookie)
+        .send({
+          itemName: 'fdghr',
+          sectionId: 1,
+          extraId: 1,
+          itemQuantity: 0,
+          itemDescription: 'pizza',
+          itemPhoto:
+            'https://images.unsplash.com/photo-1680030062888-e691d5992056?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80',
+        })
+        .expect(400);
+      await request(app.getHttpServer())
+        .post('/api/foods')
+        .set('Cookie', cookie)
+        .send({
+          itemName: 'asd',
+          itemPrice: undefined,
+          sectionId: 1,
+          extraId: 1,
+          itemQuantity: 0,
+          itemDescription: 'pizza',
+          itemPhoto:
+            'https://images.unsplash.com/photo-1680030062888-e691d5992056?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80',
+        })
+        .expect(400);
+    });
+    it.skip('POST /foods -> create food fails if photo is not a url', async () => {
+      await createBasicExtraSection();
+      await request(app.getHttpServer())
+        .post('/api/foods')
+        .set('Cookie', cookie)
+        .send({
+          itemName: 'pizza',
+          itemPrice: 8,
+          sectionId: 1,
+          extraId: 1,
+          itemQuantity: 0,
+          itemDescription: 'pizza',
+          itemPhoto: 'dvdv80',
+        })
+        .expect(400);
+    });
+    it.skip('POST /foods -> create food fails if picture is not given or undefined', async () => {
+      await createBasicExtraSection();
+      await request(app.getHttpServer())
+        .post('/api/foods')
+        .set('Cookie', cookie)
+        .send({
+          itemName: undefined,
+          itemPrice: 8,
+          sectionId: 1,
+          extraId: 1,
+          itemQuantity: 0,
+          itemDescription: 'pizza',
+          itemPhoto: 'dvdv80',
+        })
+        .expect(400);
+      await request(app.getHttpServer())
+        .post('/api/foods')
+        .set('Cookie', cookie)
+        .send({
+          itemPrice: 8,
+          sectionId: 1,
+          extraId: 1,
+          itemQuantity: 0,
+          itemDescription: 'pizza',
+          itemPhoto: 'dvdv80',
+        })
+        .expect(400);
+    });
+
+    it.skip('POST /foods -> create food fails if sectionId or extra is not given or undefined', async () => {
+      await createBasicExtraSection();
+      await request(app.getHttpServer())
+        .post('/api/foods')
+        .set('Cookie', cookie)
+        .send({
+          itemName: 'pizza',
+          itemPrice: 8,
+          sectionId: undefined,
+          extraId: 1,
+          itemQuantity: 0,
+          itemDescription: 'pizza',
+          itemPhoto: 'dvdv80',
+        })
+        .expect(400);
+      await request(app.getHttpServer())
+        .post('/api/foods')
+        .set('Cookie', cookie)
+        .send({
+          itemName: 'pizza',
+          itemPrice: 8,
+          sectionId: 1,
+          itemQuantity: 0,
+          itemDescription: 'pizza',
+          itemPhoto: 'dvdv80',
+        })
+        .expect(400);
+      await request(app.getHttpServer())
+        .post('/api/foods')
+        .set('Cookie', cookie)
+        .send({
+          itemName: 'pizza',
+          itemPrice: 8,
+          sectionId: 46366,
+          extraId: 1,
+          itemQuantity: 0,
+          itemDescription: 'pizza',
+          itemPhoto: 'dvdv80',
+        })
+        .expect(500);
+    });
+
+    it('POST /foods -> create food fails if wrong keys are given', async () => {
+      await createBasicExtraSection();
+      await request(app.getHttpServer())
+        .post('/api/foods')
+        .set('Cookie', cookie)
+        .send({
+          itemdrame: 'pizza',
+          itemssfrice: 8,
+          sectionId: 1,
+          extraId: 1,
+          itemQuantity: 0,
+          itemDescription: 'pizza',
+          itemPhoto: 'dvdv80',
+          item: 'pizza',
+        })
+        .expect(400);
+    });
+    it.skip('POST /foods -> create food', async () => {
+      await createBasicExtraSection();
+      await request(app.getHttpServer())
+        .post('/api/foods')
+        .set('Cookie', cookie)
+        .send({
+          itemName: 'hello',
+          itemPrice: 5,
+          sectionId: 1,
+          extraId: 1,
+          itemQuantity: 0,
+          itemDescription: 'pizza',
+          itemPhoto:
+            'https://images.unsplash.com/photo-1680030062888-e691d5992056?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80',
+        })
+        .expect(201);
+      expect(await Foods.countFoods()).toEqual(1);
+    });
+
+    it.skip('/foods/all (GET) - should be able to access if authenticated', async () => {
+      await createBasicFood();
+      await request(app.getHttpServer())
+        .get('/api/foods/all')
+        .send()
+        .expect(401);
+
+      const response = await request(app.getHttpServer())
+        .get('/api/foods/all')
+        .set('Cookie', cookie)
+        .send()
+        .expect(200);
+      expect(response.body.results.length).toEqual(3);
+    });
+    it.skip('/foods/section/:id (GET) - should be able to access if authenticated', async () => {
+      await createBasicFood();
+      const res1 = await request(app.getHttpServer())
+        .get('/api/foods/section/1')
+        .set('Cookie', cookie)
+        .send()
+        .expect(200);
+      expect(res1.body.results.length).toEqual(2);
+      const res2 = await request(app.getHttpServer())
+        .get('/api/foods/section/2')
+        .set('Cookie', cookie)
+        .send()
+        .expect(200);
+      expect(res2.body.results.length).toEqual(1);
+    });
+
+    it.skip('Delete food', async () => {
+      await createBasicFood();
+      expect(await Foods.countFoods()).toEqual(3);
+      await request(app.getHttpServer())
+        .delete('/api/foods/1')
+        .set('Cookie', cookie)
+        .send()
+        .expect(200);
+      expect(await Foods.countFoods()).toEqual(2);
+    });
   });
 
   afterAll(async () => {
