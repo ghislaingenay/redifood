@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: upload-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: upload
+  template:
+    metadata:
+      labels:
+        app: upload
+    spec:
+      containers:
+        - name: upload
+          image: ghislaingenay/redifood-upload
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: upload-srv
+spec:
+  selector:
+    app: upload
+  ports:
+    - name: upload
+      protocol: TCP
+      port: 3000
+      targetPort: 3000

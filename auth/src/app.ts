@@ -3,12 +3,12 @@ import { json, urlencoded } from "body-parser";
 import cookieSession from "cookie-session";
 import express from "express";
 import "express-async-errors";
+import { EMessageErrors, EStatusCodes } from "../redifood-module/src/interfaces";
+import { errorHandler } from "../redifood-module/src/middlewares/error-handler.mdwr";
 import { authRouter } from "./controllers/auth.controller";
 import { currentUserRouter } from "./controllers/currentuser.controller";
 import { settingsRouter } from "./controllers/settings.controller";
 import { NotFoundError } from "./errors/not-found.err";
-import { EMessageErrors, EStatusCodes } from "./interfaces/err.interface";
-import { errorHandler } from "./middlewares/error-handler.mdwr";
 
 const app = express();
 

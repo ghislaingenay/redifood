@@ -1,6 +1,6 @@
 import request from "supertest";
+import { EMessageErrors } from "../../../redifood-module/src/interfaces";
 import { app } from "../../app";
-import { EMessageErrors } from "../../interfaces/err.interface";
 
 const emailValid = "test@test.com";
 const emailInvalid = "ssffn.co";
