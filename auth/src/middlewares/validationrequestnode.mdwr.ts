@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { validationResult } from "express-validator";
+import { EStatusCodes } from "../../redifood-module/src/interfaces";
 
 import { RequestValidationNodeError } from "../errors/request-validation-node.err";
-import { EStatusCodes } from "../interfaces/err.interface";
 
 export const validateRequest = (req: Request, res: Response, next: NextFunction) => {
   const errors = validationResult(req);

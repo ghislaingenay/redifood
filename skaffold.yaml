@@ -16,6 +16,22 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: . # Where to sync this file to fo running container
+    - image: ghislaingenay/redifood-foods
+      context: foods
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .
+    - image: ghislaingenay/redifood-upload
+      context: upload
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .
 
     - image: ghislaingenay/redifood-client
       context: client

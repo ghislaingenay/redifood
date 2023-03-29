@@ -1,7 +1,7 @@
 import request from "supertest";
 import { ECurrency, ELanguage, ISettingsBody } from "../../../redifood-module/src/interfaces";
+import { EMessageErrors, EMessageSuccess } from "../../../redifood-module/src/interfaces/msg.interface";
 import { app } from "../../app";
-import { EMessageErrors, EMessageSuccess } from "../../interfaces/err.interface";
 
 const emailValid = "test@test.com";
 // const fakeUserId = "dndsnfkdg";

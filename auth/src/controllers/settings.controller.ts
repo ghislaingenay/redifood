@@ -1,6 +1,12 @@
 import express, { Request, Response } from "express";
-import { ECurrency, ELanguage, ISettingsBody } from "../../redifood-module/src/interfaces";
-import { EMessageErrors, EMessageSuccess, EStatusCodes } from "../interfaces/err.interface";
+import {
+  ECurrency,
+  ELanguage,
+  EMessageErrors,
+  EMessageSuccess,
+  EStatusCodes,
+  ISettingsBody,
+} from "../../redifood-module/src/interfaces";
 import { currentUser } from "../middlewares/currentuser.mdwr";
 import { requireAuth } from "../middlewares/require-auth.mdwr";
 import { validateRequest } from "../middlewares/validationrequestnode.mdwr";
