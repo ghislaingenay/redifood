@@ -35,6 +35,8 @@ exports.up = (pgm) => {
 exports.down = (pgm) => {
   pgm.sql(`
   DROP TABLE foods;
+  DROP TABLE food_extra;
   DROP TABLE food_section;
-  DROP TABLE food_extra;`);
+  
+  `);
 };

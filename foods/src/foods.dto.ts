@@ -5,6 +5,7 @@ import {
   IsNumber,
   IsPositive,
   IsString,
+  IsUrl,
   Length,
 } from 'class-validator';
 
@@ -51,6 +52,7 @@ export class FoodApiDto {
 
   @IsString()
   @IsNotEmpty()
+  @IsUrl()
   itemPhoto: string;
 
   @IsNumber()

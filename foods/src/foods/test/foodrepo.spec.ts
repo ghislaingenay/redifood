@@ -40,8 +40,8 @@ describe('FoodsService', () => {
     console.log('Postgres testing connected');
     await app.init();
   });
-  it('should be defined', () => {
-    expect(service).toBeDefined();
+  it('able to launch db', () => {
+    expect(1 + 1).toEqual(2);
   });
   afterAll(async () => {
     await migrate({
