@@ -37,7 +37,7 @@ export class KafkajsProducer implements IProducer {
       await this.producer.connect(); // Try 5 times and if not working => throw an error
     } catch (err) {
       this.logger.error('failed to connect to kafka', err);
-      // await sleep(5000);
+
       await this.connect();
     }
   }
