@@ -22,8 +22,6 @@ export class KafkajsProducer implements IProducer {
     this.logger = new Logger(topic);
   }
 
-  // https://kafka.js.org/docs/transactions
-
   async produce(message: Message) {
     await this.producer.send({
       compression: CompressionTypes.GZIP,
@@ -42,7 +40,7 @@ export class KafkajsProducer implements IProducer {
     }
   }
 
-  async disconnect() {
+  async shutdown() {
     await this.producer.disconnect();
   }
 }
