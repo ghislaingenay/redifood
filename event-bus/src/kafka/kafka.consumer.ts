@@ -8,8 +8,8 @@ import {
   KafkaMessage,
 } from 'kafkajs';
 // import { sleep } from 'src/sleep';
-import { IConsumer } from './consumer.interface';
 import * as retry from 'async-retry';
+import { IConsumer } from './consumer.interface';
 
 export class KafkajsConsumer implements IConsumer {
   private readonly kafka: Kafka;
@@ -37,7 +37,7 @@ export class KafkajsConsumer implements IConsumer {
       await this.consumer.connect(); // Try 5 times and if not working => throw an error
     } catch (err) {
       this.logger.error('failed to connect to kafka', err);
-      await sleep(5000);
+      // Add a break tim
       await this.connect();
     }
   }
@@ -76,6 +76,7 @@ export class KafkajsConsumer implements IConsumer {
     });
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private async addMessagetoDql(message: KafkaMessage) {
     // add inside the db
   }
