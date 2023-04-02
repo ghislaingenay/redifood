@@ -9,6 +9,7 @@ export class KafkajsProducer implements IProducer {
 
   constructor(private readonly topic: string, broker: string) {
     this.kafka = new Kafka({
+      clientId: 'redifood'
       // Therefore the clientId should be shared across multiple instances in a cluster or horizontally scaled application, but distinct for each application.
       brokers: [broker],
       connectionTimeout: 3000, // Time in milliseconds to wait for a successful connection
