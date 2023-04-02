@@ -1,5 +1,7 @@
-import * as dotenv from "dotenv"; // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
+import * as dotenv from "dotenv";
 import { pool } from "../redifood-module/src/definitions/pool.pg";
+import { EGroupId, ETopics } from "../redifood-module/src/events/subjects.interface";
+import { KafkajsConsumer } from "../redifood-module/src/kafka/kafka.consumer";
 import { app } from "./app";
 dotenv.config();
 const start = async () => {
@@ -22,6 +24,19 @@ const start = async () => {
     console.log("Postgres connected");
     app.listen(3000, () => {
       console.log("Listening on port 3000!");
+    });
+
+    // Initialize the consumer service
+    const consumer = new KafkajsConsumer(
+      [ETopics.PICTURE_CREATED, ETopics.PICTURE_DELETED, ETopics.PICTURE_UPDATED],
+      { groupId: EGroupId.UPLOAD as string },
+      "localhost:9092",
+    );
+
+    // Start the consumer service
+    await consumer.connect();
+    await consumer.consume(async (message) => {
+      console.log(message);
     });
   } catch (err) {
     console.error(err);
