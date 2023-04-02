@@ -22,6 +22,14 @@ export class KafkajsProducer implements IProducer {
     this.logger = new Logger(topic);
   }
 
+  // try {
+  //   await transaction.send({ topic, messages })
+
+  //   await transaction.commit()
+  // } catch (e) {
+  //   await transaction.abort()
+  // }
+
   async produce(message: Message) {
     await this.producer.send({
       compression: CompressionTypes.GZIP,
