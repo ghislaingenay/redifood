@@ -30,6 +30,7 @@ async function bootstrap() {
       secure: process.env.NODE_ENV !== 'test',
     }),
   );
+
   await app.listen(3000);
 }
 bootstrap();
