@@ -1,7 +1,6 @@
 import * as dotenv from "dotenv";
 import { pool } from "../redifood-module/src/definitions/pool.pg";
-import { EGroupId, ETopics } from "../redifood-module/src/events/subjects.interface";
-import { KafkajsConsumer } from "../redifood-module/src/kafka/kafka.consumer";
+import { kafkaClient } from "../redifood-module/src/events/kafka-client";
 import { app } from "./app";
 import { PhotoCreatedConsumer } from "./events/photo-created-consumer";
 dotenv.config();
@@ -23,14 +22,18 @@ const start = async () => {
         console.log(err);
       });
     console.log("Postgres connected");
-    
-    await 
+
+    await kafkaClient.connect("localhost:9092");
+
     // Initialize the consumer service
-    new PhotoCreatedConsumer()
-    
+    new PhotoCreatedConsumer(kafkaClient).listen();
+
     app.listen(3000, () => {
       console.log("Listening on port 3000!");
     });
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 start();
