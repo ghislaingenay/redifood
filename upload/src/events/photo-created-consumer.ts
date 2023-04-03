@@ -1,7 +1,7 @@
 import { Message } from "kafkajs";
 import { KafkaConsumer } from "../../redifood-module/src/events/base-consumer";
 import { IPhotoCreatedEvent } from "../../redifood-module/src/events/picture/picture.event";
-import { EGroupId, ETopics } from "../../redifood-module/src/events/subjects.interface";
+import { EGroupId, ETopics } from "../../redifood-module/src/interfaces/subjects.interface";
 // import Upload from "../upload.postgres";
 
 export class PhotoCreatedConsumer extends KafkaConsumer<IPhotoCreatedEvent> {
