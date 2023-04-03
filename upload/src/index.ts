@@ -34,7 +34,9 @@ const start = async () => {
     );
 
     // Start the consumer service
-    await consumer.connect();
+    await consumer.connect().then(() => {
+      console.log("Consumer connected");
+    });
     await consumer.consume(async (message) => {
       console.log(message);
     });
