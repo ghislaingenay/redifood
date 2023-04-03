@@ -49,6 +49,7 @@ export abstract class KafkaConsumer<T extends Event> {
 
   // Similar to consume
   async listen(): Promise<void> {
+    await this.createConsumer();
     await this.connect();
     await this.consumer.subscribe({
       topics: [this.topic],
