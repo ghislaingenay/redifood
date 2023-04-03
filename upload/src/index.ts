@@ -3,6 +3,7 @@ import { pool } from "../redifood-module/src/definitions/pool.pg";
 import { EGroupId, ETopics } from "../redifood-module/src/events/subjects.interface";
 import { KafkajsConsumer } from "../redifood-module/src/kafka/kafka.consumer";
 import { app } from "./app";
+import { PhotoCreatedConsumer } from "./events/photo-created-consumer";
 dotenv.config();
 const start = async () => {
   if (!process.env.JWT_TOKEN) {
@@ -22,27 +23,14 @@ const start = async () => {
         console.log(err);
       });
     console.log("Postgres connected");
+    
+    await 
+    // Initialize the consumer service
+    new PhotoCreatedConsumer()
+    
     app.listen(3000, () => {
       console.log("Listening on port 3000!");
     });
-
-    // Initialize the consumer service
-    const consumer = new KafkajsConsumer(
-      [ETopics.PICTURE_CREATED, ETopics.PICTURE_DELETED, ETopics.PICTURE_UPDATED],
-      { groupId: EGroupId.UPLOAD as string },
-      "localhost:9092",
-    );
-
-    // Start the consumer service
-    await consumer.connect().then(() => {
-      console.log("Consumer connected");
-    });
-    await consumer.consume(async (message) => {
-      console.log(message);
-    });
-  } catch (err) {
-    console.error(err);
-  }
 };
 
 start();
