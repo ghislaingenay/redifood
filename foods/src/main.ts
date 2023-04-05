@@ -3,6 +3,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import cookieSession from 'cookie-session';
 import { AppModule } from './app.module';
 import { AuthGuard } from './handling/auth-guard';
+import { kafkaClient } from './kafka-client';
 // import { AllExceptionsFilter } from './handling/catch-all.exception';
 import { pool } from './pool.pg';
 
@@ -30,6 +31,8 @@ async function bootstrap() {
       secure: process.env.NODE_ENV !== 'test',
     }),
   );
+
+  await kafkaClient.connect('localhost:9092');
 
   await app.listen(3000);
 }

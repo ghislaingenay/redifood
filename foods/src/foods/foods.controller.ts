@@ -9,8 +9,8 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { ETopics } from 'redifood-module/src/events/subjects.interface';
-import { KafkajsProducer } from 'redifood-module/src/kafka/kafka.producer';
+import { PhotoCreatedProducer } from 'src/events/producer/photo-created-producer';
+import { kafkaClient } from 'src/kafka-client';
 import { TUser } from '../../redifood-module/src/interfaces';
 import { User } from '../../src/handling/user-decorator';
 import { ExtraApiDto, FoodApiDto, SectionApiDto } from '../foods.dto';
@@ -103,15 +103,9 @@ export class FoodController {
 
   @Post('test-ms')
   async handleCreatePicture(@Body() body: any) {
-    const producer = await new KafkajsProducer(
-      ETopics.PICTURE_CREATED,
-      'localhost:9092',
-    );
-    await producer.connect();
-    producer
-      .produce({ value: { item_id: body.id, photo_url: body.url } })
-      .then(() => {
-        console.log('done');
-      });
+    new PhotoCreatedProducer(kafkaClient.kafka).publish({
+      item_id: body.id,
+      photo_url: body.url,
+    });
   }
 }
