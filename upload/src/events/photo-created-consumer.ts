@@ -6,7 +6,7 @@ import { EGroupId, ETopics } from "../../redifood-module/src/interfaces/subjects
 
 export class PhotoCreatedConsumer extends KafkaConsumer<IPhotoCreatedEvent> {
   topic: ETopics.PICTURE_CREATED = ETopics.PICTURE_CREATED;
-  groupId: EGroupId.PICTURE;
+  groupId!: EGroupId.PICTURE;
   async onMessage(data: IPhotoCreatedEvent["data"], msg: Message) {
     // const query =
     // await Upload.createUpload;
