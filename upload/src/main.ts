@@ -1,11 +1,15 @@
 import { NestFactory } from '@nestjs/core';
-import cookieSession from 'cookie-session';
-import { AuthGuard } from 'redifood-module/src/handling-nestjs/auth-guard';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { AppModule } from './app.module';
 import { pool } from './pool.pg';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.createMicroservice<MicroserviceOptions>(
+    AppModule,
+    {
+      transport: Transport.TCP,
+    },
+  );
   await pool
     .connect({
       user: process.env.POSTGRES_USER,
@@ -18,15 +22,8 @@ async function bootstrap() {
       console.log(err);
     });
   console.log('Postgres connected');
-  console.log('Listening on port 3000');
+  console.log('Listening...');
 
-  app.useGlobalGuards(new AuthGuard());
-  app.use(
-    cookieSession({
-      signed: false,
-      secure: process.env.NODE_ENV !== 'test',
-    }),
-  );
-  await app.listen(3000);
+  await app.listen();
 }
 bootstrap();
