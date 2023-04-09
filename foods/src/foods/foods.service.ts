@@ -1,6 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
+import { PhotoCreatedEvent } from '../../redifood-module/src/events/picture/picture-class.event';
 import {
+  EGroupId,
   EStatusCodes,
+  ETopics,
   IExtraApi,
   IFoodGetApi,
   IGetServerSideData,
@@ -14,6 +18,9 @@ import { DatabaseError } from '../handling/database-error.exception';
 
 @Injectable()
 export class FoodService {
+  constructor(
+    @Inject(EGroupId.UPLOAD) private readonly uploadClient: ClientProxy,
+  ) {}
   // Get foods/all
   async getAllFoods(): Promise<IGetServerSideData<IFoodGetApi[]>> {
     const foodResults = await Foods.findAll();
@@ -142,5 +149,16 @@ export class FoodService {
       statusCode: EStatusCodes.SUCCESS,
       message: EFoodMessage.FOOD_DELETED,
     };
+  }
+
+  async handleCreatePicture(createPictureDto) {
+    this.uploadClient.emit(
+      ETopics.PICTURE_CREATED,
+      new PhotoCreatedEvent(
+        createPictureDto.item_id,
+        createPictureDto.photo_url,
+      ),
+    );
+    console.log('sent');
   }
 }

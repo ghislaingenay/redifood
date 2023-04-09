@@ -4,7 +4,9 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { EGroupId } from 'redifood-module/src/interfaces';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { FoodController } from './foods/foods.controller';
 import { FoodsModule } from './foods/foods.module';
+import { FoodService } from './foods/foods.service';
 
 @Module({
   imports: [
@@ -17,8 +19,8 @@ import { FoodsModule } from './foods/foods.module';
       },
     ]),
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, FoodController],
+  providers: [AppService, FoodService],
 })
 export class AppModule {}
 // export class AppModule implements NestModule {

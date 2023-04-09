@@ -4,16 +4,13 @@ import {
   Delete,
   Get,
   HttpStatus,
-  Inject,
   Param,
   ParseIntPipe,
   Post,
   Put,
 } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
-import { PhotoCreatedEvent } from 'redifood-module/src/events/picture/picture-class.event';
 import { CreatePictureDto } from 'src/dto/create-picture.dto';
-import { EGroupId, ETopics, TUser } from '../../redifood-module/src/interfaces';
+import { TUser } from '../../redifood-module/src/interfaces';
 import { User } from '../../src/handling/user-decorator';
 import { ExtraApiDto, FoodApiDto, SectionApiDto } from '../foods.dto';
 import { ValidationPipe } from '../handling/validation.pipe';
@@ -21,10 +18,7 @@ import { FoodService } from './foods.service';
 
 @Controller('api/foods')
 export class FoodController {
-  constructor(
-    private readonly foodService: FoodService,
-    @Inject(EGroupId.UPLOAD) private readonly uploadClient: ClientProxy,
-  ) {}
+  constructor(private readonly foodService: FoodService) {}
 
   @Get('all')
   async getAllFoods() {
@@ -108,13 +102,7 @@ export class FoodController {
 
   @Post('test-ms')
   async handleCreatePicture(@Body() createPictureDto: CreatePictureDto) {
-    this.uploadClient.emit(
-      ETopics.PICTURE_CREATED,
-      new PhotoCreatedEvent(
-        createPictureDto.item_id,
-        createPictureDto.photo_url,
-      ),
-    );
+    return await this.handleCreatePicture(createPictureDto);
   }
   @Post('pit')
   async info(@Body() dto: any) {
