@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Logger } from '@nestjs/common';
+
 import {
   Consumer,
   ConsumerConfig,
@@ -6,9 +8,10 @@ import {
   EachMessagePayload,
   Kafka,
   KafkaMessage,
+  //@ts-ignore
 } from 'kafkajs';
-// import { sleep } from 'src/sleep';
-import * as retry from 'async-retry';
+//@ts-ignore
+import retry from 'async-retry';
 import { IConsumer } from './consumer.interface';
 
 export class KafkajsConsumer implements IConsumer {
@@ -61,7 +64,7 @@ export class KafkajsConsumer implements IConsumer {
         try {
           await retry(async () => onMessage(message), {
             retries: 3,
-            onRetry: (err, attempt) => {
+            onRetry: (err: Error, attempt: number) => {
               this.logger.error(
                 `Error consuming message, executing retry ${attempt}/3`,
                 err,

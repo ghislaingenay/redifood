@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Logger } from '@nestjs/common';
+//@ts-ignore
 import { CompressionTypes, Kafka, Message, Producer } from 'kafkajs';
 import { IProducer } from './producer.interface';
 
@@ -9,7 +11,6 @@ export class KafkajsProducer implements IProducer {
 
   constructor(private readonly topic: string, broker: string) {
     this.kafka = new Kafka({
-      clientId: 'redifood'
       // Therefore the clientId should be shared across multiple instances in a cluster or horizontally scaled application, but distinct for each application.
       brokers: [broker],
       connectionTimeout: 3000, // Time in milliseconds to wait for a successful connection
@@ -22,14 +23,6 @@ export class KafkajsProducer implements IProducer {
     });
     this.logger = new Logger(topic);
   }
-
-  // try {
-  //   await transaction.send({ topic, messages })
-
-  //   await transaction.commit()
-  // } catch (e) {
-  //   await transaction.abort()
-  // }
 
   async produce(message: Message) {
     await this.producer.send({

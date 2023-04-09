@@ -1,7 +1,10 @@
 import { Injectable, OnApplicationShutdown } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+
+//@ts-ignore
 import { Kafka, Message, Producer } from 'kafkajs';
-import { KafkajsProducer } from './kafkajs.producer';
+import { KafkajsProducer } from './kafka.producer';
 import { IProducer } from './producer.interface';
 
 @Injectable()
@@ -25,7 +28,7 @@ export class ProducerService implements OnApplicationShutdown {
     if (!producer) {
       producer = new KafkajsProducer(
         topic,
-        this.configService.get('KAFKA_BROKER'),
+        this.configService.get('KAFKA_BROKER') as any,
       );
       await producer.connect();
       this.producers.set(topic, producer);
@@ -36,7 +39,7 @@ export class ProducerService implements OnApplicationShutdown {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async onApplicationShutdown(signal?: string) {
     for (const producer of this.producers.values()) {
-      await producer.disconnect();
+      await producer.shutdown();
     }
   }
 }

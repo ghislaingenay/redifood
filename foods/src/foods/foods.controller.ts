@@ -116,4 +116,8 @@ export class FoodController {
       ),
     );
   }
+  @Post('pit')
+  async info(@Body() dto: any) {
+    return { ...dto, status: 'yes' };
+  }
 }
