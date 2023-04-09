@@ -4,14 +4,16 @@ import {
   Delete,
   Get,
   HttpStatus,
+  Inject,
   Param,
   ParseIntPipe,
   Post,
   Put,
 } from '@nestjs/common';
-import { PhotoCreatedProducer } from 'src/events/producer/photo-created-producer';
-import { kafkaClient } from 'src/kafka-client';
-import { TUser } from '../../redifood-module/src/interfaces';
+import { ClientProxy } from '@nestjs/microservices';
+import { PhotoCreatedEvent } from 'redifood-module/src/events/picture/picture-class.event';
+import { CreatePictureDto } from 'src/dto/create-picture.dto';
+import { EGroupId, ETopics, TUser } from '../../redifood-module/src/interfaces';
 import { User } from '../../src/handling/user-decorator';
 import { ExtraApiDto, FoodApiDto, SectionApiDto } from '../foods.dto';
 import { ValidationPipe } from '../handling/validation.pipe';
@@ -19,7 +21,10 @@ import { FoodService } from './foods.service';
 
 @Controller('api/foods')
 export class FoodController {
-  constructor(private readonly foodService: FoodService) {}
+  constructor(
+    private readonly foodService: FoodService,
+    @Inject(EGroupId.UPLOAD) private readonly uploadClient: ClientProxy,
+  ) {}
 
   @Get('all')
   async getAllFoods() {
@@ -102,10 +107,13 @@ export class FoodController {
   }
 
   @Post('test-ms')
-  async handleCreatePicture(@Body() body: any) {
-    new PhotoCreatedProducer(kafkaClient.kafka).publish({
-      item_id: body.id,
-      photo_url: body.url,
-    });
+  async handleCreatePicture(@Body() createPictureDto: CreatePictureDto) {
+    this.uploadClient.emit(
+      ETopics.PICTURE_CREATED,
+      new PhotoCreatedEvent(
+        createPictureDto.item_id,
+        createPictureDto.photo_url,
+      ),
+    );
   }
 }
