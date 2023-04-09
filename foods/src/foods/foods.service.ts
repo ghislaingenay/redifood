@@ -1,6 +1,8 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
+import retry from 'async-retry';
 import { PhotoCreatedEvent } from '../../redifood-module/src/events/picture/picture-class.event';
+
 import {
   EGroupId,
   EStatusCodes,
@@ -15,7 +17,6 @@ import { EFoodMessage } from '../foods.interface';
 import Foods from '../foods.postgres';
 import { convertKeys, createQuery, updateQuery } from '../global.function';
 import { DatabaseError } from '../handling/database-error.exception';
-
 @Injectable()
 export class FoodService {
   constructor(
@@ -153,13 +154,31 @@ export class FoodService {
 
   async handleCreatePicture(createPictureDto) {
     console.log('before sending...', createPictureDto);
-    await this.uploadClient.emit(
-      ETopics.PICTURE_CREATED,
-      new PhotoCreatedEvent(
-        createPictureDto.item_id,
-        createPictureDto.photo_url,
-      ),
-    );
-    console.log('sent');
+    try {
+      await retry(
+        async () => {
+          await this.uploadClient.emit(
+            ETopics.PICTURE_CREATED,
+            new PhotoCreatedEvent(
+              createPictureDto.item_id,
+              createPictureDto.photo_url,
+            ),
+          );
+          console.log('sent');
+        },
+        {
+          retries: 3,
+          onRetry: (err: Error, attempt: number) => {
+            Logger.error(
+              `Error consuming message, executing retry ${attempt}/3`,
+              err,
+            );
+          },
+        },
+      );
+    } catch (err) {
+      Logger.error(`Error consuming message, Adding to DQL...`, err);
+      // Failed after 3 retries, add to DQL
+    }
   }
 }
