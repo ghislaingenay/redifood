@@ -1,9 +1,9 @@
 import { NestFactory } from '@nestjs/core';
+import { Transport } from '@nestjs/microservices';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import cookieSession from 'cookie-session';
 import { AppModule } from './app.module';
 import { AuthGuard } from './handling/auth-guard';
-import { kafkaClient } from './kafka-client';
 // import { AllExceptionsFilter } from './handling/catch-all.exception';
 import { pool } from './pool.pg';
 
@@ -32,8 +32,14 @@ async function bootstrap() {
     }),
   );
 
-  await kafkaClient.connect('localhost:9092');
-
+  // Connection to microservices
+  app.connectMicroservice({
+    transport: Transport.TCP,
+    options: {
+      port: 3000,
+    },
+  });
+  await app.startAllMicroservices();
   await app.listen(3000);
 }
 bootstrap();
