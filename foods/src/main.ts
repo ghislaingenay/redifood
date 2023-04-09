@@ -35,10 +35,10 @@ async function bootstrap() {
   await app.connectMicroservice({
     transport: Transport.TCP,
     options: {
-      port: 3000,
+      port: 3001,
     },
   });
   await app.startAllMicroservices();
-  await app.listen(3001);
+  await app.listen(3002);
 }
 bootstrap();

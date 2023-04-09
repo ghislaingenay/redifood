@@ -152,7 +152,8 @@ export class FoodService {
   }
 
   async handleCreatePicture(createPictureDto) {
-    this.uploadClient.emit(
+    console.log('before sending...', createPictureDto);
+    await this.uploadClient.emit(
       ETopics.PICTURE_CREATED,
       new PhotoCreatedEvent(
         createPictureDto.item_id,
