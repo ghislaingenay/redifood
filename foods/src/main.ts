@@ -1,8 +1,8 @@
 import { NestFactory } from '@nestjs/core';
+import { Transport } from '@nestjs/microservices';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import cookieSession from 'cookie-session';
 import { AppModule } from './app.module';
-import { AuthGuard } from './handling/auth-guard';
 // import { AllExceptionsFilter } from './handling/catch-all.exception';
 import { pool } from './pool.pg';
 
@@ -22,7 +22,7 @@ async function bootstrap() {
   console.log('Postgres connected');
   console.log('Listening on port 3000');
   // app.useGlobalFilters(new AllExceptionsFilter(app.get(HttpAdapterHost)));
-  app.useGlobalGuards(new AuthGuard());
+  // app.useGlobalGuards(new AuthGuard());
   app.set('trust proxy', true);
   app.use(
     cookieSession({
@@ -30,6 +30,15 @@ async function bootstrap() {
       secure: process.env.NODE_ENV !== 'test',
     }),
   );
-  await app.listen(3000);
+
+  // Connection to microservices
+  await app.connectMicroservice({
+    transport: Transport.TCP,
+    options: {
+      port: 3001,
+    },
+  });
+  await app.startAllMicroservices();
+  await app.listen(3002);
 }
 bootstrap();

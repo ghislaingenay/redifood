@@ -1,6 +1,8 @@
-import * as dotenv from "dotenv"; // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
+import * as dotenv from "dotenv";
 import { pool } from "../redifood-module/src/definitions/pool.pg";
 import { app } from "./app";
+import { PhotoCreatedConsumer } from "./events/photo-created-consumer";
+import { kafkaClient } from "./kafka-client";
 dotenv.config();
 const start = async () => {
   if (!process.env.JWT_TOKEN) {
@@ -20,11 +22,17 @@ const start = async () => {
         console.log(err);
       });
     console.log("Postgres connected");
-    app.listen(3000, () => {
-      console.log("Listening on port 3000!");
+
+    await kafkaClient.connect("localhost:9092");
+
+    // Initialize the consumer service
+    new PhotoCreatedConsumer(kafkaClient.kafka!).listen();
+
+    app.listen(3002, () => {
+      console.log("Listening on port 3002!");
     });
   } catch (err) {
-    console.error(err);
+    console.log(err);
   }
 };
 

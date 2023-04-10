@@ -9,6 +9,7 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
+import { CreatePictureDto } from 'src/dto/create-picture.dto';
 import { TUser } from '../../redifood-module/src/interfaces';
 import { User } from '../../src/handling/user-decorator';
 import { ExtraApiDto, FoodApiDto, SectionApiDto } from '../foods.dto';
@@ -97,5 +98,14 @@ export class FoodController {
     id: number,
   ) {
     return await this.foodService.deleteFood(id);
+  }
+
+  @Post('test-ms')
+  async handleCreatePicture(@Body() createPictureDto: CreatePictureDto) {
+    return await this.foodService.handleCreatePicture(createPictureDto);
+  }
+  @Post('pit')
+  async info(@Body() dto: any) {
+    return { ...dto, status: 'yes' };
   }
 }
