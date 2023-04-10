@@ -24,7 +24,7 @@ export const checkIfArrayAreTheSame = (array1: IFoodApi[], array2: IFoodApi[]) =
     return false;
   }
   for (let i = 0; i < array1.length; i++) {
-    if (array1[i].itemId !== array2[i].itemId) {
+    if (array1[i].id !== array2[i].id) {
       return false;
     }
   }
