@@ -1,4 +1,5 @@
 import { Controller, Get, Post, Put } from '@nestjs/common';
+import { EventPattern } from '@nestjs/microservices';
 import { OrderService } from './order.service';
 
 @Controller('api/order')
@@ -14,19 +15,29 @@ export class OrderController {
   }
 
   @Get(':id')
-  getOneOrder() {}
+  getOneOrder() {
+    //empty
+  }
 
   @Post()
-  createOrder() {}
+  createOrder() {
+    //empty
+  }
 
   @Put(':id')
-  editOrder() {}
+  editOrder() {
+    //empty
+  }
 
   @Put(':id/await')
-  setAwaitPayment() {}
+  setAwaitPayment() {
+    //empty
+  }
   // should emit an event to payment service by settings the order there and foods
 
   @Put('id/delete')
-  cancelOrder() {}
+  cancelOrder() {
+    //empty
+  }
   // should emit an event
 }
