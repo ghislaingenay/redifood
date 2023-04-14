@@ -1,4 +1,6 @@
 import { NestFactory } from '@nestjs/core';
+import { Transport } from '@nestjs/microservices';
+import cookieSession from 'cookie-session';
 import mongoose from 'mongoose';
 import { OrderModule } from './order.module';
 
@@ -13,6 +15,19 @@ async function bootstrap() {
   } catch (err) {
     console.error(err);
   }
+  app.use(
+    cookieSession({
+      signed: false,
+      secure: process.env.NODE_ENV !== 'test',
+    }),
+  );
+  await app.connectMicroservice({
+    transport: Transport.TCP,
+    options: {
+      port: 3000,
+    },
+  });
+  await app.startAllMicroservices();
   await app.listen(3000);
 }
 bootstrap();
