@@ -21,7 +21,7 @@ async function bootstrap() {
       secure: process.env.NODE_ENV !== 'test',
     }),
   );
-  await app.connectMicroservice({
+  app.connectMicroservice({
     transport: Transport.TCP,
     options: {
       port: 3000,

@@ -104,6 +104,7 @@ export class FoodController {
   async handleCreatePicture(@Body() createPictureDto: CreatePictureDto) {
     return await this.foodService.handleCreatePicture(createPictureDto);
   }
+  
   @Post('pit')
   async info(@Body() dto: any) {
     return { ...dto, status: 'yes' };

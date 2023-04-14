@@ -92,6 +92,10 @@ export class FoodService {
     const updatedData = convertKeys(body, 'apiToDb');
     const postgresQuery = createQuery(updatedData, 'foods');
     const response = await Foods.createRows(postgresQuery);
+    await this.handleCreatePicture({
+      item_id: response.id,
+      photo_url: body.itemPhoto,
+    });
     if (!response) {
       throw new DatabaseError();
     }
@@ -162,6 +166,36 @@ export class FoodService {
             new PhotoCreatedEvent(
               createPictureDto.item_id,
               createPictureDto.photo_url,
+            ),
+          );
+          console.log('sent');
+        },
+        {
+          retries: 3,
+          onRetry: (err: Error, attempt: number) => {
+            Logger.error(
+              `Error consuming message, executing retry ${attempt}/3`,
+              err,
+            );
+          },
+        },
+      );
+    } catch (err) {
+      Logger.error(`Error consuming message, Adding to DQL...`, err);
+      // Failed after 3 retries, add to DQL
+    }
+  }
+
+  async handleUpdatePicture(updatePictureDto) {
+    console.log('before sending...', updatePictureDto);
+    try {
+      await retry(
+        async () => {
+          await this.uploadClient.emit(
+            ETopics.PICTURE_UPDATED,
+            new PhotoUpdatedEvent(
+              updatePictureDto.item_id,
+              updatePictureDto.photo_url,
             ),
           );
           console.log('sent');
