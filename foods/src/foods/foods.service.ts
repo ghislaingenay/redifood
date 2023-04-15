@@ -1,13 +1,18 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import retry from 'async-retry';
-import { PhotoCreatedEvent } from '../../redifood-module/src/events/picture/picture-class.event';
+import {
+  PhotoCreatedEvent,
+  PhotoDeletedEvent,
+  PhotoUpdatedEvent,
+} from '../../redifood-module/src/events/picture/picture-class.event';
 
 import {
   EGroupId,
   EStatusCodes,
   ETopics,
   IExtraApi,
+  IFoodDB,
   IFoodGetApi,
   IGetServerSideData,
   ISectionFoodApi,
@@ -197,6 +202,32 @@ export class FoodService {
               updatePictureDto.item_id,
               updatePictureDto.photo_url,
             ),
+          );
+          console.log('sent');
+        },
+        {
+          retries: 3,
+          onRetry: (err: Error, attempt: number) => {
+            Logger.error(
+              `Error consuming message, executing retry ${attempt}/3`,
+              err,
+            );
+          },
+        },
+      );
+    } catch (err) {
+      Logger.error(`Error consuming message, Adding to DQL...`, err);
+      // Failed after 3 retries, add to DQL
+    }
+  }
+
+  async handleDeletePicture(foodId: IFoodDB['id']) {
+    try {
+      await retry(
+        async () => {
+          await this.uploadClient.emit(
+            ETopics.PICTURE_DELETED,
+            new PhotoDeletedEvent(foodId),
           );
           console.log('sent');
         },
