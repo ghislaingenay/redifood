@@ -98,7 +98,7 @@ export class FoodService {
     const postgresQuery = createQuery(updatedData, 'foods');
     const response = await Foods.createRows(postgresQuery);
     await this.handleCreatePicture({
-      item_id: response.id,
+      item_id: response.rows[0],
       photo_url: body.itemPhoto,
     });
     if (!response) {
@@ -115,6 +115,10 @@ export class FoodService {
     const postgresQuery = updateQuery(convertKeys(body, 'apiToDb'), 'foods');
     console.log('postgresQuery', postgresQuery);
     const response = await Foods.updateRow(postgresQuery, id);
+    await this.handleUpdatePicture({
+      item_id: response.rows[0],
+      photo_url: body.itemPhoto,
+    });
     if (!response) {
       throw new DatabaseError();
     }
@@ -151,6 +155,7 @@ export class FoodService {
 
   async deleteFood(id: number) {
     const response = await Foods.deleteFood(id);
+    await this.handleDeletePicture(id);
     if (!response) {
       throw new DatabaseError();
     }
