@@ -5,7 +5,12 @@ import {
   FoodDeletedEvent,
   FoodUpdatedEvent,
 } from 'redifood-module/src/events/foods-event';
-import { EGroupId, ETopics } from 'redifood-module/src/interfaces';
+import { OrderStateEvent } from '../redifood-module/src/events/orders-event';
+import {
+  EGroupId,
+  EOrderStatus,
+  ETopics,
+} from '../redifood-module/src/interfaces';
 import { OrderService } from './order.service';
 
 @Controller('api/order')
@@ -39,13 +44,17 @@ export class OrderController {
   }
 
   @Post()
-  createOrder() {
+  async createOrder() {
     //empty
-    // this.foodClient.emit(ETopics.ORDER_CREATED)
+    const orderId = '67';
+    await this.foodClient.emit(
+      ETopics.ORDER_CREATED,
+      new OrderStateEvent(orderId, EOrderStatus.CREATED),
+    );
   }
 
   @Put(':id')
-  editOrder() {
+  async editOrder() {
     //empty
   }
 
@@ -56,8 +65,13 @@ export class OrderController {
   // should emit an event to payment service by settings the order there and foods
 
   @Put('id/delete')
-  cancelOrder() {
+  async cancelOrder() {
     //empty
+    const orderId = '67';
+    await this.foodClient.emit(
+      ETopics.ORDER_CANCELLED,
+      new OrderStateEvent(orderId, EOrderStatus.CANCELLED),
+    );
   }
   // should emit an event
 }

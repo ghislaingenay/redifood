@@ -9,8 +9,10 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
+import { EventPattern } from '@nestjs/microservices';
+import { OrderStateEvent } from 'redifood-module/src/events/orders-event';
 import { CreatePictureDto } from 'src/dto/create-picture.dto';
-import { TUser } from '../../redifood-module/src/interfaces';
+import { ETopics, TUser } from '../../redifood-module/src/interfaces';
 import { User } from '../../src/handling/user-decorator';
 import { ExtraApiDto, FoodApiDto, SectionApiDto } from '../foods.dto';
 import { ValidationPipe } from '../handling/validation.pipe';
@@ -19,6 +21,15 @@ import { FoodService } from './foods.service';
 @Controller('api/foods')
 export class FoodController {
   constructor(private readonly foodService: FoodService) {}
+
+  @EventPattern(ETopics.ORDER_CREATED)
+  handleCreateOrder(data: OrderStateEvent) {
+    console.log('order', data);
+  }
+  @EventPattern(ETopics.ORDER_CANCELLED)
+  handleCancelledOrder(data: OrderStateEvent) {
+    console.log('order', data);
+  }
 
   @Get('all')
   async getAllFoods() {
@@ -104,7 +115,7 @@ export class FoodController {
   async handleCreatePicture(@Body() createPictureDto: CreatePictureDto) {
     return await this.foodService.handleCreatePicture(createPictureDto);
   }
-  
+
   @Post('pit')
   async info(@Body() dto: any) {
     return { ...dto, status: 'yes' };
