@@ -1,12 +1,12 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import retry from 'async-retry';
+import { FoodDeletedEvent } from '../../redifood-module/src/events/foods-event';
 import {
   PhotoCreatedEvent,
   PhotoDeletedEvent,
   PhotoUpdatedEvent,
 } from '../../redifood-module/src/events/picture/picture-class.event';
-
 import {
   EGroupId,
   EStatusCodes,
@@ -22,10 +22,12 @@ import { EFoodMessage } from '../foods.interface';
 import Foods from '../foods.postgres';
 import { convertKeys, createQuery, updateQuery } from '../global.function';
 import { DatabaseError } from '../handling/database-error.exception';
+
 @Injectable()
 export class FoodService {
   constructor(
     @Inject(EGroupId.UPLOAD) private readonly uploadClient: ClientProxy,
+    @Inject(EGroupId.ORDER) private readonly orderClient: ClientProxy,
   ) {}
   // Get foods/all
   async getAllFoods(): Promise<IGetServerSideData<IFoodGetApi[]>> {
@@ -101,6 +103,10 @@ export class FoodService {
       item_id: response.rows[0],
       photo_url: body.itemPhoto,
     });
+    // await this.orderClient.emit(
+    //   ETopics.FOOD_CREATED,
+    //   new FoodCreatedEvent(body),
+    // );
     if (!response) {
       throw new DatabaseError();
     }
@@ -119,6 +125,11 @@ export class FoodService {
       item_id: response.rows[0],
       photo_url: body.itemPhoto,
     });
+
+    // await this.orderClient.emit(
+    //   ETopics.FOOD_UPDATED,
+    //   new FoodUpdatedEvent(body),
+    // );
     if (!response) {
       throw new DatabaseError();
     }
@@ -134,6 +145,7 @@ export class FoodService {
     if (!response) {
       throw new DatabaseError();
     }
+    await this.orderClient.emit(ETopics.FOOD_DELETED, new FoodDeletedEvent(id));
     return {
       results: {},
       statusCode: EStatusCodes.SUCCESS,
