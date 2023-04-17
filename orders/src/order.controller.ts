@@ -1,4 +1,13 @@
-import { Controller, Get, Inject, Post, Put } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpStatus,
+  Inject,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { ClientProxy, EventPattern } from '@nestjs/microservices';
 import {
   FoodCreatedEvent,
@@ -10,6 +19,7 @@ import {
   EGroupId,
   EOrderStatus,
   ETopics,
+  IGetServerSideData,
 } from '../redifood-module/src/interfaces';
 import { OrderService } from './order.service';
 
@@ -34,17 +44,23 @@ export class OrderController {
   }
 
   @Get('paid')
-  getPaidOrder(): string {
-    return '';
+  async getPaidOrder() {
+    return await this.orderService.getPaidOrder();
   }
 
   @Get(':id')
-  getOneOrder() {
-    //empty
+  async getOneOrder(
+    @Param(
+      'id',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    id: number,
+  ) {
+    return await this.orderService.getOneOrder(id);
   }
 
   @Post()
-  async createOrder() {
+  async createOrder(@Body() createOrderDto: CreateOrderDro) {
     //empty
     const orderId = '67';
     await this.foodClient.emit(
@@ -59,13 +75,25 @@ export class OrderController {
   }
 
   @Put(':id/await')
-  setAwaitPayment() {
+  setAwaitPayment(
+    @Param(
+      'id',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    id: number,
+  ) {
     //empty
   }
   // should emit an event to payment service by settings the order there and foods
 
   @Put('id/delete')
-  async cancelOrder() {
+  async cancelOrder(
+    @Param(
+      'id',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    id: number,
+  ) {
     //empty
     const orderId = '67';
     await this.foodClient.emit(

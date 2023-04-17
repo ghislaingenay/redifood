@@ -8,7 +8,7 @@ import {
 
 type OrdersAttrs = IOrderApi;
 
-interface OrdersDoc extends mongoose.Document {
+export interface OrdersDoc extends mongoose.Document {
   id?: string;
   orderNo: number;
   orderStatus: EOrderStatus;
