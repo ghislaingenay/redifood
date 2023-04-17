@@ -19,7 +19,6 @@ import {
   EGroupId,
   EOrderStatus,
   ETopics,
-  IGetServerSideData,
 } from '../redifood-module/src/interfaces';
 import { OrderService } from './order.service';
 
@@ -32,15 +31,15 @@ export class OrderController {
 
   @EventPattern(ETopics.FOOD_CREATED)
   async createFood(data: FoodCreatedEvent) {
-    console.log('Event food created', data);
+    return await this.orderService.createFood(data);
   }
   @EventPattern(ETopics.FOOD_UPDATED)
   async updateFood(data: FoodUpdatedEvent) {
-    console.log('Event food updated', data);
+    return await this.orderService.updateFood(data);
   }
   @EventPattern(ETopics.FOOD_DELETED)
   async deleteFood(data: FoodDeletedEvent) {
-    console.log('Eevnt food deleted', data);
+    return await this.orderService.deleteFood(data);
   }
 
   @Get('paid')
