@@ -17,6 +17,10 @@ import { FoodService } from './foods/foods.service';
         name: EGroupId.UPLOAD,
         transport: Transport.TCP,
       },
+      {
+        name: EGroupId.ORDER,
+        transport: Transport.TCP,
+      },
     ]),
   ],
   controllers: [AppController, FoodController],

@@ -6,4 +6,10 @@ export class UploadService {
   handleCreatePhoto(data: PhotoCreatedEvent) {
     console.log(`UPLOAD - Photo created`, data);
   }
+  handleUpdatePhoto(data: PhotoCreatedEvent) {
+    console.log(`UPLOAD - Photo created`, data);
+  }
+  handleDeletePhoto(data: PhotoCreatedEvent) {
+    console.log(`UPLOAD - Photo created`, data);
+  }
 }

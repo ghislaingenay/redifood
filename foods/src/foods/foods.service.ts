@@ -1,13 +1,18 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import retry from 'async-retry';
-import { PhotoCreatedEvent } from '../../redifood-module/src/events/picture/picture-class.event';
-
+import { FoodDeletedEvent } from '../../redifood-module/src/events/foods-event';
+import {
+  PhotoCreatedEvent,
+  PhotoDeletedEvent,
+  PhotoUpdatedEvent,
+} from '../../redifood-module/src/events/picture/picture-class.event';
 import {
   EGroupId,
   EStatusCodes,
   ETopics,
   IExtraApi,
+  IFoodDB,
   IFoodGetApi,
   IGetServerSideData,
   ISectionFoodApi,
@@ -17,10 +22,12 @@ import { EFoodMessage } from '../foods.interface';
 import Foods from '../foods.postgres';
 import { convertKeys, createQuery, updateQuery } from '../global.function';
 import { DatabaseError } from '../handling/database-error.exception';
+
 @Injectable()
 export class FoodService {
   constructor(
     @Inject(EGroupId.UPLOAD) private readonly uploadClient: ClientProxy,
+    @Inject(EGroupId.ORDER) private readonly orderClient: ClientProxy,
   ) {}
   // Get foods/all
   async getAllFoods(): Promise<IGetServerSideData<IFoodGetApi[]>> {
@@ -92,6 +99,14 @@ export class FoodService {
     const updatedData = convertKeys(body, 'apiToDb');
     const postgresQuery = createQuery(updatedData, 'foods');
     const response = await Foods.createRows(postgresQuery);
+    await this.handleCreatePicture({
+      item_id: response.rows[0],
+      photo_url: body.itemPhoto,
+    });
+    // await this.orderClient.emit(
+    //   ETopics.FOOD_CREATED,
+    //   new FoodCreatedEvent(body),
+    // );
     if (!response) {
       throw new DatabaseError();
     }
@@ -106,6 +121,15 @@ export class FoodService {
     const postgresQuery = updateQuery(convertKeys(body, 'apiToDb'), 'foods');
     console.log('postgresQuery', postgresQuery);
     const response = await Foods.updateRow(postgresQuery, id);
+    await this.handleUpdatePicture({
+      item_id: response.rows[0],
+      photo_url: body.itemPhoto,
+    });
+
+    // await this.orderClient.emit(
+    //   ETopics.FOOD_UPDATED,
+    //   new FoodUpdatedEvent(body),
+    // );
     if (!response) {
       throw new DatabaseError();
     }
@@ -121,6 +145,7 @@ export class FoodService {
     if (!response) {
       throw new DatabaseError();
     }
+    await this.orderClient.emit(ETopics.FOOD_DELETED, new FoodDeletedEvent(id));
     return {
       results: {},
       statusCode: EStatusCodes.SUCCESS,
@@ -142,6 +167,7 @@ export class FoodService {
 
   async deleteFood(id: number) {
     const response = await Foods.deleteFood(id);
+    await this.handleDeletePicture(id);
     if (!response) {
       throw new DatabaseError();
     }
@@ -163,6 +189,62 @@ export class FoodService {
               createPictureDto.item_id,
               createPictureDto.photo_url,
             ),
+          );
+          console.log('sent');
+        },
+        {
+          retries: 3,
+          onRetry: (err: Error, attempt: number) => {
+            Logger.error(
+              `Error consuming message, executing retry ${attempt}/3`,
+              err,
+            );
+          },
+        },
+      );
+    } catch (err) {
+      Logger.error(`Error consuming message, Adding to DQL...`, err);
+      // Failed after 3 retries, add to DQL
+    }
+  }
+
+  async handleUpdatePicture(updatePictureDto) {
+    console.log('before sending...', updatePictureDto);
+    try {
+      await retry(
+        async () => {
+          await this.uploadClient.emit(
+            ETopics.PICTURE_UPDATED,
+            new PhotoUpdatedEvent(
+              updatePictureDto.item_id,
+              updatePictureDto.photo_url,
+            ),
+          );
+          console.log('sent');
+        },
+        {
+          retries: 3,
+          onRetry: (err: Error, attempt: number) => {
+            Logger.error(
+              `Error consuming message, executing retry ${attempt}/3`,
+              err,
+            );
+          },
+        },
+      );
+    } catch (err) {
+      Logger.error(`Error consuming message, Adding to DQL...`, err);
+      // Failed after 3 retries, add to DQL
+    }
+  }
+
+  async handleDeletePicture(foodId: IFoodDB['id']) {
+    try {
+      await retry(
+        async () => {
+          await this.uploadClient.emit(
+            ETopics.PICTURE_DELETED,
+            new PhotoDeletedEvent(foodId),
           );
           console.log('sent');
         },
