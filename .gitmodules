@@ -7,9 +7,9 @@
 [submodule "foods/redifood-module"]
 	path = foods/redifood-module
 	url = https://github.com/ghislaingenay/redifood-module
-[submodule "event-bus/redifood-module"]
-	path = event-bus/redifood-module
-	url = https://github.com/ghislaingenay/redifood-module
 [submodule "upload/redifood-module"]
 	path = upload/redifood-module
+	url = https://github.com/ghislaingenay/redifood-module
+[submodule "orders/redifood-module"]
+	path = orders/redifood-module
 	url = https://github.com/ghislaingenay/redifood-module
