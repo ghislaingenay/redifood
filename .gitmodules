@@ -13,3 +13,6 @@
 [submodule "orders/redifood-module"]
 	path = orders/redifood-module
 	url = https://github.com/ghislaingenay/redifood-module
+[submodule "payment/redifood-module"]
+	path = payment/redifood-module
+	url = https://github.com/ghislaingenay/redifood-module
