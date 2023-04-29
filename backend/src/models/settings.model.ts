@@ -3,7 +3,7 @@ import { ECurrency, ELanguage } from '../../redifood-module/src/interfaces';
 import { UserDoc } from './users.model';
 const ObjectId = mongoose.Schema.Types.ObjectId;
 
-interface SettingsAttrs {
+export interface SettingsAttrs {
   user: UserDoc | string;
   haveFoodDescription: boolean;
   haveFoodImage: boolean;
@@ -12,7 +12,7 @@ interface SettingsAttrs {
   language: ELanguage;
 }
 
-interface SettingsDoc extends mongoose.Document {
+export interface SettingsDoc extends mongoose.Document {
   user: UserDoc;
   haveFoodDescription: boolean;
   haveFoodImage: boolean;
