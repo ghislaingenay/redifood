@@ -1,7 +1,6 @@
 import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
 import { Response } from 'express';
 import jwt from 'jsonwebtoken';
-import { EStatusCodes } from 'redifood-module/src/interfaces';
 import { IRequest } from 'src/handling/request';
 import { User } from 'src/models/users.model';
 import { signUpUserDto } from './auth.dto';
@@ -35,8 +34,8 @@ export class AuthService {
     this.req.session = { jwt: userJwt };
     return this.res.status(HttpStatus.CREATED).send({
       message: 'Successfully created',
-      data: createdUser,
-      statusCode: EStatusCodes.CREATED,
+      results: createdUser,
+      statusCode: HttpStatus.CREATED,
     });
   }
 
