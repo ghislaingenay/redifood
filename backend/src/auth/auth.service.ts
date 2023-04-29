@@ -33,7 +33,7 @@ export class AuthService {
       process.env.JWT_TOKEN!,
     );
     this.req.session = { jwt: userJwt };
-    return this.res.status(EStatusCodes.CREATED).send({
+    return this.res.status(HttpStatus.CREATED).send({
       message: 'Successfully created',
       data: createdUser,
       statusCode: EStatusCodes.CREATED,
@@ -63,7 +63,7 @@ export class AuthService {
       process.env.JWT_TOKEN!,
     );
     this.req.session = { jwt: userJwt };
-    return this.res.status(200).send(existingUser);
+    return this.res.status(HttpStatus.CREATED).send(existingUser);
   }
 
   async signOutUser() {
@@ -75,6 +75,6 @@ export class AuthService {
 
   async getCurrentUser(user: any) {
     const userInfo = user ? { currentUser: user } : { currentUser: null };
-    return this.res.status(200).send(userInfo);
+    return this.res.status(HttpStatus.OK).send(userInfo);
   }
 }
