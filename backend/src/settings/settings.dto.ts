@@ -10,7 +10,7 @@ import { ECurrency, ELanguage } from '../../redifood-module/src/interfaces';
 export class createSettingsDto {
   @IsEnum(ECurrency)
   @IsNotEmpty()
-  currency: string;
+  currency: ECurrency;
 
   @IsNumber()
   @IsPositive()
@@ -19,7 +19,7 @@ export class createSettingsDto {
 
   @IsNotEmpty()
   @IsEnum(ELanguage)
-  language: string;
+  language: ELanguage;
 
   @IsNotEmpty()
   @IsBoolean()
