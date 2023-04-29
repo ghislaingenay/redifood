@@ -8,23 +8,7 @@ build:
   local:
     push: false
   artifacts:
-    - image: ghislaingenay/redifood-auth
-      context: auth
-      docker:
-        dockerfile: Dockerfile
-      sync: # How to handle each files changes inside auth folder
-        manual:
-          - src: "src/**/*.ts"
-            dest: . # Where to sync this file to fo running container
-    - image: ghislaingenay/redifood-foods
-      context: foods
-      docker:
-        dockerfile: Dockerfile
-      sync:
-        manual:
-          - src: "src/**/*.ts"
-            dest: .
-    - image: ghislaingenay/redifood-upload
+    - image: ghislaingenay/redifood-backend
       context: upload
       docker:
         dockerfile: Dockerfile
@@ -32,14 +16,6 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: .
-    # - image: ghislaingenay/redifood-event-bus
-    #   context: event-bus
-    #   docker:
-    #     dockerfile: Dockerfile
-    #   sync:
-    #     manual:
-    #       - src: "src/**/*.ts"
-    #         dest: .
 
     - image: ghislaingenay/redifood-client
       context: client
