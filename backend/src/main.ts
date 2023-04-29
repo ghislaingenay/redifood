@@ -1,8 +1,9 @@
-import { NestFactory } from '@nestjs/core';
+import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import cookieSession from 'cookie-session';
 import { urlencoded } from 'express';
 import mongoose from 'mongoose';
+import { AllExceptionsFilter } from '../redifood-module/src/handling-nestjs/catch-all.exception';
 import { AppModule } from './app.module';
 import { pool } from './pool.pg';
 import { verifyKeys } from './verifykeys';
@@ -24,6 +25,9 @@ async function bootstrap() {
       secure: process.env.NODE_ENV !== 'test',
     }),
   );
+
+  // Catch issues for all routes
+  app.useGlobalFilters(new AllExceptionsFilter(app.get(HttpAdapterHost)));
   try {
     await pool.connect({
       user: process.env.POSTGRES_USER,
