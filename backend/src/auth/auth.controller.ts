@@ -38,8 +38,9 @@ export class AuthController {
   }
 
   @Post('logout')
-  logOutUser() {
-    return this.authService.findAll();
+  logOutUser(@Req() req: IRequest, @Res() res: Response) {
+    const authService = new AuthService(req, res);
+    return authService.signOutUser();
   }
 
   @Get('currentuser')
