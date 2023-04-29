@@ -1,34 +1,49 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Req,
+  Res,
+  ValidationPipe,
+} from '@nestjs/common';
+import { Response } from 'express';
+import { User } from '../../redifood-module/src/handling-nestjs/user-decorator';
+import { IRequest } from '../../src/handling/request';
+import { signInUserDto, signUpUserDto } from './auth.dto';
 import { AuthService } from './auth.service';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
 
-@Controller('auth')
+@Controller('api/auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post()
-  create(@Body() createAuthDto: CreateAuthDto) {
-    return this.authService.create(createAuthDto);
+  @Post('signup')
+  async signUpUser(
+    @Body(new ValidationPipe()) signUpDto: signUpUserDto,
+    @Req() req: IRequest,
+    @Res() res: Response,
+  ) {
+    const authService = new AuthService(req, res);
+    return await authService.signUpUser(signUpDto);
   }
 
-  @Get()
-  findAll() {
+  @Post('signin')
+  signInUser(
+    @Body(new ValidationPipe()) signInDto: signInUserDto,
+    @Req() req: IRequest,
+    @Res() res: Response,
+  ) {
+    const authService = new AuthService(req, res);
+    return authService.signInUser(signInDto);
+  }
+
+  @Post('logout')
+  logOutUser() {
     return this.authService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.authService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-    return this.authService.update(+id, updateAuthDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.authService.remove(+id);
+  @Get('currentuser')
+  getCurrentUser(@User() user: any) {
+    return this.authService.getCurrentUser(user);
   }
 }
