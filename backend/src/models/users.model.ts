@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { PasswordManager } from '../services/password-manager';
+import { PasswordManager } from '../../src/auth/password-manager';
 
 // what it takes to cerate a user
 interface UserAttrs {

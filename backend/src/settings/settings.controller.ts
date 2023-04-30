@@ -29,7 +29,6 @@ export class SettingsController {
     @Body(new ValidationPipe()) body: createSettingsDto,
   ) {
     const userId = user.id;
-    return await this.settingsService.updateSettings(userId, body);
+    return await this.settingsService.updateSettings(body, userId);
   }
-  // async updateSettings(@User() user: any, @Body(new ValidationPipe()) body: createSettingsDto) {
 }

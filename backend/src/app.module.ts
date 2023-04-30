@@ -7,9 +7,9 @@ import { SettingsModule } from './settings/settings.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
     AuthModule,
     SettingsModule,
+    ConfigModule.forRoot({ isGlobal: true }),
   ],
   controllers: [AppController],
   providers: [AppService],
