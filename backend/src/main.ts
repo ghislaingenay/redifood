@@ -1,6 +1,6 @@
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import cookieSession from 'cookie-session';
+import * as cookieSession from 'cookie-session';
 import { urlencoded } from 'express';
 import mongoose from 'mongoose';
 import { AllExceptionsFilter } from '../redifood-module/src/handling-nestjs/catch-all.exception';
