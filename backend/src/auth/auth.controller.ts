@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpStatus,
   Post,
   Req,
   Res,
@@ -23,28 +24,41 @@ export class AuthController {
     @Req() req: IRequest,
     @Res() res: Response,
   ) {
-    const authService = new AuthService(req, res);
-    return await authService.signUpUser(signUpDto);
+    const [userData, userJwt] = await this.authService.signUpUser(signUpDto);
+    req.session = { jwt: userJwt };
+    return res.status(HttpStatus.CREATED).send({
+      message: 'Successfully signed up',
+      results: userData,
+      statusCode: HttpStatus.CREATED,
+    });
   }
 
   @Post('signin')
-  signInUser(
+  async signInUser(
     @Body(new ValidationPipe()) signInDto: signInUserDto,
     @Req() req: IRequest,
     @Res() res: Response,
   ) {
-    const authService = new AuthService(req, res);
-    return authService.signInUser(signInDto);
+    const [userData, userJwt] = await this.authService.signInUser(signInDto);
+    req.session = { jwt: userJwt };
+    return res.status(HttpStatus.CREATED).send({
+      message: 'Successfully logged in',
+      results: userData,
+      statusCode: HttpStatus.CREATED,
+    });
   }
 
   @Post('logout')
   logOutUser(@Req() req: IRequest, @Res() res: Response) {
-    const authService = new AuthService(req, res);
-    return authService.signOutUser();
+    req.session = null;
+    return res
+      .status(HttpStatus.OK)
+      .send({ message: 'Successfully signed out', statusCode: HttpStatus.OK });
   }
 
   @Get('currentuser')
-  getCurrentUser(@User() user: any) {
-    return this.authService.getCurrentUser(user);
+  getCurrentUser(@User() user: any, @Res() res: Response) {
+    const userInfo = user ? { currentUser: user } : { currentUser: null };
+    return res.status(HttpStatus.OK).send(userInfo);
   }
 }

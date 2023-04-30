@@ -1,19 +1,11 @@
-import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
-import { Response } from 'express';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import jwt from 'jsonwebtoken';
-import { IRequest } from 'src/handling/request';
 import { User } from 'src/models/users.model';
 import { signUpUserDto } from './auth.dto';
 import { PasswordManager } from './password-manager';
 
 @Injectable()
 export class AuthService {
-  req: IRequest;
-  res: Response;
-  constructor(req: IRequest, res: Response) {
-    this.req = req;
-    this.res = res;
-  }
   async signUpUser(signUpDto: signUpUserDto) {
     const { email, password } = signUpDto;
     const existingUser = await User.findOne({ email });
@@ -31,12 +23,7 @@ export class AuthService {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       process.env.JWT_TOKEN!,
     );
-    this.req.session = { jwt: userJwt };
-    return this.res.status(HttpStatus.CREATED).send({
-      message: 'Successfully created',
-      results: createdUser,
-      statusCode: HttpStatus.CREATED,
-    });
+    return [createdUser, userJwt];
   }
 
   async signInUser(signInDto: signUpUserDto) {
@@ -61,19 +48,6 @@ export class AuthService {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       process.env.JWT_TOKEN!,
     );
-    this.req.session = { jwt: userJwt };
-    return this.res.status(HttpStatus.CREATED).send(existingUser);
-  }
-
-  async signOutUser() {
-    this.req.session = null;
-    return this.res
-      .status(HttpStatus.OK)
-      .send({ message: 'Successfully signed out', statusCode: HttpStatus.OK });
-  }
-
-  async getCurrentUser(user: any) {
-    const userInfo = user ? { currentUser: user } : { currentUser: null };
-    return this.res.status(HttpStatus.OK).send(userInfo);
+    return [existingUser, userJwt];
   }
 }
