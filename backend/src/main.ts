@@ -1,9 +1,9 @@
-import { HttpAdapterHost, NestFactory } from '@nestjs/core';
+import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import * as cookieSession from 'cookie-session';
+import * as cookieParser from 'cookie-parser';
 import { urlencoded } from 'express';
+import * as session from 'express-session';
 import mongoose from 'mongoose';
-import { AllExceptionsFilter } from '../redifood-module/src/handling-nestjs/catch-all.exception';
 import { AppModule } from './app.module';
 import { pool } from './pool.pg';
 import { verifyKeys } from './verifykeys';
@@ -19,15 +19,26 @@ async function bootstrap() {
     }),
   );
   app.set('trust proxy', true);
+
   app.use(
-    cookieSession({
+    session({
+      secret: process.env.SESSION_SECRET,
+      resave: false,
+      saveUninitialized: false,
       signed: false,
-      secure: process.env.NODE_ENV !== 'test',
+      cookie: {
+        sameSite: false,
+        secure: false,
+        // secure: process.env.NODE_ENV === 'production',
+        maxAge: 200000000,
+        httpOnly: true,
+      },
     }),
+    cookieParser(),
   );
 
   // Catch issues for all routes
-  app.useGlobalFilters(new AllExceptionsFilter(app.get(HttpAdapterHost)));
+  // app.useGlobalFilters(new AllExceptionsFilter(app.get(HttpAdapterHost)));
   try {
     await pool.connect({
       user: process.env.POSTGRES_USER,
@@ -38,9 +49,12 @@ async function bootstrap() {
     });
 
     await mongoose.connect(process.env.MONGO_URI);
+    console.log('Connected to MongoDB');
+    console.log('Listening on port 3000');
     await app.listen(3000);
   } catch (err) {
     console.log(err);
   }
 }
+
 bootstrap();
