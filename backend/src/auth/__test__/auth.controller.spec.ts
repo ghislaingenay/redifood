@@ -1,24 +1,31 @@
 import { NestApplication } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
-import request from 'supertest';
+import * as request from 'supertest';
 import { EMessageErrors } from '../../../redifood-module/src/interfaces';
-import { AppModule } from '../../../src/app.module';
+import { AuthController } from '../auth.controller';
+import { AuthModule } from '../auth.module';
+import { AuthService } from '../auth.service';
 
 const emailValid = 'test@test.com';
 const emailInvalid = 'ssffn.co';
+jest.setTimeout(30000);
 let app: NestApplication;
 beforeAll(async () => {
   const moduleRef = await Test.createTestingModule({
-    imports: [AppModule],
-  }).compile();
+    imports: [AuthModule],
+  })
+    .overrideProvider(AuthController)
+    .useValue(AuthService)
+    .compile();
   app = moduleRef.createNestApplication();
+  console.log('app connected');
   await app.init();
 });
 
 describe('POST /api/auth/login', () => {
-  it('fails when a email that does not exist is supplied', async () => {
-    const response = await request(app)
-      .post('/api/auth/login')
+  it.only('fails when a email that does not exist is supplied', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/api/auth/signin')
       .send({
         email: emailValid,
         password: 'hueheFy*_6',

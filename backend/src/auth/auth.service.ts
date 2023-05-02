@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
-import { User } from 'src/models/users.model';
+import { User } from '../models/users.model';
 import { signUpUserDto } from './auth.dto';
 import { PasswordManager } from './password-manager';
 

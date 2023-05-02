@@ -9,7 +9,7 @@ build:
     push: false
   artifacts:
     - image: ghislaingenay/redifood-backend
-      context: upload
+      context: backend
       docker:
         dockerfile: Dockerfile
       sync:

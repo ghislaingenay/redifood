@@ -1,7 +1,7 @@
 import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
 import mongoose from 'mongoose';
-import { DatabaseError } from 'redifood-module/src/handling-nestjs/database-error.exception';
 import { IGetServerSideData } from 'redifood-module/src/interfaces';
+import { DatabaseError } from '../../redifood-module/src/handling-nestjs/database-error.exception';
 import { Setting } from '../../src/models/settings.model';
 import { createSettingsDto, updateSettingsDto } from './settings.dto';
 

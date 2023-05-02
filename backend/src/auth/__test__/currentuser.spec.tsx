@@ -1,5 +1,16 @@
+import { NestApplication } from '@nestjs/core';
+import { Test } from '@nestjs/testing';
 import request from 'supertest';
-import { app } from '../../app';
+import { AppModule } from '../../app.module';
+
+let app: NestApplication;
+beforeAll(async () => {
+  const moduleRef = await Test.createTestingModule({
+    imports: [AppModule],
+  }).compile();
+  app = moduleRef.createNestApplication();
+  await app.init();
+});
 
 describe('GET /api/users/currentuser', () => {
   it('responds with details about the current user', async () => {
