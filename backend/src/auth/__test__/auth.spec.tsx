@@ -1,11 +1,12 @@
+import { NestApplication } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
-import { EMessageErrors } from '../../../../auth/redifood-module/src/interfaces';
-import { app } from '../../../../auth/src/app';
+import { EMessageErrors } from '../../../redifood-module/src/interfaces';
 import { AppModule } from '../../../src/app.module';
 
 const emailValid = 'test@test.com';
 const emailInvalid = 'ssffn.co';
+let app: NestApplication;
 beforeAll(async () => {
   const moduleRef = await Test.createTestingModule({
     imports: [AppModule],

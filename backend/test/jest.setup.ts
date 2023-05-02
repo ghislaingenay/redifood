@@ -1,21 +1,33 @@
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import mongoose from 'mongoose';
-import request from 'supertest';
+import * as mongoose from 'mongoose';
+import * as request from 'supertest';
 
-import { app } from '../app';
+import { NestApplication } from '@nestjs/core';
+import { Test } from '@nestjs/testing';
+import { AppModule } from '../src/app.module';
+import { pool } from './__mocks__/pool.pg';
 
 declare global {
   // eslint-disable-next-line no-var
   var signin: () => Promise<string[]>;
 }
 
+jest.mock('./__mocks__/postgres.db');
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let mongo: any;
+let app: NestApplication;
 // Hooks that run before evry test
 beforeAll(async () => {
+  const moduleRef = await Test.createTestingModule({
+    imports: [AppModule],
+  }).compile();
+  app = moduleRef.createNestApplication();
+  await app.init();
   process.env.JWT_TOKEN = 'innscnioop57';
   mongo = await MongoMemoryServer.create();
   const mongoUri = mongo.getUri();
+
+  await pool.connect();
 
   await mongoose.connect(mongoUri, {});
 });
@@ -31,6 +43,7 @@ afterAll(async () => {
   if (mongo) {
     await mongo.stop();
   }
+  await pool.close();
   await mongoose.connection.close();
 });
 
