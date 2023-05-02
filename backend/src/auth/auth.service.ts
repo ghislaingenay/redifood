@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import jwt from 'jsonwebtoken';
+import * as jwt from 'jsonwebtoken';
 import { User } from 'src/models/users.model';
 import { signUpUserDto } from './auth.dto';
 import { PasswordManager } from './password-manager';
@@ -32,6 +32,7 @@ export class AuthService {
     if (!existingUser) {
       throw new BadRequestException('Invalid credentials');
     }
+    console.log('existing user', existingUser);
     const passwordsMatch = await PasswordManager.compare(
       existingUser.password,
       password,

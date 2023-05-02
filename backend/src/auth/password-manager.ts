@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 // import { randomBytes } from "crypto";
 
 export class PasswordManager {
