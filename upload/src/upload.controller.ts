@@ -3,7 +3,6 @@ import { EventPattern } from '@nestjs/microservices';
 import { ETopics } from 'redifood-module/src/interfaces';
 import {
   PhotoCreatedEvent,
-  PhotoDeletedEvent,
   PhotoUpdatedEvent,
 } from '../redifood-module/src/events/picture/picture-class.event';
 import { UploadService } from './upload.service';
@@ -22,8 +21,8 @@ export class UploadController {
     return await this.uploadService.handleUpdatePhoto(data);
   }
 
-  @EventPattern(ETopics.PICTURE_DELETED)
-  async handleDeletePhoto(data: PhotoDeletedEvent) {
-    return await this.uploadService.handleDeletePhoto(data);
-  }
+  // @EventPattern(ETopics.PICTURE_DELETED)
+  // async handleDeletePhoto(data: PhotoDeletedEvent) {
+  //   return await this.uploadService.handleDeletePhoto(data);
+  // }
 }

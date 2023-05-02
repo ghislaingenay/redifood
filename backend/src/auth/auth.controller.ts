@@ -41,11 +41,7 @@ export class AuthController {
   ) {
     const [userData, userJwt] = await this.authService.signInUser(signInDto);
     req.session = { jwt: userJwt };
-    return res.status(HttpStatus.CREATED).send({
-      message: 'Successfully logged in',
-      results: userData,
-      statusCode: HttpStatus.CREATED,
-    });
+    res.status(HttpStatus.CREATED).send(userData);
   }
 
   @Post('logout')
