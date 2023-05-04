@@ -9,42 +9,59 @@ import {
   Length,
 } from 'class-validator';
 
-export class SectionApiDto {
-  // id: number
-
-  // @IsInt()
-  // @IsNotEmpty()
-  // @IsPositive()
-  // section_order: number;
-
+// SECTION //////////////
+export class CreateSectionDto {
   @IsNotEmpty()
   @IsString()
   @IsLowercase()
   @Length(3, 30)
   sectionName: string;
 
-  // @IsString()
-  // @Length(0, 50)
+  @IsString()
+  @Length(0, 50)
   sectionDescription?: string;
 }
 
-export class ExtraApiDto {
+export class UpdateSectionDto extends CreateSectionDto {
+  @IsInt()
+  @IsNotEmpty()
+  id: number;
+
+  @IsInt()
+  @IsNotEmpty()
+  @IsPositive()
+  sectionOrder: number;
+}
+
+// EXTRA ///////////////
+export class CreateExtraDto {
   @IsNotEmpty()
   @Length(3, 30)
   @IsLowercase()
   @IsString()
   extraName: string;
 
-  // @IsString()
+  @IsString()
+  @Length(0, 50)
   extraDescription?: string;
 
   @IsInt()
   sectionId: number;
 }
 
-export class FoodApiDto {
-  id?: number;
+export class UpdateExtraDto extends CreateExtraDto {
+  @IsInt()
+  @IsNotEmpty()
+  id: number;
 
+  @IsInt()
+  @IsNotEmpty()
+  @IsPositive()
+  extraOrder: number;
+}
+
+// FOOD //////////////
+export class CreateFoodDto {
   @IsString()
   @IsNotEmpty()
   @Length(2, 20)
@@ -77,4 +94,10 @@ export class FoodApiDto {
   @IsInt()
   @IsNotEmpty()
   itemQuantity: number;
+}
+
+export class updateFoodDto extends CreateFoodDto {
+  @IsInt()
+  @IsNotEmpty()
+  id: number;
 }
