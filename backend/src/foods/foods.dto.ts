@@ -1,4 +1,5 @@
 import {
+  IsBase64,
   IsInt,
   IsLowercase,
   IsNotEmpty,
@@ -68,9 +69,12 @@ export class CreateFoodDto {
   itemName: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsBase64()
+  base64Img?: string;
+
+  @IsString()
   @IsUrl()
-  itemPhoto: string;
+  itemPhoto?: string;
 
   @IsNumber()
   @IsPositive()
@@ -90,13 +94,9 @@ export class CreateFoodDto {
   extraId: number;
 
   itemCreated?: Date;
-
-  @IsInt()
-  @IsNotEmpty()
-  itemQuantity: number;
 }
 
-export class updateFoodDto extends CreateFoodDto {
+export class UpdateFoodDto extends CreateFoodDto {
   @IsInt()
   @IsNotEmpty()
   id: number;
