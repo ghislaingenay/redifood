@@ -5,7 +5,6 @@ const ObjectId = mongoose.Schema.Types.ObjectId;
 
 export interface SettingsAttrs {
   user: UserDoc | string;
-  haveFoodDescription: boolean;
   haveFoodImage: boolean;
   vat: number;
   currency: ECurrency;
@@ -14,7 +13,6 @@ export interface SettingsAttrs {
 
 export interface SettingsDoc extends mongoose.Document {
   user: UserDoc;
-  haveFoodDescription: boolean;
   haveFoodImage: boolean;
   vat: number;
   currency: ECurrency;
@@ -31,10 +29,6 @@ const settingsSchema = new mongoose.Schema(
     user: {
       type: ObjectId,
       ref: 'users',
-      required: true,
-    },
-    haveFoodDescription: {
-      type: Boolean,
       required: true,
     },
     haveFoodImage: {

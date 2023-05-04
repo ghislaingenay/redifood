@@ -44,7 +44,6 @@ export class SettingsService {
         const newSettings = Setting.build({
           user: userId,
           language: body.language,
-          haveFoodDescription: body.haveFoodDescription,
           currency: body.currency,
           haveFoodImage: body.haveFoodImage,
           vat: body.vat,

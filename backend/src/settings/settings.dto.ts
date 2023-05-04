@@ -23,10 +23,6 @@ export class createSettingsDto {
 
   @IsNotEmpty()
   @IsBoolean()
-  haveFoodDescription: boolean;
-
-  @IsNotEmpty()
-  @IsBoolean()
   haveFoodImage: boolean;
 }
 
