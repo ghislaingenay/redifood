@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import { IGetServerSideData } from 'redifood-module/src/interfaces';
 import { DatabaseError } from '../../redifood-module/src/handling-nestjs/database-error.exception';
 import { Setting } from '../../src/models/settings.model';
-import { createSettingsDto, updateSettingsDto } from './settings.dto';
+import { CreateSettingsDto, UpdateSettingsDto } from './settings.dto';
 
 @Injectable()
 export class SettingsService {
@@ -35,7 +35,7 @@ export class SettingsService {
     });
   }
 
-  async createSettings(body: createSettingsDto, userId: string) {
+  async createSettings(body: CreateSettingsDto, userId: string) {
     return await new Promise((resolve, reject) => {
       try {
         if (!body) throw new BadRequestException('No body provided');
@@ -69,7 +69,7 @@ export class SettingsService {
     });
   }
 
-  async updateSettings(body: updateSettingsDto, userId: string) {
+  async updateSettings(body: UpdateSettingsDto, userId: string) {
     return await new Promise((resolve, reject) => {
       try {
         if (!body) throw new BadRequestException('No body provided');
