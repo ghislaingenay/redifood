@@ -14,7 +14,12 @@ import { AuthGuard } from 'redifood-module/src/handling-nestjs/auth-guard';
 import { User } from 'src/auth/user-decorator';
 import { ValidationPipe } from '../../redifood-module/src/handling-nestjs/validation.pipe';
 import { TUser } from '../../redifood-module/src/interfaces';
-import { ExtraApiDto, FoodApiDto, SectionApiDto } from './foods.dto';
+import {
+  CreateExtraDto,
+  CreateFoodDto,
+  CreateSectionDto,
+  UpdateFoodDto,
+} from './foods.dto';
 import { FoodService } from './foods.service';
 
 @Controller('api/foods')
@@ -42,7 +47,7 @@ export class FoodController {
   @UseGuards(new AuthGuard())
   @Post('section')
   async createSection(
-    @Body(new ValidationPipe()) sectionDto: SectionApiDto,
+    @Body(new ValidationPipe()) sectionDto: CreateSectionDto,
     @User() userInfo: TUser,
   ) {
     console.log('user info', userInfo);
@@ -51,13 +56,13 @@ export class FoodController {
 
   @UseGuards(new AuthGuard())
   @Post('extra')
-  async createExtra(@Body(new ValidationPipe()) extraDto: ExtraApiDto) {
+  async createExtra(@Body(new ValidationPipe()) extraDto: CreateExtraDto) {
     return await this.foodService.createExtra(extraDto);
   }
 
   @UseGuards(new AuthGuard())
   @Post()
-  async createFood(@Body(new ValidationPipe()) foodDto: FoodApiDto) {
+  async createFood(@Body(new ValidationPipe()) foodDto: CreateFoodDto) {
     return await this.foodService.createFood(foodDto);
   }
 
@@ -69,7 +74,7 @@ export class FoodController {
       new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
     )
     id: number,
-    @Body(new ValidationPipe()) foodDto: FoodApiDto,
+    @Body(new ValidationPipe()) foodDto: UpdateFoodDto,
   ) {
     return await this.foodService.updateFood(foodDto, id);
   }

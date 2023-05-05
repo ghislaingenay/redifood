@@ -3,9 +3,9 @@ import {
   IFoodGetApi,
   ISectionFoodApi,
 } from 'redifood-module/src/interfaces';
+import { DatabaseError } from '../../redifood-module/src/handling-nestjs/database-error.exception';
+import { pool } from '../../src/pool.pg';
 import { convertKeys } from './global.function';
-import { DatabaseError } from './handling/database-error.exception';
-import { pool } from './pool.pg';
 
 class Foods {
   private static convertFoodResponseToFoodGet = (food: any): IFoodGetApi => {
