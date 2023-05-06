@@ -1,12 +1,10 @@
 import {
-  IsBase64,
   IsInt,
   IsLowercase,
   IsNotEmpty,
   IsNumber,
   IsPositive,
   IsString,
-  IsUrl,
   Length,
 } from 'class-validator';
 
@@ -18,9 +16,9 @@ export class CreateSectionDto {
   @Length(3, 30)
   sectionName: string;
 
-  @IsString()
-  @Length(0, 50)
-  sectionDescription?: string;
+  // @IsString()
+  // @Length(0, 50)
+  // sectionDescription?: string;
 }
 
 export class UpdateSectionDto extends CreateSectionDto {
@@ -42,9 +40,9 @@ export class CreateExtraDto {
   @IsString()
   extraName: string;
 
-  @IsString()
-  @Length(0, 50)
-  extraDescription?: string;
+  // @IsString()
+  // @Length(0, 50)
+  // extraDescription?: string;
 
   @IsInt()
   sectionId: number;
@@ -69,11 +67,8 @@ export class CreateFoodDto {
   itemName: string;
 
   @IsString()
-  @IsBase64()
-  base64Img?: string;
-
-  @IsString()
-  @IsUrl()
+  // @IsUrl()
+  //@IsBase64()
   itemPhoto?: string;
 
   @IsNumber()
