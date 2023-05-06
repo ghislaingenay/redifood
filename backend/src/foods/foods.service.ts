@@ -89,9 +89,6 @@ export class FoodService {
   }
 
   async createFood(body: CreateFoodDto) {
-    const bodyData = { ...body };
-    const url = await this.handleCreatePicture(bodyData.itemPhoto);
-    bodyData.itemPhoto = url;
     const updatedData = convertKeys(body, 'apiToDb');
     const postgresQuery = createQuery(updatedData, 'foods');
     const response = await Foods.createRows(postgresQuery);
@@ -106,9 +103,6 @@ export class FoodService {
   }
 
   async updateFood(body: UpdateFoodDto, id: number) {
-    const bodyData = { ...body };
-    const url = await this.handleCreatePicture(bodyData.itemPhoto);
-    bodyData.itemPhoto = url;
     const postgresQuery = updateQuery(convertKeys(body, 'apiToDb'), 'foods');
     console.log('postgresQuery', postgresQuery);
     const response = await Foods.updateRow(postgresQuery, id);
@@ -172,8 +166,11 @@ export class FoodService {
 
     // Initialize the form data for the picture
     try {
+      const dataBase64 = base64.split(';base64,').pop();
+      // data:image/png;base64,......
       const formData = new FormData();
-      const buff = Buffer.from(base64, 'base64').toString();
+      const buff = Buffer.from(dataBase64, 'base64').toString();
+      console.log('buff', buff);
       formData.append('file', buff);
       formData.append('upload_preset', String(process.env.UPLOAD_PRESET));
       const response = await axios.post(

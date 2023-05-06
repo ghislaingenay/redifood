@@ -5,6 +5,7 @@ import {
   IsNumber,
   IsPositive,
   IsString,
+  IsUrl,
   Length,
 } from 'class-validator';
 
@@ -67,9 +68,8 @@ export class CreateFoodDto {
   itemName: string;
 
   @IsString()
-  // @IsUrl()
-  //@IsBase64()
-  itemPhoto?: string;
+  @IsUrl()
+  itemPhoto: string;
 
   @IsNumber()
   @IsPositive()

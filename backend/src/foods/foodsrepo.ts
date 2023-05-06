@@ -8,7 +8,7 @@ import { pool } from '../../src/pool.pg';
 import { convertKeys } from './global.function';
 
 class Foods {
-  private static convertFoodResponseToFoodGet = (food: any): IFoodGetApi => {
+  private static formatFood = (food: any): IFoodGetApi => {
     return {
       id: food.id,
       itemName: food.item_name,
@@ -36,7 +36,7 @@ class Foods {
     }
 
     const updatedResponse: IFoodGetApi[] = response.map((item: any) => {
-      return this.convertFoodResponseToFoodGet(item);
+      return this.formatFood(item);
     });
     return updatedResponse;
   }
@@ -46,7 +46,7 @@ class Foods {
       await pool.query(`${this.find_foods_query} WHERE f.section_id = $1`, [id])
     ).rows;
     const updatedResponse = response.map((item: any) => {
-      return this.convertFoodResponseToFoodGet(item);
+      return this.formatFood(item);
     });
     return updatedResponse;
   }
