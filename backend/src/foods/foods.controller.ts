@@ -10,10 +10,10 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from 'redifood-module/src/handling-nestjs/auth-guard';
 import { User } from 'src/auth/user-decorator';
 import { ValidationPipe } from '../../redifood-module/src/handling-nestjs/validation.pipe';
 import { TUser } from '../../redifood-module/src/interfaces';
+import { AuthGuard } from '../../src/global/auth-guard';
 import {
   CreateExtraDto,
   CreateFoodDto,

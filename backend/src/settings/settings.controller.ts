@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post, Put, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '../../redifood-module/src/handling-nestjs/auth-guard';
 import { User } from '../../redifood-module/src/handling-nestjs/user-decorator';
 import { ValidationPipe } from '../../redifood-module/src/handling-nestjs/validation.pipe';
+import { AuthGuard } from '../global/auth-guard';
 import { CreateSettingsDto, UpdateSettingsDto } from './settings.dto';
 import { SettingsService } from './settings.service';
 

@@ -1,16 +1,10 @@
 import { Module } from '@nestjs/common';
-// import { APP_GUARD } from '@nestjs/core';
-// import { AuthGuard } from '../../redifood-module/src/handling-nestjs/auth-guard';
+import { ConfigModule } from '@nestjs/config';
 import { SettingsController } from './settings.controller';
 import { SettingsService } from './settings.service';
 @Module({
+  imports: [ConfigModule.forRoot({ isGlobal: true })],
   controllers: [SettingsController],
-  providers: [
-    SettingsService,
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: AuthGuard,
-    // },
-  ],
+  providers: [SettingsService],
 })
 export class SettingsModule {}
