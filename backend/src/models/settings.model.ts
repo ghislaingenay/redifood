@@ -30,6 +30,7 @@ const settingsSchema = new mongoose.Schema(
       type: ObjectId,
       ref: 'users',
       required: true,
+      unique: true,
     },
     haveFoodImage: {
       type: Boolean,

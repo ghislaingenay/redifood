@@ -30,5 +30,5 @@ export class CreateSettingsDto {
 export class UpdateSettingsDto extends CreateSettingsDto {
   @IsNotEmpty()
   @IsString()
-  _id: string;
+  id: string;
 }

@@ -10,93 +10,89 @@ export class SettingsService {
   async getSettings(
     userId: mongoose.Types.ObjectId,
   ): Promise<IGetServerSideData<any>> {
-    return await new Promise((resolve, reject) => {
-      try {
-        if (!userId) throw new BadRequestException('No user id provided');
+    try {
+      if (!userId) throw new BadRequestException('No user id provided');
 
-        const settings = Setting.findById(userId);
-        if (!settings) throw new DatabaseError();
-        resolve({ results: settings, message: 'Settings retrieved' });
-      } catch (err) {
-        if (err instanceof BadRequestException) {
-          reject({
-            results: {},
-            message: err.message,
-            statusCode: HttpStatus.BAD_REQUEST,
-          });
-        } else {
-          reject({
-            results: {},
-            message: err.message,
-            statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-          });
-        }
+      const settings = await Setting.findOne({ user: userId });
+      return { results: settings || {}, message: 'Settings retrieved' };
+    } catch (err) {
+      if (err instanceof BadRequestException) {
+        return {
+          results: {},
+          message: err.message,
+          statusCode: HttpStatus.BAD_REQUEST,
+        };
+      } else {
+        return {
+          results: {},
+          message: 'Error retrieving settings',
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        };
       }
-    });
+    }
   }
 
   async createSettings(body: CreateSettingsDto, userId: string) {
-    return await new Promise((resolve, reject) => {
-      try {
-        if (!body) throw new BadRequestException('No body provided');
-        if (!userId) throw new BadRequestException('No user id provided');
+    try {
+      if (!body) throw new BadRequestException('No body provided');
+      if (!userId) throw new BadRequestException('No user id provided');
 
-        const newSettings = Setting.build({
-          user: userId,
-          language: body.language,
-          currency: body.currency,
-          haveFoodImage: body.haveFoodImage,
-          vat: body.vat,
-        });
-        const savedSettings = newSettings.save();
-        if (!savedSettings) throw new DatabaseError();
-        resolve({ results: savedSettings, message: 'Settings created' });
-      } catch (err) {
-        if (err instanceof BadRequestException) {
-          reject({
-            results: {},
-            message: err.message,
-            statusCode: HttpStatus.BAD_REQUEST,
-          });
-        } else {
-          reject({
-            results: {},
-            message: err.message,
-            statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-          });
-        }
+      const newSettings = Setting.build({
+        user: userId,
+        language: body.language,
+        currency: body.currency,
+        haveFoodImage: body.haveFoodImage,
+        vat: body.vat,
+      });
+      const savedSettings = await newSettings.save();
+      if (!savedSettings) throw new DatabaseError();
+      return { results: savedSettings, message: 'Settings created' };
+    } catch (err) {
+      if (err instanceof BadRequestException) {
+        return {
+          results: {},
+          message: err.message,
+          statusCode: HttpStatus.BAD_REQUEST,
+        };
+      } else {
+        return {
+          results: {},
+          message: 'Settings already exist',
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        };
       }
-    });
+    }
   }
 
   async updateSettings(body: UpdateSettingsDto, userId: string) {
-    return await new Promise((resolve, reject) => {
-      try {
-        if (!body) throw new BadRequestException('No body provided');
-        if (!userId) throw new BadRequestException('No user id provided');
+    try {
+      if (!body) throw new BadRequestException('No body provided');
+      if (!userId) throw new BadRequestException('No user id provided');
 
-        const savedSettings = Setting.findByIdAndUpdate(userId, body);
-        if (!savedSettings) throw new DatabaseError();
-        resolve({
-          results: savedSettings,
-          message: 'Settings updated',
-          statusCode: HttpStatus.OK,
-        });
-      } catch (err) {
-        if (err instanceof BadRequestException) {
-          reject({
-            results: {},
-            message: err.message,
-            statusCode: HttpStatus.BAD_REQUEST,
-          });
-        } else {
-          reject({
-            results: {},
-            message: err.message,
-            statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-          });
-        }
+      const savedSettings = await Setting.findOneAndUpdate(
+        { user: userId },
+        body,
+      );
+      if (!savedSettings) throw new DatabaseError();
+      return {
+        results: body,
+        message: 'Settings updated',
+        statusCode: HttpStatus.OK,
+      };
+    } catch (err) {
+      if (err instanceof BadRequestException) {
+        return {
+          results: {},
+          message: err.message,
+          statusCode: HttpStatus.BAD_REQUEST,
+        };
+      } else {
+        return {
+          results: {},
+          message: err.message,
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        };
       }
-    });
+    }
   }
 }
