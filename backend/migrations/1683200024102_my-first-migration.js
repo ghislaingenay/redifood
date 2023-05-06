@@ -29,7 +29,24 @@ exports.up = (pgm) => {
     section_id INTEGER REFERENCES food_section(id),
     extra_id INTEGER REFERENCES food_extra(id),
     item_quantity SMALLINT NOT NULL DEFAULT 0
-  )`);
+  )
+
+  CREATE TABLE orders (
+    id SERIAL PRIMARY KEY,
+    order_created DATE NOT NULL DEFAULT NOW(),
+    order_time INT NOT NULL DEFAULT 0,
+    order_total NUMERIC NOT NULL CHECK (order_total > 0),
+    user_id INTEGER REFERENCES users(id)
+    );
+
+  CREATE TABLE order_items (
+    id SERIAL PRIMARY KEY,
+    order_id INTEGER REFERENCES orders(id),
+    food_id INTEGER REFERENCES foods(id),
+    order_item_status VARCHAR(20) NOT NULL,
+    order_item_quantity SMALLINT NOT NULL DEFAULT 0,
+    order_item_price NUMERIC NOT NULL CHECK (order_item_price > 0)
+  `);
 };
 
 exports.down = (pgm) => {
@@ -37,6 +54,7 @@ exports.down = (pgm) => {
   DROP TABLE foods;
   DROP TABLE food_extra;
   DROP TABLE food_section;
-  
+  DROP TABLE orders;
+  DROP TABLE order_items;
   `);
 };
