@@ -2,7 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as cookieParser from 'cookie-parser';
 import { urlencoded } from 'express';
-import * as session from 'express-session';
+// import * as session from 'express-session';
+import * as cookieSession from 'cookie-session';
 import mongoose from 'mongoose';
 import { AppModule } from './app.module';
 import { pool } from './pool.pg';
@@ -21,18 +22,22 @@ async function bootstrap() {
   app.set('trust proxy', true);
 
   app.use(
-    session({
-      secret: process.env.SESSION_SECRET,
-      resave: false,
-      saveUninitialized: false,
+    // session({
+    //   secret: process.env.SESSION_SECRET,
+    //   resave: false,
+    //   saveUninitialized: false,
+    //   signed: false,
+    //   cookie: {
+    //     sameSite: 'lax',
+    //     secure: false,
+    //     // secure: process.env.NODE_ENV === 'production',
+    //     maxAge: 200000000,
+    //     httpOnly: true,
+    //   },
+    // }),
+    cookieSession({
       signed: false,
-      cookie: {
-        sameSite: false,
-        secure: false,
-        // secure: process.env.NODE_ENV === 'production',
-        maxAge: 200000000,
-        httpOnly: true,
-      },
+      secure: false,
     }),
     cookieParser(),
   );

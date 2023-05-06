@@ -25,7 +25,8 @@ export class AuthController {
     @Res() res: Response,
   ) {
     const [userData, userJwt] = await this.authService.signUpUser(signUpDto);
-    req.session.jwt = userJwt;
+    // req.session.jwt = userJwt;
+    req.session = { jwt: userJwt };
     return res.status(HttpStatus.CREATED).send({
       message: 'Successfully signed up',
       results: userData,
@@ -40,18 +41,20 @@ export class AuthController {
     @Res() res: Response,
   ) {
     const [userData, userJwt] = await this.authService.signInUser(signInDto);
-    req.session.jwt = userJwt;
+    req.session = { jwt: userJwt };
+    // req.session.jwt = userJwt;
     return res.status(HttpStatus.CREATED).send(userData);
   }
 
   @Post('signout')
   logOutUser(@Req() req: IRequest, @Res() res: Response) {
-    req.session.destroy((err: any) => {
-      if (err) {
-        console.log('error destroying session', err);
-      }
-    });
-    res.clearCookie('connect.sid');
+    // req.session.destroy((err: any) => {
+    //   if (err) {
+    //     console.log('error destroying session', err);
+    //   }
+    // });
+    // res.clearCookie('connect.sid');
+    req.session = null;
     res
       .status(HttpStatus.OK)
       .send({ message: 'Successfully signed out', statusCode: HttpStatus.OK });
@@ -59,7 +62,6 @@ export class AuthController {
 
   @Get('currentuser')
   getCurrentUser(@User() user: any, @Res() res: Response) {
-    console.log('user', user);
     const userInfo = user ? { currentUser: user } : { currentUser: null };
     return res.status(HttpStatus.OK).send(userInfo);
   }
