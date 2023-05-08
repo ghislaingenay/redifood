@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpStatus,
   Param,
@@ -9,10 +10,20 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { TOrderType, UserPayload } from '../../redifood-module/src/interfaces';
+import {
+  EPaymentType,
+  TOrderType,
+  UserPayload,
+} from '../../redifood-module/src/interfaces';
 import { User } from '../../src/auth/user-decorator';
 import { AuthGuard } from '../../src/global/auth-guard';
 import { ValidationPipe } from '../../src/global/validation.pipe';
+import {
+  AwaitPaymenDto,
+  CreateOrderDto,
+  ReceiptBodyDto,
+  UpdateOrderDto,
+} from './orders.dto';
 import { OrdersService } from './orders.service';
 
 @Controller('api/orders')
@@ -63,15 +74,69 @@ export class OrdersController {
   @UseGuards(new AuthGuard())
   @Post()
   async createOrder(
-    @Body(new ValidationPipe()) createOrderDto: any,
+    @Body(new ValidationPipe()) createOrderDto: CreateOrderDto,
     @User() user: UserPayload,
   ) {
     // get order tot and set it to the order
     return await this.ordersService.createOrder(createOrderDto, user.id);
   }
-  // get one order by user id
-  // create order => dto, then get global price and separate each order item and set it after order is created. create function to get order id (getOrderCoiunt)
-  // create order Item db based on the order*
+
+  @UseGuards(new AuthGuard())
+  @Post(':id')
+  async awaitPayment(
+    @Param(
+      'id',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    @Query('paymentType')
+    paymentType: EPaymentType,
+    orderId: number,
+    @User() user: UserPayload,
+  ) {
+    const body: AwaitPaymenDto = {
+      orderId,
+      userId: user.id,
+      paymentType,
+    };
+    return await this.ordersService.awaitPayment(body);
+  }
+
+  @UseGuards(new AuthGuard())
+  @Post('receipt/:id')
+  async sendReceipt(
+    @Param(
+      'id',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    orderId: number,
+    @Body(new ValidationPipe()) sendReceiptDto: ReceiptBodyDto,
+  ) {
+    return await this.ordersService.sendReceipt(sendReceiptDto, orderId);
+  }
+
+  async updateOrder(
+    @Param(
+      'id',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    id: number,
+    @Body(new ValidationPipe()) updateOrderDto: UpdateOrderDto,
+  ) {
+    return await this.ordersService.updateOrder(id, updateOrderDto);
+  }
+
+  @UseGuards(new AuthGuard())
+  @Delete(':id')
+  async cancelOrder(
+    @Param(
+      'id',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    id: number,
+  ) {
+    return await this.ordersService.cancelOrder(id);
+  }
+
   // update order and update order item // send back the menu
   // cancel order apin and update order item
   // add await payment api

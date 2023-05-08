@@ -17,7 +17,7 @@ import { pool } from '../pool.pg';
 
 interface IMenuId {
   orderId: number;
-  userId: number;
+  userId: string;
 }
 
 class Orders {
@@ -112,14 +112,15 @@ class Orders {
     return convertKeys(orderDB.rows[0], 'dbToApi') as IOrderApi;
   }
 
-  static async createOrder(body: IOrderApi) {
+  static async createOrder(
+    body: Omit<IOrderApi, 'orderFinished' | 'orderCreatedDate'>,
+  ) {
     // use createQuery function
     const response = await pool.query(
-      `INSERT INTO orders (order_no, order_status, order_created_date, table_number, order_total, order_items, user_id) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      `INSERT INTO orders (order_no, order_status, order_table_number, order_total, order_items, user_id) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
       [
         body.orderNo,
         `'${body.orderStatus}'`,
-        `'${body.orderCreatedDate}'`,
         body.orderTableNumber,
         body.orderTotal,
         JSON.stringify(body.orderItems),
