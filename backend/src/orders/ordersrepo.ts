@@ -5,6 +5,7 @@ import {
   IOrderItemsApi,
   IOrderItemsDB,
   TOrderType,
+  UserPayload,
 } from 'redifood-module/src/interfaces';
 import {
   convertKeys,
@@ -30,6 +31,9 @@ class Orders {
       `SELECT * FROM order_items WHERE order_id = $1`,
       [orderId],
     );
+    if (!response) {
+      throw new DatabaseError();
+    }
     const updatedResponse: IOrderItemsApi[] = (
       response.rows as IOrderItemsDB[]
     ).map((item: IOrderItemsDB) => {
@@ -38,9 +42,26 @@ class Orders {
     return updatedResponse;
   }
 
+  static async findTable(): Promise<number[]> {
+    const response = (
+      await pool.query(
+        `SELECT order_table_number FROM orders WHERE order_status != 'completed' AND order_status != 'cancelled'`,
+      )
+    ).rows;
+    if (!response) {
+      throw new DatabaseError();
+    }
+    const updatedResponse: number[] = response.map(
+      ({ order_table_number }: { order_table_number: number }) => {
+        return order_table_number;
+      },
+    );
+    return updatedResponse;
+  }
+
   static async findAll(
     orderType: TOrderType,
-    userId: number,
+    userId: UserPayload['id'],
   ): Promise<IOrderApi[]> {
     let data: IOrderDB[] = [];
     if (orderType === 'ALL') {
@@ -81,7 +102,7 @@ class Orders {
     userId,
     orderId,
   }: {
-    userId: number;
+    userId: UserPayload['id'];
     orderId: number;
   }): Promise<IOrderApi> {
     const orderDB: { rows: IOrderDB[] } = pool.query(

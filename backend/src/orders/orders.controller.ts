@@ -44,6 +44,23 @@ export class OrdersController {
   }
 
   @UseGuards(new AuthGuard())
+  @Get('items/:id')
+  async getOrderItems(
+    @Param(
+      'id',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    id: number,
+  ) {
+    return await this.ordersService.getOrderItems(id);
+  }
+
+  @Get('table')
+  async getUnPaidOrdersTable() {
+    return await this.ordersService.getUnPaidOrdersTable();
+  }
+
+  @UseGuards(new AuthGuard())
   @Post()
   async createOrder(
     @Body(new ValidationPipe()) createOrderDto: any,
