@@ -1,9 +1,10 @@
+import { DatabaseError } from '../../redifood-module/src/handling-nestjs/database-error.exception';
 import {
   IExtraApi,
   IFoodGetApi,
   ISectionFoodApi,
-} from 'redifood-module/src/interfaces';
-import { DatabaseError } from '../../redifood-module/src/handling-nestjs/database-error.exception';
+  UserPayload,
+} from '../../redifood-module/src/interfaces';
 import { pool } from '../../src/pool.pg';
 import { convertKeys } from './global.function';
 
@@ -16,6 +17,7 @@ class Foods {
       itemDescription: food.item_description,
       itemPrice: food.item_price,
       itemQuantity: 0,
+      userId: food.user_id,
       itemExtra: {
         id: food.extra_id,
         extraName: food.extra_name,
@@ -28,8 +30,10 @@ class Foods {
   };
 
   private static find_foods_query = `SELECT * FROM foods as f INNER JOIN food_section ON food_section.id = f.section_id INNER JOIN food_extra ON f.extra_id = food_extra.id`;
-  static async findAll(): Promise<IFoodGetApi[]> {
-    const response = (await pool.query(this.find_foods_query)).rows;
+  static async findAll(userId: UserPayload['id']): Promise<IFoodGetApi[]> {
+    const response = (
+      await pool.query(`${this.find_foods_query} WHERE user_id = $1`, [userId])
+    ).rows;
 
     if (!response) {
       throw new DatabaseError();
@@ -41,9 +45,15 @@ class Foods {
     return updatedResponse;
   }
 
-  static async findBySectionId(id: number): Promise<IFoodGetApi[]> {
+  static async findBySectionId(
+    id: number,
+    userId: UserPayload['id'],
+  ): Promise<IFoodGetApi[]> {
     const response = (
-      await pool.query(`${this.find_foods_query} WHERE f.section_id = $1`, [id])
+      await pool.query(
+        `${this.find_foods_query} WHERE f.section_id = $1 AND user_id = $2`,
+        [id, userId],
+      )
     ).rows;
     const updatedResponse = response.map((item: any) => {
       return this.formatFood(item);
@@ -61,9 +71,10 @@ class Foods {
     return query;
   }
 
-  static async getSectionList() {
+  static async getSectionList(userId: UserPayload['id']) {
     const response = await pool.query(
-      `SELECT * FROM food_extra INNER JOIN food_section ON food_section.id = food.extra.section_id`,
+      `SELECT * FROM food_extra INNER JOIN food_section ON food_section.id = food.extra.section_id AND user_id = $1`,
+      [userId],
     );
     return response;
   }
@@ -98,37 +109,55 @@ class Foods {
     }
   }
 
-  static async countSection(): Promise<number> {
-    const count = (await pool.query(`SELECT COUNT(*) FROM food_section`))
-      .rows[0].count;
+  static async countSection(userId: UserPayload['id']): Promise<number> {
+    const count = (
+      await pool.query(`SELECT COUNT(*) FROM food_section WHERE user_id = $1`, [
+        userId,
+      ])
+    ).rows[0].count;
 
     if (!count) throw new DatabaseError();
     return Number(count);
   }
-  static async countExtra(): Promise<number> {
-    const res = (await pool.query(`SELECT COUNT(*) FROM food_extra`)).rows[0]
-      .count;
+  static async countExtra(userId: UserPayload['id']): Promise<number> {
+    const res = (
+      await pool.query(`SELECT COUNT(*) FROM food_extra WHERE user_id = $1`, [
+        userId,
+      ])
+    ).rows[0].count;
     if (!res) throw new DatabaseError();
     return Number(res);
   }
-  static async countFoods(): Promise<number> {
-    const res = (await pool.query(`SELECT COUNT(*) FROM foods`)).rows[0].count;
+  static async countFoods(userId: UserPayload['id']): Promise<number> {
+    const res = (
+      await pool.query(`SELECT COUNT(*) FROM foods  WHERE user_id = $1`, [
+        userId,
+      ])
+    ).rows[0].count;
     if (!res) throw new DatabaseError();
     return Number(res);
   }
   // static getSectionAndExtraList() {}
-  static async getAllSectionName(): Promise<
-    Pick<ISectionFoodApi, 'sectionName'>[]
-  > {
-    const response = await pool.query(`SELECT * FROM food_section`);
+  static async getAllSectionName(
+    userId: UserPayload['id'],
+  ): Promise<Pick<ISectionFoodApi, 'sectionName'>[]> {
+    const response = await pool.query(
+      `SELECT * FROM food_section  WHERE user_id = $1`,
+      [userId],
+    );
     const updatedResponseDB = response.map((item: any) => item.section_name);
     const updatedResponseApi = updatedResponseDB.map((item: any) =>
       convertKeys(item, 'dbToApi'),
     );
     return updatedResponseApi;
   }
-  static async getAllExtraName(): Promise<Pick<IExtraApi, 'extraName'>[]> {
-    const response = await pool.query(`SELECT * FROM food_extra`);
+  static async getAllExtraName(
+    userId: UserPayload['id'],
+  ): Promise<Pick<IExtraApi, 'extraName'>[]> {
+    const response = await pool.query(
+      `SELECT * FROM food_extra  WHERE user_id = $1`,
+      [userId],
+    );
     const updatedResponseDB = response.map((item: any) => item.extra_name);
     const updatedResponseApi = updatedResponseDB.map((item: any) =>
       convertKeys(item, 'dbToApi'),
