@@ -2,6 +2,7 @@ import {
   IFoodOrder,
   IOrderApi,
   IOrderDB,
+  IOrderItemsApi,
   IOrderItemsDB,
   TOrderType,
 } from 'redifood-module/src/interfaces';
@@ -23,6 +24,19 @@ class Orders {
     const response = await pool.query(`SELECT COUNT(*) FROM orders`);
     return response.rows[0].count;
   };
+
+  static async findOrderItems(orderId: number): Promise<IOrderItemsApi[]> {
+    const response = await pool.query(
+      `SELECT * FROM order_items WHERE order_id = $1`,
+      [orderId],
+    );
+    const updatedResponse: IOrderItemsApi[] = (
+      response.rows as IOrderItemsDB[]
+    ).map((item: IOrderItemsDB) => {
+      return convertKeys<IOrderItemsDB, IOrderItemsApi>(item, 'dbToApi');
+    });
+    return updatedResponse;
+  }
 
   static async findAll(
     orderType: TOrderType,

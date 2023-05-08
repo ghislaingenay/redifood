@@ -24,7 +24,12 @@ export function buildInsertIntoKeyValuePair(data: RecordAny): {
   return { keys, values };
 }
 
-type TTable = 'food_section' | 'food_extra' | 'foods';
+type TTable =
+  | 'food_section'
+  | 'food_extra'
+  | 'foods'
+  | 'orders'
+  | 'order_items';
 
 export const createQuery = <T extends RecordAny>(
   data: T | T[],
@@ -32,7 +37,6 @@ export const createQuery = <T extends RecordAny>(
 ) => {
   let insertQuery = '';
   let valuesQuery = '';
-  // console.log('dtata', data);
   // The data should have a type of DB and should be convert
   const foundUpperCase = Object.keys(data).find(
     (key: string) => /[A-Z]/.test(key) || /^id$/.test(key),
@@ -65,7 +69,6 @@ export const updateQuery = <T extends RecordAny>(
   data: T,
   tableName: TTable,
 ) => {
-  // Delete id from the data
   delete data.id;
   const keysEntries = Object.keys(data);
   // Avoid SQL Injection

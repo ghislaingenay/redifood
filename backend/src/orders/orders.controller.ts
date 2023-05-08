@@ -9,7 +9,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { UserPayload } from '../../redifood-module/src/interfaces';
+import { TOrderType, UserPayload } from '../../redifood-module/src/interfaces';
 import { User } from '../../src/auth/user-decorator';
 import { AuthGuard } from '../../src/global/auth-guard';
 import { ValidationPipe } from '../../src/global/validation.pipe';
@@ -23,7 +23,7 @@ export class OrdersController {
   @UseGuards(new AuthGuard())
   @Get()
   async getOrders(
-    @Query('orderType') orderType: 'ALL' | 'PAID' | 'NOT_PAID',
+    @Query('orderType') orderType: TOrderType,
     @User() user: UserPayload,
   ) {
     const userId = user.id;

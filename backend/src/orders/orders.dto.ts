@@ -11,16 +11,16 @@ export class CreateOrderDto {
   // orderCurrency: ECurrency; // block the currency from the frontend
 }
 
-// export class UpdateOrderDto extends CreateOrderDto {
-//   @IsInt()
-//   @IsNotEmpty()
-//   id: number;
+export class UpdateOrderDto extends CreateOrderDto {
+  @IsInt()
+  @IsNotEmpty()
+  id: number;
 
-//   @IsPositive()
-//   @IsInt()
-//   @IsNotEmpty()
-//   orderTotal: number;
+  @IsPositive()
+  @IsInt()
+  @IsNotEmpty()
+  orderTotal: number;
 
-//   @IsEnum(EOrderStatus)
-//   orderStatus: EOrderStatus;
-// }
+  @IsEnum(EOrderStatus)
+  orderStatus: EOrderStatus;
+}
