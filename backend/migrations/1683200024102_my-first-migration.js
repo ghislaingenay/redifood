@@ -7,12 +7,14 @@ exports.up = (pgm) => {
   CREATE TABLE food_section (
     id SERIAL PRIMARY KEY,
     section_order SMALLINT NOT NULL,
+    user_id VARCHAR NOT NULL,
     section_name VARCHAR(30) UNIQUE NOT NULL,
     section_description VARCHAR(50) DEFAULT ''
   );
 
   CREATE TABLE food_extra (
     id SERIAL PRIMARY KEY,
+    user_id VARCHAR NOT NULL,
     extra_name VARCHAR(30) UNIQUE NOT NULL,
     extra_order SMALLINT NOT NULL,
     extra_description VARCHAR(50) DEFAULT '',
@@ -25,6 +27,7 @@ exports.up = (pgm) => {
     item_description VARCHAR(50) DEFAULT '',
     item_price NUMERIC NOT NULL CHECK (item_price > 0),
     item_photo VARCHAR NOT NULL,
+    user_id VARCHAR NOT NULL,
     item_created_at DATE DEFAULT NOW(),
     section_id INTEGER REFERENCES food_section(id),
     extra_id INTEGER REFERENCES food_extra(id),
