@@ -39,7 +39,7 @@ exports.up = (pgm) => {
     order_status VARCHAR(20) NOT NULL DEFAULT 'created',
     order_total NUMERIC NOT NULL CHECK (order_total > 0),
     user_id INTEGER REFERENCES users(id),
-    order_completed DATE NOT NULL DEFAULT NOW(),
+    order_finished DATE NOT NULL DEFAULT NOW(),
     order_no VARCHAR(20) NOT NULL,
     order_items VARCHAR NOT NULL DEFAULT ''
 );
@@ -49,8 +49,8 @@ exports.up = (pgm) => {
     order_id INTEGER REFERENCES orders(id),
     user_id INTEGER REFERENCES users(id),
     food_id INTEGER REFERENCES foods(id),
-    order_item_status VARCHAR(20) NOT NULL,
     order_item_quantity SMALLINT NOT NULL DEFAULT 0,
+    order_item_name VARCHAR(20) NOT NULL,
     order_item_price NUMERIC NOT NULL CHECK (order_item_price > 0)
   `);
 };
