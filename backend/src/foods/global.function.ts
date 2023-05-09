@@ -27,9 +27,11 @@ export function buildInsertIntoKeyValuePair(data: RecordAny): {
 type TTable =
   | 'food_section'
   | 'food_extra'
-  | 'foods'
-  | 'orders'
-  | 'order_items';
+  | 'food'
+  | 'order'
+  | 'order_items'
+  | 'payment'
+  | 'discount';
 
 export const createQuery = <T extends RecordAny>(
   data: T | T[],

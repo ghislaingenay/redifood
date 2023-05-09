@@ -131,7 +131,7 @@ class Orders {
   }
 
   static async updateOrder(body: any, id: number) {
-    const updatedQuery = updateQuery(body, 'orders');
+    const updatedQuery = updateQuery(body, 'order');
     const response = await pool.query(`${updatedQuery} WHERE id = $1`, [id]);
     return response;
   }

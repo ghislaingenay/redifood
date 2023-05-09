@@ -104,7 +104,7 @@ export class FoodService {
   async createFood(body: CreateFoodDto, userId: UserPayload['id']) {
     const updatedBody = { ...body, userId };
     const updatedData = convertKeys(updatedBody, 'apiToDb');
-    const postgresQuery = createQuery(updatedData, 'foods');
+    const postgresQuery = createQuery(updatedData, 'food');
     const response = await Foods.createRows(postgresQuery);
     if (!response) {
       throw new DatabaseError();
@@ -117,7 +117,7 @@ export class FoodService {
   }
 
   async updateFood(body: UpdateFoodDto, id: number) {
-    const postgresQuery = updateQuery(convertKeys(body, 'apiToDb'), 'foods');
+    const postgresQuery = updateQuery(convertKeys(body, 'apiToDb'), 'food');
     console.log('postgresQuery', postgresQuery);
     const response = await Foods.updateRow(postgresQuery, id);
 

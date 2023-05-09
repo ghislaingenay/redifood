@@ -21,7 +21,7 @@ exports.up = (pgm) => {
     section_id INTEGER REFERENCES food_section(id)
   );
 
-  CREATE TABLE foods (
+  CREATE TABLE food (
     id SERIAL PRIMARY KEY,
     item_name VARCHAR(20) UNIQUE NOT NULL,
     item_description VARCHAR(50) DEFAULT '',
@@ -34,12 +34,14 @@ exports.up = (pgm) => {
     item_quantity SMALLINT NOT NULL DEFAULT 0
   )
 
-  CREATE TABLE orders (
+  CREATE TYPE orderstatus AS ENUM ('created', 'paid', 'cancelled', 'finished');
+
+  CREATE TABLE order (
     id SERIAL PRIMARY KEY,
     order_created DATE NOT NULL DEFAULT NOW(),
     order_table_number INTEGER NOT NULL CHECK (order_table_number > 0),
     order_time NUMERIC NOT NULL DEFAULT 0,
-    order_status VARCHAR(20) NOT NULL DEFAULT 'created',
+    order_status orderstatus NOT NULL DEFAULT 'created',
     order_total NUMERIC NOT NULL CHECK (order_total > 0),
     user_id VARCHAR NOT NULL,
     order_finished DATE NOT NULL DEFAULT NOW(),
@@ -55,6 +57,37 @@ exports.up = (pgm) => {
     order_item_quantity SMALLINT NOT NULL DEFAULT 0,
     order_item_name VARCHAR(20) NOT NULL,
     order_item_price NUMERIC NOT NULL CHECK (order_item_price > 0)
+  );
+
+  CREATE TYPE paytype AS ENUM ('cash', 'credit');
+  CREATE TYPE discounttype AS ENUM ('percentage', 'amount');
+
+  CREATE TABLE discount (
+    id SERIAL PRIMARY KEY,
+    user_id VARCHAR NOT NULL,
+    discount_code VARCHAR(20) NOT NULL,
+    discount_type discounttype NOT NULL DEFAULT 'percentage',
+    discount_amount NUMERIC NOT NULL CHECK (discount_amount > 0),
+    discount_start DATE NOT NULL DEFAULT NOW(),
+    discount_end DATE NOT NULL DEFAULT NOW(),
+    discount_active BOOLEAN NOT NULL DEFAULT true
+  )
+
+  CREATE TABLE payment(
+    id SERIAL PRIMARY KEY,
+    user_id VARCHAR NOT NULL,
+    order_id INTEGER REFERENCES orders(id),
+    stripe_id VARCHAR NOT NULL,
+    payment_status VARCHAR(20) NOT NULL DEFAULT 'created',
+    payment_type paytype NOT NULL,
+    payment_amount NUMERIC NOT NULL CHECK (payment_amount > 0),
+    payment_date DATE NOT NULL DEFAULT NOW(),
+    discount_applied BOOLEAN NOT NULL DEFAULT false,
+    discount_id INTEGER REFERENCES discount(id) DEFAULT 0
+    stripe_id VARCHAR NOT NULL,
+    stripe_link VARCHAR NOT NULL,
+    payment_tax NUMERIC NOT NULL CHECK (payment_tax > 0),
+  )
   `);
 };
 
@@ -65,5 +98,7 @@ exports.down = (pgm) => {
   DROP TABLE food_section;
   DROP TABLE orders;
   DROP TABLE order_items;
+  DROP TABLE discount;
+  DROP TABLE payment;
   `);
 };
