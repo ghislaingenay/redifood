@@ -10,6 +10,8 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
+import { User } from 'redifood-module/src/handling-nestjs/user-decorator';
+import { UserPayload } from 'redifood-module/src/interfaces';
 import { AuthGuard } from '../../src/global/auth-guard';
 import { ValidationPipe } from '../global/validation.pipe';
 import {
@@ -26,8 +28,8 @@ export class FoodController {
 
   @UseGuards(new AuthGuard())
   @Get('all')
-  async getAllFoods() {
-    return await this.foodService.getAllFoods();
+  async getAllFoods(@User() user: UserPayload) {
+    return await this.foodService.getAllFoods(user.id);
   }
 
   @UseGuards(new AuthGuard())
@@ -38,28 +40,36 @@ export class FoodController {
       new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
     )
     id: number,
+    @User() user: UserPayload,
   ) {
-    return await this.foodService.getFoodBySectionId(id);
+    return await this.foodService.getFoodBySectionId(id, user.id);
   }
 
   @UseGuards(new AuthGuard())
   @Post('section')
   async createSection(
     @Body(new ValidationPipe()) sectionDto: CreateSectionDto,
+    @User() user: UserPayload,
   ) {
-    return await this.foodService.createSection(sectionDto);
+    return await this.foodService.createSection(sectionDto, user.id);
   }
 
   @UseGuards(new AuthGuard())
   @Post('extra')
-  async createExtra(@Body(new ValidationPipe()) extraDto: CreateExtraDto) {
-    return await this.foodService.createExtra(extraDto);
+  async createExtra(
+    @Body(new ValidationPipe()) extraDto: CreateExtraDto,
+    @User() user: UserPayload,
+  ) {
+    return await this.foodService.createExtra(extraDto, user.id);
   }
 
   @UseGuards(new AuthGuard())
   @Post()
-  async createFood(@Body(new ValidationPipe()) foodDto: CreateFoodDto) {
-    return await this.foodService.createFood(foodDto);
+  async createFood(
+    @Body(new ValidationPipe()) foodDto: CreateFoodDto,
+    @User() user: UserPayload,
+  ) {
+    return await this.foodService.createFood(foodDto, user.id);
   }
 
   @UseGuards(new AuthGuard())

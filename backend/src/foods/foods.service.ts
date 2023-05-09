@@ -4,9 +4,11 @@ import { DatabaseError } from '../../redifood-module/src/handling-nestjs/databas
 import {
   EStatusCodes,
   IExtraApi,
+  IExtraDB,
   IFoodGetApi,
   IGetServerSideData,
   ISectionFoodApi,
+  UserPayload,
 } from '../../redifood-module/src/interfaces';
 import {
   CreateExtraDto,
@@ -21,8 +23,10 @@ import { convertKeys, createQuery, updateQuery } from './global.function';
 @Injectable()
 export class FoodService {
   // Get foods/all
-  async getAllFoods(): Promise<IGetServerSideData<IFoodGetApi[]>> {
-    const foodResults = await Foods.findAll();
+  async getAllFoods(
+    userId: UserPayload['id'],
+  ): Promise<IGetServerSideData<IFoodGetApi[]>> {
+    const foodResults = await Foods.findAll(userId);
     if (!foodResults) {
       throw new DatabaseError();
     }
@@ -36,8 +40,9 @@ export class FoodService {
   // @Get('section/:id')
   async getFoodBySectionId(
     id: number,
+    userId: UserPayload['id'],
   ): Promise<IGetServerSideData<IFoodGetApi[]>> {
-    const foodResults = await Foods.findBySectionId(id);
+    const foodResults = await Foods.findBySectionId(id, userId);
     if (!foodResults) {
       throw new DatabaseError();
     }
@@ -51,10 +56,12 @@ export class FoodService {
   // @Post('/section')
   async createSection(
     body: CreateSectionDto,
+    userId: UserPayload['id'],
   ): Promise<IGetServerSideData<any>> {
     const bodyWithOrder: ISectionFoodApi = {
+      userId: userId,
       ...body,
-      sectionOrder: Number(await Foods.countSection()) + 1,
+      sectionOrder: Number(await Foods.countSection(userId)) + 1,
     };
     const updatedData = convertKeys(bodyWithOrder, 'apiToDb');
     const postgresQuery = createQuery(updatedData, 'food_section');
@@ -69,13 +76,19 @@ export class FoodService {
     };
   }
 
-  async createExtra(body: CreateExtraDto): Promise<IGetServerSideData<any>> {
+  async createExtra(
+    body: CreateExtraDto,
+    userId: UserPayload['id'],
+  ): Promise<IGetServerSideData<any>> {
     const bodyWithOrder: IExtraApi = {
+      userId: userId,
       ...body,
-      extraOrder: Number(await Foods.countExtra()) + 1,
+      extraOrder: Number(await Foods.countExtra(userId)) + 1,
     };
-    const updatedData = convertKeys(bodyWithOrder, 'apiToDb');
-    console.log('updatedData', updatedData);
+    const updatedData: IExtraDB = convertKeys<IExtraApi, IExtraDB>(
+      bodyWithOrder,
+      'apiToDb',
+    );
     const postgresQuery = createQuery(updatedData, 'food_extra');
     const response = await Foods.createRows(postgresQuery);
     if (!response) {
@@ -88,8 +101,9 @@ export class FoodService {
     };
   }
 
-  async createFood(body: CreateFoodDto) {
-    const updatedData = convertKeys(body, 'apiToDb');
+  async createFood(body: CreateFoodDto, userId: UserPayload['id']) {
+    const updatedBody = { ...body, userId };
+    const updatedData = convertKeys(updatedBody, 'apiToDb');
     const postgresQuery = createQuery(updatedData, 'foods');
     const response = await Foods.createRows(postgresQuery);
     if (!response) {

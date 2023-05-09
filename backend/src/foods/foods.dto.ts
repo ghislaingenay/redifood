@@ -95,4 +95,9 @@ export class UpdateFoodDto extends CreateFoodDto {
   @IsInt()
   @IsNotEmpty()
   id: number;
+
+  @IsString()
+  @IsNotEmpty()
+  @Length(2, 20)
+  userId: string;
 }
