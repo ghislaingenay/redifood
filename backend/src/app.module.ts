@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { SettingsModule } from './settings/settings.module';
 import { FoodsModule } from './foods/foods.module';
 import { OrdersModule } from './orders/orders.module';
+import { PaymentsModule } from './payments/payments.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { OrdersModule } from './orders/orders.module';
     ConfigModule.forRoot({ isGlobal: true }),
     FoodsModule,
     OrdersModule,
+    PaymentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
