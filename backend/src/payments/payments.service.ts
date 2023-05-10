@@ -14,6 +14,7 @@ export class PaymentsService {
     return { results: 'yes', statusCode: HttpStatus.OK, message: 'recovered' };
   }
 
+  // or maybe payment already performed before
   async payOrder(createPaymentDto: any): Promise<IGetServerSideData<any>> {
     console.log(createPaymentDto);
     return { results: 'yes', statusCode: HttpStatus.OK, message: 'recovered' };

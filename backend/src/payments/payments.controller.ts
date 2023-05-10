@@ -6,6 +6,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Query,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
@@ -35,7 +36,9 @@ export class PaymentsController {
   @UseGuards(new AuthGuard())
   @Post()
   // Might be obtained from callback of stripe payment
-  async payOrder(@Body(new ValidationPipe()) paymentDto: any) {
+  async payOrder(
+    @Body(new ValidationPipe()) paymentDto: any,
+  ) {
     return await this.paymentsService.payOrder(paymentDto);
   }
 }
