@@ -2,83 +2,131 @@
 
 // import { authenticate } from '@google-cloud/local-auth';
 
+import { HttpStatus } from '@nestjs/common';
+import { JWT } from 'google-auth-library';
 import { google, sheets_v4 } from 'googleapis';
+import { EPaymentType } from 'redifood-module/src/interfaces';
+
+interface IOrderHeaders {
+  column: string;
+  headerColumn: string;
+  apiKey: string;
+  dbKey: string;
+}
+
+interface IOrderData {
+  orderNo: string;
+  orderTotal: string;
+  orderTableNumber: number;
+  orderFinished: string;
+  paymentType: EPaymentType;
+  paymentAmount: string;
+}
 
 // import { google } from 'googleapis';
-class GoogleSheetApi {
-  spreadsheetId = '1copNXVPX-bt-3bOlyfGMekr2JoA57iJdiX8FO01RL9o';
-  googleSheets: sheets_v4.Sheets;
+class GoogleSheetService {
+  private spreadsheetId = '1copNXVPX-bt-3bOlyfGMekr2JoA57iJdiX8FO01RL9o';
+  private googleSheets: sheets_v4.Sheets;
+  private auth!: JWT;
+
+  private headers: IOrderHeaders[] = [
+    {
+      column: 'A',
+      headerColumn: 'Order No',
+      apiKey: 'orderNo',
+      dbKey: 'order_no',
+    },
+    {
+      column: 'B',
+      headerColumn: 'Order Total',
+      apiKey: 'orderTotal',
+      dbKey: 'order_total',
+    },
+    {
+      column: 'C',
+      headerColumn: 'Table Number',
+      apiKey: 'orderTableNumber',
+      dbKey: 'order_table_number',
+    },
+    {
+      column: 'D',
+      headerColumn: 'order completed',
+      apiKey: 'orderFinished',
+      dbKey: 'order_finished',
+    },
+    {
+      column: 'E',
+      headerColumn: 'Payment type',
+      apiKey: 'paymentType',
+      dbKey: 'payment_type',
+    },
+    {
+      column: 'F',
+      headerColumn: 'Payment amount',
+      apiKey: 'paymentAmount',
+      dbKey: 'payment_amount',
+    },
+  ];
+
+  async authorize() {
+    if (this.auth === null) {
+      throw new Error('Auth is null');
+    }
+  }
 
   async initialize() {
-    const auth = new google.auth.GoogleAuth({
-      scopes: 'https://www.googleapis.com/auth/spreadsheets',
-      keyFile: '../../credentials.json',
+    this.auth = new google.auth.JWT({
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+      email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+      key: process.env.GOOGLE_PRIVATE_KEY,
     });
-
-    // Create client instance for auth
-    return await auth.getClient();
   }
 
   async createInstance() {
-    const client = await this.initialize();
+    await this.initialize();
     this.googleSheets = google.sheets({ version: 'v4' });
+  }
+
+  async getSheetData() {
+    await this.createInstance();
+    const response = await this.googleSheets.spreadsheets.values.get({
+      auth: this.auth,
+      spreadsheetId: this.spreadsheetId,
+      range: 'Sheet1',
+    });
+    return response.data;
+  }
+
+  async getData(data: IOrderHeaders['apiKey']) {
+    const response = await this.getSheetData();
+    const { values } = response;
+    const header = values?.shift();
+    const index = header?.findIndex((item) => item === data);
+    const dataResponse = values?.map((item) => item[index as number]);
+    return dataResponse;
+  }
+
+  async createRow(data: IOrderData) {
+    const orderArray = this.headers.map((item) => item.apiKey);
+    const orderData = orderArray.map((item) => data[item]);
+    try {
+      await this.googleSheets.spreadsheets.values.append({
+        auth: this.auth,
+        spreadsheetId: this.spreadsheetId,
+        range: 'Sheet1',
+        valueInputOption: 'USER_ENTERED', // USER_ENTERED OR RAW
+        requestBody: {
+          values: [orderData],
+        },
+      });
+      return { statusCode: HttpStatus.OK, message: 'Row created' };
+    } catch (err) {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Impossible to create row',
+      };
+    }
   }
 }
 
-// export default GoogleSheet;
-
-// rmer step.
-// ;(async () => {
-//   const auth = new google.auth.JWT({
-//     email: SERVICE_ACCOUNT_EMAIL,
-//     key: SERVICE_ACCOUNT_PRIVATE_KEY,
-//     scopes: ["https://www.googleapis.com/auth/spreadsheets"]
-//   })
-//   const sheet = google.sheets("v4")
-//   await sheet.spreadsheets.values.append({
-//     spreadsheetId: SHEET_ID,
-//     auth: auth,
-//     range: "Sheet1",
-//     valueInputOption: "RAW",
-//     requestBody: {
-//       values: [["hello", "world"]]
-//     }
-//   })
-// })()
-
-// const auth = new google.auth.GoogleAuth({
-//   keyFile: "credentials.json",
-//   scopes: "https://www.googleapis.com/auth/spreadsheets",
-// });
-
-// // Create client instance for auth
-// const client = await auth.getClient();
-
-// // Instance of Google Sheets API
-// const googleSheets = google.sheets({ version: "v4", auth: client });
-
-// const spreadsheetId = "1J5OesnSTJCgLTTA0hQ_QSk_UPVK1nwRTEkvvRHHrEqM";
-
-// // Get metadata about spreadsheet
-// const metaData = await googleSheets.spreadsheets.get({
-//   auth,
-//   spreadsheetId,
-// });
-
-// // Read rows from spreadsheet
-// const getRows = await googleSheets.spreadsheets.values.get({
-//   auth,
-//   spreadsheetId,
-//   range: "Sheet1!A:A",
-// });
-
-// // Write row(s) to spreadsheet
-// await googleSheets.spreadsheets.values.append({
-//   auth,
-//   spreadsheetId,
-//   range: "Sheet1!A:B",
-//   valueInputOption: "USER_ENTERED",
-//   resource: {
-//     values: [[request, name]],
-//   },
-// });
+export default GoogleSheetService;
