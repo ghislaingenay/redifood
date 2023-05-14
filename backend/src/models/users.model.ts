@@ -7,10 +7,6 @@ interface UserAttrs {
   password: string;
   firstName: string;
   lastName: string;
-  isEmailValidated: boolean;
-  codePassword: string;
-  expirationCodePassword: Date; // 15 min delay => used to reinitialize password after forgetting it
-  expirationValidLink: Date; // 1 hour delay =>  Date when the link expired to validate your email
 }
 
 // interface that describes the properties the user document has
@@ -19,10 +15,6 @@ export interface UserDoc extends mongoose.Document {
   password: string;
   firstName: string;
   lastName: string;
-  isEmailValidated: boolean;
-  codePassword: string;
-  expirationCodePassword: Date;
-  expirationValidLink: Date;
 }
 
 interface UserModel extends mongoose.Model<UserDoc> {
@@ -49,24 +41,15 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    isEmailValidated: {
-      tye: Boolean,
-      required: true,
-      default: false,
-    },
-    codePassword: {
-      type: String,
-      required: false,
-    },
-    expirationCodePassword: {
-      type: Date,
-      required: false,
-    },
-    expirationValidLink: {
-      type: Date,
-      required: false,
-    },
   },
+  //   validate: {
+  //     validator: function(v) {
+  //       return /\d{3}-\d{3}-\d{4}/.test(v);
+  //     },
+  //     message: props => `${props.value} is not a valid phone number!`
+  //   },
+  //   required: [true, 'User phone number required']
+  // }
   {
     timestamps: true, // add createdAt and updatedAt
     toJSON: {
