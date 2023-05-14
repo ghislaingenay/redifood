@@ -1,11 +1,13 @@
 import { NotFoundException } from '@nestjs/common';
 import { MailerSend, Recipient, Sender } from 'mailersend';
+
 import {
   ELanguage,
   TEmailType,
   UserPayload,
-} from 'redifood-module/src/interfaces';
-import { User } from 'src/models/users.model';
+} from '../../redifood-module/src/interfaces';
+import { Setting, SettingsDoc } from '../../src/models/settings.model';
+import { User, UserDoc } from '../../src/models/users.model';
 
 class EmailService {
   protected lang: ELanguage;
@@ -33,8 +35,22 @@ class EmailService {
     });
   }
 
-  private async getUser() {
+  private async getUser(): Promise<UserDoc> {
     return await User.findById(this.userId);
+  }
+
+  private async getSettings(): Promise<SettingsDoc> {
+    return await Setting.findOne({ user: this.userId });
+  }
+
+  private async createRecepient(): Promise<void> {
+    const userData = await this.getUser();
+    this.recepients = [
+      new Recipient(
+        userData.email,
+        `${userData.firstName} ${userData.lastName}`,
+      ),
+    ];
   }
 
   // recipients = [new Recipient('your@client.com', 'Your Client')];
@@ -47,8 +63,6 @@ class EmailService {
   //     },
   //   },
   // ];
-
-  recipients = [new Recipient('your@client.com', 'Your Client')];
 
   variables = [
     {
