@@ -5,12 +5,16 @@ import { PasswordManager } from '../../src/auth/password-manager';
 interface UserAttrs {
   email: string;
   password: string;
+  firstName: string;
+  lastName: string;
 }
 
 // interface that describes the properties the user document has
 export interface UserDoc extends mongoose.Document {
   email: string;
   password: string;
+  firstName: string;
+  lastName: string;
 }
 
 interface UserModel extends mongoose.Model<UserDoc> {
@@ -25,6 +29,14 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
     password: {
+      type: String,
+      required: true,
+    },
+    firstName: {
+      type: String,
+      required: true,
+    },
+    lastName: {
       type: String,
       required: true,
     },
