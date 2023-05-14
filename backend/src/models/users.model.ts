@@ -7,6 +7,10 @@ interface UserAttrs {
   password: string;
   firstName: string;
   lastName: string;
+  isEmailValidated: boolean;
+  codePassword: string;
+  expirationCodePassword: Date; // 15 min delay => used to reinitialize password after forgetting it
+  expirationValidLink: Date; // 1 hour delay =>  Date when the link expired to validate your email
 }
 
 // interface that describes the properties the user document has
@@ -15,6 +19,10 @@ export interface UserDoc extends mongoose.Document {
   password: string;
   firstName: string;
   lastName: string;
+  isEmailValidated: boolean;
+  codePassword: string;
+  expirationCodePassword: Date;
+  expirationValidLink: Date;
 }
 
 interface UserModel extends mongoose.Model<UserDoc> {
@@ -27,6 +35,7 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
       required: true,
+      unique: true,
     },
     password: {
       type: String,
@@ -39,6 +48,23 @@ const userSchema = new mongoose.Schema(
     lastName: {
       type: String,
       required: true,
+    },
+    isEmailValidated: {
+      tye: Boolean,
+      required: true,
+      default: false,
+    },
+    codePassword: {
+      type: String,
+      required: false,
+    },
+    expirationCodePassword: {
+      type: Date,
+      required: false,
+    },
+    expirationValidLink: {
+      type: Date,
+      required: false,
     },
   },
   {
