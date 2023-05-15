@@ -13,13 +13,15 @@ class EmailService {
   protected lang: ELanguage;
   protected userId: UserPayload['id'];
   protected emailType: TEmailType;
-  private client: MailerSend;
+  private client!: MailerSend;
   private sender = new Sender('ghislain@food.com', 'Ghislain'); // (email, 'my name')
   private recepients: Recipient[];
+  private htmlText: string;
+  private userEmail: string;
 
-  constructor(lang: ELanguage, userId: UserPayload['id']) {
-    this.lang = lang;
+  constructor(emailType: TEmailType, userId: UserPayload['id']) {
     this.userId = userId;
+    this.emailType = emailType;
   }
 
   private verifyKey() {
@@ -28,7 +30,7 @@ class EmailService {
     }
   }
 
-  private initialize() {
+  private initializeClient() {
     this.verifyKey();
     this.client = new MailerSend({
       apiKey: process.env.MAILSENDER_API_KEY,
@@ -43,7 +45,7 @@ class EmailService {
     return await Setting.findOne({ user: this.userId });
   }
 
-  private async createRecepient(): Promise<void> {
+  private async createRecipient(): Promise<void> {
     const userData = await this.getUser();
     this.recepients = [
       new Recipient(
@@ -51,9 +53,37 @@ class EmailService {
         `${userData.firstName} ${userData.lastName}`,
       ),
     ];
+    this.userEmail = userData.email;
   }
 
-  // recipients = [new Recipient('your@client.com', 'Your Client')];
+  private async getTemplateText(): Promise<void> {
+    const settingsData = await this.getSettings();
+    const response = this.client.email.template
+      .single(`${this.emailType}_${settingsData.language}`)
+      .catch((error) => console.log(error.body));
+    this.htmlText = (response as any).body as string;
+  }
+
+  private async implementVariables(): Promise<{ email: string; substitutions: { var: string; value: string }[] }[]> {}
+
+  protected async sendEmail(): Promise<void> {}
+    this.initializeClient();
+    await this.createRecipient(); // this.recepients
+    await this.getTemplateText(); // this.htmlText
+  }
+
+  // private async createEmailParams(): Promise<void> {
+  //   const settingsData = await this.getSettings();
+  //   const emailParams = {
+  //     from: this.sender,
+  //     to: this.recepients,
+  //     subject: 'Subject',
+  //     text: 'Text',
+  //     html: 'HTML',
+  //     variables: [
+  //       {
+  //         email: '  ',
+  //         substitutions: [
 
   // personalization = [
   //   {
