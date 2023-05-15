@@ -9,6 +9,10 @@ interface UserAttrs {
   lastName: string;
 }
 
+export interface IUserData extends UserAttrs {
+  id: string;
+}
+
 // interface that describes the properties the user document has
 export interface UserDoc extends mongoose.Document {
   email: string;
