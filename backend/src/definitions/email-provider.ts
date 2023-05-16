@@ -6,10 +6,10 @@ import {
   TEmailType,
   UserPayload,
 } from '../../redifood-module/src/interfaces';
-import { Setting, SettingsDoc } from '../../src/models/settings.model';
-import { IUserData, User, UserDoc } from '../../src/models/users.model';
+import { Setting, SettingsDoc } from '../models/settings.model';
+import { IUserData, User, UserDoc } from '../models/users.model';
 
-class EmailService {
+class EmailProvider {
   protected lang: ELanguage;
   protected userId: UserPayload['id'];
   protected emailType: TEmailType;
@@ -117,4 +117,4 @@ class EmailService {
   }
 }
 
-export default EmailService;
+export default EmailProvider;
