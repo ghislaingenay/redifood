@@ -1,6 +1,6 @@
 # Redifood
 
-## Creation of POS system as a web application using microservices architecture with in-built microservices system inside NestJS
+## Creation of POS system as a web application using monolith architecture with NextJS / NestJS
 
 This project started on January 2023 and it based on redifood-v1. This project will include a complete workflow of a web application from testing to deployment on cloud using Docker and Kubernetes technologies.This project show the differents technologies that I can currently use.
 
