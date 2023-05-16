@@ -5,7 +5,6 @@ import Stripe from 'stripe';
 import {
   ECurrency,
   ELanguage,
-  IOrderApi,
   UserPayload,
 } from '../../redifood-module/src/interfaces';
 
@@ -50,10 +49,10 @@ class StripePayService {
     // function that check the services and send back the targeted data
     switch (this.service) {
       case 'orders':
-        return (await Orders.findOne({
+        return await Orders.findOne({
           userId: this.userId,
           orderId: this.id,
-        })) as IOrderApi;
+        }); // later => create similar function for payments in repo
       case 'payments':
         return '';
       default:
@@ -84,23 +83,13 @@ class StripePayService {
       description: ``,
     });
     return chargeResponse;
+    // What to do ?
   }
 }
 
 //   const stripe = require('stripe')('sk_test_4eC39HqLyjWDarjtT1zdp7dc');
 
-// const charge = await stripe.charges.update(
-//   'ch_17LYzm2eZvKYlo2CUAhwAYTk',
-//   {metadata: {order_id: '6735'}}
-// );
-// "status": "succeeded"
-
-// const charge = await stripe.charges.retrieve(
-//   'ch_17LYzm2eZvKYlo2CUAhwAYTk'
-// );
-// https://stripe.com/docs/payments/accept-a-payment
-
-export default StripeService;
+export default StripePayService;
 
 // Response from charge
 // {
