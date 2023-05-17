@@ -16,6 +16,9 @@ import {
   UserPayload,
 } from '../../redifood-module/src/interfaces';
 import { User } from '../../src/auth/user-decorator';
+import GoogleSheetService, {
+  IOrderData,
+} from '../../src/definitions/googlesheet';
 import { AuthGuard } from '../../src/global/auth-guard';
 import { ValidationPipe } from '../../src/global/validation.pipe';
 import {
@@ -135,6 +138,13 @@ export class OrdersController {
     id: number,
   ) {
     return await this.ordersService.cancelOrder(id);
+  }
+
+  @UseGuards(new AuthGuard())
+  @Post('sheet')
+  async createRowInSheet(@Body() body: IOrderData) {
+    const sheets = new GoogleSheetService();
+    await sheets.createRow(body);
   }
 
   // update order and update order item // send back the menu

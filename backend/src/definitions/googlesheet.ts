@@ -14,7 +14,7 @@ interface IOrderHeaders {
   dbKey: string;
 }
 
-interface IOrderData {
+export interface IOrderData {
   orderNo: string;
   orderTotal: string;
   orderTableNumber: number;
