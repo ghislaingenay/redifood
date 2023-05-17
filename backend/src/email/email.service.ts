@@ -12,18 +12,23 @@ import { ForgetPasswordDto, ValidateEmailDto } from './email.dto';
 export class EmailService {
   async getEmailValidation(
     userId: UserPayload['id'],
-  ): Promise<IGetServerSideData<{ isValidated: boolean }>> {
+  ): Promise<
+    IGetServerSideData<{ isValidated: boolean; expiresAt: Date | null }>
+  > {
     console.log('id', userId);
     const emailData = await Email.findOne({ user: userId });
     if (!emailData) {
       return {
-        results: { isValidated: false },
+        results: { isValidated: false, expiresAt: null },
         statusCode: HttpStatus.OK,
         message: 'Email validation',
       }; // User should'nt know if email is validated or not
     }
     return {
-      results: { isValidated: emailData.isEmailValidated },
+      results: {
+        isValidated: emailData.isEmailValidated,
+        expiresAt: emailData.expirationValidLink,
+      },
       statusCode: HttpStatus.OK,
       message: 'Email validation',
     };
@@ -56,7 +61,7 @@ export class EmailService {
         return {
           results: { verified: true },
           statusCode: HttpStatus.OK,
-          message: 'Email verified',
+          message: 'Verified information',
         };
       } else {
         return nonVerifiedRes;
@@ -68,13 +73,21 @@ export class EmailService {
 
   async createLinkValidation(id: string): Promise<any> {
     console.log('id', id);
-    // what to do ?
+    // 1 - Extends the expiration date for code
+    // 2 - Send email with the link on client
+    // 3 - When user click on the link, it will redirect to the client with the code
+    // 4 - Check on client with the date
   }
 
   async createLinkForgetPassword(
     forgetPasswordDto: ForgetPasswordDto,
   ): Promise<any> {
     console.log('validateEmailDto', forgetPasswordDto);
-    // what to do?
+    // Create a code
+    // send code in db with expiration date (15 min)
+    // create a email with the code
+
+    // on client, when user forget password, => open modal with code and ask to check email => fill the code from
+    // the email and send request to BE => call verifyCode API after it
   }
 }
