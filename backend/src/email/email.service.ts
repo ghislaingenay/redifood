@@ -1,7 +1,10 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import * as moment from 'moment';
+import EmailProvider from 'src/definitions/email-provider';
+import { User } from 'src/models/users.model';
 import { DatabaseError } from '../../redifood-module/src/handling-nestjs/database-error.exception';
 import {
+  ELanguage,
   IGetServerSideData,
   UserPayload,
 } from '../../redifood-module/src/interfaces';
@@ -71,18 +74,60 @@ export class EmailService {
     }
   }
 
-  async createLinkValidation(id: string): Promise<any> {
-    console.log('id', id);
-    // 1 - Extends the expiration date for code
-    // 2 - Send email with the link on client
-    // 3 - When user click on the link, it will redirect to the client with the code
-    // 4 - Check on client with the date
+  async createLinkValidation(
+    userId: UserPayload['id'],
+  ): Promise<IGetServerSideData<any>> {
+    const expireIn1Hour = new Date(new Date().getTime() + 60 * 60 * 1000);
+    await Email.findOneAndUpdate(
+      { user: userId },
+      { expirationValidLink: expireIn1Hour },
+    );
+    const email = new EmailProvider('VALIDATE_EMAIL', userId);
+    await email.sendEmail();
+    return {
+      results: {},
+      message: 'Updated link',
+      statusCode: HttpStatus.OK,
+    };
   }
 
   async createLinkForgetPassword(
     forgetPasswordDto: ForgetPasswordDto,
-  ): Promise<any> {
+  ): Promise<IGetServerSideData<any>> {
+    const { email, lang } = forgetPasswordDto;
+    const msgEmail =
+      lang === ELanguage.ENGLISH
+        ? 'A email was sent to your mailbox if the email you provided was valid'
+        : "Un email a été envoyé à ta messagerie si l'email est coorect";
     console.log('validateEmailDto', forgetPasswordDto);
+    const newCode = String(
+      Math.floor(Math.random() * (999999 - 100000 + 1) + 100000),
+    );
+    const expiresIn15min = new Date(new Date().getTime() + 15 * 60 * 1000);
+    try {
+      await Email.findOneAndUpdate(
+        { email },
+        { expirationCodePassword: expiresIn15min, codePassword: newCode },
+      );
+      const userData = await User.findOne({ email });
+      await new EmailProvider(
+        'FORGET_PASSWORD',
+        userData.id,
+        newCode,
+      ).sendEmail();
+      return {
+        results: {},
+        statusCode: HttpStatus.OK,
+        message: msgEmail,
+      };
+    } catch (err) {
+      return {
+        results: {},
+        statusCode: HttpStatus.OK,
+        message: msgEmail,
+      };
+    }
+
     // Create a code
     // send code in db with expiration date (15 min)
     // create a email with the code

@@ -103,7 +103,7 @@ class EmailProvider {
     }
   }
 
-  protected async sendEmail(): Promise<void> {
+  public async sendEmail(): Promise<void> {
     this.initializeClient();
     await this.createRecipient(); // this.recepients
     await this.getTemplateText(); // this.htmlText
