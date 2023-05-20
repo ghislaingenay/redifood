@@ -86,7 +86,7 @@ exports.up = (pgm) => {
     discount_id INTEGER REFERENCES discount(id) DEFAULT 0
     stripe_id VARCHAR NOT NULL,
     stripe_link VARCHAR NOT NULL,
-    payment_tax NUMERIC NOT NULL CHECK (payment_tax > 0),
+    tax_amount NUMERIC NOT NULL CHECK (payment_tax > 0),
   )
   `);
 };
