@@ -5,7 +5,10 @@
 import { HttpStatus } from '@nestjs/common';
 import { JWT } from 'google-auth-library';
 import { google, sheets_v4 } from 'googleapis';
-import { EPaymentType } from 'redifood-module/src/interfaces';
+import {
+  EPaymentType,
+  IGetServerSideData,
+} from 'redifood-module/src/interfaces';
 
 interface IOrderHeaders {
   column: string;
@@ -106,7 +109,7 @@ class GoogleSheetService {
     return dataResponse;
   }
 
-  async createRow(data: IOrderData) {
+  async createRow(data: IOrderData): Promise<IGetServerSideData<any>> {
     const orderArray = this.headers.map((item) => item.apiKey);
     const orderData = orderArray.map((item) => data[item]);
     try {
@@ -122,6 +125,7 @@ class GoogleSheetService {
       return { statusCode: HttpStatus.OK, message: 'Row created' };
     } catch (err) {
       return {
+        results: {},
         statusCode: HttpStatus.BAD_REQUEST,
         message: 'Impossible to create row',
       };

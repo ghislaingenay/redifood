@@ -29,6 +29,19 @@ class EmailProvider {
     this.codePassword = codePassword;
   }
 
+  private templates: { type: TEmailType; id: string; lang: ELanguage }[] = [
+    {
+      type: 'FORGET_PASSWORD',
+      id: 'ynrw7gy6ojkl2k8e',
+      lang: ELanguage.ENGLISH,
+    },
+    {
+      type: 'VALIDATE_EMAIL',
+      id: 'z86org89p6k4ew13',
+      lang: ELanguage.FRENCH,
+    },
+  ];
+
   private verifyKey() {
     if (!process.env.MAILSENDER_API_KEY) {
       throw new NotFoundException();
@@ -61,9 +74,15 @@ class EmailProvider {
   }
 
   private async getTemplateText(): Promise<void> {
-    const settingsData = await this.getSettings();
+    // const settingsData = await this.getSettings();
+    const templateInformation = this.templates.find(
+      (item) => item.type === this.emailType,
+    );
+    const template_id = templateInformation.id;
+
     const response = this.client.email.template
-      .single(`${this.emailType}_${settingsData.language}`)
+      .single(template_id)
+      // .single(`${this.emailType}_${settingsData.language}`)
       .catch((error) => console.log(error.body));
     this.htmlText = (response as any).body as string;
   }
