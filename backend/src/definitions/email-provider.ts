@@ -6,7 +6,7 @@ import {
   TEmailType,
   UserPayload,
 } from '../../redifood-module/src/interfaces';
-import { Setting, SettingsDoc } from '../models/settings.model';
+// import { Setting, SettingsDoc } from '../models/settings.model';
 import { IUserData, User, UserDoc } from '../models/users.model';
 
 class EmailProvider {
@@ -18,6 +18,7 @@ class EmailProvider {
   private recepients: Recipient[];
   private htmlText: string;
   private codePassword!: any;
+  private domainId: any = 'vdvd';
 
   constructor(
     emailType: TEmailType,
@@ -38,7 +39,7 @@ class EmailProvider {
     {
       type: 'VALIDATE_EMAIL',
       id: 'z86org89p6k4ew13',
-      lang: ELanguage.FRENCH,
+      lang: ELanguage.ENGLISH,
     },
   ];
 
@@ -59,9 +60,9 @@ class EmailProvider {
     return await User.findById(this.userId);
   }
 
-  private async getSettings(): Promise<SettingsDoc> {
-    return await Setting.findOne({ user: this.userId });
-  }
+  // private async getSettings(): Promise<SettingsDoc> {
+  //   return await Setting.findOne({ user: this.userId });
+  // }
 
   private async createRecipient(): Promise<void> {
     const userData = await this.getUser();
@@ -111,10 +112,10 @@ class EmailProvider {
 
   private setSubject() {
     switch (this.emailType) {
-      case 'VALIDATE_EMAIL':
-        return this.lang === ELanguage.ENGLISH
-          ? 'FOOD - Email validation'
-          : 'FOOD - Validation de votre email';
+      // case 'VALIDATE_EMAIL':
+      //   return this.lang === ELanguage.FRENCH
+      //     ? 'FOOD - Email validation'
+      //     : 'FOOD - Validation de votre email';
       default:
         return this.lang === ELanguage.ENGLISH
           ? 'FOOD - Reset your password'
