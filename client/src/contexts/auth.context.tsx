@@ -28,30 +28,29 @@ interface IAuthProvider {
 }
 
 export function AuthProvider({ children }: IAuthProvider) {
-  // const [currentUser, setCurrentUser] = useState({ username: "pit" });
-  const [currentUser, setCurrentUser] = useState<IUseAuth["currentUser"]>({ username: "pit" });
+  const [currentUser, setCurrentUser] = useState<IUseAuth["currentUser"]>(null);
   const [spinLoading, setSpinLoading] = useState(true);
 
   useEffect(() => {
-    setSpinLoading(false);
-    // setTimeout(() => {
-    //   setCurrentUser({ username: "pit" });
-    //   // console.log("currentUser", currentUser);
-    //   // setSpinLoading(false);
-    // }, 1000);
-    // new Promise((resolve, reject) => {
-    //   AxiosFunction({ url: "/api/auth/currentuser", method: "get", body: {}, queryParams: {} })
-    //     .then((res) => {
-    //       setCurrentUser(res.data.currentUser);
-    //       setSpinLoading(false);
-    //       resolve(res);
-    //     })
-    //     .catch((err) => {
-    //       setCurrentUser(null);
-    //       setSpinLoading(false);
-    //       reject(err);
-    //     });
-    // });
+    setSpinLoading(true);
+    new Promise((resolve, reject) => {
+      AxiosFunction({
+        url: `${process.env.NEXT_PUBLIC_BACK_END}/api/auth/currentuser`,
+        method: "get",
+        body: {},
+        queryParams: {},
+      })
+        .then((res) => {
+          setCurrentUser(res.data.currentUser);
+          setSpinLoading(false);
+          resolve(res);
+        })
+        .catch((err) => {
+          setCurrentUser(null);
+          setSpinLoading(false);
+          reject(err);
+        });
+    });
   }, [currentUser]);
 
   const verifyUser = () => {

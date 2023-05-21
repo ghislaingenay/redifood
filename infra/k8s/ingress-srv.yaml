@@ -7,21 +7,14 @@ metadata:
     nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
   rules:
-    - host: redifood.com # Made up domain name that will work on my local machine
+    - host: redifood.com
       http:
         paths:
-          - path: /api/auth/?(.*)
+          - path: /api/?(.*)
             pathType: Prefix
             backend:
               service:
-                name: auth-srv
-                port:
-                  number: 3000
-          - path: /api/foods/?(.*)
-            pathType: Prefix
-            backend:
-              service:
-                name: foods-srv
+                name: backend-srv
                 port:
                   number: 3000
           - path: /?(.*)
