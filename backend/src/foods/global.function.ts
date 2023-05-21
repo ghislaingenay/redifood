@@ -94,13 +94,14 @@ interface IKeys<T, K> {
 }
 
 type TDirection = 'apiToDb' | 'dbToApi';
+type ResKeys<T, K> = TDirection extends 'apiToDb' ? T : K;
 
 export const convertKeys = <T extends RecordAny, K extends RecordAny>(
   data: TDirection extends 'apiToDb' ? K : T,
   direction: TDirection,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   keys?: IKeys<T, K>,
-) => {
+): ResKeys<T, K> => {
   const keyValuePairs = Object.entries(data).map(([key, value]) => {
     if (direction === 'dbToApi') {
       if (key === 'id') {
