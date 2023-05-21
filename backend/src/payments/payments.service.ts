@@ -1,4 +1,5 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
+import moment from 'moment';
 import StripePayService from 'src/definitions/stripe-pay';
 import Stripe from 'stripe';
 import {
@@ -25,7 +26,11 @@ export class PaymentsService {
     paymentDto: CreatePaymentDto,
     userId: UserPayload['id'],
   ): Promise<IGetServerSideData<any>> {
-    const paymentInformation: IPaymentApi = { ...paymentDto, userId }; // missing informations
+    const paymentInformation: IPaymentApi = {
+      ...paymentDto,
+      userId,
+      paymentDate: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+    };
     // query is created in repo
     await Payments.createOne(paymentInformation);
     return {
@@ -64,7 +69,7 @@ export class PaymentsService {
         service: 'payments',
       });
       const chargeData = await stripePayment.payCharge();
-      console.log(chargeData);
+      console.log('chrged', chargeData);
     }
     return {
       results: { isPaid: true },

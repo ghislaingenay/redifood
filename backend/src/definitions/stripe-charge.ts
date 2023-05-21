@@ -24,13 +24,13 @@ class StripeCharge {
     }
   }
 
-  protected async retrieveCharge(): Promise<Stripe.Charge> {
+  public async retrieveCharge(): Promise<Stripe.Charge> {
     this.initializeClient();
     this.checkChargeId();
     return await this.stripeClient.charges.retrieve(this.chargeId);
   }
 
-  protected async updateCharge(data: any) {
+  public async updateCharge(data: any) {
     this.initializeClient();
     this.checkChargeId();
     // send data in snake case

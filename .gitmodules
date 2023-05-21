@@ -1,9 +1,6 @@
 [submodule "client/redifood-module"]
 	path = client/redifood-module
 	url = https://github.com/ghislaingenay/redifood-module
-[submodule "orders/redifood-module"]
-	path = orders/redifood-module
-	url = https://github.com/ghislaingenay/redifood-module
 [submodule "backend/redifood-module"]
 	path = backend/redifood-module
 	url = https://github.com/ghislaingenay/redifood-module
