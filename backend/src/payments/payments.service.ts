@@ -1,8 +1,15 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
+import StripePayService from 'src/definitions/stripe-pay';
+import Stripe from 'stripe';
 import {
+  EPaymentStatus,
+  EPaymentType,
   IGetServerSideData,
+  IPaymentApi,
   UserPayload,
 } from '../../redifood-module/src/interfaces';
+import { CreatePaymentDto, PayPaymentDto } from './payments.dto';
+import Payments from './paymentsrepo';
 
 @Injectable()
 export class PaymentsService {
@@ -14,9 +21,55 @@ export class PaymentsService {
     return { results: 'yes', statusCode: HttpStatus.OK, message: 'recovered' };
   }
 
+  async initializePayment(
+    paymentDto: CreatePaymentDto,
+    userId: UserPayload['id'],
+  ): Promise<IGetServerSideData<any>> {
+    const paymentInformation: IPaymentApi = { ...paymentDto, userId }; // missing informations
+    // query is created in repo
+    await Payments.createOne(paymentInformation);
+    return {
+      results: {},
+      message: 'Payment initialized',
+      statusCode: HttpStatus.CREATED,
+    };
+  }
+
   // or maybe payment already performed before
-  async payOrder(createPaymentDto: any): Promise<IGetServerSideData<any>> {
-    console.log(createPaymentDto);
-    return { results: 'yes', statusCode: HttpStatus.OK, message: 'recovered' };
+  async payOrder(
+    payPaymentDto: PayPaymentDto,
+    userId: UserPayload['id'],
+    paymentType: EPaymentType,
+    token: Stripe.Token,
+  ): Promise<IGetServerSideData<{ isPaid: boolean }>> {
+    // check for discount
+    if (paymentType === EPaymentType.CASH) {
+      const updatedData: Partial<IPaymentApi> = {
+        id: payPaymentDto.id,
+        paymentType: EPaymentType.CASH,
+        paymentStatus: EPaymentStatus.COMPLETED,
+      };
+      // update payment - catch err already in updateOne function
+      await Payments.updateOne(updatedData, userId);
+      return {
+        results: { isPaid: true },
+        statusCode: HttpStatus.OK,
+        message: 'recovered',
+      };
+    } else {
+      const stripePayment = new StripePayService({
+        userId,
+        token,
+        id: payPaymentDto.orderId,
+        service: 'payments',
+      });
+      const chargeData = await stripePayment.payCharge();
+      console.log(chargeData);
+    }
+    return {
+      results: { isPaid: true },
+      statusCode: HttpStatus.OK,
+      message: 'recovered',
+    };
   }
 }

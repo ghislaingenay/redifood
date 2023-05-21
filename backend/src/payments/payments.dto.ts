@@ -26,3 +26,8 @@ export class CreatePaymentDto {
   @IsEnum(EPaymentStatus)
   paymentStatus: EPaymentStatus;
 }
+
+export class PayPaymentDto extends CreatePaymentDto {
+  @IsInt()
+  id: number;
+}
