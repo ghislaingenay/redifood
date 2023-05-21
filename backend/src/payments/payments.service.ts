@@ -1,4 +1,5 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
+import moment from 'moment';
 import StripePayService from 'src/definitions/stripe-pay';
 import Stripe from 'stripe';
 import {
@@ -10,7 +11,6 @@ import {
 } from '../../redifood-module/src/interfaces';
 import { CreatePaymentDto, PayPaymentDto } from './payments.dto';
 import Payments from './paymentsrepo';
-import moment from 'moment';
 
 @Injectable()
 export class PaymentsService {
@@ -69,7 +69,7 @@ export class PaymentsService {
         service: 'payments',
       });
       const chargeData = await stripePayment.payCharge();
-      console.log(chargeData);
+      console.log('chrged', chargeData);
     }
     return {
       results: { isPaid: true },
