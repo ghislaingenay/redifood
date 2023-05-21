@@ -10,6 +10,7 @@ import {
 } from '../../redifood-module/src/interfaces';
 import { CreatePaymentDto, PayPaymentDto } from './payments.dto';
 import Payments from './paymentsrepo';
+import moment from 'moment';
 
 @Injectable()
 export class PaymentsService {
@@ -25,7 +26,11 @@ export class PaymentsService {
     paymentDto: CreatePaymentDto,
     userId: UserPayload['id'],
   ): Promise<IGetServerSideData<any>> {
-    const paymentInformation: IPaymentApi = { ...paymentDto, userId }; // missing informations
+    const paymentInformation: IPaymentApi = {
+      ...paymentDto,
+      userId,
+      paymentDate: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+    };
     // query is created in repo
     await Payments.createOne(paymentInformation);
     return {
