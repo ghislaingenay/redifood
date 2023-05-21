@@ -11,8 +11,12 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { User } from 'redifood-module/src/handling-nestjs/user-decorator';
-import { UserPayload } from '../../redifood-module/src/interfaces';
+import {
+  EPaymentType,
+  UserPayload,
+} from '../../redifood-module/src/interfaces';
 import { AuthGuard } from '../../src/global/auth-guard';
+import { CreatePaymentDto } from './payments.dto';
 import { PaymentsService } from './payments.service';
 
 @Controller('payments')
@@ -35,10 +39,15 @@ export class PaymentsController {
   // paidOrder
   @UseGuards(new AuthGuard())
   @Post()
-  // Might be obtained from callback of stripe payment
   async payOrder(
-    @Body(new ValidationPipe()) paymentDto: any,
+    @Body(new ValidationPipe()) paymentDto: CreatePaymentDto,
+    @User() user: UserPayload,
+    @Query('paymentType') paymentType: EPaymentType,
   ) {
-    return await this.paymentsService.payOrder(paymentDto);
+    return await this.paymentsService.payOrder(
+      paymentDto,
+      user.id,
+      paymentType,
+    );
   }
 }

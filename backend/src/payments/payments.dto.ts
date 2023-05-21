@@ -1,7 +1,7 @@
-import { IsEnum, IsInt, IsString } from 'class-validator';
+import { IsBoolean, IsEnum, IsInt, IsNumber } from 'class-validator';
 import {
+  EPaymentStatus,
   EPaymentType,
-  UserPayload,
 } from '../../redifood-module/src/interfaces';
 
 export class CreatePaymentDto {
@@ -11,12 +11,18 @@ export class CreatePaymentDto {
   @IsEnum(EPaymentType)
   paymentType: EPaymentType;
 
-  @IsString()
-  userId: UserPayload['id'];
+  @IsInt()
+  paymentDiscountId: number; // 0 if no discount
 
   @IsInt()
-  discountId: number; // 0 if no discount
+  paymentAmount: number;
 
-  @IsInt()
-  orderTotal: number;
+  @IsBoolean()
+  paymentDiscountApplied: boolean;
+
+  @IsNumber()
+  paymentTaxAmount: number;
+
+  @IsEnum(EPaymentStatus)
+  paymentStatus: EPaymentStatus;
 }
