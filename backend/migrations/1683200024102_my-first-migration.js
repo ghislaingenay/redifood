@@ -77,16 +77,14 @@ exports.up = (pgm) => {
     id SERIAL PRIMARY KEY,
     user_id VARCHAR NOT NULL,
     order_id INTEGER REFERENCES orders(id),
-    stripe_id VARCHAR NOT NULL,
+    payment_stripe_id VARCHAR NOT NULL,
     payment_status VARCHAR(20) NOT NULL DEFAULT 'created',
     payment_type paytype NOT NULL,
     payment_amount NUMERIC NOT NULL CHECK (payment_amount > 0),
     payment_date DATE NOT NULL DEFAULT NOW(),
-    discount_applied BOOLEAN NOT NULL DEFAULT false,
-    discount_id INTEGER REFERENCES discount(id) DEFAULT 0
-    stripe_id VARCHAR NOT NULL,
-    stripe_link VARCHAR NOT NULL,
-    tax_amount NUMERIC NOT NULL CHECK (payment_tax > 0),
+    payment_discount_applied BOOLEAN NOT NULL DEFAULT false,
+    payment_discount_id INTEGER REFERENCES discount(id) DEFAULT 0
+    payment_tax_amount NUMERIC NOT NULL CHECK (payment_tax > 0),
   )
   `);
 };
