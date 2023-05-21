@@ -71,7 +71,7 @@ class StripePayService {
     };
   }
 
-  protected async payCharge(): Promise<Stripe.Charge> {
+  public async payCharge(): Promise<Stripe.Charge> {
     this.initializeClient();
     const { lang, currency } = await this.getUserInformation();
     const orderDescription =
