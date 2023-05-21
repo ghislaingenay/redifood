@@ -1,40 +1,68 @@
+import { DatabaseError } from '../../redifood-module/src/handling-nestjs/database-error.exception';
 import {
   IPaymentApi,
   IPaymentDB,
   UserPayload,
-} from 'redifood-module/src/interfaces';
-import { convertKeys } from 'src/foods/global.function';
+} from '../../redifood-module/src/interfaces';
+import { convertKeys, createQuery } from '../../src/foods/global.function';
 import { pool } from '../../src/pool.pg';
 
 class Payments {
   static async findAll(userId: UserPayload['id']) {
-    const response = await pool.query(
-      `SELECT * FROM payment WHERE user_id = $1`,
-      [userId],
-    );
-    return response.rows;
+    try {
+      const response = await pool.query(
+        `SELECT * FROM payment WHERE user_id = $1`,
+        [userId],
+      );
+      return response.rows;
+    } catch (err) {
+      throw new DatabaseError();
+    }
   }
 
   static async findOne(id, userId): Promise<IPaymentApi> {
-    const response: IPaymentDB = (
-      await pool.query(`SELECT * FROM payment WHERE id = $1 AND user_id = $2`, [
-        id,
-        userId,
-      ])
-    ).rows[0];
-    const apiResponse = convertKeys<IPaymentDB, IPaymentApi>(
-      response,
-      'dbToApi',
-    );
-    return apiResponse;
+    try {
+      const response: IPaymentDB = (
+        await pool.query(
+          `SELECT * FROM payment WHERE id = $1 AND user_id = $2`,
+          [id, userId],
+        )
+      ).rows[0];
+      const apiResponse = convertKeys<IPaymentDB, IPaymentApi>(
+        response,
+        'dbToApi',
+      );
+      return apiResponse;
+    } catch (err) {
+      throw new DatabaseError();
+    }
   }
 
-  static async createOne(payment: IPaymentApi, userId: UserPayload['id']) {}
+  static async createOne(data: IPaymentApi) {
+    const postgresQuery = createQuery(data, 'payment');
+    try {
+      await pool.query(postgresQuery);
+      return data;
+    } catch (err) {
+      throw new DatabaseError();
+    }
+  }
 
   static async updateOne(
     payment: Partial<IPaymentApi>,
     userId: UserPayload['id'],
-  ) {}
+  ) {
+    try {
+      const updatedQuery = createQuery(payment, 'payment');
+      const response = await pool.query(
+        `${updatedQuery} WHERE id = $1 AND user_id = $2`,
+        [payment.id, userId],
+      );
+      return response.rows[0];
+    } catch (err) {
+      throw new DatabaseError();
+    }
+  }
 }
 
 export default Payments;
