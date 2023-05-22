@@ -9,19 +9,28 @@ import { convertKeys, createQuery } from '../../src/foods/global.function';
 import { pool } from '../../src/pool.pg';
 
 class Payments {
-  static async findAll(userId: UserPayload['id']) {
+  static async findAllByUser(
+    userId: UserPayload['id'],
+  ): Promise<IPaymentApi[]> {
     try {
       const response = await pool.query(
         `SELECT * FROM payment WHERE user_id = $1`,
         [userId],
       );
-      return response.rows;
+      const res: IPaymentDB[] = response.rows;
+      const apiResponse = res.map((item: IPaymentDB) => {
+        return convertKeys<IPaymentDB, IPaymentApi>(item, 'dbToApi');
+      });
+      return apiResponse;
     } catch (err) {
       throw new DatabaseError();
     }
   }
 
-  static async findOne(id, userId): Promise<IPaymentApi> {
+  static async findOne(
+    id: number,
+    userId: UserPayload['id'],
+  ): Promise<IPaymentApi> {
     try {
       const response: IPaymentDB = (
         await pool.query(
@@ -39,11 +48,11 @@ class Payments {
     }
   }
 
-  static async createOne(data: IPaymentApi) {
+  static async createOne(data: IPaymentApi): Promise<{ created: boolean }> {
     const postgresQuery = createQuery(data, 'payment');
     try {
       await pool.query(postgresQuery);
-      return data;
+      return { created: true };
     } catch (err) {
       throw new DatabaseError();
     }
@@ -52,14 +61,14 @@ class Payments {
   static async updateOne(
     payment: Partial<IPaymentApi>,
     userId: UserPayload['id'],
-  ) {
+  ): Promise<{ updated: boolean }> {
     try {
       const updatedQuery = createQuery(payment, 'payment');
-      const response = await pool.query(
-        `${updatedQuery} WHERE id = $1 AND user_id = $2`,
-        [payment.id, userId],
-      );
-      return response.rows[0];
+      await pool.query(`${updatedQuery} WHERE id = $1 AND user_id = $2`, [
+        payment.id,
+        userId,
+      ]);
+      return { updated: true };
     } catch (err) {
       throw new DatabaseError();
     }
