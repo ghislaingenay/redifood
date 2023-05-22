@@ -27,6 +27,27 @@ class Payments {
     }
   }
 
+  static async findByOrderId(
+    orderId: IPaymentApi['orderId'] | IPaymentDB['order_id'],
+    userId: UserPayload['id'],
+  ): Promise<IPaymentApi> {
+    try {
+      const response: IPaymentDB = (
+        await pool.query(
+          `SELECT * FROM payment WHERE order_id = $1 AND user_id = $2`,
+          [orderId, userId],
+        )
+      ).rows[0];
+      const apiResponse = convertKeys<IPaymentDB, IPaymentApi>(
+        response,
+        'dbToApi',
+      );
+      return apiResponse;
+    } catch (err) {
+      throw new DatabaseError();
+    }
+  }
+
   static async findOne(
     id: number,
     userId: UserPayload['id'],

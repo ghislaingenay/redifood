@@ -17,9 +17,13 @@ export class PaymentsService {
   async getPaymentByOrderId(
     orderId: number,
     userId: UserPayload['id'],
-  ): Promise<IGetServerSideData<any>> {
-    console.log(orderId, userId);
-    return { results: 'yes', statusCode: HttpStatus.OK, message: 'recovered' };
+  ): Promise<IGetServerSideData<IPaymentApi>> {
+    const payment = await Payments.findByOrderId(orderId, userId);
+    return {
+      results: payment,
+      statusCode: HttpStatus.OK,
+      message: 'recovered',
+    };
   }
 
   async initializePayment(
