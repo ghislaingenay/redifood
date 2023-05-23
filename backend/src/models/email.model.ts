@@ -39,7 +39,7 @@ const emailSchema = new mongoose.Schema(
       unique: true,
     },
     isEmailValidated: {
-      tye: Boolean,
+      type: Boolean,
       required: true,
       default: false,
     },
@@ -69,8 +69,6 @@ const emailSchema = new mongoose.Schema(
     toJSON: {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       transform(doc: mongoose.Document, ret: any) {
-        // Make direct changes to the JSON OBJECT
-        delete ret.password;
         delete ret.__v;
         ret.id = ret._id;
         delete ret._id;
