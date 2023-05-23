@@ -2,6 +2,7 @@
 
 exports.shorthands = undefined;
 
+// CREATE TYPE orderstatus AS ENUM ('created', 'paid', 'cancelled', 'finished');
 exports.up = (pgm) => {
   pgm.sql(`
   CREATE TABLE food_section (
@@ -34,14 +35,14 @@ exports.up = (pgm) => {
     item_quantity SMALLINT NOT NULL DEFAULT 0
   );
 
-  CREATE TYPE orderstatus AS ENUM ('created', 'paid', 'cancelled', 'finished');
 
-  CREATE TABLE order (
+
+  CREATE TABLE orders (
     id SERIAL PRIMARY KEY,
     order_created TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
     order_table_number INTEGER NOT NULL CHECK (order_table_number > 0),
     order_time NUMERIC NOT NULL DEFAULT 0,
-    order_status orderstatus NOT NULL,
+    order_status orderstatus NOT NULL DEFAULT 'created',
     order_total NUMERIC NOT NULL CHECK (order_total > 0),
     user_id VARCHAR NOT NULL,
     order_finished TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
@@ -51,7 +52,7 @@ exports.up = (pgm) => {
 
   CREATE TABLE order_items (
     id SERIAL PRIMARY KEY,
-    order_id INTEGER REFERENCES order(id),
+    order_id INTEGER REFERENCES orders(id),
     user_id VARCHAR NOT NULL,
     food_id INTEGER REFERENCES food(id),
     order_item_quantity SMALLINT NOT NULL DEFAULT 0,
@@ -83,8 +84,8 @@ exports.up = (pgm) => {
     payment_amount NUMERIC NOT NULL CHECK (payment_amount > 0),
     payment_date TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     payment_discount_applied BOOLEAN NOT NULL DEFAULT false,
-    payment_discount_id INTEGER REFERENCES discount(id) DEFAULT 0
-    payment_tax_amount NUMERIC NOT NULL CHECK (payment_tax > 0),
+    payment_discount_id INTEGER REFERENCES discount(id) DEFAULT 0,
+    payment_tax_amount NUMERIC NOT NULL CHECK (payment_tax_amount > 0)
   )
   `);
 };
