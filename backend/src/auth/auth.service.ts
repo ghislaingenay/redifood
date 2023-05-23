@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
 import { User } from '../models/users.model';
-import { signUpUserDto } from './auth.dto';
+import { signInUserDto, signUpUserDto } from './auth.dto';
 import { PasswordManager } from './password-manager';
 
 @Injectable()
@@ -26,7 +26,7 @@ export class AuthService {
     return [createdUser, userJwt];
   }
 
-  async signInUser(signInDto: signUpUserDto) {
+  async signInUser(signInDto: signInUserDto) {
     const { email, password } = signInDto;
     const existingUser = await User.findOne({ email });
     if (!existingUser) {

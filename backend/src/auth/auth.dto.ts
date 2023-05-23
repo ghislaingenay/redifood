@@ -6,7 +6,7 @@ import {
   Matches,
 } from 'class-validator';
 
-export class signUpUserDto {
+export class signInUserDto {
   @IsNotEmpty()
   @IsEmail()
   email: string;
@@ -21,7 +21,9 @@ export class signUpUserDto {
     },
   )
   password: string;
+}
 
+export class signUpUserDto extends signInUserDto {
   @IsNotEmpty()
   @IsString()
   firstName: string;
@@ -30,5 +32,3 @@ export class signUpUserDto {
   @IsString()
   lastName: string;
 }
-
-export class signInUserDto extends signUpUserDto {}
