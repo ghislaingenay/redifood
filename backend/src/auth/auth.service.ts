@@ -7,12 +7,12 @@ import { PasswordManager } from './password-manager';
 @Injectable()
 export class AuthService {
   async signUpUser(signUpDto: signUpUserDto) {
-    const { email, password } = signUpDto;
+    const { email, password, firstName, lastName } = signUpDto;
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       throw new BadRequestException('Invalid credentials');
     }
-    const newUser = User.build({ email, password });
+    const newUser = User.build({ email, password, firstName, lastName });
     const createdUser = await newUser.save();
     // Generate JWT
     const userJwt: string = jwt.sign(
