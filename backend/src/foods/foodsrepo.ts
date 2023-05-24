@@ -29,10 +29,12 @@ class Foods {
     };
   };
 
-  private static find_foods_query = `SELECT * FROM foods as f INNER JOIN food_section ON food_section.id = f.section_id INNER JOIN food_extra ON f.extra_id = food_extra.id`;
+  private static find_foods_query = `SELECT * FROM food as f INNER JOIN food_section ON food_section.id = f.section_id INNER JOIN food_extra ON f.extra_id = food_extra.id`;
   static async findAll(userId: UserPayload['id']): Promise<IFoodGetApi[]> {
     const response = (
-      await pool.query(`${this.find_foods_query} WHERE user_id = $1`, [userId])
+      await pool.query(`${this.find_foods_query} WHERE f.user_id = $1`, [
+        userId,
+      ])
     ).rows;
 
     if (!response) {
@@ -51,7 +53,7 @@ class Foods {
   ): Promise<IFoodGetApi[]> {
     const response = (
       await pool.query(
-        `${this.find_foods_query} WHERE f.section_id = $1 AND user_id = $2`,
+        `${this.find_foods_query} WHERE f.section_id = $1 AND f.user_id = $2`,
         [id, userId],
       )
     ).rows;
@@ -73,7 +75,7 @@ class Foods {
 
   static async getSectionList(userId: UserPayload['id']) {
     const response = await pool.query(
-      `SELECT * FROM food_extra INNER JOIN food_section ON food_section.id = food.extra.section_id AND user_id = $1`,
+      `SELECT * FROM fe INNER JOIN food_section ON food_section.id = fe.section_id AND fe.user_id = $1`,
       [userId],
     );
     return response;
@@ -81,7 +83,7 @@ class Foods {
 
   static async deleteExtra(id: number) {
     try {
-      await pool.query(`DELETE FROM foods WHERE extra_id = $1`, [id]);
+      await pool.query(`DELETE FROM food WHERE extra_id = $1`, [id]);
       await pool.query(`DELETE FROM food_extra WHERE id = $1`, [id]);
       return { deleted: true };
     } catch (error) {
@@ -91,7 +93,7 @@ class Foods {
 
   static async deleteSection(id: number) {
     try {
-      await pool.query(`DELETE FROM foods WHERE section_id = $1`, [id]);
+      await pool.query(`DELETE FROM food WHERE section_id = $1`, [id]);
       await pool.query(`DELETE FROM food_extra WHERE section_id = $1`, [id]);
       await pool.query(`DELETE FROM food_section WHERE id = $1`, [id]);
       return { deleted: true };
@@ -102,7 +104,7 @@ class Foods {
 
   static async deleteFood(id: number) {
     try {
-      await pool.query(`DELETE FROM foods WHERE id = $1`, [id]);
+      await pool.query(`DELETE FROM food WHERE id = $1`, [id]);
       return { deleted: true };
     } catch (err) {
       throw new DatabaseError();
@@ -130,9 +132,7 @@ class Foods {
   }
   static async countFoods(userId: UserPayload['id']): Promise<number> {
     const res = (
-      await pool.query(`SELECT COUNT(*) FROM foods  WHERE user_id = $1`, [
-        userId,
-      ])
+      await pool.query(`SELECT COUNT(*) FROM food WHERE user_id = $1`, [userId])
     ).rows[0].count;
     if (!res) throw new DatabaseError();
     return Number(res);

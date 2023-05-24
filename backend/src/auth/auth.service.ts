@@ -32,7 +32,6 @@ export class AuthService {
     if (!existingUser) {
       throw new BadRequestException('Invalid credentials');
     }
-    console.log('existing user', existingUser);
     const passwordsMatch = await PasswordManager.compare(
       existingUser.password,
       password,

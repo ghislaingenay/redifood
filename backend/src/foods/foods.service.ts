@@ -112,7 +112,7 @@ export class FoodService {
     return {
       results: {},
       statusCode: EStatusCodes.CREATED,
-      message: EFoodMessage.FOOD_CREATED,
+      message: `${body.itemName} was properly created`,
     };
   }
 
