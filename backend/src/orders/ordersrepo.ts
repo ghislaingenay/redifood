@@ -1,4 +1,5 @@
 import {
+  IFoodGetApi,
   IFoodOrder,
   IOrderApi,
   IOrderDB,
@@ -7,6 +8,7 @@ import {
   TOrderType,
   UserPayload,
 } from 'redifood-module/src/interfaces';
+import Foods from 'src/foods/foodsrepo';
 import {
   convertKeys,
   createQuery,
@@ -155,7 +157,20 @@ class Orders {
   static async setOrderItems(idList: IMenuId, orderItems: string) {
     const { userId, orderId } = idList;
     const orderMenu: IFoodOrder[] = JSON.parse(orderItems);
-    const updatedMenu: IOrderItemsDB[] = orderMenu.map((item: IFoodOrder) => {
+    const foodList = await Foods.findAll(userId);
+    const updatedMenu: IFoodGetApi[] = foodList.map((item: IFoodGetApi) => {
+      const foundItem = orderMenu.find(
+        (orderItem: IFoodOrder) => orderItem.id === item.id,
+      );
+      if (foundItem) {
+        return {
+          ...item,
+          itemQuantity: foundItem.itemQuantity,
+        };
+      }
+      return item;
+    });
+    const completedMenu: IOrderItemsDB[] = updatedMenu.map((item) => {
       return {
         order_id: orderId,
         user_id: userId,
@@ -167,7 +182,7 @@ class Orders {
     });
 
     const createdQuery = createQuery<IOrderItemsDB[]>(
-      updatedMenu,
+      completedMenu,
       'order_items',
     );
     const response = await pool.query(createdQuery);
