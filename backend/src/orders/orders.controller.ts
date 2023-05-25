@@ -7,6 +7,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -95,6 +96,7 @@ export class OrdersController {
     paymentType: EPaymentType,
     orderId: number,
     @User() user: UserPayload,
+    @Body() data: any,
   ) {
     const body: AwaitPaymenDto = {
       orderId,
@@ -117,6 +119,8 @@ export class OrdersController {
     return await this.ordersService.sendReceipt(sendReceiptDto, orderId);
   }
 
+  @UseGuards(new AuthGuard())
+  @Put(':id')
   async updateOrder(
     @Param(
       'id',
