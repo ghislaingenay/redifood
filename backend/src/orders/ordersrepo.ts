@@ -1,3 +1,4 @@
+import { BadRequestException } from '@nestjs/common';
 import {
   IFoodGetApi,
   IFoodOrder,
@@ -107,10 +108,13 @@ class Orders {
     userId: UserPayload['id'];
     orderId: number;
   }): Promise<IOrderApi> {
-    const orderDB: { rows: IOrderDB[] } = pool.query(
+    const orderDB: { rows: IOrderDB[] } = await pool.query(
       `SELECT * FROM orders WHERE user_id = $1 AND id = $2`,
       [userId, orderId],
     );
+    if (!orderDB.rows[0]) {
+      throw new BadRequestException('Order not found');
+    }
     return convertKeys(orderDB.rows[0], 'dbToApi') as IOrderApi;
   }
 
