@@ -119,12 +119,12 @@ class Orders {
   ) {
     // use createQuery function
     const response = await pool.query(
-      `INSERT INTO orders (order_no, order_status, order_table_number, order_total, order_items, user_id) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      `INSERT INTO orders (order_no, order_status, order_table_number, order_total, order_items, user_id) VALUES ($1, $2, $3, $4, $5, $6)`,
       [
         body.orderNo,
-        `'${body.orderStatus}'`,
+        body.orderStatus,
         body.orderTableNumber,
-        body.orderTotal,
+        Number(body.orderTotal),
         JSON.stringify(body.orderItems),
         body.userId,
       ],
@@ -206,9 +206,14 @@ class Orders {
       }
       return item;
     });
-    return updatedMenu.reduce((acc, item) => {
+    const filteredMenu = updatedMenu.filter((item) => item.itemQuantity > 0);
+    console.log('filteredMenu', filteredMenu);
+    const totalAmount = filteredMenu.reduce((acc, item) => {
       return acc + item.itemPrice * item.itemQuantity;
     }, 0);
+    console.log('totalAmount', totalAmount);
+
+    return totalAmount;
   }
 }
 

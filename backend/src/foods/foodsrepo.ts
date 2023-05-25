@@ -29,7 +29,7 @@ class Foods {
     };
   };
 
-  private static find_foods_query = `SELECT * FROM food as f INNER JOIN food_section ON food_section.id = f.section_id INNER JOIN food_extra ON f.extra_id = food_extra.id`;
+  private static find_foods_query = `SELECT * FROM food as f INNER JOIN food_section fs on fs.id = f.section_id INNER JOIN food_extra fe ON f.extra_id = fe.id`;
   static async findAll(userId: UserPayload['id']): Promise<IFoodGetApi[]> {
     const response = (
       await pool.query(`${this.find_foods_query} WHERE f.user_id = $1`, [
