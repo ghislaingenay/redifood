@@ -188,6 +188,28 @@ class Orders {
     const response = await pool.query(createdQuery);
     return response;
   }
+
+  static async calculateAmountFromMenu(
+    orderItems: IFoodOrder[],
+    userId: UserPayload['id'],
+  ): Promise<number> {
+    const foodList = await Foods.findAll(userId);
+    const updatedMenu: IFoodGetApi[] = foodList.map((item: IFoodGetApi) => {
+      const foundItem = [...orderItems].find(
+        (orderItem: IFoodOrder) => orderItem.id === item.id,
+      );
+      if (foundItem) {
+        return {
+          ...item,
+          itemQuantity: foundItem.itemQuantity,
+        };
+      }
+      return item;
+    });
+    return updatedMenu.reduce((acc, item) => {
+      return acc + item.itemPrice * item.itemQuantity;
+    }, 0);
+  }
 }
 
 export default Orders;

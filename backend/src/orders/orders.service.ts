@@ -1,15 +1,12 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import {
   EOrderStatus,
-  IFoodGetApi,
-  IFoodOrder,
   IGetServerSideData,
   IOrderApi,
   IOrderItemsApi,
   TOrderType,
   UserPayload,
 } from '../../redifood-module/src/interfaces';
-import Foods from '../../src/foods/foodsrepo';
 import {
   AwaitPaymenDto,
   CreateOrderDto,
@@ -68,22 +65,10 @@ export class OrdersService {
     body: CreateOrderDto,
     userId: UserPayload['id'],
   ): Promise<IGetServerSideData<any>> {
-    const foodList = await Foods.findAll(userId);
-    const updatedMenu: IFoodGetApi[] = foodList.map((item: IFoodGetApi) => {
-      const foundItem = [...body.orderItems].find(
-        (orderItem: IFoodOrder) => orderItem.id === item.id,
-      );
-      if (foundItem) {
-        return {
-          ...item,
-          itemQuantity: foundItem.itemQuantity,
-        };
-      }
-      return item;
-    });
-    const totalPrice = updatedMenu.reduce((acc, item) => {
-      return acc + item.itemPrice * item.itemQuantity;
-    }, 0);
+    const totalPrice = await Orders.calculateAmountFromMenu(
+      body.orderItems,
+      userId,
+    );
     const getOrderNo = await Orders.countOrders();
     const today = new Date();
     // Generate order number
