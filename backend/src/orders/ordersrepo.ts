@@ -78,13 +78,13 @@ class Orders {
     } else {
       const orderClause =
         orderType === 'PAID'
-          ? 'order_status == "completed"'
+          ? `order_status = 'finished'`
           : orderType === 'NOT_PAID'
-          ? 'order_status != "completed"'
+          ? `order_status != 'finished'`
           : '';
 
       const response = await pool.query(
-        `SELECT * FROM orders WHERE ${orderClause} AND user_id = $1`,
+        `SELECT * FROM orders o WHERE ${orderClause} AND user_id = $1`,
         [userId],
       );
 
