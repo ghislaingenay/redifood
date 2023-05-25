@@ -46,6 +46,12 @@ export class OrdersController {
   }
 
   @UseGuards(new AuthGuard())
+  @Get('table')
+  async getUnPaidOrdersTable(@User() user: UserPayload) {
+    return await this.ordersService.getUnPaidOrdersTable(user.id);
+  }
+
+  @UseGuards(new AuthGuard())
   @Get(':id')
   async getOneOrder(
     @Param(
@@ -68,11 +74,6 @@ export class OrdersController {
     id: number,
   ) {
     return await this.ordersService.getOrderItems(id);
-  }
-
-  @Get('table')
-  async getUnPaidOrdersTable() {
-    return await this.ordersService.getUnPaidOrdersTable();
   }
 
   @UseGuards(new AuthGuard())

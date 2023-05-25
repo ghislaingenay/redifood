@@ -45,10 +45,11 @@ class Orders {
     return updatedResponse;
   }
 
-  static async findTable(): Promise<number[]> {
+  static async findTable(userId: UserPayload['id']): Promise<number[]> {
     const response = (
       await pool.query(
-        `SELECT order_table_number FROM orders WHERE order_status != 'completed' AND order_status != 'cancelled'`,
+        `SELECT order_table_number FROM orders WHERE order_status != 'finished' AND order_status != 'cancelled' AND user_id = $1`,
+        [userId],
       )
     ).rows;
     if (!response) {

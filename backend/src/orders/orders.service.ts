@@ -52,8 +52,10 @@ export class OrdersService {
     };
   }
 
-  async getUnPaidOrdersTable(): Promise<IGetServerSideData<number[]>> {
-    const orderItemsResults = await Orders.findTable();
+  async getUnPaidOrdersTable(
+    userId: UserPayload['id'],
+  ): Promise<IGetServerSideData<number[]>> {
+    const orderItemsResults = await Orders.findTable(userId);
     return {
       statusCode: HttpStatus.OK,
       results: orderItemsResults,
