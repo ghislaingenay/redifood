@@ -76,6 +76,7 @@ class Payments {
       await pool.query(postgresQuery);
       return { created: true };
     } catch (err) {
+      console.log(err);
       throw new DatabaseError();
     }
   }
@@ -107,11 +108,14 @@ class Payments {
     }
   }
 
-  static async cancelPayment(orderId: IPaymentApi['orderId']) {
+  static async cancelPayment(
+    orderId: IPaymentApi['orderId'],
+    userId: UserPayload['id'],
+  ) {
     try {
       await pool.query(
-        `UPDATE payment SET payment_status = 'cancelled' WHERE order_id = $1`,
-        [orderId],
+        `UPDATE payment SET payment_status = 'cancelled' WHERE order_id = $1 AND user_id = $2`,
+        [orderId, userId],
       );
       return { message: 'Payment cancelled' };
     } catch (err) {
