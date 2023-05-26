@@ -93,13 +93,13 @@ export class OrdersController {
       'id',
       new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
     )
-    @Query('paymentType')
-    paymentType: EPaymentType,
     orderId: number,
+    @Query('paymentType') paymentType: EPaymentType,
     @User() user: UserPayload,
     @Body() data: any,
   ) {
     const body: AwaitPaymenDto = {
+      ...data,
       orderId,
       userId: user.id,
       paymentType,
@@ -141,9 +141,10 @@ export class OrdersController {
       'id',
       new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
     )
-    id: number,
+    orderId: number,
+    @User() user: UserPayload,
   ) {
-    return await this.ordersService.cancelOrder(id);
+    return await this.ordersService.cancelOrder(orderId, user.id);
   }
 
   @UseGuards(new AuthGuard())
