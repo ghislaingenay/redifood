@@ -84,7 +84,7 @@ exports.up = (pgm) => {
     payment_amount NUMERIC NOT NULL CHECK (payment_amount > 0),
     payment_date TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     payment_discount_applied BOOLEAN NOT NULL DEFAULT false,
-    payment_discount_id INTEGER REFERENCES discount(id) DEFAULT 0,
+    payment_discount_id INTEGER DEFAULT 0 NOT NULL,
     payment_tax_amount NUMERIC NOT NULL CHECK (payment_tax_amount > 0)
   )
   `);

@@ -160,10 +160,10 @@ class Orders {
     return response;
   }
 
-  static async cancelOrder(orderId: number) {
+  static async cancelOrder(orderId: number, userId: UserPayload['id']) {
     const response = await pool.query(
-      `UPDATE orders SET order_status = 'cancelled' WHERE id = $1`,
-      [orderId],
+      `UPDATE orders SET order_status = 'cancelled' WHERE id = $1 AND user_id = $2`,
+      [orderId, userId],
     );
     return response;
   }

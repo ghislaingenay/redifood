@@ -1,9 +1,14 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
+import * as moment from 'moment';
+import { Setting } from 'src/models/settings.model';
+import Payments from 'src/payments/paymentsrepo';
 import {
   EOrderStatus,
+  EPaymentStatus,
   IGetServerSideData,
   IOrderApi,
   IOrderItemsApi,
+  IPaymentDB,
   TOrderType,
   UserPayload,
 } from '../../redifood-module/src/interfaces';
@@ -129,8 +134,13 @@ export class OrdersService {
     };
   }
 
-  async cancelOrder(orderId: number): Promise<IGetServerSideData<any>> {
-    await Orders.cancelOrder(orderId);
+  async cancelOrder(
+    orderId: number,
+    userId: UserPayload['id'],
+  ): Promise<IGetServerSideData<any>> {
+    await Orders.cancelOrder(orderId, userId);
+    await Payments.cancelPayment(orderId, userId);
+
     return {
       statusCode: HttpStatus.OK,
       results: {},
@@ -138,9 +148,39 @@ export class OrdersService {
     };
   }
 
-  async awaitPayment(body: AwaitPaymenDto) {
-    // emptty
-    console.log(body);
+  async awaitPayment(
+    body: AwaitPaymenDto,
+  ): Promise<IGetServerSideData<IPaymentDB>> {
+    const { orderId, userId, paymentType } = body;
+    console.log('%c params', 'color: #00e600', body);
+    const orderData = await Orders.findOne({ orderId, userId });
+    const settingData = await Setting.findOne({ user: userId });
+    const dataForPayment: IPaymentDB = {
+      user_id: userId,
+      order_id: orderId,
+      payment_stripe_id: '',
+      payment_status: EPaymentStatus.AWAITING,
+      payment_type: paymentType,
+      payment_amount: orderData.orderTotal,
+      payment_date: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+      payment_discount_applied: false,
+      payment_discount_id: 0,
+      payment_tax_amount: orderData.orderTotal * (settingData.vat / 100),
+    };
+    const paymentResult = await Payments.createOne(dataForPayment);
+    if (paymentResult.created) {
+      return {
+        statusCode: HttpStatus.OK,
+        results: dataForPayment,
+        message: `Payment created from order ${orderId}`,
+      };
+    } else {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        results: dataForPayment,
+        message: `Payment not created from order ${orderId}`,
+      };
+    }
   }
 
   async sendReceipt(sendReceiptDto: ReceiptBodyDto, orderId: number) {
