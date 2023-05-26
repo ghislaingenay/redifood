@@ -77,13 +77,10 @@ export class OrdersController {
   }
 
   @UseGuards(new AuthGuard())
-  @Post()
-  async createOrder(
-    @Body(new ValidationPipe()) createOrderDto: CreateOrderDto,
-    @User() user: UserPayload,
-  ) {
-    // get order tot and set it to the order
-    return await this.ordersService.createOrder(createOrderDto, user.id);
+  @Post('sheet')
+  async createRowInSheet(@Body() body: IOrderData) {
+    const sheets = new GoogleSheetService();
+    const res = await sheets.createRow(body);
   }
 
   @UseGuards(new AuthGuard())
@@ -121,6 +118,16 @@ export class OrdersController {
   }
 
   @UseGuards(new AuthGuard())
+  @Post()
+  async createOrder(
+    @Body(new ValidationPipe()) createOrderDto: CreateOrderDto,
+    @User() user: UserPayload,
+  ) {
+    // get order tot and set it to the order
+    return await this.ordersService.createOrder(createOrderDto, user.id);
+  }
+
+  @UseGuards(new AuthGuard())
   @Put(':id')
   async updateOrder(
     @Param(
@@ -145,13 +152,6 @@ export class OrdersController {
     @User() user: UserPayload,
   ) {
     return await this.ordersService.cancelOrder(orderId, user.id);
-  }
-
-  @UseGuards(new AuthGuard())
-  @Post('sheet')
-  async createRowInSheet(@Body() body: IOrderData) {
-    const sheets = new GoogleSheetService();
-    await sheets.createRow(body);
   }
 
   // update order and update order item // send back the menu

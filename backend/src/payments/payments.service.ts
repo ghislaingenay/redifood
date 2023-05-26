@@ -1,12 +1,14 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import moment from 'moment';
 import StripePayService from 'src/definitions/stripe-pay';
+import { convertKeys } from 'src/foods/global.function';
 import Stripe from 'stripe';
 import {
   EPaymentStatus,
   EPaymentType,
   IGetServerSideData,
   IPaymentApi,
+  IPaymentDB,
   UserPayload,
 } from '../../redifood-module/src/interfaces';
 import { CreatePaymentDto, PayPaymentDto } from './payments.dto';
@@ -35,8 +37,13 @@ export class PaymentsService {
       userId,
       paymentDate: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
     };
+
+    const paymentDataDB = convertKeys<IPaymentApi, IPaymentDB>(
+      paymentInformation,
+      'apiToDb',
+    );
     // query is created in repo
-    await Payments.createOne(paymentInformation);
+    await Payments.createOne(paymentDataDB);
     return {
       results: {},
       message: 'Payment initialized',
