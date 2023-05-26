@@ -119,8 +119,9 @@ export class OrdersService {
   async updateOrder(
     orderId: number,
     updateOrderDto: UpdateOrderDto,
+    userId: UserPayload['id'],
   ): Promise<IGetServerSideData<any>> {
-    await Orders.updateOrder(updateOrderDto, orderId);
+    await Orders.updateOrder(updateOrderDto, orderId, userId);
     return {
       statusCode: HttpStatus.OK,
       results: {},

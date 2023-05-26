@@ -28,7 +28,7 @@ type TTable =
   | 'food_section'
   | 'food_extra'
   | 'food'
-  | 'order'
+  | 'orders'
   | 'order_items'
   | 'payment'
   | 'discount';

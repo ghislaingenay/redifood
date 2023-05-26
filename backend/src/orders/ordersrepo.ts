@@ -137,9 +137,26 @@ class Orders {
     return response;
   }
 
-  static async updateOrder(body: any, id: number) {
-    const updatedQuery = updateQuery(body, 'order');
-    const response = await pool.query(`${updatedQuery} WHERE id = $1`, [id]);
+  static async updateOrder(
+    body: any,
+    orderId: number,
+    userId: UserPayload['id'],
+  ) {
+    const { orderItems } = body;
+    const totalPrice = await Orders.calculateAmountFromMenu(orderItems, userId);
+    const updatedDataApi: Partial<IOrderApi> = {
+      ...body,
+      orderItems: JSON.stringify(orderItems),
+      orderTotal: totalPrice,
+    };
+    const updatedDataDB = convertKeys<Partial<IOrderApi>, Partial<IOrderDB>>(
+      updatedDataApi,
+      'apiToDb',
+    );
+    const updatedQuery = updateQuery(updatedDataDB, 'orders');
+    const response = await pool.query(`${updatedQuery} WHERE id = $1`, [
+      orderId,
+    ]);
     return response;
   }
 

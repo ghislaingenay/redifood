@@ -129,8 +129,9 @@ export class OrdersController {
     )
     id: number,
     @Body(new ValidationPipe()) updateOrderDto: UpdateOrderDto,
+    @User() user: UserPayload,
   ) {
-    return await this.ordersService.updateOrder(id, updateOrderDto);
+    return await this.ordersService.updateOrder(id, updateOrderDto, user.id);
   }
 
   @UseGuards(new AuthGuard())
