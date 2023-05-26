@@ -49,14 +49,14 @@ class Payments {
   }
 
   static async findOne(
-    id: number,
+    paymentId: number,
     userId: UserPayload['id'],
   ): Promise<IPaymentApi> {
     try {
       const response: IPaymentDB = (
         await pool.query(
           `SELECT * FROM payment WHERE id = $1 AND user_id = $2`,
-          [id, userId],
+          [paymentId, userId],
         )
       ).rows[0];
       const apiResponse = convertKeys<IPaymentDB, IPaymentApi>(
@@ -69,8 +69,9 @@ class Payments {
     }
   }
 
-  static async createOne(data: IPaymentApi): Promise<{ created: boolean }> {
+  static async createOne(data: IPaymentDB): Promise<{ created: boolean }> {
     const postgresQuery = createQuery(data, 'payment');
+    console.log(postgresQuery);
     try {
       await pool.query(postgresQuery);
       return { created: true };
@@ -101,6 +102,18 @@ class Payments {
     try {
       const stripe = new StripeCharge(chargeId);
       return await stripe.retrieveCharge();
+    } catch (err) {
+      throw new DatabaseError();
+    }
+  }
+
+  static async cancelPayment(orderId: IPaymentApi['orderId']) {
+    try {
+      await pool.query(
+        `UPDATE payment SET payment_status = 'cancelled' WHERE order_id = $1`,
+        [orderId],
+      );
+      return { message: 'Payment cancelled' };
     } catch (err) {
       throw new DatabaseError();
     }
