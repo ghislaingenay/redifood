@@ -17,16 +17,18 @@ import { SpacingDiv5X } from "../styles";
 import { RedSpan } from "../styles/styledComponents/span.styled";
 import { LabelFormWhite, RoundedInput } from "../styles/styledComponents/typography.styled";
 import { RediButton } from "./styling/Button.style";
-import { RowCenter, RowSpaceBetween } from "./styling/grid.styled";
 import RediRadioButton from "./styling/RediRadioButton";
+import { RowCenter, RowSpaceBetween } from "./styling/grid.styled";
 
 const Auth = () => {
   // ------------ CONSTANTS ---------
   const [formLogin] = Form.useForm();
   const [formSignUp] = Form.useForm();
+  const [formSettings] = Form.useForm();
   const router = useRouter();
   // ------------ STATE ---------
   const { t } = useTranslation("common");
+  const [showSettings, setShowSettings] = useState(false);
   const options = [
     {
       value: EAuthChoice.SIGNIN,
@@ -129,6 +131,17 @@ const Auth = () => {
     }),
   ];
 
+  const nameRules = (name: "first name" | "last name") => [
+    {
+      required: true,
+      message: `Please input your ${name}!`,
+    },
+    {
+      pattern: /^[a-zA-Z]+$/,
+      message: `Please input a valid ${name}`,
+    },
+  ];
+
   const emailRules = [
     {
       required: true,
@@ -215,6 +228,24 @@ const Auth = () => {
                   <Form.Item name="email" id="email-signup" rules={emailRules} style={formStyle}>
                     <RoundedInput type="text" aria-label="email" placeholder="Email..." />
                   </Form.Item>
+                  <RowSpaceBetween>
+                    <Col xs={24} md={11}>
+                      <LabelFormWhite htmlFor="first-name">
+                        {t("auth.first-name")} <RedSpan>*</RedSpan>
+                      </LabelFormWhite>
+                      <Form.Item name="firstName" id="first-name" rules={nameRules("first name")} style={formStyle}>
+                        <RoundedInput type="text" aria-label="firstName" />
+                      </Form.Item>
+                    </Col>
+                    <Col xs={24} md={11}>
+                      <LabelFormWhite htmlFor="last-name">
+                        {t("auth.last-name")} <RedSpan>*</RedSpan>
+                      </LabelFormWhite>
+                      <Form.Item name="lastName" id="last-name" rules={nameRules("last name")} style={formStyle}>
+                        <RoundedInput type="text" aria-label="lastName" />
+                      </Form.Item>
+                    </Col>
+                  </RowSpaceBetween>
                   <RowSpaceBetween>
                     <Col xs={24} md={11}>
                       <LabelFormWhite htmlFor="pwd-signup">

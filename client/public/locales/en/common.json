@@ -69,6 +69,8 @@
   },
 
   "auth": {
+    "first-name": "First name",
+    "last-name": "Last name",
     "email": "Email",
     "signin": "SIGN IN",
     "register": "REGISTER",
