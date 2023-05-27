@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import axios from 'axios';
 import { DatabaseError } from '../../redifood-module/src/handling-nestjs/database-error.exception';
 import {
@@ -71,15 +71,15 @@ export class FoodService {
     }
     return {
       results: {},
-      statusCode: EStatusCodes.CREATED,
-      message: EFoodMessage.SECTION_CREATED,
+      statusCode: HttpStatus.CREATED,
+      message: `Section: ${body.sectionName} was created successfully`,
     };
   }
 
   async createExtra(
     body: CreateExtraDto,
     userId: UserPayload['id'],
-  ): Promise<IGetServerSideData<any>> {
+  ): Promise<IGetServerSideData<IExtraApi | null>> {
     const bodyWithOrder: IExtraApi = {
       userId: userId,
       ...body,
@@ -90,30 +90,46 @@ export class FoodService {
       'apiToDb',
     );
     const postgresQuery = createQuery(updatedData, 'food_extra');
-    const response = await Foods.createRows(postgresQuery);
-    if (!response) {
-      throw new DatabaseError();
+    try {
+      const response = await Foods.createRows(postgresQuery);
+      if (!response) {
+        throw new DatabaseError();
+      }
+      return {
+        results: bodyWithOrder,
+        statusCode: HttpStatus.CREATED,
+        message: `Section: ${body.extraName} was created successfully for section #${body.sectionId}`,
+      };
+    } catch (err) {
+      return {
+        results: null,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: `Impossible to create ${body.extraName}. Please verify the extra name is already allocated and try again`,
+      };
     }
-    return {
-      results: {},
-      statusCode: EStatusCodes.CREATED,
-      message: EFoodMessage.EXTRA_CREATED,
-    };
   }
 
   async createFood(body: CreateFoodDto, userId: UserPayload['id']) {
     const updatedBody = { ...body, userId };
     const updatedData = convertKeys(updatedBody, 'apiToDb');
     const postgresQuery = createQuery(updatedData, 'food');
-    const response = await Foods.createRows(postgresQuery);
-    if (!response) {
-      throw new DatabaseError();
+    try {
+      const response = await Foods.createRows(postgresQuery);
+      if (!response) {
+        throw new DatabaseError();
+      }
+      return {
+        results: {},
+        statusCode: HttpStatus.CREATED,
+        message: `${body.itemName} was properly created`,
+      };
+    } catch (error) {
+      return {
+        results: {},
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: `Impossible to create ${body.itemName}. Please try again later`,
+      };
     }
-    return {
-      results: {},
-      statusCode: EStatusCodes.CREATED,
-      message: EFoodMessage.FOOD_CREATED,
-    };
   }
 
   async updateFood(body: UpdateFoodDto, id: number) {

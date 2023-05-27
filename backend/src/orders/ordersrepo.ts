@@ -1,4 +1,6 @@
+import { BadRequestException } from '@nestjs/common';
 import {
+  IFoodGetApi,
   IFoodOrder,
   IOrderApi,
   IOrderDB,
@@ -7,6 +9,7 @@ import {
   TOrderType,
   UserPayload,
 } from 'redifood-module/src/interfaces';
+import Foods from 'src/foods/foodsrepo';
 import {
   convertKeys,
   createQuery,
@@ -42,10 +45,11 @@ class Orders {
     return updatedResponse;
   }
 
-  static async findTable(): Promise<number[]> {
+  static async findTable(userId: UserPayload['id']): Promise<number[]> {
     const response = (
       await pool.query(
-        `SELECT order_table_number FROM orders WHERE order_status != 'completed' AND order_status != 'cancelled'`,
+        `SELECT order_table_number FROM orders WHERE order_status != 'finished' AND order_status != 'cancelled' AND user_id = $1`,
+        [userId],
       )
     ).rows;
     if (!response) {
@@ -76,13 +80,13 @@ class Orders {
     } else {
       const orderClause =
         orderType === 'PAID'
-          ? 'order_status == "completed"'
+          ? `order_status = 'finished'`
           : orderType === 'NOT_PAID'
-          ? 'order_status != "completed"'
+          ? `order_status != 'finished'`
           : '';
 
       const response = await pool.query(
-        `SELECT * FROM orders WHERE ${orderClause} AND user_id = $1`,
+        `SELECT * FROM orders o WHERE ${orderClause} AND user_id = $1`,
         [userId],
       );
 
@@ -105,10 +109,13 @@ class Orders {
     userId: UserPayload['id'];
     orderId: number;
   }): Promise<IOrderApi> {
-    const orderDB: { rows: IOrderDB[] } = pool.query(
+    const orderDB: { rows: IOrderDB[] } = await pool.query(
       `SELECT * FROM orders WHERE user_id = $1 AND id = $2`,
       [userId, orderId],
     );
+    if (!orderDB.rows[0]) {
+      throw new BadRequestException('Order not found');
+    }
     return convertKeys(orderDB.rows[0], 'dbToApi') as IOrderApi;
   }
 
@@ -117,12 +124,12 @@ class Orders {
   ) {
     // use createQuery function
     const response = await pool.query(
-      `INSERT INTO orders (order_no, order_status, order_table_number, order_total, order_items, user_id) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      `INSERT INTO orders (order_no, order_status, order_table_number, order_total, order_items, user_id) VALUES ($1, $2, $3, $4, $5, $6)`,
       [
         body.orderNo,
-        `'${body.orderStatus}'`,
+        body.orderStatus,
         body.orderTableNumber,
-        body.orderTotal,
+        Number(body.orderTotal),
         JSON.stringify(body.orderItems),
         body.userId,
       ],
@@ -130,16 +137,33 @@ class Orders {
     return response;
   }
 
-  static async updateOrder(body: any, id: number) {
-    const updatedQuery = updateQuery(body, 'order');
-    const response = await pool.query(`${updatedQuery} WHERE id = $1`, [id]);
+  static async updateOrder(
+    body: any,
+    orderId: number,
+    userId: UserPayload['id'],
+  ) {
+    const { orderItems } = body;
+    const totalPrice = await Orders.calculateAmountFromMenu(orderItems, userId);
+    const updatedDataApi: Partial<IOrderApi> = {
+      ...body,
+      orderItems: JSON.stringify(orderItems),
+      orderTotal: totalPrice,
+    };
+    const updatedDataDB = convertKeys<Partial<IOrderApi>, Partial<IOrderDB>>(
+      updatedDataApi,
+      'apiToDb',
+    );
+    const updatedQuery = updateQuery(updatedDataDB, 'orders');
+    const response = await pool.query(`${updatedQuery} WHERE id = $1`, [
+      orderId,
+    ]);
     return response;
   }
 
-  static async cancelOrder(orderId: number) {
+  static async cancelOrder(orderId: number, userId: UserPayload['id']) {
     const response = await pool.query(
-      `UPDATE orders SET order_status = 'cancelled' WHERE id = $1`,
-      [orderId],
+      `UPDATE orders SET order_status = 'cancelled' WHERE id = $1 AND user_id = $2`,
+      [orderId, userId],
     );
     return response;
   }
@@ -155,7 +179,20 @@ class Orders {
   static async setOrderItems(idList: IMenuId, orderItems: string) {
     const { userId, orderId } = idList;
     const orderMenu: IFoodOrder[] = JSON.parse(orderItems);
-    const updatedMenu: IOrderItemsDB[] = orderMenu.map((item: IFoodOrder) => {
+    const foodList = await Foods.findAll(userId);
+    const updatedMenu: IFoodGetApi[] = foodList.map((item: IFoodGetApi) => {
+      const foundItem = orderMenu.find(
+        (orderItem: IFoodOrder) => orderItem.id === item.id,
+      );
+      if (foundItem) {
+        return {
+          ...item,
+          itemQuantity: foundItem.itemQuantity,
+        };
+      }
+      return item;
+    });
+    const completedMenu: IOrderItemsDB[] = updatedMenu.map((item) => {
       return {
         order_id: orderId,
         user_id: userId,
@@ -167,11 +204,38 @@ class Orders {
     });
 
     const createdQuery = createQuery<IOrderItemsDB[]>(
-      updatedMenu,
+      completedMenu,
       'order_items',
     );
     const response = await pool.query(createdQuery);
     return response;
+  }
+
+  static async calculateAmountFromMenu(
+    orderItems: IFoodOrder[],
+    userId: UserPayload['id'],
+  ): Promise<number> {
+    const foodList = await Foods.findAll(userId);
+    const updatedMenu: IFoodGetApi[] = foodList.map((item: IFoodGetApi) => {
+      const foundItem = [...orderItems].find(
+        (orderItem: IFoodOrder) => orderItem.id === item.id,
+      );
+      if (foundItem) {
+        return {
+          ...item,
+          itemQuantity: foundItem.itemQuantity,
+        };
+      }
+      return item;
+    });
+    const filteredMenu = updatedMenu.filter((item) => item.itemQuantity > 0);
+    console.log('filteredMenu', filteredMenu);
+    const totalAmount = filteredMenu.reduce((acc, item) => {
+      return acc + item.itemPrice * item.itemQuantity;
+    }, 0);
+    console.log('totalAmount', totalAmount);
+
+    return totalAmount;
   }
 }
 

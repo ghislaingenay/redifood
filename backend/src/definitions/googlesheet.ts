@@ -2,7 +2,7 @@
 
 // import { authenticate } from '@google-cloud/local-auth';
 
-import { HttpStatus } from '@nestjs/common';
+import { BadRequestException, HttpStatus } from '@nestjs/common';
 import { JWT } from 'google-auth-library';
 import { google, sheets_v4 } from 'googleapis';
 import {
@@ -19,11 +19,11 @@ interface IOrderHeaders {
 
 export interface IOrderData {
   orderNo: string;
-  orderTotal: string;
+  orderTotal: number;
   orderTableNumber: number;
-  orderFinished: string;
+  orderFinished: string | Date;
   paymentType: EPaymentType;
-  paymentAmount: string;
+  paymentAmount: number;
 }
 
 // import { google } from 'googleapis';
@@ -73,7 +73,7 @@ class GoogleSheetService {
 
   async authorize() {
     if (this.auth === null) {
-      throw new Error('Auth is null');
+      throw new BadRequestException('Auth is null');
     }
   }
 
@@ -110,13 +110,15 @@ class GoogleSheetService {
   }
 
   async createRow(data: IOrderData): Promise<IGetServerSideData<any>> {
+    console.log('data', data);
     const orderArray = this.headers.map((item) => item.apiKey);
     const orderData = orderArray.map((item) => data[item]);
+    console.log('orderData', orderData);
     try {
       await this.googleSheets.spreadsheets.values.append({
         auth: this.auth,
         spreadsheetId: this.spreadsheetId,
-        range: 'Sheet1',
+        range: 'Feuille 1',
         valueInputOption: 'USER_ENTERED', // USER_ENTERED OR RAW
         requestBody: {
           values: [orderData],
@@ -124,11 +126,7 @@ class GoogleSheetService {
       });
       return { statusCode: HttpStatus.OK, message: 'Row created' };
     } catch (err) {
-      return {
-        results: {},
-        statusCode: HttpStatus.BAD_REQUEST,
-        message: 'Impossible to create row',
-      };
+      throw new BadRequestException('Impossible to create row');
     }
   }
 }

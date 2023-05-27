@@ -5,6 +5,9 @@ const blockSQLInjection = (data: any) => {
     if (typeof val === 'number') {
       return val;
     }
+    // if (typeof val === 'boolean') {
+    //   return val === true ? 'TRUE' : 'FALSE';
+    // }
     if (val === null || val === undefined) {
       return 'NULL';
     }
@@ -28,7 +31,7 @@ type TTable =
   | 'food_section'
   | 'food_extra'
   | 'food'
-  | 'order'
+  | 'orders'
   | 'order_items'
   | 'payment'
   | 'discount';

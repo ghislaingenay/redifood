@@ -23,14 +23,14 @@ export class CreateOrderDto {
 }
 
 export class UpdateOrderDto extends CreateOrderDto {
-  @IsInt()
-  @IsNotEmpty()
-  id: number;
+  // @IsInt()
+  // @IsNotEmpty()
+  // id: number;
 
-  @IsPositive()
-  @IsInt()
-  @IsNotEmpty()
-  orderTotal: number;
+  // @IsPositive()
+  // @IsInt()
+  // @IsNotEmpty()
+  // orderTotal: number;
 
   @IsEnum(EOrderStatus)
   orderStatus: EOrderStatus;

@@ -1,18 +1,18 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
 import { User } from '../models/users.model';
-import { signUpUserDto } from './auth.dto';
+import { signInUserDto, signUpUserDto } from './auth.dto';
 import { PasswordManager } from './password-manager';
 
 @Injectable()
 export class AuthService {
   async signUpUser(signUpDto: signUpUserDto) {
-    const { email, password } = signUpDto;
+    const { email, password, firstName, lastName } = signUpDto;
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       throw new BadRequestException('Invalid credentials');
     }
-    const newUser = User.build({ email, password });
+    const newUser = User.build({ email, password, firstName, lastName });
     const createdUser = await newUser.save();
     // Generate JWT
     const userJwt: string = jwt.sign(
@@ -26,13 +26,12 @@ export class AuthService {
     return [createdUser, userJwt];
   }
 
-  async signInUser(signInDto: signUpUserDto) {
+  async signInUser(signInDto: signInUserDto) {
     const { email, password } = signInDto;
     const existingUser = await User.findOne({ email });
     if (!existingUser) {
       throw new BadRequestException('Invalid credentials');
     }
-    console.log('existing user', existingUser);
     const passwordsMatch = await PasswordManager.compare(
       existingUser.password,
       password,
