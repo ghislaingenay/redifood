@@ -46,7 +46,11 @@ export class SettingsService {
       });
       const savedSettings = await newSettings.save();
       if (!savedSettings) throw new DatabaseError();
-      return { results: savedSettings, message: 'Settings created' };
+      return {
+        results: savedSettings,
+        message: 'Settings created',
+        statusCode: HttpStatus.CREATED,
+      };
     } catch (err) {
       if (err instanceof BadRequestException) {
         return {
