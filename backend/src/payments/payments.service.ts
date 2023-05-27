@@ -1,5 +1,6 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import moment from 'moment';
+import { DatabaseError } from 'redifood-module/src/handling-nestjs/database-error.exception';
 import StripePayService from 'src/definitions/stripe-pay';
 import { convertKeys } from 'src/foods/global.function';
 import Stripe from 'stripe';
@@ -65,13 +66,22 @@ export class PaymentsService {
         paymentType: EPaymentType.CASH,
         paymentStatus: EPaymentStatus.COMPLETED,
       };
-      // update payment - catch err already in updateOne function
-      await Payments.updateOne(updatedData, userId);
-      return {
-        results: { isPaid: true },
-        statusCode: HttpStatus.OK,
-        message: 'recovered',
-      };
+      try {
+        // update payment - catch err already in updateOne function
+        const res = await Payments.updateOne(updatedData, userId);
+        if (!res) throw new DatabaseError();
+        return {
+          results: { isPaid: true },
+          statusCode: HttpStatus.OK,
+          message: `Payment for order #${payPaymentDto.orderId} is completed}`,
+        };
+      } catch (err) {
+        return {
+          results: { isPaid: false },
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'An issue occured while updating payment',
+        };
+      }
     } else {
       const stripePayment = new StripePayService({
         userId,
@@ -79,13 +89,21 @@ export class PaymentsService {
         id: payPaymentDto.orderId,
         service: 'payments',
       });
-      const chargeData = await stripePayment.payCharge();
-      console.log('chrged', chargeData);
+      try {
+        const chargeData = await stripePayment.payCharge();
+        console.log('chrged', chargeData);
+        return {
+          results: { isPaid: true },
+          statusCode: HttpStatus.OK,
+          message: 'recovered',
+        };
+      } catch (err) {
+        return {
+          results: { isPaid: false },
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'Issue while paying with stripe',
+        };
+      }
     }
-    return {
-      results: { isPaid: true },
-      statusCode: HttpStatus.OK,
-      message: 'recovered',
-    };
   }
 }
