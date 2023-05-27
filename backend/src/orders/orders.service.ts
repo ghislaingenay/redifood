@@ -1,5 +1,6 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import * as moment from 'moment';
+import { BadRequestError } from 'redifood-module/src/errors/bad-request-error';
 import { Setting } from 'src/models/settings.model';
 import Payments from 'src/payments/paymentsrepo';
 import {
@@ -76,6 +77,12 @@ export class OrdersService {
       body.orderItems,
       userId,
     );
+
+    // Check the table if not already allocated
+    const orderItemsResults = await Orders.findTable(userId);
+    if (orderItemsResults.includes(body.orderTableNumber)) {
+      throw new BadRequestError('Table already has an order');
+    }
     const getOrderNo = await Orders.countOrders();
     const today = new Date();
     // Generate order number
