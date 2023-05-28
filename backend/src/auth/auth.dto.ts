@@ -32,3 +32,9 @@ export class signUpUserDto extends signInUserDto {
   @IsString()
   lastName: string;
 }
+
+export class CheckEmailDto {
+  @IsNotEmpty()
+  @IsString()
+  email: string;
+}

@@ -10,7 +10,8 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { IRequest } from '../../src/handling/request';
-import { signInUserDto, signUpUserDto } from './auth.dto';
+import { User as UserRepo } from '../../src/models/users.model';
+import { CheckEmailDto, signInUserDto, signUpUserDto } from './auth.dto';
 import { AuthService } from './auth.service';
 import { User } from './user-decorator';
 
@@ -32,6 +33,11 @@ export class AuthController {
       results: userData,
       statusCode: HttpStatus.CREATED,
     });
+  }
+
+  @Post('verify')
+  async checkEmail(@Body(new ValidationPipe()) checkEmailDto: CheckEmailDto) {
+    return await this.authService.checkEmail(checkEmailDto);
   }
 
   @Post('signin')
