@@ -26,11 +26,14 @@ export class OrdersService {
   async getOrders(
     orderType: TOrderType,
     userId: UserPayload['id'],
-  ): Promise<IGetServerSideData<IOrderApi[]>> {
+  ): Promise<
+    IGetServerSideData<{ orders: IOrderApi[]; unPaidOrdersNo: string[] }>
+  > {
     const orderResults = await Orders.findAll(orderType, userId);
+    const unPaidOrdersNo = orderResults.map((item) => item.orderNo);
     return {
       statusCode: 200,
-      results: orderResults,
+      results: { orders: orderResults, unPaidOrdersNo },
       message: 'Orders recovered',
     };
   }
