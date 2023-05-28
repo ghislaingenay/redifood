@@ -24,11 +24,9 @@ const Auth = () => {
   // ------------ CONSTANTS ---------
   const [formLogin] = Form.useForm();
   const [formSignUp] = Form.useForm();
-  const [formSettings] = Form.useForm();
   const router = useRouter();
   // ------------ STATE ---------
   const { t } = useTranslation("common");
-  const [showSettings, setShowSettings] = useState(false);
   const options = [
     {
       value: EAuthChoice.SIGNIN,
@@ -75,32 +73,6 @@ const Auth = () => {
         // console.log(err);
       });
   };
-
-  // const verifyEmail = async (email: string) => {
-  //   setShowSettings(false);
-  //   AxiosFunction({
-  //     method: "post",
-  //     url: "api/auth/verify",
-  //     body: { email },
-  //     queryParams: {},
-  //   })
-  //     .then((res: IGetServerSideData<{ canCreate: boolean }>) => {
-  //       const { results, message } = res;
-  //       if (results?.canCreate) {
-  //         setShowSettings(true);
-  //       } else {
-  //         toast.error(message, {
-  //           position: toast.POSITION.BOTTOM_CENTER,
-  //         });
-  //       }
-  //     })
-  //     .catch((res) => {
-  //       const { message } = res;
-  //       toast.error(message, {
-  //         position: toast.POSITION.BOTTOM_CENTER,
-  //       });
-  //     });
-  // };
 
   const handleSignUp = async (values: any) => {
     setClicked(true);
@@ -179,8 +151,6 @@ const Auth = () => {
     },
   ];
 
-  // 3 - user context (later)
-  // 4 - reddo jest testing for this component
   // ------------ RENDER ---------
 
   return (
