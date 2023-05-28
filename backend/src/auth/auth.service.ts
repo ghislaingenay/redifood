@@ -1,6 +1,11 @@
 import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
-import { IGetServerSideData } from 'redifood-module/src/interfaces';
+import {
+  ECurrency,
+  ELanguage,
+  IGetServerSideData,
+} from 'redifood-module/src/interfaces';
+import { Setting } from 'src/models/settings.model';
 import { User } from '../models/users.model';
 import { CheckEmailDto, signInUserDto, signUpUserDto } from './auth.dto';
 import { PasswordManager } from './password-manager';
@@ -16,6 +21,14 @@ export class AuthService {
     const newUser = User.build({ email, password, firstName, lastName });
     const createdUser = await newUser.save();
     // Generate JWT
+    const newSettings = Setting.build({
+      user: createdUser.id,
+      currency: ECurrency.USD,
+      language: ELanguage.ENGLISH,
+      vat: 0,
+      haveFoodImage: true,
+    });
+    await newSettings.save();
     const userJwt: string = jwt.sign(
       {
         id: createdUser.id,
