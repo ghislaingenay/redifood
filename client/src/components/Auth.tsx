@@ -76,6 +76,32 @@ const Auth = () => {
       });
   };
 
+  // const verifyEmail = async (email: string) => {
+  //   setShowSettings(false);
+  //   AxiosFunction({
+  //     method: "post",
+  //     url: "api/auth/verify",
+  //     body: { email },
+  //     queryParams: {},
+  //   })
+  //     .then((res: IGetServerSideData<{ canCreate: boolean }>) => {
+  //       const { results, message } = res;
+  //       if (results?.canCreate) {
+  //         setShowSettings(true);
+  //       } else {
+  //         toast.error(message, {
+  //           position: toast.POSITION.BOTTOM_CENTER,
+  //         });
+  //       }
+  //     })
+  //     .catch((res) => {
+  //       const { message } = res;
+  //       toast.error(message, {
+  //         position: toast.POSITION.BOTTOM_CENTER,
+  //       });
+  //     });
+  // };
+
   const handleSignUp = async (values: any) => {
     setClicked(true);
     await AxiosFunction({
