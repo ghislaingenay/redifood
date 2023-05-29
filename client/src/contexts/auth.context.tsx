@@ -35,7 +35,7 @@ export function AuthProvider({ children }: IAuthProvider) {
     setSpinLoading(true);
     new Promise((resolve, reject) => {
       AxiosFunction({
-        url: `${process.env.NEXT_PUBLIC_BACK_END}/api/auth/currentuser`,
+        url: `/api/auth/currentuser`,
         method: "get",
         body: {},
         queryParams: {},
@@ -45,10 +45,9 @@ export function AuthProvider({ children }: IAuthProvider) {
           setSpinLoading(false);
           resolve(res);
         })
-        .catch((err) => {
+        .catch(() => {
           setCurrentUser(null);
           setSpinLoading(false);
-          reject(err);
         });
     });
   }, [currentUser]);
