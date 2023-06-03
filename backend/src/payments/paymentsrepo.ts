@@ -1,4 +1,4 @@
-import StripeCharge from 'src/definitions/stripe-charge';
+import StripePayService from 'src/definitions/stripe-service';
 import { DatabaseError } from '../../redifood-module/src/handling-nestjs/database-error.exception';
 import {
   IPaymentApi,
@@ -101,8 +101,7 @@ class Payments {
     chargeId: IPaymentApi['paymentStripeId'] | IPaymentDB['payment_stripe_id'],
   ) {
     try {
-      const stripe = new StripeCharge(chargeId);
-      return await stripe.retrieveCharge();
+      return await StripePayService.retrieveCharge(chargeId);
     } catch (err) {
       throw new DatabaseError();
     }
