@@ -159,8 +159,9 @@ const Auth = () => {
           <RowCenter style={{ paddingTop: "3rem" }}>
             <Image src={whiteLogo} alt="Redifood logo white" width={200} height={200} />
           </RowCenter>
+
           <SpacingDiv5X>
-            <RowCenter style={{ paddingTop: "2rem" }}>
+            <RowCenter style={{ paddingTop: "2rem", width: "100%" }}>
               <RediRadioButton
                 disabled={isDisabled}
                 options={options}

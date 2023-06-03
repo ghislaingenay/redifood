@@ -5,7 +5,7 @@ import { hexToRgba } from "../../functions/global.fn";
 import { RadioButton } from "../../styles";
 import { AnimRadioButton } from "../../styles/animations/styled.anim";
 import { SpanBlockM02Y } from "../../styles/styledComponents/span.styled";
-import { RowSpaceAround } from "./grid.styled";
+import { RowSpaceBetween } from "./grid.styled";
 
 interface IRediRadio {
   value: string;
@@ -98,7 +98,7 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
   };
 
   return (
-    <RowSpaceAround style={{ width: "100%" }}>
+    <RowSpaceBetween style={{ width: "100%" }}>
       {options.map(({ label, value, icon, ariaLabel }: any, index: number) => (
         <>
           <Col
@@ -135,7 +135,7 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
           </Col>
         </>
       ))}
-    </RowSpaceAround>
+    </RowSpaceBetween>
   );
 };
 

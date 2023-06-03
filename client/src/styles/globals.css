@@ -32,11 +32,13 @@ a {
 }
 
 .background-auth {
-  overflow: hidden;
   background: url("/bg-image-auth.jpg");
   background-size: 100% 120%;
   object-fit: contain;
   background-repeat: no-repeat;
+  overflow: scroll;
+  overflow-y: auto;
+  overflow-x: hidden;
   width: 100vw;
   height: 100vh;
 }
