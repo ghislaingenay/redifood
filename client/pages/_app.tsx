@@ -11,7 +11,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 import { config } from "@fortawesome/fontawesome-svg-core";
 import { appWithTranslation } from "next-i18next";
-import { Suspense } from "react";
+import { Suspense, useMemo } from "react";
 import RediHeader from "../src/components/Page";
 import { BACKGROUND_COLOR, ORANGE_LIGHT } from "../src/constants";
 import { AuthProvider } from "../src/contexts/auth.context";
@@ -27,8 +27,12 @@ config.autoAddCss = false;
 interface IAppProps {
   Component: any;
   pageProps: any;
+  isSignOutPage?: boolean;
 }
-const AppComponent = ({ Component, pageProps }: IAppProps) => {
+const AppComponent = ({ Component, pageProps, isSignOutPage }: IAppProps) => {
+  const isSignOut = useMemo(() => {
+    return isSignOutPage;
+  }, [isSignOutPage]);
   return (
     <>
       <Head>
@@ -38,23 +42,30 @@ const AppComponent = ({ Component, pageProps }: IAppProps) => {
         <FoodProvider>
           <ConfigProvider theme={{ token: tokenProvider, inherit: false }}>
             <AuthProvider>
-              <Layout style={{ minHeight: "100vh" }}>
-                <RediHeader bgColor={BACKGROUND_COLOR} color={ORANGE_LIGHT} />
-                <Layout className="layout" style={{ backgroundColor: ORANGE_LIGHT, overflowY: "hidden" }}>
-                  <RediContent>
-                    <Suspense
-                      fallback={
-                        <div style={{ width: "100%", height: "100%", backgroundColor: "black", color: "white" }}>
-                          Loading...
-                        </div>
-                      }
-                    >
-                      <Component {...pageProps} />
-                    </Suspense>
-                  </RediContent>
-                </Layout>
-              </Layout>
+              {isSignOut ? (
+                <Component {...pageProps} />
+              ) : (
+                <>
+                  <Layout style={{ minHeight: "100vh" }}>
+                    <RediHeader bgColor={BACKGROUND_COLOR} color={ORANGE_LIGHT} />
+                    <Layout className="layout" style={{ backgroundColor: ORANGE_LIGHT, overflowY: "hidden" }}>
+                      <RediContent>
+                        <Suspense
+                          fallback={
+                            <div style={{ width: "100%", height: "100%", backgroundColor: "black", color: "white" }}>
+                              Loading...
+                            </div>
+                          }
+                        >
+                          <Component {...pageProps} />
+                        </Suspense>
+                      </RediContent>
+                    </Layout>
+                  </Layout>
+                </>
+              )}
             </AuthProvider>
+
             <ToastContainer />
           </ConfigProvider>
         </FoodProvider>
@@ -66,13 +77,14 @@ const AppComponent = ({ Component, pageProps }: IAppProps) => {
 AppComponent.getInitialProps = async (appContext: any) => {
   // const client = buildClient(appContext.ctx);
   // const { data } = await client.get("/api/auth/currentuser");
-  // console.log("path", appContext.ctx.pathname);
+  const path = appContext.ctx.pathname;
   let pageProps = {};
   if (appContext.Component.getInitialProps) {
     pageProps = (await appContext.Component.getInitialProps(appContext.ctx)) as any;
   }
   return {
     pageProps,
+    isSignOutPage: path === "/signout",
   };
   // };
 };

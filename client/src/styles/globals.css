@@ -39,8 +39,12 @@ a {
   overflow: scroll;
   overflow-y: auto;
   overflow-x: hidden;
+  display: grid;
   width: 100vw;
   height: 100vh;
+}
+.no-overflow {
+  overflow: hidden;
 }
 
 .center-element-middle {
