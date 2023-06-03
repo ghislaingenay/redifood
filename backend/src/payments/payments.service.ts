@@ -1,8 +1,8 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import moment from 'moment';
-import { DatabaseError } from 'redifood-module/src/handling-nestjs/database-error.exception';
-import StripePayService from 'src/definitions/stripe-pay';
-import { convertKeys } from 'src/foods/global.function';
+import { DatabaseError } from '../../redifood-module/src/handling-nestjs/database-error.exception';
+import StripePayService from '../../src/definitions/stripe-service';
+import { convertKeys } from '../../src/foods/global.function';
 import Stripe from 'stripe';
 import {
   EPaymentStatus,

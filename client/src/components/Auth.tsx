@@ -33,12 +33,14 @@ const Auth = () => {
       label: t("auth.signin"),
       icon: <FontAwesomeIcon icon={faSign} />,
       ariaLabel: "sign in",
+      key: 1,
     },
     {
       value: EAuthChoice.REGISTER,
       label: t("auth.register"),
       icon: <FontAwesomeIcon icon={faRegistered} />,
       ariaLabel: "register",
+      key: 2,
     },
   ];
   const [selectedOption, setSelectedOption] = useState(options[0].value);
@@ -160,7 +162,7 @@ const Auth = () => {
             <Image src={whiteLogo} alt="Redifood logo white" width={200} height={200} />
           </RowCenter>
 
-          <SpacingDiv5X>
+          <SpacingDiv5X style={{ paddingBottom: "2rem" }}>
             <RowCenter style={{ paddingTop: "2rem", width: "100%" }}>
               <RediRadioButton
                 disabled={isDisabled}
@@ -198,13 +200,13 @@ const Auth = () => {
                     />
                   </Form.Item>
                   <RowSpaceBetween>
-                    <Col span={6}>
+                    <Col span={12}>
                       <RediButton buttonType={EButtonType.SUCCESS} onClick={() => formLogin.submit()} loading={clicked}>
                         {t("auth.submit")}
                       </RediButton>
                     </Col>
-                    <Col span={6}>
-                      <Button loading={clicked} type="link" aria-label="Forgot password">
+                    <Col span={12} style={{ textAlign: "right" }}>
+                      <Button loading={clicked} type="link" aria-label="Forgot password" style={{ padding: 0 }}>
                         {t("auth.forget-password")}
                       </Button>
                     </Col>
@@ -251,7 +253,7 @@ const Auth = () => {
                         <Input.Password
                           aria-label="Password"
                           style={{ borderRadius: "2rem" }}
-                          placeholder="Password..."
+                          placeholder={`${t("auth.password")}...`}
                           iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
                         />
                       </Form.Item>
