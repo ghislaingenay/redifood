@@ -64,7 +64,7 @@ const Auth = () => {
           position: toast.POSITION.BOTTOM_CENTER,
         });
         setTimeout(() => {
-          router.push("/");
+          router.reload();
         }, 2000);
       })
       .catch(() => {
@@ -88,7 +88,7 @@ const Auth = () => {
           position: toast.POSITION.BOTTOM_CENTER,
         });
         setTimeout(() => {
-          router.push("/");
+          router.reload();
         }, 2000);
       })
       .catch(() => {
