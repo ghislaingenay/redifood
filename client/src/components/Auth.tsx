@@ -3,7 +3,7 @@ import { faRegistered, faSign } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button, Col, Divider, Form, Input } from "antd";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Else, If, Then } from "react-if";
@@ -51,9 +51,9 @@ const Auth = () => {
 
   const handleLogin = async (values: any) => {
     setClicked(true);
-    await AxiosFunction({
+    AxiosFunction({
       queryParams: {},
-      url: "/api/auth/login",
+      url: "/api/auth/signin",
       method: "post",
       body: values,
     })
@@ -70,7 +70,6 @@ const Auth = () => {
           position: toast.POSITION.BOTTOM_CENTER,
         });
         setClicked(false);
-        // console.log(err);
       });
   };
 
@@ -166,7 +165,7 @@ const Auth = () => {
                 disabled={isDisabled}
                 options={options}
                 radioGroupName="auth"
-                haveIcon="false"
+                haveIcon="true"
                 selectedButton={selectedOption}
                 setSelectedButton={setSelectedOption}
               />
