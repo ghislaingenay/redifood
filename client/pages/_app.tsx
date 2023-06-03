@@ -18,7 +18,9 @@ import { AuthProvider } from "../src/contexts/auth.context";
 import { FoodProvider } from "../src/contexts/food.context";
 // Tell Font Awesome to skip adding the CSS automatically
 // since it's already imported above
-import "../i18n.ts";
+import Head from "next/head";
+// import faviconRedifood from "../public/favicon-redifood.png";
+import "../i18n";
 
 config.autoAddCss = false;
 
@@ -29,6 +31,9 @@ interface IAppProps {
 const AppComponent = ({ Component, pageProps }: IAppProps) => {
   return (
     <>
+      <Head>
+        <link rel="icon" href="/favicon-redifood.png" />
+      </Head>
       <AppProvider>
         <FoodProvider>
           <ConfigProvider theme={{ token: tokenProvider, inherit: false }}>
@@ -59,16 +64,9 @@ const AppComponent = ({ Component, pageProps }: IAppProps) => {
 };
 
 AppComponent.getInitialProps = async (appContext: any) => {
-  // return {
-  // currentUser: null,
-  //   currentUser: { username: "pit" },
-  // };
-  // console.log("appContext", appContext.Component);
   // const client = buildClient(appContext.ctx);
   // const { data } = await client.get("/api/auth/currentuser");
-  // console.log("data", data);
-  console.log("path", appContext.ctx.pathname);
-
+  // console.log("path", appContext.ctx.pathname);
   let pageProps = {};
   if (appContext.Component.getInitialProps) {
     pageProps = (await appContext.Component.getInitialProps(appContext.ctx)) as any;

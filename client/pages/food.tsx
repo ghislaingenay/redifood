@@ -28,7 +28,6 @@ const FoodPage = ({ foodList, foodSection, status }: IFoodProps) => {
       <Head>
         <title>{t("foods.head.title")}</title>
         <meta name="description" content={t("foods.head.description") as string} />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
       <FoodLayout
         status={status}

@@ -54,7 +54,6 @@ const CurrentOrder = ({ currentOrder, status }: any) => {
       <Head>
         <title>{t("orders.head-view.title")}</title>
         <meta name="description" content={t("orders.head-view.description") as string} />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
       <body>
         <AnimToTop>

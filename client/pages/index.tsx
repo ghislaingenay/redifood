@@ -108,7 +108,6 @@ const AllOrdersPage = ({ allOrders, getList }: IAllOrdersPageProps) => {
       <Head>
         <title>{t("index.head.title")}</title>
         <meta name="description" content={t("index.head.description") as string} />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
         <AnimToTop>

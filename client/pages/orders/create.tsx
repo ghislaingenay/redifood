@@ -41,7 +41,6 @@ const CreateOrder = ({ foodList, foodSection, status }: ICreateOrderProps) => {
       <Head>
         <title>{t("orders.head-create.title")}</title>
         <meta name="description" content={t("orders.head-create.description") as string} />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
         <FoodLayout
