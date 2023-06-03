@@ -98,7 +98,7 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
   };
 
   return (
-    <RowSpaceAround>
+    <RowSpaceAround style={{ width: "100%" }}>
       {options.map(({ label, value, icon, ariaLabel }: any, index: number) => (
         <>
           <Col
