@@ -1,12 +1,12 @@
 import Error, { ErrorProps } from "next/error";
-import { ReactNode, useContext, useEffect, useState } from "react";
+import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 import { AxiosFunction } from "../../pages/api/axios-request";
 import { UserPayload } from "../../redifood-module/src/interfaces";
 import Auth from "../../src/components/Auth";
 import Loading from "../components/Loading";
 
 // @ts-ignore
-export const AuthContext = React.createContext({} as IUseAuth);
+export const AuthContext = createContext({} as IUseAuth);
 
 interface IUseAuth {
   currentUser: any;
