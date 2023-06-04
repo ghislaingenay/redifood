@@ -5,7 +5,6 @@ import { UserPayload } from "../../redifood-module/src/interfaces";
 import Auth from "../../src/components/Auth";
 import Loading from "../components/Loading";
 
-// @ts-ignore
 export const AuthContext = createContext({} as IUseAuth);
 
 interface IUseAuth {

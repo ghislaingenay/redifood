@@ -1,20 +1,13 @@
-import { Col } from "antd";
-import { RowSpaceAround } from "../src/components/styling/grid.styled";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faExclamationTriangle } from "@fortawesome/free-solid-svg-icons";
-import { CenteredTitle } from "../src/styles";
+import { ExclamationCircleOutlined } from "@ant-design/icons";
 
 const NotFoundPage = () => {
   return (
     <div className="background-auth no-overflow">
-      <RowSpaceAround>
-        <Col span={12}>
-          <FontAwesomeIcon icon={faExclamationTriangle} />
-        </Col>
+      <ExclamationCircleOutlined style={{ color: "white", fontSize: "4rem" }} />
+      {/* </Col>
         <Col span={12}>
           <CenteredTitle>This page doesn't exist.Please try again </CenteredTitle>
-        </Col>
-      </RowSpaceAround>
+        </Col> */}
     </div>
   );
 };

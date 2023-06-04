@@ -11,7 +11,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 import { config } from "@fortawesome/fontawesome-svg-core";
 import { appWithTranslation } from "next-i18next";
-import { Suspense, useMemo } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import RediHeader from "../src/components/Page";
 import { BACKGROUND_COLOR, ORANGE_LIGHT } from "../src/constants";
 import { AuthProvider } from "../src/contexts/auth.context";
@@ -21,6 +21,7 @@ import { FoodProvider } from "../src/contexts/food.context";
 import Head from "next/head";
 // import faviconRedifood from "../public/favicon-redifood.png";
 import "../i18n";
+import Loading from "../src/components/Loading";
 
 config.autoAddCss = false;
 
@@ -28,11 +29,20 @@ interface IAppProps {
   Component: any;
   pageProps: any;
   isSignOutPage?: boolean;
+  loadingPage?: boolean;
 }
-const AppComponent = ({ Component, pageProps, isSignOutPage }: IAppProps) => {
+const AppComponent = ({ Component, pageProps, isSignOutPage, loadingPage }: IAppProps) => {
   const isSignOut = useMemo(() => {
     return isSignOutPage;
   }, [isSignOutPage]);
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(loadingPage || false);
+  }, []);
+  if (loading) return <Loading />;
+
   return (
     <>
       <Head>
@@ -82,9 +92,12 @@ AppComponent.getInitialProps = async (appContext: any) => {
   if (appContext.Component.getInitialProps) {
     pageProps = (await appContext.Component.getInitialProps(appContext.ctx)) as any;
   }
+
+  const routesNoLayout = ["/signin", "/signup", "/signout", "/forgot-password", "/reset-password", "/404"];
   return {
     pageProps,
-    isSignOutPage: path === "/signout",
+    isSignOutPage: routesNoLayout.includes(path),
+    loadingPage: false,
   };
   // };
 };

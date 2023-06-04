@@ -10,7 +10,6 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { IRequest } from '../../src/handling/request';
-import { User as UserRepo } from '../../src/models/users.model';
 import { CheckEmailDto, signInUserDto, signUpUserDto } from './auth.dto';
 import { AuthService } from './auth.service';
 import { User } from './user-decorator';
@@ -46,6 +45,7 @@ export class AuthController {
     @Req() req: IRequest,
     @Res() res: Response,
   ) {
+    console.log('bdy', signInDto);
     const [userData, userJwt] = await this.authService.signInUser(signInDto);
     req.session = { jwt: userJwt };
     // req.session.jwt = userJwt;
