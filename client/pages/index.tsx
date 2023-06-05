@@ -14,9 +14,9 @@ import { RowSpaceAround, RowSpaceBetween } from "../src/components/styling/grid.
 import { BACKGROUND_COLOR } from "../src/constants";
 import { getOptions } from "../src/functions/global.fn";
 import useCurrency from "../src/hooks/useCurrency.hook";
-import { EButtonType, ServerInfo } from "../src/interfaces";
+import { EButtonType } from "../src/interfaces";
 import { AnimToTop } from "../src/styles/animations/global.anim";
-import { allDataOrders, getListUnpaidOrders } from "../test/mocks/mockOrdersData";
+import buildClient from "./api/build-client";
 import { buildLanguage } from "./api/build-language";
 
 interface IAllOrdersPageProps {
@@ -33,7 +33,7 @@ const AllOrdersPage = ({ allOrders, getList }: IAllOrdersPageProps) => {
   const [filteredOrders, setFilteredOrders] = useState<IOrderApi[]>([]);
   const [spinLoading, setSpinLoading] = useState(true);
   const { Title } = Typography;
-  const renderAmount = (orderTotal: number) => (displayCurrency() === "$" ? orderTotal : 0.85 * orderTotal);
+  const renderAmount = (orderTotal: number) => (displayCurrency() === "$" ? orderTotal : 0.85 * orderTotal) || 0;
   const columns = [
     {
       title: "ID",
@@ -172,37 +172,37 @@ const AllOrdersPage = ({ allOrders, getList }: IAllOrdersPageProps) => {
 
 export default AllOrdersPage;
 
-export async function getServerSideProps({ locale, req }: ServerInfo) {
+export async function getServerSideProps(appContext: any) {
+  const { locale, req } = appContext;
+  const client = buildClient(appContext);
   const getLanguageValue = buildLanguage(locale, req);
-  return {
-    props: {
-      allOrders: allDataOrders,
-      getList: getListUnpaidOrders,
-      status: "success",
-      ...(await serverSideTranslations(getLanguageValue, ["common"])),
-    },
-  };
+  const url = "/api/orders/";
+  const res = await client
+    .get(url, { params: { orderType: "NOT_PAID" } })
+    .then(async (res) => {
+      console.log("res", res);
+      const {
+        data: {
+          results: { orders: allDataOrders, unPaidOrdersNo: getListUnpaidOrders },
+        },
+      } = res;
+      return {
+        props: {
+          allOrders: allDataOrders,
+          getList: getListUnpaidOrders,
+          ...(await serverSideTranslations(getLanguageValue, ["common"])),
+        },
+      };
+    })
+    .catch(async () => {
+      return {
+        props: {
+          allOrders: [],
+          getList: [],
+          ...(await serverSideTranslations(getLanguageValue, ["common"])),
+        },
+      };
+    });
 
-  // return {
-  //   statusCode: 200,
-  //   results: { orders: orderResults, unPaidOrdersNo },
-  //   message: 'Orders recovered',
-  // };
-  // const url = "/api/orders/";
-  // await axios
-  //   .get(url, { params: { orderType: "NOT_PAID" } })
-  //   .then(async (res) => {
-  //     const {
-  //       data: { results: {allDataOrders, getListUnpaidOrders} },
-  //     } = res;
-  //     return {
-  //       props: { allOrders: allDataOrders, getList: getListUnpaidOrders, status: "success", ...(await serverSideTranslations(getLanguageValue, ["common"])) },
-  //     };
-  //   })
-  //   .catch((err) => {
-  //     console.log("erre", err);
-  //   });
-  // return {
-  //   props: { allOrders: [], getList: [], status: "error", ...(await serverSideTranslations(getLanguageValue, ["common"])) },
-  // };
+  return res;
 }
