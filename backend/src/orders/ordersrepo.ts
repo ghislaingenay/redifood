@@ -82,7 +82,7 @@ class Orders {
         orderType === 'PAID'
           ? `order_status = 'finished'`
           : orderType === 'NOT_PAID'
-          ? `order_status != 'finished'`
+          ? `order_status != 'finished' AND order_status != 'cancelled'`
           : '';
 
       const response = await pool.query(
