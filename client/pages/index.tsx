@@ -28,11 +28,13 @@ const AllOrdersPage = ({ allOrders, getList }: IAllOrdersPageProps) => {
   const { displayCurrency } = useCurrency();
 
   const router = useRouter();
+
   const [listAllOrders] = useState(allOrders);
   const [selectedOption, setSelectedOption] = useState("ALL");
   const [filteredOrders, setFilteredOrders] = useState<IOrderApi[]>([]);
   const [spinLoading, setSpinLoading] = useState(true);
   const { Title } = Typography;
+
   const columns = [
     {
       title: "ID",
@@ -191,10 +193,11 @@ export async function getServerSideProps(appContext: any) {
       } = res;
       console.log("allorders", orders);
       console.log("listing", unPaidOrdersNo);
+      const updatedListing = unPaidOrdersNo.unshift("ALL");
       return {
         props: {
           allOrders: orders,
-          getList: unPaidOrdersNo,
+          getList: updatedListing,
           ...(await serverSideTranslations(getLanguageValue, ["common"])),
         },
       };
