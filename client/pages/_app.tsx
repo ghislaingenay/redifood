@@ -85,8 +85,6 @@ const AppComponent = ({ Component, pageProps, isSignOutPage, loadingPage }: IApp
 };
 
 AppComponent.getInitialProps = async (appContext: any) => {
-  // const client = buildClient(appContext.ctx);
-  // const { data } = await client.get("/api/auth/currentuser");
   const path = appContext.ctx.pathname;
   let pageProps = {};
   if (appContext.Component.getInitialProps) {
