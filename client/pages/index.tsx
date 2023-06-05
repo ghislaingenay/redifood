@@ -7,7 +7,7 @@ import Head from "next/head";
 import { useRouter } from "next/navigation";
 import { AlignType } from "rc-table/lib/interface";
 import { useEffect, useState } from "react";
-import { IOrderApi } from "../redifood-module/src/interfaces";
+import { IFoodOrder, IOrderApi } from "../redifood-module/src/interfaces";
 import { RediSelect } from "../src/components/RediSelect";
 import { RediIconButton } from "../src/components/styling/Button.style";
 import { RowSpaceAround, RowSpaceBetween } from "../src/components/styling/grid.styled";
@@ -33,18 +33,23 @@ const AllOrdersPage = ({ allOrders, getList }: IAllOrdersPageProps) => {
   const [filteredOrders, setFilteredOrders] = useState<IOrderApi[]>([]);
   const [spinLoading, setSpinLoading] = useState(true);
   const { Title } = Typography;
-  const renderAmount = (orderTotal: number) => (displayCurrency() === "$" ? orderTotal : 0.85 * orderTotal) || 0;
   const columns = [
     {
       title: "ID",
-      dataIndex: "_id",
-      key: "_id",
+      dataIndex: "id",
+      key: "id",
+      align: "center" as AlignType,
+    },
+    {
+      title: "No",
+      dataIndex: "orderNo",
+      key: "orderNo",
       align: "center" as AlignType,
     },
     {
       title: "Table",
-      dataIndex: "tableNumber",
-      key: "tableNumber",
+      dataIndex: "orderTableNumber",
+      key: "orderTableNumber",
       align: "center" as AlignType,
     },
     {
@@ -52,13 +57,12 @@ const AllOrdersPage = ({ allOrders, getList }: IAllOrdersPageProps) => {
       dataIndex: "orderTotal",
       key: "orderTotal",
       align: "center" as AlignType,
-      render: (item: number) => renderAmount(item).toFixed(2),
     },
     {
       title: "Action",
-      dataIndex: "_id",
+      dataIndex: "id",
       align: "center" as AlignType,
-      key: "_id",
+      key: "id",
       render: (item: IOrderApi) => (
         <Space>
           <RediIconButton
@@ -96,7 +100,7 @@ const AllOrdersPage = ({ allOrders, getList }: IAllOrdersPageProps) => {
       return {
         ...order,
         key: order.id,
-        orderTotal: renderAmount(order.orderTotal),
+        orderTotal: order.orderTotal,
       };
     });
     setFilteredOrders(sortedData);
@@ -138,7 +142,7 @@ const AllOrdersPage = ({ allOrders, getList }: IAllOrdersPageProps) => {
           </RowSpaceBetween>
           <Table
             loading={spinLoading}
-            rowKey="_id"
+            rowKey="id"
             columns={columns}
             dataSource={filteredOrders}
             pagination={false}
@@ -146,7 +150,7 @@ const AllOrdersPage = ({ allOrders, getList }: IAllOrdersPageProps) => {
               expandedRowRender: (record: IOrderApi) => {
                 return (
                   <RowSpaceAround>
-                    {record.orderItems.map((item) => {
+                    {(JSON.parse(record.orderItems as any) as IFoodOrder[]).map((item) => {
                       return (
                         <Col span={6} key={item.id} style={{ color: BACKGROUND_COLOR }}>
                           <b>
@@ -180,16 +184,17 @@ export async function getServerSideProps(appContext: any) {
   const res = await client
     .get(url, { params: { orderType: "NOT_PAID" } })
     .then(async (res) => {
-      console.log("res", res);
       const {
         data: {
-          results: { orders: allDataOrders, unPaidOrdersNo: getListUnpaidOrders },
+          results: { orders, unPaidOrdersNo },
         },
       } = res;
+      console.log("allorders", orders);
+      console.log("listing", unPaidOrdersNo);
       return {
         props: {
-          allOrders: allDataOrders,
-          getList: getListUnpaidOrders,
+          allOrders: orders,
+          getList: unPaidOrdersNo,
           ...(await serverSideTranslations(getLanguageValue, ["common"])),
         },
       };
