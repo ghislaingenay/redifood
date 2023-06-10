@@ -20,7 +20,7 @@ import buildClient from "./api/build-client";
 import { buildLanguage } from "./api/build-language";
 
 interface IAllOrdersPageProps {
-  allOrders: IOrderApi[];
+  allOrders: IOrderApi<IFoodOrder[]>[];
   getList: string[];
 }
 const AllOrdersPage = ({ allOrders, getList }: IAllOrdersPageProps) => {
@@ -149,19 +149,19 @@ const AllOrdersPage = ({ allOrders, getList }: IAllOrdersPageProps) => {
             dataSource={filteredOrders}
             pagination={false}
             expandable={{
-              expandedRowRender: (record: IOrderApi) => {
+              expandedRowRender: (record: IOrderApi<IFoodOrder[]>) => {
                 return (
                   <RowSpaceAround>
-                    {(JSON.parse(record.orderItems as any) as IFoodOrder[]).map((item) => {
+                    {record.orderItems.map(({ id, itemName, itemQuantity }) => {
                       return (
-                        <Col span={6} key={item.id} style={{ color: BACKGROUND_COLOR }}>
+                        <Col span={6} key={id} style={{ color: BACKGROUND_COLOR }}>
                           <b>
                             <Space>
                               <FontAwesomeIcon icon={faUtensils} />
-                              {item.itemName}
+                              {itemName}
                             </Space>
                           </b>{" "}
-                          (<em>{item.itemQuantity}</em>)
+                          (<em>{itemQuantity}</em>)
                         </Col>
                       );
                     })}
