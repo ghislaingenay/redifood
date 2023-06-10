@@ -47,6 +47,8 @@ const AppComponent = ({ Component, pageProps, isSignOutPage, loadingPage }: IApp
     <>
       <Head>
         <link rel="icon" href="/favicon-redifood.png" />
+        <title>REDIFOOD</title>
+        <meta name="description" content="Redifood application" />
       </Head>
       <AppProvider>
         <FoodProvider>
