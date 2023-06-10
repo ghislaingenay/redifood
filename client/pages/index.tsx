@@ -6,7 +6,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useRouter } from "next/navigation";
 import { AlignType } from "rc-table/lib/interface";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { IFoodOrder, IOrderApi } from "../redifood-module/src/interfaces";
 import { RediSelect } from "../src/components/RediSelect";
 import { RediIconButton } from "../src/components/styling/Button.style";
@@ -29,7 +29,7 @@ const AllOrdersPage = ({ allOrders, getList }: IAllOrdersPageProps) => {
 
   const router = useRouter();
 
-  const [listAllOrders] = useState(allOrders);
+  const [orderNoList] = useState(getList);
   const [selectedOption, setSelectedOption] = useState("ALL");
   const [filteredOrders, setFilteredOrders] = useState<IOrderApi[]>([]);
   const [spinLoading, setSpinLoading] = useState(true);
@@ -59,6 +59,7 @@ const AllOrdersPage = ({ allOrders, getList }: IAllOrdersPageProps) => {
       dataIndex: "orderTotal",
       key: "orderTotal",
       align: "center" as AlignType,
+      render: (amount: IOrderApi["orderTotal"]) => <>{Number(amount).toFixed(2)}</>,
     },
     {
       title: "Action",
@@ -86,25 +87,27 @@ const AllOrdersPage = ({ allOrders, getList }: IAllOrdersPageProps) => {
     },
   ];
 
-  const showProperData = (option: string) => {
-    setSelectedOption(option);
-    if (option === "ALL") {
-      return setFilteredOrders(listAllOrders);
-    }
-    const newList = listAllOrders.filter((order) => order?.orderNo === option);
-    if (newList) {
-      return setFilteredOrders(newList);
-    }
-  };
+  const option = useMemo(() => {
+    return selectedOption;
+  }, [selectedOption]);
 
   useEffect(() => {
-    const sortedData = allOrders.map((order: IOrderApi) => {
+    setSpinLoading(true);
+    const sortedData = [...allOrders].map((order: IOrderApi) => {
       return {
         ...order,
         key: order.id,
         orderTotal: order.orderTotal,
       };
     });
+    if (selectedOption === "ALL") {
+      console.log("here");
+      setFilteredOrders(() => sortedData);
+    } else {
+      const newList = [...sortedData].filter((order) => order?.orderNo === option);
+      console.log("nl", newList);
+      setFilteredOrders(() => newList);
+    }
     setFilteredOrders(sortedData);
     setSpinLoading(false);
   }, [selectedOption]);
@@ -126,8 +129,10 @@ const AllOrdersPage = ({ allOrders, getList }: IAllOrdersPageProps) => {
                 initialOption={{ value: "ALL", label: t("glossary.all") }}
                 style={{ width: "8rem" }}
                 value={selectedOption}
-                onChange={(e: any) => showProperData(e)}
-                options={getOptions(getList)}
+                onChange={(e) => {
+                  setSelectedOption(e as string);
+                }}
+                options={getOptions(orderNoList)}
               />
             </Col>
             <Col span={11} style={{ textAlign: "right" }}>
@@ -191,13 +196,12 @@ export async function getServerSideProps(appContext: any) {
           results: { orders, unPaidOrdersNo },
         },
       } = res;
-      console.log("allorders", orders);
-      console.log("listing", unPaidOrdersNo);
-      const updatedListing = unPaidOrdersNo.unshift("ALL");
+      const listingStringFormat = [];
+      for (let i = 0; i < unPaidOrdersNo.length; i++) listingStringFormat.push(String(unPaidOrdersNo[i]));
       return {
         props: {
           allOrders: orders,
-          getList: updatedListing,
+          getList: listingStringFormat,
           ...(await serverSideTranslations(getLanguageValue, ["common"])),
         },
       };
