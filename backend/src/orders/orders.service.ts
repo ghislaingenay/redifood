@@ -6,6 +6,7 @@ import Payments from 'src/payments/paymentsrepo';
 import {
   EOrderStatus,
   EPaymentStatus,
+  IFoodOrder,
   IGetServerSideData,
   IOrderApi,
   IOrderItemsApi,
@@ -27,13 +28,25 @@ export class OrdersService {
     orderType: TOrderType,
     userId: UserPayload['id'],
   ): Promise<
-    IGetServerSideData<{ orders: IOrderApi[]; unPaidOrdersNo: string[] }>
+    IGetServerSideData<{
+      orders: IOrderApi<IFoodOrder[]>[];
+      unPaidOrdersNo: string[];
+    }>
   > {
     const orderResults = await Orders.findAll(orderType, userId);
+    const ordersWithItems: IOrderApi<IFoodOrder[]>[] = [...orderResults].map(
+      (item) => {
+        return {
+          ...item,
+          orderItems: JSON.parse(item.orderItems),
+        } as IOrderApi<IFoodOrder[]>;
+      },
+    );
+
     const unPaidOrdersNo = orderResults.map((item) => item.orderNo);
     return {
       statusCode: 200,
-      results: { orders: orderResults, unPaidOrdersNo },
+      results: { orders: ordersWithItems, unPaidOrdersNo },
       message: 'Orders recovered',
     };
   }
@@ -41,11 +54,15 @@ export class OrdersService {
   async getOneOrder(
     orderId: number,
     userId: UserPayload['id'],
-  ): Promise<IGetServerSideData<IOrderApi>> {
-    const orderResults = await Orders.findOne({ orderId, userId });
+  ): Promise<IGetServerSideData<IOrderApi<IFoodOrder[]>>> {
+    const orderResult = await Orders.findOne({ orderId, userId });
+    const parsedOrderResult: IOrderApi<IFoodOrder[]> = {
+      ...orderResult,
+      orderItems: JSON.parse(orderResult.orderItems),
+    };
     return {
       statusCode: 200,
-      results: orderResults,
+      results: parsedOrderResult,
       message: 'Order recovered',
     };
   }
@@ -92,7 +109,10 @@ export class OrdersService {
     const orderNo = `${today.getFullYear()}${
       today.getMonth() + 1
     }${getOrderNo}`;
-    const updatedBody: Omit<IOrderApi, 'orderFinished' | 'orderCreatedDate'> = {
+    const updatedBody: Omit<
+      IOrderApi<IFoodOrder[]>,
+      'orderFinished' | 'orderCreatedDate'
+    > = {
       orderTotal: totalPrice,
       orderNo,
       orderTableNumber: body.orderTableNumber,

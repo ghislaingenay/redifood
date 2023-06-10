@@ -2,8 +2,7 @@ import { BadRequestException } from '@nestjs/common';
 import {
   IFoodGetApi,
   IFoodOrder,
-  IOrderApiItemsString,
-  IOrderApiWithItems,
+  IOrderApi,
   IOrderDB,
   IOrderItemsApi,
   IOrderItemsDB,
@@ -67,7 +66,7 @@ class Orders {
   static async findAll(
     orderType: TOrderType,
     userId: UserPayload['id'],
-  ): Promise<IOrderApiItemsString[]> {
+  ): Promise<IOrderApi<string>[]> {
     let data: IOrderDB[] = [];
     if (orderType === 'ALL') {
       const response = await pool.query(
@@ -97,7 +96,7 @@ class Orders {
       data = response.rows;
     }
 
-    const updatedData: IOrderApiItemsString[] = data.map((item: IOrderDB) =>
+    const updatedData: IOrderApi<string>[] = data.map((item: IOrderDB) =>
       convertKeys(item, 'dbToApi'),
     );
     return updatedData;
@@ -109,7 +108,7 @@ class Orders {
   }: {
     userId: UserPayload['id'];
     orderId: number;
-  }): Promise<IOrderApiItemsString> {
+  }): Promise<IOrderApi<string>> {
     const orderDB: { rows: IOrderDB[] } = await pool.query(
       `SELECT * FROM orders WHERE user_id = $1 AND id = $2`,
       [userId, orderId],
@@ -117,11 +116,11 @@ class Orders {
     if (!orderDB.rows[0]) {
       throw new BadRequestException('Order not found');
     }
-    return convertKeys(orderDB.rows[0], 'dbToApi') as IOrderApiItemsString;
+    return convertKeys(orderDB.rows[0], 'dbToApi') as IOrderApi<string>;
   }
 
   static async createOrder(
-    body: Omit<IOrderApiWithItems, 'orderFinished' | 'orderCreatedDate'>,
+    body: Omit<IOrderApi<IFoodOrder[]>, 'orderFinished' | 'orderCreatedDate'>,
   ) {
     // use createQuery function
     const response = await pool.query(
@@ -145,15 +144,15 @@ class Orders {
   ) {
     const { orderItems } = body;
     const totalPrice = await Orders.calculateAmountFromMenu(orderItems, userId);
-    const updatedDataApi: Partial<IOrderApiWithItems> = {
+    const updatedDataApi: Partial<IOrderApi<string>> = {
       ...body,
       orderItems: JSON.stringify(orderItems),
       orderTotal: totalPrice,
     };
-    const updatedDataDB = convertKeys<
-      Partial<IOrderApiWithItems>,
-      Partial<IOrderDB>
-    >(updatedDataApi, 'apiToDb');
+    const updatedDataDB = convertKeys<Partial<IOrderApi>, Partial<IOrderDB>>(
+      updatedDataApi,
+      'apiToDb',
+    );
     const updatedQuery = updateQuery(updatedDataDB, 'orders');
     const response = await pool.query(`${updatedQuery} WHERE id = $1`, [
       orderId,
