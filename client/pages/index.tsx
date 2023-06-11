@@ -108,7 +108,6 @@ const AllOrdersPage = ({ allOrders, getList }: IAllOrdersPageProps) => {
       console.log("nl", newList);
       setFilteredOrders(() => newList);
     }
-    setFilteredOrders(sortedData);
     setSpinLoading(false);
   }, [selectedOption]);
 
