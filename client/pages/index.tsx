@@ -1,6 +1,6 @@
 import { faCartShopping, faPenToSquare, faPlusCircle, faUtensils } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Col, Space, Table, Typography } from "antd";
+import { Alert, Col, Space, Table, Typography } from "antd";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
@@ -26,6 +26,7 @@ interface IAllOrdersPageProps {
 const AllOrdersPage = ({ allOrders, getList }: IAllOrdersPageProps) => {
   const { t } = useTranslation("common");
   const { displayCurrency } = useCurrency();
+  const haveOrders = allOrders.length > 0
 
   const router = useRouter();
 
@@ -146,6 +147,7 @@ const AllOrdersPage = ({ allOrders, getList }: IAllOrdersPageProps) => {
               </RediIconButton>
             </Col>
           </RowSpaceBetween>
+          {haveOrders ? (<>
           <Table
             loading={spinLoading}
             rowKey="id"
@@ -174,6 +176,8 @@ const AllOrdersPage = ({ allOrders, getList }: IAllOrdersPageProps) => {
               },
             }}
           />
+          </>): (<>
+          <Alert type='info' style={{width: '100%', textAlign: 'center'}} showIcon message='No orders found'/></>)}
         </AnimToTop>
       </main>
     </>
