@@ -6,9 +6,8 @@ import { IFoodApi } from "../../redifood-module/src/interfaces";
 import FoodLayout from "../../src/components/food-order/FoodLayout";
 import { useFood } from "../../src/contexts/food.context";
 import { NotificationRes } from "../../src/definitions/notification.class";
-import { ServerInfo } from "../../src/interfaces";
 import { EFoodMode } from "../../src/interfaces/food.interface";
-import { foodSectionArray, mockedFoodData } from "../../test/mocks/mockFoodData";
+import buildClient from "../api/build-client";
 import { buildLanguage } from "../api/build-language";
 
 interface ICreateOrderProps {
@@ -58,31 +57,32 @@ const CreateOrder = ({ foodList, foodSection, status }: ICreateOrderProps) => {
 
 export default CreateOrder;
 
-export async function getServerSideProps({ locale, req }: ServerInfo) {
+export async function getServerSideProps(appContext: any) {
+  const { locale, req } = appContext;
+  const client = buildClient(appContext);
   const getLanguageValue = buildLanguage(locale, req);
-  return {
-    props: {
-      foodList: mockedFoodData,
-      foodSection: foodSectionArray,
-      status: "success",
-      ...(await serverSideTranslations(getLanguageValue, ["common"])),
-    },
-  };
-  // const url = "/api/foods/all";
-  // await axios
-  //   .get(url })
-  //   .then(async (res) => {
-  //     const {
-  //       data: { results: {foodList, foodSectionList} },
-  //     } = res;
-  //     return {
-  //       props: { foodList: foodList, foodSectionList: foodSectionList, status: "success", ...(await serverSideTranslations(getLanguageValue, ["common"])) },
-  //     };
-  //   })
-  //   .catch((err) => {
-  //     console.log("erre", err);
-  //   });
-  // return {
-  //   props: { foodList: [], foodSectionList: [], status: "error", ...(await serverSideTranslations(getLanguageValue, ["common"])) },
-  // };
+  const url = "/api/food/all";
+  await client
+    .get(url)
+    .then(async (res) => {
+      const {
+        data: {
+          results: { foodList },
+        },
+      } = res;
+      return {
+        props: {
+          foodList,
+          ...(await serverSideTranslations(getLanguageValue, ["common"])),
+        },
+      };
+    })
+    .catch(async () => {
+      return {
+        props: {
+          foodList: [],
+          ...(await serverSideTranslations(getLanguageValue, ["common"])),
+        },
+      };
+    });
 }
