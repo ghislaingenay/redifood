@@ -2,7 +2,9 @@ import { Col, Modal, Row, Typography } from "antd";
 import { useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import { Else, If, Then } from "react-if";
-import { IFoodApi } from "../../../redifood-module/src/interfaces";
+import { toast } from "react-toastify";
+import { AxiosFunction } from "../../../pages/api/axios-request";
+import { IFoodApi, IGetServerSideData } from "../../../redifood-module/src/interfaces";
 import { noErrorInTable } from "../../constants";
 import AppContext from "../../contexts/app.context";
 import { useFood } from "../../contexts/food.context";
@@ -13,8 +15,8 @@ import { IErrorTableInput } from "../../interfaces";
 import { EFoodMode } from "../../interfaces/food.interface";
 import { LGCard } from "../../styles";
 import { AnimToTop } from "../../styles/animations/global.anim";
-import { RowCenter } from "../styling/grid.styled";
 import RediRadioButton from "../styling/RediRadioButton";
+import { RowCenter } from "../styling/grid.styled";
 import FoodCard from "./FoodCard";
 import FoodForm from "./FoodForm";
 import OrderSection from "./OrderSection";
@@ -41,7 +43,6 @@ const FoodLayout = ({
   editOrder,
 }: IFoodLayoutProps) => {
   const router = useRouter();
-  const tableTaken = [1, 4, 5];
 
   const { setStatus } = useContext(AppContext);
   const { foodOrder } = useFood();
@@ -54,7 +55,7 @@ const FoodLayout = ({
   const isLargeScreen = width && width > widthBreakPoint;
 
   const [sortedFoods, setSortedFoods] = useState(foodList);
-  const [selectedSection, setSelectedSection] = useState("all");
+  const [selectedSectionId, setSelectedSectionId] = useState("all");
 
   const [tableNumberValue, setTableNumberValue] = useState<null | number>(null);
   const [errorTable, setErrorTable] = useState<IErrorTableInput>({ alreadyInDb: false, missingValue: false });
@@ -63,18 +64,34 @@ const FoodLayout = ({
   const [currentOrder, setCurrentOrder] = useState<IFoodApi[]>([]);
   const [cancelOrderModal, setCancelOrderModal] = useState(false);
 
-  const changeActiveButton = (sectionName: string) => {
-    if (sectionName === "all") {
-      return setSortedFoods(foodList);
-    }
-    let filteredfoods = foodList?.filter((food) => food.itemSection === sectionName);
-    setSortedFoods(filteredfoods);
+  const [tableTakenList, setTableTakenList] = useState<number[]>([]);
+
+  const changeActiveButton = (sectionId: string) => {
+    // if (sectionName === "all") {
+    //   return setSortedFoods(foodList);
+    // }
+    // let filteredfoods = foodList?.filter((food) => food.sectionId === sectionId);
+    // setSortedFoods(filteredfoods);
   };
+
+  // api/orders/table
+  const getTakenTableNumber = async () => {
+    AxiosFunction({
+      method: "get",
+      url: "api/orders/table",
+      body: {},
+      queryParams: {}
+    }).then((res: IGetServerSideData<number[]>) => {
+      const { results} = res
+      results && setTableTakenList(results)
+    }).catch(() => toast.error("Error getting table number"))
+  }
+
 
   const handleSubmit = (foodOrder: IFoodApi[]) => {
     switch (mode) {
       case EFoodMode.CREATE: {
-        const result = sendErrorTableInput(tableNumberValue as number, tableTaken);
+        const result = sendErrorTableInput(tableNumberValue as number, tableTakenList);
         if (result === noErrorInTable) {
           if (handleOrderCreate) handleOrderCreate(foodOrder);
         } else {
@@ -102,8 +119,11 @@ const FoodLayout = ({
     setStatus(status as string);
     setCurrentOrder(foodOrder);
   };
+
   useEffect(() => {
+    getTakenTableNumber()
     loadData();
+    
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -147,9 +167,9 @@ const FoodLayout = ({
               options={getOptions(foodSection) as any}
               radioGroupName="food"
               haveIcon="false"
-              selectedButton={selectedSection}
-              setSelectedButton={setSelectedSection}
-              clickedFn={() => changeActiveButton(selectedSection)}
+              selectedButton={selectedSectionId}
+              setSelectedButton={setSelectedSectionId}
+              clickedFn={() => changeActiveButton(selectedSectionId)}
             />
             <Row gutter={[5, 10]}>
               {sortedFoods?.map((food, index) => (
