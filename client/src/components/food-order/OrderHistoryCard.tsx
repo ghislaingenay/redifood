@@ -51,7 +51,7 @@ const OrderHistoryCard = ({ foodOrder }: IOrderHistoryCard) => {
             </Col>
             <Col {...colSpan}>
               <CenteredPBold>
-                {t("glossary.amount")}: {foodOrder?.orderCurrency}
+                {t("glossary.amount")}: {foodOrder?.orderTotal}
               </CenteredPBold>
             </Col>
           </RowCenter>
@@ -60,7 +60,7 @@ const OrderHistoryCard = ({ foodOrder }: IOrderHistoryCard) => {
           <RediIconButton
             iconFt={faList}
             buttonType={EButtonType.EDIT}
-            onClick={() => router.push(`/orders/${foodOrder?._id}`)}
+            onClick={() => router.push(`/orders/${foodOrder?.id}`)}
           >
             {t("buttons.view-order")}
           </RediIconButton>

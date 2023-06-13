@@ -36,7 +36,7 @@ const FoodOrderCard = ({ food }: IFoodOrderCard) => {
           name={`Delete ${food.itemName}`}
           shape="round"
           size="large"
-          onClick={() => deleteFood(food.itemId)}
+          onClick={() => deleteFood(food.id)}
         >
           <DeleteOutlined aria-label={`delete ${food.itemName}`} />
         </RediButton>
@@ -52,21 +52,21 @@ const FoodOrderCard = ({ food }: IFoodOrderCard) => {
           size="large"
           shape="circle"
           disabled={isDisabled}
-          onClick={() => removeFood(food.itemId)}
+          onClick={() => removeFood(food.id)}
         >
           <MinusSquareOutlined aria-label={`remove ${food.itemName}`} />
         </RediButton>
         <CenteredTitle level={4} style={{ margin: 0 }}>
           {food.itemQuantity}
         </CenteredTitle>
-        <RediButton buttonType={EButtonType.SUCCESS} size="large" shape="circle" onClick={() => addFood(food.itemId)}>
+        <RediButton buttonType={EButtonType.SUCCESS} size="large" shape="circle" onClick={() => addFood(food.id)}>
           <PlusSquareOutlined aria-label={`add ${food.itemName}`} />
         </RediButton>
       </RowSpaceAround>
     );
   };
   return (
-    <AnimFoodCard key={food.itemId} role="card">
+    <AnimFoodCard key={food.id} role="card">
       {isLargeScreen ? (
         <>
           <RowCenterSp size={20} gutter={10} style={{ padding: "0 0.5rem", marginBottom: "0.25rem" }}>

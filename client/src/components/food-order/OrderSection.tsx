@@ -77,7 +77,7 @@ const OrderSection = ({
       </CenteredTitle>
       <Scroll>
         {foodOrder?.map((food) => (
-          <FoodOrderCard key={food.itemId} food={food} />
+          <FoodOrderCard key={food.id} food={food} />
         ))}
       </Scroll>
       <CenteredTitle level={5} style={{ color: RED, visibility: isVisible }}>

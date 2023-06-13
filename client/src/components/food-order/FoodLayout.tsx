@@ -121,10 +121,8 @@ const FoodLayout = ({
   };
 
   useEffect(() => {
-    getTakenTableNumber()
+    if (mode === EFoodMode.CREATE) getTakenTableNumber()
     loadData();
-    
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const renderLGCard = () => {
