@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Case, Default, Else, If, Switch, Then } from "react-if";
-import { IFoodApi } from "../../../redifood-module/src/interfaces";
+import { IFoodApi, IFoodSectionList } from "../../../redifood-module/src/interfaces";
 import { GREY, ORANGE_DARK } from "../../constants";
 import { useFood } from "../../contexts/food.context";
 import { convertFoodToSection } from "../../functions/food.fn";
@@ -31,7 +31,7 @@ import RediRadioButton, { Booleanish } from "../styling/RediRadioButton";
 import { RowCenter, RowCenterSp } from "../styling/grid.styled";
 const { Option } = Select;
 interface IFoodForm {
-  foodSection: string[];
+  foodSection: IFoodSectionList[];
   foodList: IFoodApi[];
 }
 
