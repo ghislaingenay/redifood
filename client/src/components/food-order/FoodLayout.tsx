@@ -8,7 +8,6 @@ import { IFoodApi, IFoodSectionList, IGetServerSideData } from "../../../redifoo
 import { noErrorInTable } from "../../constants";
 import AppContext from "../../contexts/app.context";
 import { useFood } from "../../contexts/food.context";
-import { getOptions } from "../../functions/global.fn";
 import { checkIfArrayAreTheSame, sendErrorTableInput } from "../../functions/order.fn";
 import { useWindowSize } from "../../hooks/useWindowSIze.hook";
 import { IErrorTableInput } from "../../interfaces";
@@ -47,7 +46,7 @@ const FoodLayout = ({
   const { setStatus } = useContext(AppContext);
   const { foodOrder } = useFood();
 
-  const [foodSection, setFoodSection] = useState<string[]>(sectionList);
+  const [foodSection] = useState<IFoodSectionList[]>(sectionList);
   const [foodList] = useState(foods);
 
   const [width] = useWindowSize();
@@ -55,7 +54,7 @@ const FoodLayout = ({
   const isLargeScreen = width && width > widthBreakPoint;
 
   const [sortedFoods, setSortedFoods] = useState(foodList);
-  const [selectedSectionId, setSelectedSectionId] = useState("all");
+  const [selectedSectionId, setSelectedSectionId] = useState(0);
 
   const [tableNumberValue, setTableNumberValue] = useState<null | number>(null);
   const [errorTable, setErrorTable] = useState<IErrorTableInput>({ alreadyInDb: false, missingValue: false });
@@ -66,13 +65,13 @@ const FoodLayout = ({
 
   const [tableTakenList, setTableTakenList] = useState<number[]>([]);
 
-  // const changeActiveButton = (sectionId: string) => {
-  //   if (sectionName === "all") {
-  //     return setSortedFoods(foodList);
-  //   }
-  //   let filteredfoods = foodList?.filter((food) => food.sectionId === sectionId);
-  //   setSortedFoods(filteredfoods);
-  // };
+  const changeActiveButton = (sectionId: number) => {
+    if (sectionId === 0) {
+      return setSortedFoods(foodList);
+    }
+    let filteredfoods = foodList?.filter((food) => food.sectionId === sectionId);
+    return setSortedFoods(filteredfoods);
+  };
 
   // api/orders/table
   const getTakenTableNumber = async () => {
@@ -121,12 +120,20 @@ const FoodLayout = ({
   };
 
   useEffect(() => {
-    const updatedSectionList = [...foodSection]
-    updatedSectionList.unshift("all")
-    setFoodSection([...updatedSectionList])
     if (mode === EFoodMode.CREATE) getTakenTableNumber()
     loadData();
   }, []);
+
+  const setOptionsSelection = (foodSection: IFoodSectionList[]) => {
+    const newFoodSection = [{label: 'ALL', value: 0}]
+    const  options = foodSection.map((section) => {
+      return {
+        label: section.sectionName,
+        value: section.id,
+      };
+    });
+    return [...newFoodSection, ...options];
+  }
 
   const renderLGCard = () => {
     return (
@@ -165,7 +172,7 @@ const FoodLayout = ({
               fontSize="1rem"
               padding="0.5rem 0.5rem"
               disabled={isDisabled}
-              options={getOptions(foodSection) as any}
+              options={setOptionsSelection(foodSection) as any}
               radioGroupName="food"
               haveIcon="false"
               selectedButton={selectedSectionId}
