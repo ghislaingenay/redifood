@@ -26,14 +26,10 @@ const CreateOrder = ({ foodList, foodSection, status }: ICreateOrderProps) => {
       description: "You will be redirected in 2 seconds",
       placement: "topRight",
     });
-    // Recover info
-    // Add missing data
-    // axios
   };
 
   useEffect(() => {
     setFoodOrder([]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
