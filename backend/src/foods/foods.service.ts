@@ -25,14 +25,17 @@ export class FoodService {
   // Get foods/all
   async getAllFoods(
     userId: UserPayload['id'],
-  ): Promise<IGetServerSideData<IFoodGetApi[]>> {
+  ): Promise<
+    IGetServerSideData<{ foodResults: IFoodGetApi[]; sectionList: string[] }>
+  > {
     const foodResults = await Foods.findAll(userId);
     if (!foodResults) {
       throw new DatabaseError();
     }
+    const sectionList = await Foods.getSectionList(userId);
     return {
       statusCode: EStatusCodes.SUCCESS,
-      results: foodResults,
+      results: { foodResults, sectionList },
       message: EFoodMessage.FOOD_RECOVERED,
     };
   }

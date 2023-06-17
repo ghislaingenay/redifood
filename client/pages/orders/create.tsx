@@ -1,3 +1,4 @@
+import { AxiosResponse } from "axios";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
@@ -61,28 +62,30 @@ export async function getServerSideProps(appContext: any) {
   const { locale, req } = appContext;
   const client = buildClient(appContext);
   const getLanguageValue = buildLanguage(locale, req);
-  const url = "/api/food/all";
-  await client
+  const url = "/api/foods/all";
+  const res = await client
     .get(url)
-    .then(async (res) => {
-      const {
-        data: {
-          results: { foodList },
-        },
-      } = res;
-      return {
-        props: {
-          foodList,
-          ...(await serverSideTranslations(getLanguageValue, ["common"])),
-        },
-      };
-    })
     .catch(async () => {
       return {
         props: {
           foodList: [],
+          foodSection: [],
           ...(await serverSideTranslations(getLanguageValue, ["common"])),
         },
       };
     });
-}
+    console.log('res', res)
+      const {
+        data: {
+          results: { foodList, sectionList },
+        },
+      } = res as AxiosResponse<{ results: { foodList: IFoodApi[], sectionList: string[] } }>;
+      return {
+        props: {
+          foodList,
+          foodSection: sectionList,
+          ...(await serverSideTranslations(getLanguageValue, ["common"])),
+        },
+      };
+    }
+
