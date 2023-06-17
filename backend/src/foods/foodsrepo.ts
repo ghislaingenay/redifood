@@ -73,12 +73,14 @@ class Foods {
     return query;
   }
 
-  static async getSectionList(userId: UserPayload['id']) {
-    const response = await pool.query(
-      `SELECT * FROM food fe INNER JOIN food_section ON food_section.id = fe.section_id AND fe.user_id = $1`,
-      [userId],
-    );
-    return response.rows;
+  static async getSectionList(userId: UserPayload['id']): Promise<string[]> {
+    const response: { section_name: string }[] = (
+      await pool.query(
+        `SELECT section_name FROM food_section fs WHERE fs.user_id = $1`,
+        [userId],
+      )
+    ).rows;
+    return response.map((item) => item.section_name);
   }
 
   static async deleteExtra(id: number) {
