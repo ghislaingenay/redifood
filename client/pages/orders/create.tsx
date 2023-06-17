@@ -59,7 +59,7 @@ export async function getServerSideProps(appContext: any) {
   const client = buildClient(appContext);
   const getLanguageValue = buildLanguage(locale, req);
   const url = "/api/foods/all";
-  const res = await client
+  const res: any = await client
     .get(url)
     .catch(async () => {
       return {
@@ -70,15 +70,14 @@ export async function getServerSideProps(appContext: any) {
         },
       };
     });
-    console.log('res', res)
       const {
         data: {
-          results: { foodList, sectionList },
+          results: { foodResults, sectionList },
         },
-      } = res as AxiosResponse<{ results: { foodList: IFoodApi[], sectionList: string[] } }>;
+      } = res as AxiosResponse<{ results: { foodResults: IFoodApi[], sectionList: string[] } }>;
       return {
         props: {
-          foodList,
+          foodList: foodResults,
           foodSection: sectionList,
           ...(await serverSideTranslations(getLanguageValue, ["common"])),
         },
