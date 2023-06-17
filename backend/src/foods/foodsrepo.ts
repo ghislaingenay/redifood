@@ -75,10 +75,10 @@ class Foods {
 
   static async getSectionList(userId: UserPayload['id']) {
     const response = await pool.query(
-      `SELECT * FROM fe INNER JOIN food_section ON food_section.id = fe.section_id AND fe.user_id = $1`,
+      `SELECT * FROM food fe INNER JOIN food_section ON food_section.id = fe.section_id AND fe.user_id = $1`,
       [userId],
     );
-    return response;
+    return response.rows;
   }
 
   static async deleteExtra(id: number) {
