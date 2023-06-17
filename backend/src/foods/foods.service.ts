@@ -24,10 +24,11 @@ import { convertKeys, createQuery, updateQuery } from './global.function';
 @Injectable()
 export class FoodService {
   // Get foods/all
-  async getAllFoods(
-    userId: UserPayload['id'],
-  ): Promise<
-    IGetServerSideData<{ foodResults: IFoodGetApi[]; sectionList: IFoodSectionList[] }>
+  async getAllFoods(userId: UserPayload['id']): Promise<
+    IGetServerSideData<{
+      foodResults: IFoodGetApi[];
+      sectionList: IFoodSectionList[];
+    }>
   > {
     const foodResults = await Foods.findAll(userId);
     if (!foodResults) {
