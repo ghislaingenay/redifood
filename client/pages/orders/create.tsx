@@ -3,7 +3,7 @@ import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useEffect } from "react";
-import { IFoodApi } from "../../redifood-module/src/interfaces";
+import { IFoodApi, IFoodSectionList } from "../../redifood-module/src/interfaces";
 import FoodLayout from "../../src/components/food-order/FoodLayout";
 import { useFood } from "../../src/contexts/food.context";
 import { NotificationRes } from "../../src/definitions/notification.class";
@@ -13,7 +13,7 @@ import { buildLanguage } from "../api/build-language";
 
 interface ICreateOrderProps {
   foodList: IFoodApi[];
-  foodSection: string[];
+  foodSection: IFoodSectionList[];
   status: string;
 }
 const CreateOrder = ({ foodList, foodSection, status }: ICreateOrderProps) => {
@@ -74,7 +74,7 @@ export async function getServerSideProps(appContext: any) {
         data: {
           results: { foodResults, sectionList },
         },
-      } = res as AxiosResponse<{ results: { foodResults: IFoodApi[], sectionList: string[] } }>;
+      } = res as AxiosResponse<{ results: { foodResults: IFoodApi[], sectionList: IFoodSectionList[] } }>;
       return {
         props: {
           foodList: foodResults,

@@ -4,7 +4,7 @@ import { useContext, useEffect, useState } from "react";
 import { Else, If, Then } from "react-if";
 import { toast } from "react-toastify";
 import { AxiosFunction } from "../../../pages/api/axios-request";
-import { IFoodApi, IGetServerSideData } from "../../../redifood-module/src/interfaces";
+import { IFoodApi, IFoodSectionList, IGetServerSideData } from "../../../redifood-module/src/interfaces";
 import { noErrorInTable } from "../../constants";
 import AppContext from "../../contexts/app.context";
 import { useFood } from "../../contexts/food.context";
@@ -29,7 +29,7 @@ interface IFoodLayoutProps {
   handleOrderCreate?: (foodOrder: IFoodApi[]) => any;
   editOrder?: (foodOrder: IFoodApi[]) => any;
   updateFood?: (food: IFoodApi) => any;
-  sectionList: string[];
+  sectionList: IFoodSectionList[];
   mainTitle: string;
 }
 
@@ -47,7 +47,7 @@ const FoodLayout = ({
   const { setStatus } = useContext(AppContext);
   const { foodOrder } = useFood();
 
-  const [foodSection] = useState<string[]>(sectionList);
+  const [foodSection, setFoodSection] = useState<string[]>(sectionList);
   const [foodList] = useState(foods);
 
   const [width] = useWindowSize();
@@ -66,13 +66,13 @@ const FoodLayout = ({
 
   const [tableTakenList, setTableTakenList] = useState<number[]>([]);
 
-  const changeActiveButton = (sectionId: string) => {
-    // if (sectionName === "all") {
-    //   return setSortedFoods(foodList);
-    // }
-    // let filteredfoods = foodList?.filter((food) => food.sectionId === sectionId);
-    // setSortedFoods(filteredfoods);
-  };
+  // const changeActiveButton = (sectionId: string) => {
+  //   if (sectionName === "all") {
+  //     return setSortedFoods(foodList);
+  //   }
+  //   let filteredfoods = foodList?.filter((food) => food.sectionId === sectionId);
+  //   setSortedFoods(filteredfoods);
+  // };
 
   // api/orders/table
   const getTakenTableNumber = async () => {
@@ -121,6 +121,9 @@ const FoodLayout = ({
   };
 
   useEffect(() => {
+    const updatedSectionList = [...foodSection]
+    updatedSectionList.unshift("all")
+    setFoodSection([...updatedSectionList])
     if (mode === EFoodMode.CREATE) getTakenTableNumber()
     loadData();
   }, []);
