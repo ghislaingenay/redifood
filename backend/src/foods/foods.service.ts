@@ -6,6 +6,7 @@ import {
   IExtraApi,
   IExtraDB,
   IFoodGetApi,
+  IFoodSectionList,
   IGetServerSideData,
   ISectionFoodApi,
   UserPayload,
@@ -26,7 +27,7 @@ export class FoodService {
   async getAllFoods(
     userId: UserPayload['id'],
   ): Promise<
-    IGetServerSideData<{ foodResults: IFoodGetApi[]; sectionList: string[] }>
+    IGetServerSideData<{ foodResults: IFoodGetApi[]; sectionList: IFoodSectionList[] }>
   > {
     const foodResults = await Foods.findAll(userId);
     if (!foodResults) {
