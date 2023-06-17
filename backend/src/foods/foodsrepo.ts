@@ -79,7 +79,7 @@ class Foods {
   ): Promise<IFoodSectionList[]> {
     const response: { section_name: string; id: number }[] = (
       await pool.query(
-        `SELECT section_name, section_id FROM food_section fs WHERE fs.user_id = $1`,
+        `SELECT section_name, id FROM food_section fs WHERE fs.user_id = $1`,
         [userId],
       )
     ).rows;
