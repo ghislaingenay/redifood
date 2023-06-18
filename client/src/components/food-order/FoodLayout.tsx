@@ -65,13 +65,12 @@ const FoodLayout = ({
 
   const [tableTakenList, setTableTakenList] = useState<number[]>([]);
 
-  const changeActiveButton = (sectionId: number) => {
-    if (sectionId === 0) {
-      return setSortedFoods(foodList);
-    }
-    let filteredfoods = foodList?.filter((food) => food.sectionId === sectionId);
-    return setSortedFoods(filteredfoods);
-  };
+  const changeActiveButton =(sectionId: number) => {
+    setSelectedSectionId(sectionId)
+    if (sectionId === 0) return setSortedFoods([...foodList]);
+    const filteredfoods = [...foodList]?.filter((food) => food.sectionId === sectionId);
+    return setSortedFoods([...filteredfoods]);
+  }
 
   // api/orders/table
   const getTakenTableNumber = async () => {
@@ -91,8 +90,8 @@ const FoodLayout = ({
     switch (mode) {
       case EFoodMode.CREATE: {
         const result = sendErrorTableInput(tableNumberValue as number, tableTakenList);
-        if (result === noErrorInTable) {
-          if (handleOrderCreate) handleOrderCreate(foodOrder);
+        if (result === noErrorInTable && handleOrderCreate) {
+          handleOrderCreate(foodOrder);
         } else {
           setErrorTable(result);
         }
@@ -125,11 +124,12 @@ const FoodLayout = ({
   }, []);
 
   const setOptionsSelection = (foodSection: IFoodSectionList[]) => {
-    const newFoodSection = [{label: 'ALL', value: 0}]
-    const  options = foodSection.map((section) => {
+    const newFoodSection = [{label: 'ALL', value: 0, ariaLabel: 'ALL'}]
+    const  options = [...foodSection].map((section) => {
       return {
         label: section.sectionName,
         value: section.id,
+        ariaLabel: section.sectionName
       };
     });
     return [...newFoodSection, ...options];
@@ -176,8 +176,8 @@ const FoodLayout = ({
               radioGroupName="food"
               haveIcon="false"
               selectedButton={selectedSectionId}
-              setSelectedButton={setSelectedSectionId}
-              clickedFn={() => changeActiveButton(selectedSectionId)}
+              // setSelectedButton={setSelectedSectionId}
+              clickedFn={changeActiveButton}
             />
             <Row gutter={[5, 10]}>
               {sortedFoods?.map((food, index) => (
