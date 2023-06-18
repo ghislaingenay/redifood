@@ -21,6 +21,7 @@ interface IOrderSectionProps {
   errorTable: { alreadyInDb: boolean; missingValue: boolean };
   handleSubmit: (foodOrder: IFoodApi[]) => void;
   handleCancel: (url: string) => void;
+  loading?: boolean;
 }
 
 const OrderSection = ({
@@ -30,6 +31,7 @@ const OrderSection = ({
   errorTable,
   handleSubmit,
   handleCancel,
+  loading
 }: IOrderSectionProps) => {
   const { t } = useTranslation("common");
   const { convertPrice } = useCurrency();
@@ -91,6 +93,7 @@ const OrderSection = ({
               shape="round"
               aria-label="Validate"
               disabled={isDisabled}
+              loading={loading}
               onClick={() => handleSubmit(foodOrder)}
             >
               <b>{t("buttons.validate")}</b>

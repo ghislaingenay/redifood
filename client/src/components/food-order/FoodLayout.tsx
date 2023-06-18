@@ -4,10 +4,11 @@ import { useContext, useEffect, useState } from "react";
 import { Else, If, Then } from "react-if";
 import { toast } from "react-toastify";
 import { AxiosFunction } from "../../../pages/api/axios-request";
-import { IFoodApi, IFoodSectionList, IGetServerSideData } from "../../../redifood-module/src/interfaces";
+import { IFoodApi, IFoodOrder, IFoodSectionList, IGetServerSideData } from "../../../redifood-module/src/interfaces";
 import { noErrorInTable } from "../../constants";
 import AppContext from "../../contexts/app.context";
 import { useFood } from "../../contexts/food.context";
+import { NotificationRes } from "../../definitions/notification.class";
 import { checkIfArrayAreTheSame, sendErrorTableInput } from "../../functions/order.fn";
 import { useWindowSize } from "../../hooks/useWindowSIze.hook";
 import { IErrorTableInput } from "../../interfaces";
@@ -32,12 +33,14 @@ interface IFoodLayoutProps {
   mainTitle: string;
 }
 
+type TCreateOrderBody =   {orderTableNumber: number,
+orderItems: IFoodOrder[];
+}
 const FoodLayout = ({
   foods,
   mode,
   sectionList,
   mainTitle,
-  handleOrderCreate,
   status,
   editOrder,
 }: IFoodLayoutProps) => {
@@ -48,6 +51,8 @@ const FoodLayout = ({
 
   const [foodSection] = useState<IFoodSectionList[]>(sectionList);
   const [foodList] = useState(foods);
+
+  const [loading, setLoading] = useState(false);
 
   const [width] = useWindowSize();
   const widthBreakPoint = 768;
@@ -87,11 +92,42 @@ const FoodLayout = ({
 
 
   const handleSubmit = (foodOrder: IFoodApi[]) => {
+    setLoading(true)
     switch (mode) {
       case EFoodMode.CREATE: {
         const result = sendErrorTableInput(tableNumberValue as number, tableTakenList);
-        console.log('food order', foodOrder)
-        if (result === noErrorInTable && handleOrderCreate) tableNumberValue && handleOrderCreate(foodOrder, tableNumberValue);
+        if (result === noErrorInTable) {
+          console.log("order created", foodOrder, tableNumberValue);
+          const updatedFoodList: IFoodOrder[] = foodOrder.map(({itemName, itemQuantity, id}) => {return {
+            itemName, itemQuantity, id
+          } as IFoodOrder})
+          console.log('updated food list', updatedFoodList)
+          const bodyCreateOrder: TCreateOrderBody = {
+            orderTableNumber: tableNumberValue as number,
+            orderItems: updatedFoodList
+          }
+          AxiosFunction({
+            method: "post",
+            url: "/api/orders",
+            body: bodyCreateOrder,
+            queryParams: {}
+          }).then(() => {
+            NotificationRes.onSuccess({
+              title: "Order was succesfully created",
+              description: "You will be redirected in 2 seconds",
+              placement: "topRight",
+            });
+            router.replace("/");
+            setLoading(false)
+          }).then(() => {
+            NotificationRes.onFailure({
+              title: "Error creating order",
+              description: "Please try again",
+              placement: "topRight",
+            });
+            setLoading(false)
+          })
+        }
         else setErrorTable(result)
       }
       case EFoodMode.EDIT: {
@@ -141,7 +177,8 @@ const FoodLayout = ({
             <OrderSection
               tableNumber={tableNumberValue}
               setTableNumber={setTableNumberValue}
-              mode={mode}
+              mode={mode} 
+              loading={loading}
               errorTable={errorTable}
               handleSubmit={handleSubmit}
               handleCancel={handleCancel}
