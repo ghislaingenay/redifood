@@ -25,7 +25,7 @@ interface IFoodLayoutProps {
   status?: string;
   foods: IFoodApi[];
   mode: EFoodMode;
-  handleOrderCreate?: (foodOrder: IFoodApi[]) => any;
+  handleOrderCreate?: (foodOrder: IFoodApi[], tableNumber: number) => any;
   editOrder?: (foodOrder: IFoodApi[]) => any;
   updateFood?: (food: IFoodApi) => any;
   sectionList: IFoodSectionList[];
@@ -90,11 +90,9 @@ const FoodLayout = ({
     switch (mode) {
       case EFoodMode.CREATE: {
         const result = sendErrorTableInput(tableNumberValue as number, tableTakenList);
-        if (result === noErrorInTable && handleOrderCreate) {
-          handleOrderCreate(foodOrder);
-        } else {
-          setErrorTable(result);
-        }
+        console.log('food order', foodOrder)
+        if (result === noErrorInTable && handleOrderCreate) tableNumberValue && handleOrderCreate(foodOrder, tableNumberValue);
+        else setErrorTable(result)
       }
       case EFoodMode.EDIT: {
         if (editOrder) editOrder(foodOrder);

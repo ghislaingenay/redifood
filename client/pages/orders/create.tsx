@@ -3,7 +3,7 @@ import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useEffect } from "react";
-import { IFoodApi, IFoodSectionList } from "../../redifood-module/src/interfaces";
+import { IFoodApi, IFoodOrder, IFoodSectionList } from "../../redifood-module/src/interfaces";
 import FoodLayout from "../../src/components/food-order/FoodLayout";
 import { useFood } from "../../src/contexts/food.context";
 import { NotificationRes } from "../../src/definitions/notification.class";
@@ -19,8 +19,12 @@ interface ICreateOrderProps {
 const CreateOrder = ({ foodList, foodSection, status }: ICreateOrderProps) => {
   const { setFoodOrder } = useFood();
   const { t } = useTranslation("common");
-  const handleOrderCreate = (foodOrder: IFoodApi[]) => {
-    console.log("order created", foodOrder);
+  const handleOrderCreate = (foodOrder: IFoodApi[], tableNumber: number) => {
+    console.log("order created", foodOrder, tableNumber);
+    const updatedFoodList: IFoodOrder[] = foodOrder.map(({itemName, itemQuantity, id}) => {return {
+      itemName, itemQuantity, id
+    } as IFoodOrder})
+    console.log('updated food list', updatedFoodList)
     NotificationRes.onSuccess({
       title: "Order was succesfully created",
       description: "You will be redirected in 2 seconds",
