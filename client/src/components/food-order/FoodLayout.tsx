@@ -4,7 +4,7 @@ import { useContext, useEffect, useState } from "react";
 import { Else, If, Then } from "react-if";
 import { toast } from "react-toastify";
 import { AxiosFunction } from "../../../pages/api/axios-request";
-import { IFoodApi, IFoodOrder, IFoodSectionList, IGetServerSideData } from "../../../redifood-module/src/interfaces";
+import { EOrderStatus, IFoodApi, IFoodOrder, IFoodSectionList, IGetServerSideData } from "../../../redifood-module/src/interfaces";
 import { noErrorInTable } from "../../constants";
 import AppContext from "../../contexts/app.context";
 import { useFood } from "../../contexts/food.context";
@@ -26,8 +26,6 @@ interface IFoodLayoutProps {
   status?: string;
   foods: IFoodApi[];
   mode: EFoodMode;
-  handleOrderCreate?: (foodOrder: IFoodApi[], tableNumber: number) => any;
-  editOrder?: (foodOrder: IFoodApi[]) => any;
   updateFood?: (food: IFoodApi) => any;
   sectionList: IFoodSectionList[];
   mainTitle: string;
@@ -36,13 +34,21 @@ interface IFoodLayoutProps {
 type TCreateOrderBody =   {orderTableNumber: number,
 orderItems: IFoodOrder[];
 }
+
+type TUpdateOrderBody = {
+  orderTableNumber: number,
+orderItems: IFoodOrder[];
+orderStatus: EOrderStatus
+}
+
+
+
 const FoodLayout = ({
   foods,
   mode,
   sectionList,
   mainTitle,
   status,
-  editOrder,
 }: IFoodLayoutProps) => {
   const router = useRouter();
 
@@ -91,6 +97,14 @@ const FoodLayout = ({
   }
 
 
+  const setFoodItemsForDb = (foodOrder: IFoodApi[]): IFoodOrder[] => {
+    return [...foodOrder].map(({itemName, itemQuantity, id}) => {return {
+      itemName, itemQuantity, id
+    } as IFoodOrder})
+  }
+
+
+
   const handleSubmit = (foodOrder: IFoodApi[]) => {
     setLoading(true)
     switch (mode) {
@@ -98,9 +112,7 @@ const FoodLayout = ({
         const result = sendErrorTableInput(tableNumberValue as number, tableTakenList);
         if (result === noErrorInTable) {
           console.log("order created", foodOrder, tableNumberValue);
-          const updatedFoodList: IFoodOrder[] = foodOrder.map(({itemName, itemQuantity, id}) => {return {
-            itemName, itemQuantity, id
-          } as IFoodOrder})
+          const updatedFoodList = setFoodItemsForDb([...foodOrder])
           console.log('updated food list', updatedFoodList)
           const bodyCreateOrder: TCreateOrderBody = {
             orderTableNumber: tableNumberValue as number,
@@ -131,7 +143,18 @@ const FoodLayout = ({
         else setErrorTable(result)
       }
       case EFoodMode.EDIT: {
-        if (editOrder) editOrder(foodOrder);
+        // if (editOrder) editOrder(foodOrder);
+        const updatedFoodList = setFoodItemsForDb([...foodOrder])
+        const bodyUpdateOrder: TUpdateOrderBody = {
+          
+        }
+        AxiosFunction({
+          method: "put",
+          url: `/api/orders/`,
+          // ${}`,
+          body: bodyUpdateOrder,
+          queryParams: {}
+        })
       }
       default: {
       }
