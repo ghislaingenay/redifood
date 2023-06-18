@@ -1,5 +1,5 @@
 import { ButtonProps, Col } from "antd";
-import { Dispatch, SetStateAction, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { BACKGROUND_COLOR, LIGHT_GREY, ORANGE_DARK, ORANGE_LIGHT } from "../../constants";
 import { hexToRgba } from "../../functions/global.fn";
 import { RadioButton } from "../../styles";
@@ -28,15 +28,12 @@ export type TIconDataMap = {
 export type Booleanish = "true" | "false";
 
 interface IRediRadioButtonProps<T extends Booleanish> extends ButtonProps {
-  // radioSize: "small" | "middle" | "large";
-  // widthButton: string | number;
   radioGroupName: string;
   options: TIconDataMap[T];
   haveIcon: T;
   selectedButton: any;
-  setSelectedButton: Dispatch<SetStateAction<any>>;
   disabled?: boolean;
-  clickedFn?: () => void;
+  clickedFn?: (element?: any) => void;
   padding?: string;
   fontSize?: string;
 }
@@ -46,23 +43,17 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
     options,
     haveIcon,
     selectedButton,
-    setSelectedButton,
     radioGroupName,
     clickedFn,
     padding,
     fontSize,
   }: IRediRadioButtonProps<Booleanish> = props;
 
-  const isSelected = (radioValue: string) => {
-    return selectedButton === radioValue;
-  };
+  const selectedButtonMemo = useMemo(() => {
+    return selectedButton
+  }, [selectedButton])
+  const isSelected = (radioValue: string| number) => selectedButtonMemo === radioValue;
 
-  // const isSelected = useCallback(
-  //   (radioValue: string) => {
-  //     return selectedButton === radioValue;
-  //   },
-  //   [selectedButton],
-  // );
 
   const spanValue = (options: IRediRadio[] | IRediRadioWithIcon[]) => {
     switch (options.length) {
@@ -78,11 +69,7 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
     }
   };
 
-  const selectedValue = useMemo(() => {
-    return selectedButton;
-  }, [selectedButton]);
-
-  const colorStyle = (currentButton: string) => {
+  const colorStyle = useCallback((currentButton: string | number) => { // maybe useCallback for thsis function
     return {
       fontSize: fontSize || "1.5rem",
       padding: padding || "1rem 3rem",
@@ -95,7 +82,7 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
         ? `0px 0px 10px 2px ${hexToRgba(ORANGE_LIGHT, 0.25)}`
         : `inset 0 0 10px  ${hexToRgba(BACKGROUND_COLOR, 0.2)}`,
     };
-  };
+  }, [selectedButtonMemo]);
 
   return (
     <RowSpaceBetween style={{ width: "100%" }}>
@@ -109,13 +96,9 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
             key={index}
             onClick={(e) => {
               const target = e.target as HTMLButtonElement;
-              if (!target) {
-                console.log("ente");
-                return setSelectedButton(selectedValue);
-              }
-              if (clickedFn) clickedFn();
-
-              return setSelectedButton(target.value as any);
+              // if (!target) return setSelectedButton(selectedButton);
+              clickedFn && clickedFn(target.value);
+              // return setSelectedButton(target.value as any);
             }}
           >
             <AnimRadioButton>
