@@ -3,10 +3,9 @@ import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useEffect } from "react";
-import { IFoodApi, IFoodOrder, IFoodSectionList } from "../../redifood-module/src/interfaces";
+import { IFoodApi, IFoodSectionList } from "../../redifood-module/src/interfaces";
 import FoodLayout from "../../src/components/food-order/FoodLayout";
 import { useFood } from "../../src/contexts/food.context";
-import { NotificationRes } from "../../src/definitions/notification.class";
 import { EFoodMode } from "../../src/interfaces/food.interface";
 import buildClient from "../api/build-client";
 import { buildLanguage } from "../api/build-language";
@@ -19,18 +18,6 @@ interface ICreateOrderProps {
 const CreateOrder = ({ foodList, foodSection, status }: ICreateOrderProps) => {
   const { setFoodOrder } = useFood();
   const { t } = useTranslation("common");
-  const handleOrderCreate = (foodOrder: IFoodApi[], tableNumber: number) => {
-    console.log("order created", foodOrder, tableNumber);
-    const updatedFoodList: IFoodOrder[] = foodOrder.map(({itemName, itemQuantity, id}) => {return {
-      itemName, itemQuantity, id
-    } as IFoodOrder})
-    console.log('updated food list', updatedFoodList)
-    NotificationRes.onSuccess({
-      title: "Order was succesfully created",
-      description: "You will be redirected in 2 seconds",
-      placement: "topRight",
-    });
-  };
 
   useEffect(() => {
     setFoodOrder([]);
@@ -49,7 +36,6 @@ const CreateOrder = ({ foodList, foodSection, status }: ICreateOrderProps) => {
           foods={foodList}
           mode={EFoodMode.CREATE}
           mainTitle={t("orders.create-order")}
-          handleOrderCreate={handleOrderCreate}
         />
       </main>
     </>
