@@ -4,11 +4,18 @@ import { useContext, useEffect, useState } from "react";
 import { Else, If, Then } from "react-if";
 import { toast } from "react-toastify";
 import { AxiosFunction } from "../../../pages/api/axios-request";
-import { EOrderStatus, IFoodApi, IFoodOrder, IFoodSectionList, IGetServerSideData } from "../../../redifood-module/src/interfaces";
+import {
+  EOrderStatus,
+  IFoodApi,
+  IFoodOrder,
+  IFoodSectionList,
+  IGetServerSideData,
+} from "../../../redifood-module/src/interfaces";
 import { noErrorInTable } from "../../constants";
 import AppContext from "../../contexts/app.context";
 import { useFood } from "../../contexts/food.context";
 import { NotificationRes } from "../../definitions/notification.class";
+import { handleCreateOrder } from "../../functions/create-order.fn";
 import { checkIfArrayAreTheSame, sendErrorTableInput } from "../../functions/order.fn";
 import { useWindowSize } from "../../hooks/useWindowSIze.hook";
 import { IErrorTableInput } from "../../interfaces";
@@ -31,25 +38,15 @@ interface IFoodLayoutProps {
   mainTitle: string;
 }
 
-type TCreateOrderBody =   {orderTableNumber: number,
-orderItems: IFoodOrder[];
-}
+export type TCreateOrderBody = { orderTableNumber: number; orderItems: IFoodOrder[] };
 
 type TUpdateOrderBody = {
-  orderTableNumber: number,
-orderItems: IFoodOrder[];
-orderStatus: EOrderStatus
-}
+  orderTableNumber: number;
+  orderItems: IFoodOrder[];
+  orderStatus: EOrderStatus;
+};
 
-
-
-const FoodLayout = ({
-  foods,
-  mode,
-  sectionList,
-  mainTitle,
-  status,
-}: IFoodLayoutProps) => {
+const FoodLayout = ({ foods, mode, sectionList, mainTitle, status }: IFoodLayoutProps) => {
   const router = useRouter();
 
   const { setStatus } = useContext(AppContext);
@@ -76,12 +73,12 @@ const FoodLayout = ({
 
   const [tableTakenList, setTableTakenList] = useState<number[]>([]);
 
-  const changeActiveButton =(sectionId: number) => {
-    setSelectedSectionId(sectionId)
+  const changeActiveButton = (sectionId: number) => {
+    setSelectedSectionId(sectionId);
     if (sectionId === 0) return setSortedFoods([...foodList]);
     const filteredfoods = [...foodList]?.filter((food) => food.sectionId === sectionId);
     return setSortedFoods([...filteredfoods]);
-  }
+  };
 
   // api/orders/table
   const getTakenTableNumber = async () => {
@@ -89,72 +86,46 @@ const FoodLayout = ({
       method: "get",
       url: "api/orders/table",
       body: {},
-      queryParams: {}
-    }).then((res: IGetServerSideData<number[]>) => {
-      const { results} = res
-      results && setTableTakenList(results)
-    }).catch(() => toast.error("Error getting table number"))
-  }
+      queryParams: {},
+    })
+      .then((res: IGetServerSideData<number[]>) => {
+        const { results } = res;
+        results && setTableTakenList(results);
+      })
+      .catch(() => toast.error("Error getting table number"));
+  };
 
-
-  const setFoodItemsForDb = (foodOrder: IFoodApi[]): IFoodOrder[] => {
-    return [...foodOrder].map(({itemName, itemQuantity, id}) => {return {
-      itemName, itemQuantity, id
-    } as IFoodOrder})
-  }
-
-
-
-  const handleSubmit = (foodOrder: IFoodApi[]) => {
-    setLoading(true)
+  const handleSubmit = async (foodOrder: IFoodApi[]) => {
+    setLoading(true);
     switch (mode) {
       case EFoodMode.CREATE: {
         const result = sendErrorTableInput(tableNumberValue as number, tableTakenList);
         if (result === noErrorInTable) {
-          console.log("order created", foodOrder, tableNumberValue);
-          const updatedFoodList = setFoodItemsForDb([...foodOrder])
-          console.log('updated food list', updatedFoodList)
-          const bodyCreateOrder: TCreateOrderBody = {
-            orderTableNumber: tableNumberValue as number,
-            orderItems: updatedFoodList
-          }
-          AxiosFunction({
-            method: "post",
-            url: "/api/orders",
-            body: bodyCreateOrder,
-            queryParams: {}
-          }).then(() => {
-            NotificationRes.onSuccess({
-              title: "Order was succesfully created",
-              description: "You will be redirected in 2 seconds",
-              placement: "topRight",
-            });
+          const res = await handleCreateOrder(foodOrder, tableNumberValue as number);
+          if (res.success) {
             router.replace("/");
-            setLoading(false)
-          }).then(() => {
-            NotificationRes.onFailure({
-              title: "Error creating order",
-              description: "Please try again",
-              placement: "topRight",
-            });
-            setLoading(false)
-          })
-        }
-        else setErrorTable(result)
+            setLoading(false);
+          } else {
+            setLoading(false);
+          }
+        } else setErrorTable(result);
       }
       case EFoodMode.EDIT: {
+        NotificationRes.onSuccess({
+          title: "Order was succesfully created",
+          description: "You will be redirected in 2 seconds",
+          placement: "topRight",
+        });
         // if (editOrder) editOrder(foodOrder);
-        const updatedFoodList = setFoodItemsForDb([...foodOrder])
-        const bodyUpdateOrder: TUpdateOrderBody = {
-          
-        }
+        const updatedFoodList = setFoodItemsForDb([...foodOrder]);
+        const bodyUpdateOrder: TUpdateOrderBody = {};
         AxiosFunction({
           method: "put",
           url: `/api/orders/`,
           // ${}`,
           body: bodyUpdateOrder,
-          queryParams: {}
-        })
+          queryParams: {},
+        });
       }
       default: {
       }
@@ -176,21 +147,21 @@ const FoodLayout = ({
   };
 
   useEffect(() => {
-    if (mode === EFoodMode.CREATE) getTakenTableNumber()
+    if (mode === EFoodMode.CREATE) getTakenTableNumber();
     loadData();
   }, []);
 
   const setOptionsSelection = (foodSection: IFoodSectionList[]) => {
-    const newFoodSection = [{label: 'ALL', value: 0, ariaLabel: 'ALL'}]
-    const  options = [...foodSection].map((section) => {
+    const newFoodSection = [{ label: "ALL", value: 0, ariaLabel: "ALL" }];
+    const options = [...foodSection].map((section) => {
       return {
         label: section.sectionName,
         value: section.id,
-        ariaLabel: section.sectionName
+        ariaLabel: section.sectionName,
       };
     });
     return [...newFoodSection, ...options];
-  }
+  };
 
   const renderLGCard = () => {
     return (
@@ -200,7 +171,7 @@ const FoodLayout = ({
             <OrderSection
               tableNumber={tableNumberValue}
               setTableNumber={setTableNumberValue}
-              mode={mode} 
+              mode={mode}
               loading={loading}
               errorTable={errorTable}
               handleSubmit={handleSubmit}
