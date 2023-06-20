@@ -19,3 +19,15 @@ export const setFoodItemsForDb = (foodOrder: IFoodApi[]): IFoodOrder[] => {
     } as IFoodOrder;
   });
 };
+
+export const setOptionsSelection = (foodSection: IFoodSectionList[]) => {
+  const newFoodSection = [{ label: "ALL", value: 0, ariaLabel: "ALL" }];
+  const options = [...foodSection].map((section) => {
+    return {
+      label: section.sectionName,
+      value: section.id,
+      ariaLabel: section.sectionName,
+    };
+  });
+  return [...newFoodSection, ...options];
+};
