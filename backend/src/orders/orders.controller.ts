@@ -65,6 +65,19 @@ export class OrdersController {
   }
 
   @UseGuards(new AuthGuard())
+  @Get(':id/edit')
+  async getEditOrder(
+    @Param(
+      'id',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    id: number,
+    @User() user: UserPayload,
+  ) {
+    return await this.ordersService.getEditOrder(id, user.id);
+  }
+
+  @UseGuards(new AuthGuard())
   @Get('items/:id')
   async getOrderItems(
     @Param(

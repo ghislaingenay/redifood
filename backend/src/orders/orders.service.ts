@@ -1,12 +1,15 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import * as moment from 'moment';
 import { BadRequestError } from 'redifood-module/src/errors/bad-request-error';
+import Foods from 'src/foods/foodsrepo';
 import { Setting } from 'src/models/settings.model';
 import Payments from 'src/payments/paymentsrepo';
 import {
+  AsyncServer,
   EOrderStatus,
   EPaymentStatus,
   IFoodOrder,
+  IGetEditOrderRes,
   IGetServerSideData,
   IOrderApi,
   IOrderItemsApi,
@@ -65,6 +68,34 @@ export class OrdersService {
       results: parsedOrderResult,
       message: 'Order recovered',
     };
+  }
+
+  async getEditOrder(
+    orderId: number,
+    userId: UserPayload['id'],
+  ): AsyncServer<IGetEditOrderRes> {
+    try {
+      const order = await Orders.findOne({ orderId, userId });
+      const orderItems = order.orderItems;
+      const orderItemsResults: IFoodOrder[] = JSON.parse(orderItems);
+      const foodIdArray =
+        Orders.getFoodIdArrayFromOrderItems(orderItemsResults);
+      const foodResults = await Foods.getFoodByFoodIdArray(foodIdArray, userId);
+      const updatedFoodWithQuantity = Orders.addFoodQuantityToOrderItems(
+        foodResults,
+        orderItemsResults,
+      );
+      return {
+        results: {
+          order,
+          orderItems: updatedFoodWithQuantity,
+        },
+        statusCode: HttpStatus.OK,
+        message: 'Order recovered',
+      };
+    } catch (err) {
+      throw new BadRequestError('Order not found');
+    }
   }
 
   async getOrderItems(
