@@ -1,6 +1,6 @@
 import { Col, Modal, Row, Typography } from "antd";
 import { useRouter } from "next/navigation";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Else, If, Then } from "react-if";
 import { toast } from "react-toastify";
 import { AxiosFunction } from "../../../pages/api/axios-request";
@@ -10,27 +10,28 @@ import {
   IFoodOrder,
   IFoodSectionList,
   IGetServerSideData,
+  IOrderApi,
 } from "../../../redifood-module/src/interfaces";
 import { noErrorInTable } from "../../constants";
-import AppContext from "../../contexts/app.context";
 import { useFood } from "../../contexts/food.context";
-import { NotificationRes } from "../../definitions/notification.class";
 import { handleCreateOrder } from "../../functions/create-order.fn";
+import { setOptionsSelection } from "../../functions/food.fn";
 import { checkIfArrayAreTheSame, sendErrorTableInput } from "../../functions/order.fn";
+import { handleUpdateOrder } from "../../functions/update-order.fn";
 import { useWindowSize } from "../../hooks/useWindowSIze.hook";
 import { IErrorTableInput } from "../../interfaces";
 import { EFoodMode } from "../../interfaces/food.interface";
 import { LGCard } from "../../styles";
 import { AnimToTop } from "../../styles/animations/global.anim";
 import RediRadioButton from "../styling/RediRadioButton";
-import { RowCenter } from "../styling/grid.styled";
+import { RowCenter, RowSpaceBetween } from "../styling/grid.styled";
 import FoodCard from "./FoodCard";
 import FoodForm from "./FoodForm";
 import OrderSection from "./OrderSection";
 
 const { Title } = Typography;
 interface IFoodLayoutProps {
-  status?: string;
+  transaction?: IOrderApi;
   foods: IFoodApi[];
   mode: EFoodMode;
   updateFood?: (food: IFoodApi) => any;
@@ -40,38 +41,35 @@ interface IFoodLayoutProps {
 
 export type TCreateOrderBody = { orderTableNumber: number; orderItems: IFoodOrder[] };
 
-type TUpdateOrderBody = {
+export type TUpdateOrderBody = {
   orderTableNumber: number;
   orderItems: IFoodOrder[];
   orderStatus: EOrderStatus;
 };
 
-const FoodLayout = ({ foods, mode, sectionList, mainTitle, status }: IFoodLayoutProps) => {
-  const router = useRouter();
+const FoodLayout = ({ foods, mode, sectionList, mainTitle, transaction }: IFoodLayoutProps) => {
+  const WIDTH_BREAKPOINT = 768;
 
-  const { setStatus } = useContext(AppContext);
+  const router = useRouter();
   const { foodOrder } = useFood();
+  const [width] = useWindowSize();
 
   const [foodSection] = useState<IFoodSectionList[]>(sectionList);
   const [foodList] = useState(foods);
-
   const [loading, setLoading] = useState(false);
-
-  const [width] = useWindowSize();
-  const widthBreakPoint = 768;
-  const isLargeScreen = width && width > widthBreakPoint;
-
   const [sortedFoods, setSortedFoods] = useState(foodList);
   const [selectedSectionId, setSelectedSectionId] = useState(0);
-
   const [tableNumberValue, setTableNumberValue] = useState<null | number>(null);
   const [errorTable, setErrorTable] = useState<IErrorTableInput>({ alreadyInDb: false, missingValue: false });
-  const isDisabled = foodOrder.length === 0 ? true : false;
-
   const [currentOrder, setCurrentOrder] = useState<IFoodApi[]>([]);
   const [cancelOrderModal, setCancelOrderModal] = useState(false);
-
   const [tableTakenList, setTableTakenList] = useState<number[]>([]);
+
+  const isLargeScreen = width && width > WIDTH_BREAKPOINT;
+  const isDisabled = foodOrder.length === 0 ? true : false;
+  const isCreateMode = mode === EFoodMode.CREATE;
+  const ariaLabelMainTitle =
+    mode === EFoodMode.ALTER ? "FOOD SECTION" : mode === EFoodMode.CREATE ? "CREATE ORDER" : "EDIT ORDER";
 
   const changeActiveButton = (sectionId: number) => {
     setSelectedSectionId(sectionId);
@@ -80,7 +78,6 @@ const FoodLayout = ({ foods, mode, sectionList, mainTitle, status }: IFoodLayout
     return setSortedFoods([...filteredfoods]);
   };
 
-  // api/orders/table
   const getTakenTableNumber = async () => {
     AxiosFunction({
       method: "get",
@@ -102,66 +99,31 @@ const FoodLayout = ({ foods, mode, sectionList, mainTitle, status }: IFoodLayout
         const result = sendErrorTableInput(tableNumberValue as number, tableTakenList);
         if (result === noErrorInTable) {
           const res = await handleCreateOrder(foodOrder, tableNumberValue as number);
-          if (res.success) {
-            router.replace("/");
-            setLoading(false);
-          } else {
-            setLoading(false);
-          }
+          if (res.success) router.replace("/");
+          else setLoading(false);
         } else setErrorTable(result);
       }
       case EFoodMode.EDIT: {
-        NotificationRes.onSuccess({
-          title: "Order was succesfully created",
-          description: "You will be redirected in 2 seconds",
-          placement: "topRight",
-        });
-        // if (editOrder) editOrder(foodOrder);
-        const updatedFoodList = setFoodItemsForDb([...foodOrder]);
-        const bodyUpdateOrder: TUpdateOrderBody = {};
-        AxiosFunction({
-          method: "put",
-          url: `/api/orders/`,
-          // ${}`,
-          body: bodyUpdateOrder,
-          queryParams: {},
-        });
+        const res = await handleUpdateOrder(foodOrder, transaction as IOrderApi);
+        if (res.success) router.replace("/");
+        else setLoading(false);
       }
-      default: {
-      }
+      default:
     }
   };
-  // function that check if two array are the same
 
   const handleCancel = (link: string) => {
-    if (!checkIfArrayAreTheSame(foodOrder, currentOrder)) {
-      return setCancelOrderModal(true);
-    }
+    if (!checkIfArrayAreTheSame(foodOrder, currentOrder)) return setCancelOrderModal(true);
     router.push(link);
     return setCancelOrderModal(false);
   };
 
-  const loadData = async () => {
-    setStatus(status as string);
-    setCurrentOrder(foodOrder);
-  };
+  const loadData = async () => setCurrentOrder(foodOrder);
 
   useEffect(() => {
-    if (mode === EFoodMode.CREATE) getTakenTableNumber();
+    if (isCreateMode) getTakenTableNumber();
     loadData();
   }, []);
-
-  const setOptionsSelection = (foodSection: IFoodSectionList[]) => {
-    const newFoodSection = [{ label: "ALL", value: 0, ariaLabel: "ALL" }];
-    const options = [...foodSection].map((section) => {
-      return {
-        label: section.sectionName,
-        value: section.id,
-        ariaLabel: section.sectionName,
-      };
-    });
-    return [...newFoodSection, ...options];
-  };
 
   const renderLGCard = () => {
     return (
@@ -186,16 +148,13 @@ const FoodLayout = ({ foods, mode, sectionList, mainTitle, status }: IFoodLayout
     );
   };
 
-  const ariaLabelMainTitle =
-    mode === EFoodMode.ALTER ? "FOOD SECTION" : mode === EFoodMode.CREATE ? "CREATE ORDER" : "EDIT ORDER";
-
   return (
     <>
       <AnimToTop>
         <Title level={2} aria-label={ariaLabelMainTitle}>
           {mainTitle}
         </Title>
-        <Row gutter={[0, 20]} justify="space-between" style={{ width: "100%" }}>
+        <RowSpaceBetween gutter={[0, 20]} style={{ width: "100%" }}>
           <Col md={24} lg={15}>
             <RediRadioButton
               fontSize="1rem"
@@ -205,7 +164,6 @@ const FoodLayout = ({ foods, mode, sectionList, mainTitle, status }: IFoodLayout
               radioGroupName="food"
               haveIcon="false"
               selectedButton={selectedSectionId}
-              // setSelectedButton={setSelectedSectionId}
               clickedFn={changeActiveButton}
             />
             <Row gutter={[5, 10]}>
@@ -222,7 +180,7 @@ const FoodLayout = ({ foods, mode, sectionList, mainTitle, status }: IFoodLayout
               {renderLGCard()}
             </Col>
           )}
-        </Row>
+        </RowSpaceBetween>
         {!isLargeScreen && <RowCenter style={{ marginTop: "1rem" }}>{renderLGCard()}</RowCenter>}
         <Modal
           title="Are u sure you want to cancel?"
