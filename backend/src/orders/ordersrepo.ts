@@ -241,6 +241,24 @@ class Orders {
   static getFoodIdArrayFromOrderItems(orderItems: IFoodOrder[]) {
     return orderItems.map((item) => item.id);
   }
+
+  static addFoodQuantityToOrderItems(
+    foodList: IFoodGetApi[],
+    orderItems: IFoodOrder[],
+  ) {
+    return [...foodList].map((item) => {
+      const foundItem = orderItems.find(
+        (orderItem) => orderItem.id === item.id,
+      );
+      if (foundItem) {
+        return {
+          ...item,
+          itemQuantity: foundItem.itemQuantity,
+        };
+      }
+      return item;
+    });
+  }
 }
 
 export default Orders;
