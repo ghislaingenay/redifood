@@ -174,6 +174,20 @@ class Foods {
     );
     return updatedResponseApi;
   }
+
+  static async getFoodByFoodIdArray(
+    foodArray: number[],
+    userId: UserPayload['id'],
+  ): Promise<IFoodGetApi[]> {
+    const response = await pool.query(
+      `SELECT * FROM food WHERE id IN ($1) AND user_id = $2`,
+      [foodArray, userId],
+    );
+    const updatedResponse = response.rows.map((item: any) =>
+      this.formatFood(item),
+    );
+    return updatedResponse;
+  }
 }
 
 export default Foods;
