@@ -6,6 +6,7 @@ import {
   IExtraApi,
   IExtraDB,
   IFoodGetApi,
+  IFoodSectionList,
   IGetServerSideData,
   ISectionFoodApi,
   UserPayload,
@@ -23,16 +24,20 @@ import { convertKeys, createQuery, updateQuery } from './global.function';
 @Injectable()
 export class FoodService {
   // Get foods/all
-  async getAllFoods(
-    userId: UserPayload['id'],
-  ): Promise<IGetServerSideData<IFoodGetApi[]>> {
+  async getAllFoods(userId: UserPayload['id']): Promise<
+    IGetServerSideData<{
+      foodResults: IFoodGetApi[];
+      sectionList: IFoodSectionList[];
+    }>
+  > {
     const foodResults = await Foods.findAll(userId);
     if (!foodResults) {
       throw new DatabaseError();
     }
+    const sectionList = await Foods.getSectionList(userId);
     return {
       statusCode: EStatusCodes.SUCCESS,
-      results: foodResults,
+      results: { foodResults, sectionList },
       message: EFoodMessage.FOOD_RECOVERED,
     };
   }

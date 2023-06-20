@@ -2,6 +2,7 @@ import { DatabaseError } from '../../redifood-module/src/handling-nestjs/databas
 import {
   IExtraApi,
   IFoodGetApi,
+  IFoodSectionList,
   ISectionFoodApi,
   UserPayload,
 } from '../../redifood-module/src/interfaces';
@@ -73,12 +74,21 @@ class Foods {
     return query;
   }
 
-  static async getSectionList(userId: UserPayload['id']) {
-    const response = await pool.query(
-      `SELECT * FROM fe INNER JOIN food_section ON food_section.id = fe.section_id AND fe.user_id = $1`,
-      [userId],
-    );
-    return response;
+  static async getSectionList(
+    userId: UserPayload['id'],
+  ): Promise<IFoodSectionList[]> {
+    const response: { section_name: string; id: number }[] = (
+      await pool.query(
+        `SELECT section_name, id FROM food_section fs WHERE fs.user_id = $1`,
+        [userId],
+      )
+    ).rows;
+    return response.map((item) => {
+      return {
+        sectionName: item.section_name,
+        id: item.id,
+      } as IFoodSectionList;
+    });
   }
 
   static async deleteExtra(id: number) {

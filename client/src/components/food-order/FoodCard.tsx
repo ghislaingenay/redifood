@@ -20,9 +20,9 @@ const FoodCard = ({ food, foodList, mode }: IFoodCard) => {
       <AnimCard
         onClick={() => {
           if (mode === EFoodMode.ALTER) {
-            selectFood(food.itemId, foodList);
+            selectFood(food.id, foodList);
           } else {
-            addToCart(food.itemId, foodList);
+            addToCart(food.id, foodList);
           }
         }}
         role="card"

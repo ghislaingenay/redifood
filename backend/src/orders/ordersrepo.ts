@@ -66,7 +66,7 @@ class Orders {
   static async findAll(
     orderType: TOrderType,
     userId: UserPayload['id'],
-  ): Promise<IOrderApi[]> {
+  ): Promise<IOrderApi<string>[]> {
     let data: IOrderDB[] = [];
     if (orderType === 'ALL') {
       const response = await pool.query(
@@ -82,7 +82,7 @@ class Orders {
         orderType === 'PAID'
           ? `order_status = 'finished'`
           : orderType === 'NOT_PAID'
-          ? `order_status != 'finished'`
+          ? `order_status != 'finished' AND order_status != 'cancelled'`
           : '';
 
       const response = await pool.query(
@@ -96,7 +96,7 @@ class Orders {
       data = response.rows;
     }
 
-    const updatedData: IOrderApi[] = data.map((item: IOrderDB) =>
+    const updatedData: IOrderApi<string>[] = data.map((item: IOrderDB) =>
       convertKeys(item, 'dbToApi'),
     );
     return updatedData;
@@ -108,7 +108,7 @@ class Orders {
   }: {
     userId: UserPayload['id'];
     orderId: number;
-  }): Promise<IOrderApi> {
+  }): Promise<IOrderApi<string>> {
     const orderDB: { rows: IOrderDB[] } = await pool.query(
       `SELECT * FROM orders WHERE user_id = $1 AND id = $2`,
       [userId, orderId],
@@ -116,11 +116,11 @@ class Orders {
     if (!orderDB.rows[0]) {
       throw new BadRequestException('Order not found');
     }
-    return convertKeys(orderDB.rows[0], 'dbToApi') as IOrderApi;
+    return convertKeys(orderDB.rows[0], 'dbToApi') as IOrderApi<string>;
   }
 
   static async createOrder(
-    body: Omit<IOrderApi, 'orderFinished' | 'orderCreatedDate'>,
+    body: Omit<IOrderApi<IFoodOrder[]>, 'orderFinished' | 'orderCreatedDate'>,
   ) {
     // use createQuery function
     const response = await pool.query(
@@ -144,7 +144,7 @@ class Orders {
   ) {
     const { orderItems } = body;
     const totalPrice = await Orders.calculateAmountFromMenu(orderItems, userId);
-    const updatedDataApi: Partial<IOrderApi> = {
+    const updatedDataApi: Partial<IOrderApi<string>> = {
       ...body,
       orderItems: JSON.stringify(orderItems),
       orderTotal: totalPrice,

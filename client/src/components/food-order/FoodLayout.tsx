@@ -2,19 +2,21 @@ import { Col, Modal, Row, Typography } from "antd";
 import { useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import { Else, If, Then } from "react-if";
-import { IFoodApi } from "../../../redifood-module/src/interfaces";
+import { toast } from "react-toastify";
+import { AxiosFunction } from "../../../pages/api/axios-request";
+import { EOrderStatus, IFoodApi, IFoodOrder, IFoodSectionList, IGetServerSideData } from "../../../redifood-module/src/interfaces";
 import { noErrorInTable } from "../../constants";
 import AppContext from "../../contexts/app.context";
 import { useFood } from "../../contexts/food.context";
-import { getOptions } from "../../functions/global.fn";
+import { NotificationRes } from "../../definitions/notification.class";
 import { checkIfArrayAreTheSame, sendErrorTableInput } from "../../functions/order.fn";
 import { useWindowSize } from "../../hooks/useWindowSIze.hook";
 import { IErrorTableInput } from "../../interfaces";
 import { EFoodMode } from "../../interfaces/food.interface";
 import { LGCard } from "../../styles";
 import { AnimToTop } from "../../styles/animations/global.anim";
-import { RowCenter } from "../styling/grid.styled";
 import RediRadioButton from "../styling/RediRadioButton";
+import { RowCenter } from "../styling/grid.styled";
 import FoodCard from "./FoodCard";
 import FoodForm from "./FoodForm";
 import OrderSection from "./OrderSection";
@@ -24,37 +26,46 @@ interface IFoodLayoutProps {
   status?: string;
   foods: IFoodApi[];
   mode: EFoodMode;
-  handleOrderCreate?: (foodOrder: IFoodApi[]) => any;
-  editOrder?: (foodOrder: IFoodApi[]) => any;
   updateFood?: (food: IFoodApi) => any;
-  sectionList: string[];
+  sectionList: IFoodSectionList[];
   mainTitle: string;
 }
+
+type TCreateOrderBody =   {orderTableNumber: number,
+orderItems: IFoodOrder[];
+}
+
+type TUpdateOrderBody = {
+  orderTableNumber: number,
+orderItems: IFoodOrder[];
+orderStatus: EOrderStatus
+}
+
+
 
 const FoodLayout = ({
   foods,
   mode,
   sectionList,
   mainTitle,
-  handleOrderCreate,
   status,
-  editOrder,
 }: IFoodLayoutProps) => {
   const router = useRouter();
-  const tableTaken = [1, 4, 5];
 
   const { setStatus } = useContext(AppContext);
   const { foodOrder } = useFood();
 
-  const [foodSection] = useState<string[]>(sectionList);
+  const [foodSection] = useState<IFoodSectionList[]>(sectionList);
   const [foodList] = useState(foods);
+
+  const [loading, setLoading] = useState(false);
 
   const [width] = useWindowSize();
   const widthBreakPoint = 768;
   const isLargeScreen = width && width > widthBreakPoint;
 
   const [sortedFoods, setSortedFoods] = useState(foodList);
-  const [selectedSection, setSelectedSection] = useState("all");
+  const [selectedSectionId, setSelectedSectionId] = useState(0);
 
   const [tableNumberValue, setTableNumberValue] = useState<null | number>(null);
   const [errorTable, setErrorTable] = useState<IErrorTableInput>({ alreadyInDb: false, missingValue: false });
@@ -63,26 +74,87 @@ const FoodLayout = ({
   const [currentOrder, setCurrentOrder] = useState<IFoodApi[]>([]);
   const [cancelOrderModal, setCancelOrderModal] = useState(false);
 
-  const changeActiveButton = (sectionName: string) => {
-    if (sectionName === "all") {
-      return setSortedFoods(foodList);
-    }
-    let filteredfoods = foodList?.filter((food) => food.itemSection === sectionName);
-    setSortedFoods(filteredfoods);
-  };
+  const [tableTakenList, setTableTakenList] = useState<number[]>([]);
+
+  const changeActiveButton =(sectionId: number) => {
+    setSelectedSectionId(sectionId)
+    if (sectionId === 0) return setSortedFoods([...foodList]);
+    const filteredfoods = [...foodList]?.filter((food) => food.sectionId === sectionId);
+    return setSortedFoods([...filteredfoods]);
+  }
+
+  // api/orders/table
+  const getTakenTableNumber = async () => {
+    AxiosFunction({
+      method: "get",
+      url: "api/orders/table",
+      body: {},
+      queryParams: {}
+    }).then((res: IGetServerSideData<number[]>) => {
+      const { results} = res
+      results && setTableTakenList(results)
+    }).catch(() => toast.error("Error getting table number"))
+  }
+
+
+  const setFoodItemsForDb = (foodOrder: IFoodApi[]): IFoodOrder[] => {
+    return [...foodOrder].map(({itemName, itemQuantity, id}) => {return {
+      itemName, itemQuantity, id
+    } as IFoodOrder})
+  }
+
+
 
   const handleSubmit = (foodOrder: IFoodApi[]) => {
+    setLoading(true)
     switch (mode) {
       case EFoodMode.CREATE: {
-        const result = sendErrorTableInput(tableNumberValue as number, tableTaken);
+        const result = sendErrorTableInput(tableNumberValue as number, tableTakenList);
         if (result === noErrorInTable) {
-          if (handleOrderCreate) handleOrderCreate(foodOrder);
-        } else {
-          setErrorTable(result);
+          console.log("order created", foodOrder, tableNumberValue);
+          const updatedFoodList = setFoodItemsForDb([...foodOrder])
+          console.log('updated food list', updatedFoodList)
+          const bodyCreateOrder: TCreateOrderBody = {
+            orderTableNumber: tableNumberValue as number,
+            orderItems: updatedFoodList
+          }
+          AxiosFunction({
+            method: "post",
+            url: "/api/orders",
+            body: bodyCreateOrder,
+            queryParams: {}
+          }).then(() => {
+            NotificationRes.onSuccess({
+              title: "Order was succesfully created",
+              description: "You will be redirected in 2 seconds",
+              placement: "topRight",
+            });
+            router.replace("/");
+            setLoading(false)
+          }).then(() => {
+            NotificationRes.onFailure({
+              title: "Error creating order",
+              description: "Please try again",
+              placement: "topRight",
+            });
+            setLoading(false)
+          })
         }
+        else setErrorTable(result)
       }
       case EFoodMode.EDIT: {
-        if (editOrder) editOrder(foodOrder);
+        // if (editOrder) editOrder(foodOrder);
+        const updatedFoodList = setFoodItemsForDb([...foodOrder])
+        const bodyUpdateOrder: TUpdateOrderBody = {
+          
+        }
+        AxiosFunction({
+          method: "put",
+          url: `/api/orders/`,
+          // ${}`,
+          body: bodyUpdateOrder,
+          queryParams: {}
+        })
       }
       default: {
       }
@@ -102,10 +174,23 @@ const FoodLayout = ({
     setStatus(status as string);
     setCurrentOrder(foodOrder);
   };
+
   useEffect(() => {
+    if (mode === EFoodMode.CREATE) getTakenTableNumber()
     loadData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const setOptionsSelection = (foodSection: IFoodSectionList[]) => {
+    const newFoodSection = [{label: 'ALL', value: 0, ariaLabel: 'ALL'}]
+    const  options = [...foodSection].map((section) => {
+      return {
+        label: section.sectionName,
+        value: section.id,
+        ariaLabel: section.sectionName
+      };
+    });
+    return [...newFoodSection, ...options];
+  }
 
   const renderLGCard = () => {
     return (
@@ -115,7 +200,8 @@ const FoodLayout = ({
             <OrderSection
               tableNumber={tableNumberValue}
               setTableNumber={setTableNumberValue}
-              mode={mode}
+              mode={mode} 
+              loading={loading}
               errorTable={errorTable}
               handleSubmit={handleSubmit}
               handleCancel={handleCancel}
@@ -144,12 +230,12 @@ const FoodLayout = ({
               fontSize="1rem"
               padding="0.5rem 0.5rem"
               disabled={isDisabled}
-              options={getOptions(foodSection) as any}
+              options={setOptionsSelection(foodSection) as any}
               radioGroupName="food"
               haveIcon="false"
-              selectedButton={selectedSection}
-              setSelectedButton={setSelectedSection}
-              clickedFn={() => changeActiveButton(selectedSection)}
+              selectedButton={selectedSectionId}
+              // setSelectedButton={setSelectedSectionId}
+              clickedFn={changeActiveButton}
             />
             <Row gutter={[5, 10]}>
               {sortedFoods?.map((food, index) => (

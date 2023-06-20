@@ -81,6 +81,7 @@ export class OrdersController {
   async createRowInSheet(@Body() body: IOrderData) {
     const sheets = new GoogleSheetService();
     const res = await sheets.createRow(body);
+    return res;
   }
 
   @UseGuards(new AuthGuard())
