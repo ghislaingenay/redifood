@@ -39,14 +39,6 @@ interface IFoodLayoutProps {
   mainTitle: string;
 }
 
-export type TCreateOrderBody = { orderTableNumber: number; orderItems: IFoodOrder[] };
-
-export type TUpdateOrderBody = {
-  orderTableNumber: number;
-  orderItems: IFoodOrder[];
-  orderStatus: EOrderStatus;
-};
-
 const FoodLayout = ({ foods, mode, sectionList, mainTitle, transaction }: IFoodLayoutProps) => {
   const WIDTH_BREAKPOINT = 768;
 

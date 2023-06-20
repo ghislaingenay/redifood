@@ -1,7 +1,7 @@
 import { AxiosFunction } from "../../pages/api/axios-request";
 import { EOrderStatus, IFoodApi, IOrderApi } from "../../redifood-module/src/interfaces";
-import { TUpdateOrderBody } from "../components/food-order/FoodLayout";
 import { NotificationRes } from "../definitions/notification.class";
+import { TUpdateOrderBody } from "../interfaces";
 import { setFoodItemsForDb } from "./food.fn";
 
 export const handleUpdateOrder = async (
