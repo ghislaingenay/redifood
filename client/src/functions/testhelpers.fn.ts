@@ -30,6 +30,8 @@ export const typeIntoFormAuth = async (
     await user.type(confirmPasswordInput, confirmPassword);
     Object.assign(finalData, { confirmPasswordElement: confirmPasswordInput });
   }
+  await user.type(screen.getByRole("textbox", { name: /first/i }), "test");
+  await user.type(screen.getByRole("textbox", { name: /last/i }), "hallo");
   userKeys.forEach((key) => {
     if (!finalData.hasOwnProperty(key)) {
       finalData[key] = undefined;

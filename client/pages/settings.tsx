@@ -90,7 +90,6 @@ const Settings = ({ language }: ISettingsProps) => {
       <Head>
         <title>{t("settings.head.title")}</title>
         <meta name="description" content={t("settings.head.description") as string} />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
         <AnimToTop>

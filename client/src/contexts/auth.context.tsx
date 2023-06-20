@@ -1,15 +1,15 @@
-import { Skeleton } from "antd";
 import Error, { ErrorProps } from "next/error";
-import React, { useContext, useEffect, useState } from "react";
+import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 import { AxiosFunction } from "../../pages/api/axios-request";
+import { UserPayload } from "../../redifood-module/src/interfaces";
 import Auth from "../../src/components/Auth";
+import Loading from "../components/Loading";
 
-// @ts-ignore
-export const AuthContext = React.createContext({} as IUseAuth);
+export const AuthContext = createContext({} as IUseAuth);
 
 interface IUseAuth {
   currentUser: any;
-  verifyUser: () => any;
+  verifyUser: () => Promise<UserPayload | null>;
 }
 
 export function useAuth() {
@@ -24,7 +24,7 @@ export function useAuth() {
 }
 
 interface IAuthProvider {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export function AuthProvider({ children }: IAuthProvider) {
@@ -32,40 +32,40 @@ export function AuthProvider({ children }: IAuthProvider) {
   const [spinLoading, setSpinLoading] = useState(true);
 
   useEffect(() => {
+    if (currentUser) {
+      setSpinLoading(false);
+      return;
+    }
     setSpinLoading(true);
-    new Promise((resolve, reject) => {
-      AxiosFunction({
-        url: `${process.env.NEXT_PUBLIC_BACK_END}/api/auth/currentuser`,
-        method: "get",
-        body: {},
-        queryParams: {},
+    console.log("currentUser", currentUser);
+    AxiosFunction({
+      url: `/api/auth/currentuser`,
+      method: "get",
+      body: {},
+      queryParams: {},
+    })
+      .then((res) => {
+        setCurrentUser(res.currentUser);
+        setSpinLoading(false);
       })
-        .then((res) => {
-          setCurrentUser(res.data.currentUser);
-          setSpinLoading(false);
-          resolve(res);
-        })
-        .catch((err) => {
-          setCurrentUser(null);
-          setSpinLoading(false);
-          reject(err);
-        });
-    });
+      .catch(() => {
+        setCurrentUser(null);
+        setSpinLoading(false);
+      });
   }, [currentUser]);
 
-  const verifyUser = () => {
-    AxiosFunction({ url: "/api/auth/currentuser", method: "get", body: {}, queryParams: {} })
+  const verifyUser = async (): Promise<UserPayload | null> => {
+    return AxiosFunction({ url: "/api/auth/currentuser", method: "get", body: {}, queryParams: {} })
       .then((res) => {
-        return res.data.currentUser;
+        return res.currentUser;
       })
-      .catch((err: ErrorProps) => {
-        console.error(err);
+      .catch(() => {
         return null;
       });
   };
 
   if (spinLoading) {
-    return <Skeleton />;
+    return <Loading />;
   }
 
   return (

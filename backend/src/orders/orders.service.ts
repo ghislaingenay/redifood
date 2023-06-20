@@ -1,12 +1,19 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
+import * as moment from 'moment';
+import { BadRequestError } from 'redifood-module/src/errors/bad-request-error';
+import { Setting } from 'src/models/settings.model';
+import Payments from 'src/payments/paymentsrepo';
 import {
   EOrderStatus,
+  EPaymentStatus,
+  IFoodOrder,
   IGetServerSideData,
   IOrderApi,
   IOrderItemsApi,
+  IPaymentDB,
   TOrderType,
   UserPayload,
-} from 'redifood-module/src/interfaces';
+} from '../../redifood-module/src/interfaces';
 import {
   AwaitPaymenDto,
   CreateOrderDto,
@@ -20,11 +27,26 @@ export class OrdersService {
   async getOrders(
     orderType: TOrderType,
     userId: UserPayload['id'],
-  ): Promise<IGetServerSideData<IOrderApi[]>> {
+  ): Promise<
+    IGetServerSideData<{
+      orders: IOrderApi<IFoodOrder[]>[];
+      unPaidOrdersNo: string[];
+    }>
+  > {
     const orderResults = await Orders.findAll(orderType, userId);
+    const ordersWithItems: IOrderApi<IFoodOrder[]>[] = [...orderResults].map(
+      (item) => {
+        return {
+          ...item,
+          orderItems: JSON.parse(item.orderItems),
+        } as IOrderApi<IFoodOrder[]>;
+      },
+    );
+
+    const unPaidOrdersNo = orderResults.map((item) => item.orderNo);
     return {
       statusCode: 200,
-      results: orderResults,
+      results: { orders: ordersWithItems, unPaidOrdersNo },
       message: 'Orders recovered',
     };
   }
@@ -32,11 +54,15 @@ export class OrdersService {
   async getOneOrder(
     orderId: number,
     userId: UserPayload['id'],
-  ): Promise<IGetServerSideData<IOrderApi>> {
-    const orderResults = await Orders.findOne({ orderId, userId });
+  ): Promise<IGetServerSideData<IOrderApi<IFoodOrder[]>>> {
+    const orderResult = await Orders.findOne({ orderId, userId });
+    const parsedOrderResult: IOrderApi<IFoodOrder[]> = {
+      ...orderResult,
+      orderItems: JSON.parse(orderResult.orderItems),
+    };
     return {
       statusCode: 200,
-      results: orderResults,
+      results: parsedOrderResult,
       message: 'Order recovered',
     };
   }
@@ -52,8 +78,10 @@ export class OrdersService {
     };
   }
 
-  async getUnPaidOrdersTable(): Promise<IGetServerSideData<number[]>> {
-    const orderItemsResults = await Orders.findTable();
+  async getUnPaidOrdersTable(
+    userId: UserPayload['id'],
+  ): Promise<IGetServerSideData<number[]>> {
+    const orderItemsResults = await Orders.findTable(userId);
     return {
       statusCode: HttpStatus.OK,
       results: orderItemsResults,
@@ -65,16 +93,26 @@ export class OrdersService {
     body: CreateOrderDto,
     userId: UserPayload['id'],
   ): Promise<IGetServerSideData<any>> {
-    const totalPrice = body.orderItems.reduce((acc, item) => {
-      return acc + item.itemPrice * item.itemQuantity;
-    }, 0);
+    const totalPrice = await Orders.calculateAmountFromMenu(
+      body.orderItems,
+      userId,
+    );
+
+    // Check the table if not already allocated
+    const orderItemsResults = await Orders.findTable(userId);
+    if (orderItemsResults.includes(body.orderTableNumber)) {
+      throw new BadRequestError('Table already has an order');
+    }
     const getOrderNo = await Orders.countOrders();
     const today = new Date();
     // Generate order number
     const orderNo = `${today.getFullYear()}${
       today.getMonth() + 1
     }${getOrderNo}`;
-    const updatedBody: Omit<IOrderApi, 'orderFinished' | 'orderCreatedDate'> = {
+    const updatedBody: Omit<
+      IOrderApi<IFoodOrder[]>,
+      'orderFinished' | 'orderCreatedDate'
+    > = {
       orderTotal: totalPrice,
       orderNo,
       orderTableNumber: body.orderTableNumber,
@@ -116,8 +154,9 @@ export class OrdersService {
   async updateOrder(
     orderId: number,
     updateOrderDto: UpdateOrderDto,
+    userId: UserPayload['id'],
   ): Promise<IGetServerSideData<any>> {
-    await Orders.updateOrder(updateOrderDto, orderId);
+    await Orders.updateOrder(updateOrderDto, orderId, userId);
     return {
       statusCode: HttpStatus.OK,
       results: {},
@@ -125,8 +164,13 @@ export class OrdersService {
     };
   }
 
-  async cancelOrder(orderId: number): Promise<IGetServerSideData<any>> {
-    await Orders.cancelOrder(orderId);
+  async cancelOrder(
+    orderId: number,
+    userId: UserPayload['id'],
+  ): Promise<IGetServerSideData<any>> {
+    await Orders.cancelOrder(orderId, userId);
+    await Payments.cancelPayment(orderId, userId);
+
     return {
       statusCode: HttpStatus.OK,
       results: {},
@@ -134,9 +178,39 @@ export class OrdersService {
     };
   }
 
-  async awaitPayment(body: AwaitPaymenDto) {
-    // emptty
-    console.log(body);
+  async awaitPayment(
+    body: AwaitPaymenDto,
+  ): Promise<IGetServerSideData<IPaymentDB>> {
+    const { orderId, userId, paymentType } = body;
+    console.log('%c params', 'color: #00e600', body);
+    const orderData = await Orders.findOne({ orderId, userId });
+    const settingData = await Setting.findOne({ user: userId });
+    const dataForPayment: IPaymentDB = {
+      user_id: userId,
+      order_id: orderId,
+      payment_stripe_id: '',
+      payment_status: EPaymentStatus.AWAITING,
+      payment_type: paymentType,
+      payment_amount: orderData.orderTotal,
+      payment_date: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+      payment_discount_applied: false,
+      payment_discount_id: 0,
+      payment_tax_amount: orderData.orderTotal * (settingData.vat / 100),
+    };
+    const paymentResult = await Payments.createOne(dataForPayment);
+    if (paymentResult.created) {
+      return {
+        statusCode: HttpStatus.OK,
+        results: dataForPayment,
+        message: `Payment created from order ${orderId}`,
+      };
+    } else {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        results: dataForPayment,
+        message: `Payment not created from order ${orderId}`,
+      };
+    }
   }
 
   async sendReceipt(sendReceiptDto: ReceiptBodyDto, orderId: number) {

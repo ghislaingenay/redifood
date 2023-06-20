@@ -1,61 +1,58 @@
 import { faCartShopping, faPenToSquare, faPlusCircle, faUtensils } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Col, Space, Table, Typography } from "antd";
+import { Alert, Col, Space, Table, Typography } from "antd";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useRouter } from "next/navigation";
 import { AlignType } from "rc-table/lib/interface";
-import { useContext, useEffect, useState } from "react";
-import { IOrderApi } from "../redifood-module/src/interfaces";
+import { useEffect, useMemo, useState } from "react";
+import { IFoodOrder, IOrderApi } from "../redifood-module/src/interfaces";
 import { RediSelect } from "../src/components/RediSelect";
 import { RediIconButton } from "../src/components/styling/Button.style";
 import { RowSpaceAround, RowSpaceBetween } from "../src/components/styling/grid.styled";
 import { BACKGROUND_COLOR } from "../src/constants";
-import AppContext from "../src/contexts/app.context";
 import { getOptions } from "../src/functions/global.fn";
 import useCurrency from "../src/hooks/useCurrency.hook";
-import { EButtonType, ServerInfo } from "../src/interfaces";
+import { EButtonType } from "../src/interfaces";
 import { AnimToTop } from "../src/styles/animations/global.anim";
-import { allDataOrders, getListUnpaidOrders } from "../test/mocks/mockOrdersData";
+import buildClient from "./api/build-client";
 import { buildLanguage } from "./api/build-language";
 
 interface IAllOrdersPageProps {
-  allOrders: IOrderApi[];
+  allOrders: IOrderApi<IFoodOrder[]>[];
   getList: string[];
-  status: string;
 }
-const AllOrdersPage = ({ allOrders, getList, status }: IAllOrdersPageProps) => {
+const AllOrdersPage = ({ allOrders, getList }: IAllOrdersPageProps) => {
   const { t } = useTranslation("common");
   const { displayCurrency } = useCurrency();
-  const { setStatus } = useContext(AppContext);
+  const haveOrders = allOrders.length > 0
 
   const router = useRouter();
-  const [listAllOrders] = useState(allOrders);
+
+  const [orderNoList] = useState(getList);
   const [selectedOption, setSelectedOption] = useState("ALL");
   const [filteredOrders, setFilteredOrders] = useState<IOrderApi[]>([]);
   const [spinLoading, setSpinLoading] = useState(true);
   const { Title } = Typography;
 
-  // const [response, doRequest, loading] = useRequest({
-  //   url: "/api/orders/all",
-  //   method: "get",
-  //   queryParams: {selectedOption},
-  //   body: {},
-  // });
-
-  const renderAmount = (orderTotal: number) => (displayCurrency() === "$" ? orderTotal : 0.85 * orderTotal);
   const columns = [
     {
       title: "ID",
-      dataIndex: "_id",
-      key: "_id",
+      dataIndex: "id",
+      key: "id",
+      align: "center" as AlignType,
+    },
+    {
+      title: "No",
+      dataIndex: "orderNo",
+      key: "orderNo",
       align: "center" as AlignType,
     },
     {
       title: "Table",
-      dataIndex: "tableNumber",
-      key: "tableNumber",
+      dataIndex: "orderTableNumber",
+      key: "orderTableNumber",
       align: "center" as AlignType,
     },
     {
@@ -63,24 +60,24 @@ const AllOrdersPage = ({ allOrders, getList, status }: IAllOrdersPageProps) => {
       dataIndex: "orderTotal",
       key: "orderTotal",
       align: "center" as AlignType,
-      render: (item: number) => renderAmount(item).toFixed(2),
+      render: (amount: IOrderApi["orderTotal"]) => <>{Number(amount).toFixed(2)}</>,
     },
     {
       title: "Action",
-      dataIndex: "_id",
+      dataIndex: "id",
       align: "center" as AlignType,
-      key: "_id",
+      key: "id",
       render: (item: IOrderApi) => (
         <Space>
           <RediIconButton
-            onClick={() => router.push(`/orders/${item._id}/edit`)}
+            onClick={() => router.push(`/orders/${item.id}/edit`)}
             buttonType={EButtonType.EDIT}
             iconFt={faPenToSquare}
           >
             {t("buttons.edit")}
           </RediIconButton>
           <RediIconButton
-            onClick={() => router.push(`/orders/${item._id}`)}
+            onClick={() => router.push(`/orders/${item.id}`)}
             iconFt={faCartShopping}
             buttonType={EButtonType.SUCCESS}
           >
@@ -91,40 +88,35 @@ const AllOrdersPage = ({ allOrders, getList, status }: IAllOrdersPageProps) => {
     },
   ];
 
-  const showProperData = (option: string) => {
-    // replace later by axios get
-    setSelectedOption(option);
-    if (option === "ALL") {
-      return setFilteredOrders(listAllOrders);
-    }
-    const newList = listAllOrders.filter((order) => order._id === option);
-    if (newList) {
-      return setFilteredOrders(newList);
-    }
-  };
+  const option = useMemo(() => {
+    return selectedOption;
+  }, [selectedOption]);
 
   useEffect(() => {
-    setStatus(status);
-    // data coming from backend
-    const sortedData = allOrders.map((order: IOrderApi) => {
+    setSpinLoading(true);
+    const sortedData = [...allOrders].map((order: IOrderApi) => {
       return {
         ...order,
-        key: order._id,
-        orderTotal: renderAmount(order.orderTotal),
+        key: order.id,
+        orderTotal: order.orderTotal,
       };
     });
-    setFilteredOrders(sortedData);
+    if (selectedOption === "ALL") {
+      console.log("here");
+      setFilteredOrders(() => sortedData);
+    } else {
+      const newList = [...sortedData].filter((order) => order?.orderNo === option);
+      console.log("nl", newList);
+      setFilteredOrders(() => newList);
+    }
     setSpinLoading(false);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status, selectedOption]);
+  }, [selectedOption]);
 
   return (
     <>
       <Head>
         <title>{t("index.head.title")}</title>
         <meta name="description" content={t("index.head.description") as string} />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
         <AnimToTop>
@@ -137,8 +129,10 @@ const AllOrdersPage = ({ allOrders, getList, status }: IAllOrdersPageProps) => {
                 initialOption={{ value: "ALL", label: t("glossary.all") }}
                 style={{ width: "8rem" }}
                 value={selectedOption}
-                onChange={(e: any) => showProperData(e)}
-                options={getOptions(getList)}
+                onChange={(e) => {
+                  setSelectedOption(e as string);
+                }}
+                options={getOptions(orderNoList)}
               />
             </Col>
             <Col span={11} style={{ textAlign: "right" }}>
@@ -153,26 +147,27 @@ const AllOrdersPage = ({ allOrders, getList, status }: IAllOrdersPageProps) => {
               </RediIconButton>
             </Col>
           </RowSpaceBetween>
+          {haveOrders ? (<>
           <Table
             loading={spinLoading}
-            rowKey="_id"
+            rowKey="id"
             columns={columns}
             dataSource={filteredOrders}
             pagination={false}
             expandable={{
-              expandedRowRender: (record: IOrderApi) => {
+              expandedRowRender: (record: IOrderApi<IFoodOrder[]>) => {
                 return (
                   <RowSpaceAround>
-                    {record.orderItems.map((item) => {
+                    {record.orderItems.map(({ id, itemName, itemQuantity }) => {
                       return (
-                        <Col span={6} key={item.itemId} style={{ color: BACKGROUND_COLOR }}>
+                        <Col span={6} key={id} style={{ color: BACKGROUND_COLOR }}>
                           <b>
                             <Space>
                               <FontAwesomeIcon icon={faUtensils} />
-                              {item.itemName}
+                              {itemName}
                             </Space>
                           </b>{" "}
-                          (<em>{item.itemQuantity}</em>)
+                          (<em>{itemQuantity}</em>)
                         </Col>
                       );
                     })}
@@ -181,6 +176,8 @@ const AllOrdersPage = ({ allOrders, getList, status }: IAllOrdersPageProps) => {
               },
             }}
           />
+          </>): (<>
+          <Alert type='info' style={{width: '100%', textAlign: 'center'}} showIcon message='No orders found'/></>)}
         </AnimToTop>
       </main>
     </>
@@ -189,31 +186,38 @@ const AllOrdersPage = ({ allOrders, getList, status }: IAllOrdersPageProps) => {
 
 export default AllOrdersPage;
 
-export async function getServerSideProps({ locale, req }: ServerInfo) {
+export async function getServerSideProps(appContext: any) {
+  const { locale, req } = appContext;
+  const client = buildClient(appContext);
   const getLanguageValue = buildLanguage(locale, req);
-  return {
-    props: {
-      allOrders: allDataOrders,
-      getList: getListUnpaidOrders,
-      status: "success",
-      ...(await serverSideTranslations(getLanguageValue, ["common"])),
-    },
-  };
-  // const url = "/api/orders/all";
-  // await axios
-  //   .get(url, { params: { selectedOption: "ALL" } })
-  //   .then(async (res) => {
-  //     const {
-  //       data: { results: {allDataOrders, getListUnpaidOrders} },
-  //     } = res;
-  //     return {
-  //       props: { allOrders: allDataOrders, getList: getListUnpaidOrders, status: "success", ...(await serverSideTranslations(getLanguageValue, ["common"])) },
-  //     };
-  //   })
-  //   .catch((err) => {
-  //     console.log("erre", err);
-  //   });
-  // return {
-  //   props: { allOrders: [], getList: [], status: "error", ...(await serverSideTranslations(getLanguageValue, ["common"])) },
-  // };
+  const url = "/api/orders/";
+  const res = await client
+    .get(url, { params: { orderType: "NOT_PAID" } })
+    .then(async (res) => {
+      const {
+        data: {
+          results: { orders, unPaidOrdersNo },
+        },
+      } = res;
+      const listingStringFormat = [];
+      for (let i = 0; i < unPaidOrdersNo.length; i++) listingStringFormat.push(String(unPaidOrdersNo[i]));
+      return {
+        props: {
+          allOrders: orders,
+          getList: listingStringFormat,
+          ...(await serverSideTranslations(getLanguageValue, ["common"])),
+        },
+      };
+    })
+    .catch(async () => {
+      return {
+        props: {
+          allOrders: [],
+          getList: [],
+          ...(await serverSideTranslations(getLanguageValue, ["common"])),
+        },
+      };
+    });
+
+  return res;
 }

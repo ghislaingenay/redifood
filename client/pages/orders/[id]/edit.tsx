@@ -41,7 +41,6 @@ const EditOrder = ({ foodList, currentFoodOrder, foodSection, status }: IEditOrd
       <Head>
         <title>{t("orders.head-edit.title")}</title>
         <meta name="description" content={t("orders.head-edit.description") as string} />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
       <body>
         <FoodLayout

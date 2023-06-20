@@ -12,30 +12,34 @@ const returnAxiosCall = (data: IAxiosRequest) => {
   const { body, queryParams, method, url } = data;
   // const userValue = authToken?.authorization;
 
+  const axiosFn = axios.create({
+    baseURL: `${process.env.NEXT_PUBLIC_BACK_END}`
+  })
   // const headers = {
   //   Cookie: "session",
   //   authToken: userValue,
   // };
   switch (method) {
     case "get":
-      return axios.get(url, {
+      return axiosFn.get(url, {
         withCredentials: true,
         // headers,
         params: { queryParams },
       });
     case "post":
-      return axios.post(url, body, {
+      return axiosFn.post(url, body, {
         withCredentials: true,
         // headers,
         params: { queryParams },
       });
     case "put":
-      return axios.put(url, body, {
+      return axiosFn.put(url, body, {
         withCredentials: true,
         // headers,
+        params: { queryParams },
       });
     case "delete":
-      return axios.delete(url, {
+      return axiosFn.delete(url, {
         withCredentials: true,
         // headers,
       });

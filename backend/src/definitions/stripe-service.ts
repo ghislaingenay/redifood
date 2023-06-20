@@ -86,6 +86,28 @@ class StripePayService {
     });
     return chargeResponse;
   }
+
+  static async retrieveCharge(chargeId: string): Promise<Stripe.Charge> {
+    const stripeClient = new Stripe(process.env.STRIPE_API_KEY, {
+      apiVersion: '2022-11-15',
+    });
+    if (!chargeId) {
+      throw new NotAcceptableException('A charge ID must be provided');
+    }
+    return await stripeClient.charges.retrieve(chargeId);
+  }
+
+  static async updateCharge(data: any, chargeId: string) {
+    const stripeClient = new Stripe(process.env.STRIPE_API_KEY, {
+      apiVersion: '2022-11-15',
+    });
+    if (!chargeId) {
+      throw new NotAcceptableException('A charge ID must be provided');
+    }
+    return await stripeClient.charges.update(chargeId, {
+      metadata: data,
+    });
+  }
 }
 
 export default StripePayService;

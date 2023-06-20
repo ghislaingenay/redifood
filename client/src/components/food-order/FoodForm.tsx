@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Case, Default, Else, If, Switch, Then } from "react-if";
-import { IFoodApi } from "../../../redifood-module/src/interfaces";
+import { IFoodApi, IFoodSectionList } from "../../../redifood-module/src/interfaces";
 import { GREY, ORANGE_DARK } from "../../constants";
 import { useFood } from "../../contexts/food.context";
 import { convertFoodToSection } from "../../functions/food.fn";
@@ -27,15 +27,27 @@ import {
   RoundedInputNum,
 } from "../../styles/styledComponents/typography.styled";
 import { RediButton, RediIconButton } from "../styling/Button.style";
-import { RowCenter, RowCenterSp } from "../styling/grid.styled";
 import RediRadioButton, { Booleanish } from "../styling/RediRadioButton";
+import { RowCenter, RowCenterSp } from "../styling/grid.styled";
 const { Option } = Select;
 interface IFoodForm {
-  foodSection: string[];
+  foodSection: IFoodSectionList[];
   foodList: IFoodApi[];
 }
 
-type PartialFood = Partial<IFoodApi> | null;
+interface IFoodFormValues {
+  itemName: string,
+  itemPrice: number,
+  sectionId: EHandleType,
+  extraId: EHandleType,
+  itemPhoto: string,
+  itemDescription?: string,
+  itemQuantity: number,
+  id?: undefined,
+}
+
+type PartialFormFood = Partial<IFoodFormValues>;
+type PartialFood = Partial<IFoodApi>| null
 
 enum EHandleType {
   NONE = "NONE",
@@ -85,16 +97,17 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
     { label: t("buttons.create"), value: "false", icon: <FontAwesomeIcon icon={faSquarePlus} />, ariaLabel: "CREATE" },
   ];
 
-  const initialFormValues: PartialFood = {
+  const initialFormValues: PartialFormFood = {
     itemName: undefined,
     itemPrice: undefined,
-    itemSection: EHandleType.NONE,
-    itemExtra: EHandleType.NONE,
+    sectionId: EHandleType.NONE,
+    extraId: EHandleType.NONE,
     itemPhoto: undefined,
     itemDescription: undefined,
     itemQuantity: undefined,
-    itemId: undefined,
+    id: undefined,
   };
+
 
   const [handleType, setHandleType] = useState<EHandleType>(EHandleType.NONE);
   const [sortedFood, setSortedFood] = useState<Record<string, string[]>>({});
@@ -264,11 +277,11 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
     if (handleType === EHandleType.ADDSECTION || handleType === EHandleType.DELETESECTION) {
       setInputSection("");
       setDelSection("");
-      form.setFieldsValue({ itemSection: foodOrder[0].itemSection });
+      form.setFieldsValue({ itemSection: foodOrder[0].sectionId });
     } else if (handleType === EHandleType.ADDEXTRA || handleType === EHandleType.DELETEEXTRA) {
       setInputExtra("");
       setDelExtra("");
-      form.setFieldsValue({ itemExtra: foodOrder[0].itemExtra });
+      form.setFieldsValue({ itemExtra: foodOrder[0].extraId });
     } else if (handleType === EHandleType.EDIT) {
       form.setFieldsValue(foodOrder[0]);
     } else {
@@ -335,15 +348,15 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
         itemDescription: foodOrder[0].itemDescription,
         itemPrice: convertPrice(foodOrder[0].itemPrice, "backToFront", false),
         itemPhoto: foodOrder[0].itemPhoto,
-        itemSection: foodOrder[0].itemSection,
-        itemExtra: foodOrder[0].itemExtra,
-      });
+        sectionId: foodOrder[0].sectionId,
+        extraId: foodOrder[0].extraId,
+      } as any);
       setFiles([foodOrder[0].itemPhoto]);
-      setSortedFood(convertFoodToSection(foodList, foodSection));
+      setSortedFood(convertFoodToSection(foodList, foodSection) as any);
     } else {
       setFiles([]);
       form.setFieldsValue(initialFormValues);
-      setCurrentFood(initialFormValues);
+      setCurrentFood(initialFormValues as PartialFood);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectFood, editMode]);
@@ -644,10 +657,10 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
               {foodList &&
                 foodList
                   .filter((food) => {
-                    return food.itemSection === delSection;
+                    return food.sectionId === delSection as any;
                   })
                   .map((food: IFoodApi) => {
-                    return <p key={food.itemId}>{food.itemName}</p>;
+                    return <p key={food.id}>{food.itemName}</p>;
                   })}
             </>
           </Case>
@@ -658,9 +671,9 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
               <p>These foods will be deleted</p>
               {foodList &&
                 foodList
-                  .filter((food) => food.itemExtra === delExtra)
+                  .filter((food) => food.extraId === delExtra as any)
                   .map((food: IFoodApi) => {
-                    return <p key={food.itemId}>{food.itemName}</p>;
+                    return <p key={food.id}>{food.itemName}</p>;
                   })}
             </>
           </Case>

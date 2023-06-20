@@ -7,6 +7,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -45,6 +46,12 @@ export class OrdersController {
   }
 
   @UseGuards(new AuthGuard())
+  @Get('table')
+  async getUnPaidOrdersTable(@User() user: UserPayload) {
+    return await this.ordersService.getUnPaidOrdersTable(user.id);
+  }
+
+  @UseGuards(new AuthGuard())
   @Get(':id')
   async getOneOrder(
     @Param(
@@ -69,19 +76,12 @@ export class OrdersController {
     return await this.ordersService.getOrderItems(id);
   }
 
-  @Get('table')
-  async getUnPaidOrdersTable() {
-    return await this.ordersService.getUnPaidOrdersTable();
-  }
-
   @UseGuards(new AuthGuard())
-  @Post()
-  async createOrder(
-    @Body(new ValidationPipe()) createOrderDto: CreateOrderDto,
-    @User() user: UserPayload,
-  ) {
-    // get order tot and set it to the order
-    return await this.ordersService.createOrder(createOrderDto, user.id);
+  @Post('sheet')
+  async createRowInSheet(@Body() body: IOrderData) {
+    const sheets = new GoogleSheetService();
+    const res = await sheets.createRow(body);
+    return res;
   }
 
   @UseGuards(new AuthGuard())
@@ -91,12 +91,13 @@ export class OrdersController {
       'id',
       new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
     )
-    @Query('paymentType')
-    paymentType: EPaymentType,
     orderId: number,
+    @Query('paymentType') paymentType: EPaymentType,
     @User() user: UserPayload,
+    @Body() data: any,
   ) {
     const body: AwaitPaymenDto = {
+      ...data,
       orderId,
       userId: user.id,
       paymentType,
@@ -117,6 +118,18 @@ export class OrdersController {
     return await this.ordersService.sendReceipt(sendReceiptDto, orderId);
   }
 
+  @UseGuards(new AuthGuard())
+  @Post()
+  async createOrder(
+    @Body(new ValidationPipe()) createOrderDto: CreateOrderDto,
+    @User() user: UserPayload,
+  ) {
+    // get order tot and set it to the order
+    return await this.ordersService.createOrder(createOrderDto, user.id);
+  }
+
+  @UseGuards(new AuthGuard())
+  @Put(':id')
   async updateOrder(
     @Param(
       'id',
@@ -124,8 +137,9 @@ export class OrdersController {
     )
     id: number,
     @Body(new ValidationPipe()) updateOrderDto: UpdateOrderDto,
+    @User() user: UserPayload,
   ) {
-    return await this.ordersService.updateOrder(id, updateOrderDto);
+    return await this.ordersService.updateOrder(id, updateOrderDto, user.id);
   }
 
   @UseGuards(new AuthGuard())
@@ -135,16 +149,10 @@ export class OrdersController {
       'id',
       new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
     )
-    id: number,
+    orderId: number,
+    @User() user: UserPayload,
   ) {
-    return await this.ordersService.cancelOrder(id);
-  }
-
-  @UseGuards(new AuthGuard())
-  @Post('sheet')
-  async createRowInSheet(@Body() body: IOrderData) {
-    const sheets = new GoogleSheetService();
-    await sheets.createRow(body);
+    return await this.ordersService.cancelOrder(orderId, user.id);
   }
 
   // update order and update order item // send back the menu

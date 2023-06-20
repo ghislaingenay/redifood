@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { IRequest } from '../../src/handling/request';
-import { signInUserDto, signUpUserDto } from './auth.dto';
+import { CheckEmailDto, signInUserDto, signUpUserDto } from './auth.dto';
 import { AuthService } from './auth.service';
 import { User } from './user-decorator';
 
@@ -34,12 +34,18 @@ export class AuthController {
     });
   }
 
+  @Post('verify')
+  async checkEmail(@Body(new ValidationPipe()) checkEmailDto: CheckEmailDto) {
+    return await this.authService.checkEmail(checkEmailDto);
+  }
+
   @Post('signin')
   async signInUser(
     @Body(new ValidationPipe()) signInDto: signInUserDto,
     @Req() req: IRequest,
     @Res() res: Response,
   ) {
+    console.log('bdy', signInDto);
     const [userData, userJwt] = await this.authService.signInUser(signInDto);
     req.session = { jwt: userJwt };
     // req.session.jwt = userJwt;

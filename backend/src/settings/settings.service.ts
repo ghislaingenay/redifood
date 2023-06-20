@@ -46,7 +46,11 @@ export class SettingsService {
       });
       const savedSettings = await newSettings.save();
       if (!savedSettings) throw new DatabaseError();
-      return { results: savedSettings, message: 'Settings created' };
+      return {
+        results: savedSettings,
+        message: 'Settings created',
+        statusCode: HttpStatus.CREATED,
+      };
     } catch (err) {
       if (err instanceof BadRequestException) {
         return {
@@ -76,20 +80,21 @@ export class SettingsService {
       if (!savedSettings) throw new DatabaseError();
       return {
         results: body,
-        message: 'Settings updated',
+        message: `Settings ${savedSettings._id} updated`,
         statusCode: HttpStatus.OK,
       };
     } catch (err) {
       if (err instanceof BadRequestException) {
         return {
           results: {},
-          message: err.message,
+          message: 'Please provide a valid id',
           statusCode: HttpStatus.BAD_REQUEST,
         };
       } else {
         return {
           results: {},
-          message: err.message,
+          message:
+            "Your settings didn't save properly. Please try again or contact the Redifood team",
           statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         };
       }

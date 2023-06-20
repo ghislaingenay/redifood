@@ -1,10 +1,10 @@
-import { IFoodApi } from "../../redifood-module/src/interfaces";
+import { IFoodApi, IFoodSectionList } from "../../redifood-module/src/interfaces";
 
-export const convertFoodToSection = (foodList: IFoodApi[], foodSection: string[]) => {
+export const convertFoodToSection = (foodList: IFoodApi[], foodSection: IFoodSectionList[]) => {
   let foodObject: Record<string, number[]> = {};
-  foodSection.forEach((section: string) => {
-    foodObject[section] = Array.from(
-      new Set(foodList.filter((food) => food.sectionId === section).map((food) => food.extraId)),
+  foodSection.forEach(({id, sectionName}) => {
+    foodObject[sectionName] = Array.from(
+      new Set(foodList.filter((food) => food.sectionId === id).map((food) => food.extraId)),
     );
   });
   return foodObject;

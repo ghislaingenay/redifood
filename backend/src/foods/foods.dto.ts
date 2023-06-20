@@ -98,6 +98,5 @@ export class UpdateFoodDto extends CreateFoodDto {
 
   @IsString()
   @IsNotEmpty()
-  @Length(2, 20)
   userId: string;
 }
