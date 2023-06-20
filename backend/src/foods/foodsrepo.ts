@@ -1,6 +1,7 @@
 import { DatabaseError } from '../../redifood-module/src/handling-nestjs/database-error.exception';
 import {
   IExtraApi,
+  IFoodApi,
   IFoodGetApi,
   IFoodSectionList,
   ISectionFoodApi,
@@ -175,17 +176,22 @@ class Foods {
     return updatedResponseApi;
   }
 
-  static async getFoodByFoodIdArray(
+  static async getFoodApiByFoodIdArray(
     foodArray: number[],
     userId: UserPayload['id'],
-  ): Promise<IFoodGetApi[]> {
+  ): Promise<IFoodApi[]> {
     const response = await pool.query(
       `SELECT * FROM food WHERE id IN ($1) AND user_id = $2`,
       [foodArray, userId],
     );
-    const updatedResponse = response.rows.map((item: any) =>
-      this.formatFood(item),
-    );
+    return response.rows;
+  }
+  static async getFoodGetByFoodIdArray(
+    foodArray: number[],
+    userId: UserPayload['id'],
+  ): Promise<IFoodGetApi[]> {
+    const response = await Foods.getFoodApiByFoodIdArray(foodArray, userId);
+    const updatedResponse = response.map((item: any) => this.formatFood(item));
     return updatedResponse;
   }
 }

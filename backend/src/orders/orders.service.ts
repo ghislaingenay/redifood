@@ -80,13 +80,22 @@ export class OrdersService {
       const orderItemsResults: IFoodOrder[] = JSON.parse(orderItems);
       const foodIdArray =
         Orders.getFoodIdArrayFromOrderItems(orderItemsResults);
-      const foodResults = await Foods.getFoodByFoodIdArray(foodIdArray, userId);
+      const foodResults = await Foods.getFoodApiByFoodIdArray(
+        foodIdArray,
+        userId,
+      );
       const updatedFoodWithQuantity = Orders.addFoodQuantityToOrderItems(
         foodResults,
         orderItemsResults,
       );
+
+      const foodList = await Foods.findAll(userId);
+      const foodSection = await Foods.getSectionList(userId);
+
       return {
         results: {
+          foodList,
+          foodSection,
           order,
           orderItems: updatedFoodWithQuantity,
         },

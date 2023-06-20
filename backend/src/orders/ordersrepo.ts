@@ -1,5 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
 import {
+  IFoodApi,
   IFoodGetApi,
   IFoodOrder,
   IOrderApi,
@@ -243,9 +244,9 @@ class Orders {
   }
 
   static addFoodQuantityToOrderItems(
-    foodList: IFoodGetApi[],
+    foodList: Omit<IFoodApi[], 'itemQuantity'>,
     orderItems: IFoodOrder[],
-  ) {
+  ): IFoodApi[] {
     return [...foodList].map((item) => {
       const foundItem = orderItems.find(
         (orderItem) => orderItem.id === item.id,
