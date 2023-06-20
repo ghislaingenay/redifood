@@ -237,6 +237,10 @@ class Orders {
 
     return totalAmount;
   }
+
+  static getFoodIdArrayFromOrderItems(orderItems: IFoodOrder[]) {
+    return orderItems.map((item) => item.id);
+  }
 }
 
 export default Orders;
