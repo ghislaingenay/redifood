@@ -16,6 +16,7 @@ import { BACKGROUND_COLOR } from "../src/constants";
 import { getOptions } from "../src/functions/global.fn";
 import useCurrency from "../src/hooks/useCurrency.hook";
 import { EButtonType } from "../src/interfaces";
+import { LabelFormBlack } from "../src/styles";
 import { AnimToTop } from "../src/styles/animations/global.anim";
 import { AxiosFunction } from "./api/axios-request";
 import buildClient from "./api/build-client";
@@ -210,41 +211,36 @@ const AllOrdersPage = ({ allOrders, getList }: IAllOrdersPageProps) => {
             </>
           )}
         </AnimToTop>
-        <Modal open={viewTableNumberModal} footer={false}>
+        <Modal open={viewTableNumberModal} footer={false} onCancel={() => removeTableNumberModal()} centered>
           <Form form={tableForm} onFinish={() => router.push(`/orders/create/${tableValue}`)}>
-            <Form.Item
-              label="Table Number"
-              name="tableNumber"
-              rules={[
-                { required: true, message: "Please input table number" },
-                {
-                  pattern: /^[0-9\b]+$/,
-                  message: "Please input only number",
-                },
-                () => ({
-                  validator(_, value) {
-                    if (value && tableTakenList.includes(Number(value))) {
-                      return Promise.reject(new Error("Table number already taken"));
-                    }
-                    return Promise.resolve();
-                  },
-                }),
-              ]}
-            >
-              <InputNumber />
-            </Form.Item>
+            <RowSpaceBetween style={{ width: "100%" }}>
+              <Col span={12}>
+                <LabelFormBlack>Table no</LabelFormBlack>
+              </Col>
+              <Col span={12}>
+                <Form.Item
+                  name="tableNumber"
+                  rules={[
+                    { required: true, message: "Please input table number" },
+                    {
+                      pattern: /^\d+$/,
+                      message: "Please input only number",
+                    },
+                    () => ({
+                      validator(_, value) {
+                        const tableNumberIsAlreadyTaken = value && tableTakenList.includes(Number(value));
+                        if (tableNumberIsAlreadyTaken) return Promise.reject(new Error("Table number already taken"));
+                        return Promise.resolve();
+                      },
+                    }),
+                  ]}
+                >
+                  <InputNumber />
+                </Form.Item>
+              </Col>
+            </RowSpaceBetween>
             <RowCenterSp>
-              <RediIconButton
-                buttonType={EButtonType.ERROR}
-                iconFt={<FontAwesomeIcon icon={faCancel} onClick={removeTableNumberModal} />}
-              >
-                {t("buttons.cancel")}
-              </RediIconButton>
-              <RediIconButton
-                buttonType={EButtonType.CREATE}
-                iconFt={<FontAwesomeIcon icon={faCancel} />}
-                onClick={() => tableForm.submit()}
-              >
+              <RediIconButton buttonType={EButtonType.CREATE} iconFt={faCancel} onClick={() => tableForm.submit()}>
                 {t("buttons.create")}
               </RediIconButton>
             </RowCenterSp>
