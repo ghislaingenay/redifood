@@ -3,12 +3,12 @@ import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useEffect } from "react";
-import { IFoodApi, IFoodSectionList } from "../../redifood-module/src/interfaces";
-import FoodLayout from "../../src/components/food-order/FoodLayout";
-import { useFood } from "../../src/contexts/food.context";
-import { EFoodMode } from "../../src/interfaces/food.interface";
-import buildClient from "../api/build-client";
-import { buildLanguage } from "../api/build-language";
+import { IFoodApi, IFoodSectionList } from "../../../redifood-module/src/interfaces";
+import FoodLayout from "../../../src/components/food-order/FoodLayout";
+import { useFood } from "../../../src/contexts/food.context";
+import { EFoodMode } from "../../../src/interfaces/food.interface";
+import buildClient from "../../api/build-client";
+import { buildLanguage } from "../../api/build-language";
 
 interface ICreateOrderProps {
   foodList: IFoodApi[];
