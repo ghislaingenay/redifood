@@ -45,25 +45,30 @@ export async function getServerSideProps(appContext: any) {
   const client = buildClient(appContext);
   const getLanguageValue = buildLanguage(locale, req);
   const url = "/api/foods/all";
-  const res: any = await client.get(url).catch(async () => {
-    return {
-      props: {
-        foodList: [],
-        foodSection: [],
-        ...(await serverSideTranslations(getLanguageValue, ["common"])),
-      },
-    };
-  });
-  const {
-    data: {
-      results: { foodResults, sectionList },
-    },
-  } = res as AxiosResponse<{ results: { foodResults: IFoodApi[]; sectionList: IFoodSectionList[] } }>;
-  return {
-    props: {
-      foodList: foodResults,
-      foodSection: sectionList,
-      ...(await serverSideTranslations(getLanguageValue, ["common"])),
-    },
-  };
+  const res: any = await client
+    .get(url)
+    .then(async (res) => {
+      const {
+        data: {
+          results: { foodResults, sectionList },
+        },
+      } = res as AxiosResponse<{ results: { foodResults: IFoodApi[]; sectionList: IFoodSectionList[] } }>;
+      return {
+        props: {
+          foodList: foodResults,
+          foodSection: sectionList,
+          ...(await serverSideTranslations(getLanguageValue, ["common"])),
+        },
+      };
+    })
+    .catch(async () => {
+      return {
+        props: {
+          foodList: [],
+          foodSection: [],
+          ...(await serverSideTranslations(getLanguageValue, ["common"])),
+        },
+      };
+    });
+  return res;
 }
