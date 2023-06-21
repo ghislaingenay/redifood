@@ -2,6 +2,7 @@ import { DatabaseError } from '../../redifood-module/src/handling-nestjs/databas
 import {
   IExtraApi,
   IFoodApi,
+  IFoodDB,
   IFoodGetApi,
   IFoodSectionList,
   ISectionFoodApi,
@@ -32,7 +33,9 @@ class Foods {
   };
 
   private static find_foods_query = `SELECT * FROM food as f INNER JOIN food_section fs on fs.id = f.section_id INNER JOIN food_extra fe ON f.extra_id = fe.id`;
-  static async findAll(userId: UserPayload['id']): Promise<IFoodGetApi[]> {
+  static async findAllFormatted(
+    userId: UserPayload['id'],
+  ): Promise<IFoodGetApi[]> {
     const response = (
       await pool.query(`${this.find_foods_query} WHERE f.user_id = $1`, [
         userId,
@@ -47,6 +50,18 @@ class Foods {
       return this.formatFood(item);
     });
     return updatedResponse;
+  }
+
+  static async findAllFoods(userId: UserPayload['id']): Promise<IFoodApi[]> {
+    const response: IFoodDB[] = (
+      await pool.query(`${this.find_foods_query} WHERE f.user_id = $1`, [
+        userId,
+      ])
+    ).rows;
+    if (!response) throw new DatabaseError();
+    return [...response].map((item: any) => {
+      return convertKeys<IFoodDB, IFoodApi>(item, 'dbToApi');
+    });
   }
 
   static async findBySectionId(

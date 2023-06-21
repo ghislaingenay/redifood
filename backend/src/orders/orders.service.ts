@@ -89,7 +89,7 @@ export class OrdersService {
         orderItemsResults,
       );
 
-      const foodList = await Foods.findAll(userId);
+      const foodList = await Foods.findAllFoods(userId);
       const foodSection = await Foods.getSectionList(userId);
 
       return {

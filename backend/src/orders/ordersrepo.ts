@@ -180,7 +180,7 @@ class Orders {
   static async setOrderItems(idList: IMenuId, orderItems: string) {
     const { userId, orderId } = idList;
     const orderMenu: IFoodOrder[] = JSON.parse(orderItems);
-    const foodList = await Foods.findAll(userId);
+    const foodList = await Foods.findAllFormatted(userId);
     const updatedMenu: IFoodGetApi[] = foodList.map((item: IFoodGetApi) => {
       const foundItem = orderMenu.find(
         (orderItem: IFoodOrder) => orderItem.id === item.id,
@@ -216,7 +216,7 @@ class Orders {
     orderItems: IFoodOrder[],
     userId: UserPayload['id'],
   ): Promise<number> {
-    const foodList = await Foods.findAll(userId);
+    const foodList = await Foods.findAllFormatted(userId);
     const updatedMenu: IFoodGetApi[] = foodList.map((item: IFoodGetApi) => {
       const foundItem = [...orderItems].find(
         (orderItem: IFoodOrder) => orderItem.id === item.id,
