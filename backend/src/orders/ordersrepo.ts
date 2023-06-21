@@ -114,9 +114,7 @@ class Orders {
       `SELECT * FROM orders WHERE user_id = $1 AND id = $2`,
       [userId, orderId],
     );
-    if (!orderDB.rows[0]) {
-      throw new BadRequestException('Order not found');
-    }
+    if (!orderDB.rows[0]) throw new BadRequestException('Order not found');
     return convertKeys(orderDB.rows[0], 'dbToApi') as IOrderApi<string>;
   }
 

@@ -195,12 +195,17 @@ class Foods {
     foodArray: number[],
     userId: UserPayload['id'],
   ): Promise<IFoodApi[]> {
+    const arrayString = `(${foodArray.join(',')})`;
     const response = await pool.query(
-      `SELECT * FROM food WHERE id IN ($1) AND user_id = $2`,
-      [foodArray, userId],
+      `SELECT * FROM food WHERE id IN ${arrayString} AND user_id = $1`,
+      [userId],
     );
-    return response.rows;
+    const dbResponse: IFoodDB[] = response.rows;
+    return [...dbResponse]?.map((item) => {
+      return convertKeys<IFoodDB, IFoodApi>(item, 'dbToApi');
+    });
   }
+
   static async getFoodGetByFoodIdArray(
     foodArray: number[],
     userId: UserPayload['id'],

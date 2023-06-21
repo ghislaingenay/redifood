@@ -137,7 +137,6 @@ export class OrdersController {
     @Body(new ValidationPipe()) createOrderDto: CreateOrderDto,
     @User() user: UserPayload,
   ) {
-    // get order tot and set it to the order
     return await this.ordersService.createOrder(createOrderDto, user.id);
   }
 
