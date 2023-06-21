@@ -4,14 +4,7 @@ import { useEffect, useState } from "react";
 import { Else, If, Then } from "react-if";
 import { toast } from "react-toastify";
 import { AxiosFunction } from "../../../pages/api/axios-request";
-import {
-  EOrderStatus,
-  IFoodApi,
-  IFoodOrder,
-  IFoodSectionList,
-  IGetServerSideData,
-  IOrderApi,
-} from "../../../redifood-module/src/interfaces";
+import { IFoodApi, IFoodSectionList, IGetServerSideData, IOrderApi } from "../../../redifood-module/src/interfaces";
 import { noErrorInTable } from "../../constants";
 import { useFood } from "../../contexts/food.context";
 import { handleCreateOrder } from "../../functions/create-order.fn";
@@ -24,7 +17,7 @@ import { EFoodMode } from "../../interfaces/food.interface";
 import { LGCard } from "../../styles";
 import { AnimToTop } from "../../styles/animations/global.anim";
 import RediRadioButton from "../styling/RediRadioButton";
-import { RowCenter, RowSpaceBetween } from "../styling/grid.styled";
+import { RowCenter } from "../styling/grid.styled";
 import FoodCard from "./FoodCard";
 import FoodForm from "./FoodForm";
 import OrderSection from "./OrderSection";
@@ -146,7 +139,7 @@ const FoodLayout = ({ foods, mode, sectionList, mainTitle, transaction }: IFoodL
         <Title level={2} aria-label={ariaLabelMainTitle}>
           {mainTitle}
         </Title>
-        <RowSpaceBetween gutter={[0, 20]} style={{ width: "100%" }}>
+        <Row justify="space-around" gutter={[0, 20]} style={{ width: "100%" }}>
           <Col md={24} lg={15}>
             <RediRadioButton
               fontSize="1rem"
@@ -172,7 +165,7 @@ const FoodLayout = ({ foods, mode, sectionList, mainTitle, transaction }: IFoodL
               {renderLGCard()}
             </Col>
           )}
-        </RowSpaceBetween>
+        </Row>
         {!isLargeScreen && <RowCenter style={{ marginTop: "1rem" }}>{renderLGCard()}</RowCenter>}
         <Modal
           title="Are u sure you want to cancel?"
