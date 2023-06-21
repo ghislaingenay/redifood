@@ -1,18 +1,15 @@
 import { Col, Modal, Row, Typography } from "antd";
 import { useRouter } from "next/navigation";
+import { useRouter as Router } from "next/router";
 import { useEffect, useState } from "react";
 import { Else, If, Then } from "react-if";
-import { toast } from "react-toastify";
-import { AxiosFunction } from "../../../pages/api/axios-request";
-import { IFoodApi, IFoodSectionList, IGetServerSideData, IOrderApi } from "../../../redifood-module/src/interfaces";
-import { noErrorInTable } from "../../constants";
+import { IFoodApi, IFoodSectionList, IOrderApi } from "../../../redifood-module/src/interfaces";
 import { useFood } from "../../contexts/food.context";
 import { handleCreateOrder } from "../../functions/create-order.fn";
 import { setOptionsSelection } from "../../functions/food.fn";
-import { checkIfArrayAreTheSame, sendErrorTableInput } from "../../functions/order.fn";
+import { checkIfArrayAreTheSame } from "../../functions/order.fn";
 import { handleUpdateOrder } from "../../functions/update-order.fn";
 import { useWindowSize } from "../../hooks/useWindowSIze.hook";
-import { IErrorTableInput } from "../../interfaces";
 import { EFoodMode } from "../../interfaces/food.interface";
 import { LGCard } from "../../styles";
 import { AnimToTop } from "../../styles/animations/global.anim";
@@ -36,6 +33,9 @@ const FoodLayout = ({ foods, mode, sectionList, mainTitle, transaction }: IFoodL
   const WIDTH_BREAKPOINT = 768;
 
   const router = useRouter();
+  const routerClient = Router();
+  const tableNo = Number(routerClient.query.tableNumber) || 0;
+
   const { foodOrder } = useFood();
   const [width] = useWindowSize();
 
@@ -44,17 +44,14 @@ const FoodLayout = ({ foods, mode, sectionList, mainTitle, transaction }: IFoodL
   const [loading, setLoading] = useState(false);
   const [sortedFoods, setSortedFoods] = useState(foodList);
   const [selectedSectionId, setSelectedSectionId] = useState(0);
-  const [tableNumberValue, setTableNumberValue] = useState<null | number>(null);
-  const [errorTable, setErrorTable] = useState<IErrorTableInput>({ alreadyInDb: false, missingValue: false });
   const [currentOrder, setCurrentOrder] = useState<IFoodApi[]>([]);
   const [cancelOrderModal, setCancelOrderModal] = useState(false);
-  const [tableTakenList, setTableTakenList] = useState<number[]>([]);
 
   const isLargeScreen = width && width > WIDTH_BREAKPOINT;
   const isDisabled = foodOrder.length === 0 ? true : false;
   const isCreateMode = mode === EFoodMode.CREATE;
-  const ariaLabelMainTitle =
-    mode === EFoodMode.ALTER ? "FOOD SECTION" : mode === EFoodMode.CREATE ? "CREATE ORDER" : "EDIT ORDER";
+  const isAlterMode = mode === EFoodMode.ALTER;
+  const ariaLabelMainTitle = isAlterMode ? "FOOD SECTION" : isCreateMode ? "CREATE ORDER" : "EDIT ORDER";
 
   const changeActiveButton = (sectionId: number) => {
     setSelectedSectionId(sectionId);
@@ -63,30 +60,13 @@ const FoodLayout = ({ foods, mode, sectionList, mainTitle, transaction }: IFoodL
     return setSortedFoods([...filteredfoods]);
   };
 
-  const getTakenTableNumber = async () => {
-    AxiosFunction({
-      method: "get",
-      url: "api/orders/table",
-      body: {},
-      queryParams: {},
-    })
-      .then((res: IGetServerSideData<number[]>) => {
-        const { results } = res;
-        results && setTableTakenList(results);
-      })
-      .catch(() => toast.error("Error getting table number"));
-  };
-
   const handleSubmit = async (foodOrder: IFoodApi[]) => {
     setLoading(true);
     switch (mode) {
       case EFoodMode.CREATE: {
-        const result = sendErrorTableInput(tableNumberValue as number, tableTakenList);
-        if (result === noErrorInTable) {
-          const res = await handleCreateOrder(foodOrder, tableNumberValue as number);
-          if (res.success) router.replace("/");
-          else setLoading(false);
-        } else setErrorTable(result);
+        const res = await handleCreateOrder(foodOrder, Number(tableNo));
+        if (res.success) router.replace("/");
+        else setLoading(false);
       }
       case EFoodMode.EDIT: {
         const res = await handleUpdateOrder(foodOrder, transaction as IOrderApi);
@@ -103,24 +83,17 @@ const FoodLayout = ({ foods, mode, sectionList, mainTitle, transaction }: IFoodL
     return setCancelOrderModal(false);
   };
 
-  const loadData = async () => setCurrentOrder(foodOrder);
+  useEffect(() => setCurrentOrder(foodOrder), []);
 
-  useEffect(() => {
-    if (isCreateMode) getTakenTableNumber();
-    loadData();
-  }, []);
-
-  const renderLGCard = () => {
+  const RenderLGCard = () => {
     return (
       <LGCard style={{ height: "100%", width: "100%" }}>
         <If condition={mode !== EFoodMode.ALTER}>
           <Then>
             <OrderSection
-              tableNumber={tableNumberValue}
-              setTableNumber={setTableNumberValue}
+              tableNumber={tableNo}
               mode={mode}
               loading={loading}
-              errorTable={errorTable}
               handleSubmit={handleSubmit}
               handleCancel={handleCancel}
             />
@@ -160,13 +133,19 @@ const FoodLayout = ({ foods, mode, sectionList, mainTitle, transaction }: IFoodL
             </Row>
           </Col>
 
-          {isLargeScreen && (
-            <Col md={24} lg={8}>
-              {renderLGCard()}
-            </Col>
-          )}
+          <If condition={isLargeScreen}>
+            <Then>
+              <Col md={24} lg={8}>
+                <RenderLGCard />
+              </Col>
+            </Then>
+            <Else>
+              <RowCenter style={{ marginTop: "1rem" }}>
+                <RenderLGCard />
+              </RowCenter>
+            </Else>
+          </If>
         </Row>
-        {!isLargeScreen && <RowCenter style={{ marginTop: "1rem" }}>{renderLGCard()}</RowCenter>}
         <Modal
           title="Are u sure you want to cancel?"
           open={cancelOrderModal}
