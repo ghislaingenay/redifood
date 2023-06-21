@@ -47,7 +47,7 @@ export const RediButton = ({ buttonType, children, ...props }: IRediButtonProps)
 
 interface IRediIconButtonProps extends ButtonProps {
   buttonType: EButtonType;
-  iconFt: IconProp | JSX.Element;
+  iconFt: IconProp;
   square?: boolean;
 }
 
