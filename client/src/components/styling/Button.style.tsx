@@ -14,7 +14,7 @@ export const RediButton = ({ buttonType, children, ...props }: IRediButtonProps)
   const handleButtonColor = (buttonColor: IRediButtonProps["buttonType"]) => {
     const basicStyling = { margin: 0 };
 
-    const colorDictionary = {
+    const colorDictionary: Record<EButtonType, Record<string, string>> = {
       [EButtonType.CREATE]: { backgroundColor: BLUE },
       [EButtonType.DISPLAY]: { backgroundColor: ORANGE },
       [EButtonType.EDIT]: { backgroundColor: PURPLE },
