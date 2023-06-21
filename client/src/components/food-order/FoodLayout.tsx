@@ -62,19 +62,14 @@ const FoodLayout = ({ foods, mode, sectionList, mainTitle, transaction }: IFoodL
 
   const handleSubmit = async (foodOrder: IFoodApi[]) => {
     setLoading(true);
-    switch (mode) {
-      case EFoodMode.CREATE: {
-        const res = await handleCreateOrder(foodOrder, Number(tableNo));
-        if (res.success) router.replace("/");
-        else setLoading(false);
-      }
-      case EFoodMode.EDIT: {
-        const res = await handleUpdateOrder(foodOrder, transaction as IOrderApi);
-        if (res.success) router.replace("/");
-        else setLoading(false);
-      }
-      default:
+    if (isCreateMode) {
+      const res = await handleCreateOrder(foodOrder, Number(tableNo));
+      if (res.success) return router.replace("/");
+    } else {
+      const res = await handleUpdateOrder(foodOrder, transaction as IOrderApi);
+      if (res.success) return router.replace("/");
     }
+    setLoading(false);
   };
 
   const handleCancel = (link: string) => {

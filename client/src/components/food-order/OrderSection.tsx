@@ -1,4 +1,4 @@
-import { Divider, InputNumber, Space, Typography } from "antd";
+import { Divider, Space, Typography } from "antd";
 import { useTranslation } from "next-i18next";
 import { Else, If, Then } from "react-if";
 import { IFoodApi } from "../../../redifood-module/src/interfaces";
@@ -33,20 +33,12 @@ const OrderSection = ({ tableNumber, mode, handleSubmit, handleCancel, loading }
 
   return (
     <>
-      <RowCenter>
+      <Space>
         <Title level={5} aria-label="Table number">
           {t("orders.table-number")}:
         </Title>
-        <InputNumber
-          type="number"
-          value={tableNumber}
-          disabled
-          name="tableNumber"
-          min={0}
-          aria-label="tableNumber"
-          style={{ height: "50%", top: "0.5rem", marginLeft: "1rem" }}
-        />
-      </RowCenter>
+        <Title level={5}>{tableNumber}</Title>
+      </Space>
       <If condition={isCreateMode}>
         <Then>
           <Divider style={{ border: `0.125rem solid ${ORANGE}` }} />

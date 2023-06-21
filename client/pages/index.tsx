@@ -1,4 +1,4 @@
-import { faCancel, faCartShopping, faPenToSquare, faPlusCircle, faUtensils } from "@fortawesome/free-solid-svg-icons";
+import { faCartShopping, faPenToSquare, faPlusCircle, faUtensils } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Alert, Col, Form, InputNumber, Modal, Space, Table, Typography } from "antd";
 import { useTranslation } from "next-i18next";
@@ -219,6 +219,7 @@ const AllOrdersPage = ({ allOrders, getList }: IAllOrdersPageProps) => {
               </Col>
               <Col span={12}>
                 <Form.Item
+                  style={{ margin: 0, padding: 0 }}
                   name="tableNumber"
                   rules={[
                     { required: true, message: "Please input table number" },
@@ -239,8 +240,8 @@ const AllOrdersPage = ({ allOrders, getList }: IAllOrdersPageProps) => {
                 </Form.Item>
               </Col>
             </RowSpaceBetween>
-            <RowCenterSp>
-              <RediIconButton buttonType={EButtonType.CREATE} iconFt={faCancel} onClick={() => tableForm.submit()}>
+            <RowCenterSp style={{ marginTop: "1rem" }}>
+              <RediIconButton buttonType={EButtonType.CREATE} iconFt={faPlusCircle} onClick={() => tableForm.submit()}>
                 {t("buttons.create")}
               </RediIconButton>
             </RowCenterSp>
