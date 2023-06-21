@@ -88,8 +88,11 @@ const FoodLayout = ({ foods, mode, sectionList, mainTitle, transaction }: IFoodL
   const RenderLGCard = () => {
     return (
       <LGCard style={{ height: "100%", width: "100%" }}>
-        <If condition={mode !== EFoodMode.ALTER}>
+        <If condition={isAlterMode}>
           <Then>
+            <FoodForm foodSection={foodSection} foodList={foodList} />
+          </Then>
+          <Else>
             <OrderSection
               tableNumber={tableNo}
               mode={mode}
@@ -97,9 +100,6 @@ const FoodLayout = ({ foods, mode, sectionList, mainTitle, transaction }: IFoodL
               handleSubmit={handleSubmit}
               handleCancel={handleCancel}
             />
-          </Then>
-          <Else>
-            <FoodForm foodSection={foodSection} foodList={foodList} />
           </Else>
         </If>
       </LGCard>
