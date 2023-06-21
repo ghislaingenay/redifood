@@ -77,14 +77,14 @@ const AllOrdersPage = ({ allOrders, getList }: IAllOrdersPageProps) => {
       render: (item: IOrderApi) => (
         <Space>
           <RediIconButton
-            onClick={() => router.push(`/orders/${item.id}/edit`)}
+            onClick={() => router.push(`/orders/${item}/edit`)}
             buttonType={EButtonType.EDIT}
             iconFt={faPenToSquare}
           >
             {t("buttons.edit")}
           </RediIconButton>
           <RediIconButton
-            onClick={() => router.push(`/orders/${item.id}`)}
+            onClick={() => router.push(`/orders/${item}`)}
             iconFt={faCartShopping}
             buttonType={EButtonType.SUCCESS}
           >
