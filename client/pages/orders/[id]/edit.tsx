@@ -15,8 +15,10 @@ const EditOrder = ({ foodList, orderItems, foodSection, order }: IEditOrderProps
   const { setFoodOrder } = useFood();
   const { t } = useTranslation("common");
 
+  const haveOrders = orderItems.length > 0;
+
   useEffect(() => {
-    setFoodOrder(orderItems);
+    haveOrders && setFoodOrder(orderItems);
   }, []);
 
   return (
@@ -46,29 +48,34 @@ export async function getServerSideProps(appContext: any) {
   const client = buildClient(appContext);
   const id: string = appContext.query["id"];
   const url = `/api/orders/${id}/edit`;
-  const response: any = await client.get(url).catch(async () => {
-    return {
-      props: {
-        order: [],
-        orderItems: [],
-        status: "error",
-        ...(await serverSideTranslations(getLanguageValue, ["common"])),
-      },
-    };
-  });
+  const response: any = await client
+    .get(url)
+    .then(async (res) => {
+      const {
+        data: {
+          results: { order, orderItems, foodList, foodSection },
+        },
+      } = res as any;
 
-  const {
-    data: {
-      results: { order, orderItems, foodList, foodSection },
-    },
-  } = response as any;
-  return {
-    props: {
-      order,
-      orderItems,
-      foodList,
-      foodSection,
-      ...(await serverSideTranslations(getLanguageValue, ["common"])),
-    },
-  };
+      return {
+        props: {
+          order,
+          orderItems,
+          foodList,
+          foodSection,
+          ...(await serverSideTranslations(getLanguageValue, ["common"])),
+        },
+      };
+    })
+    .catch(async () => {
+      return {
+        props: {
+          order: [],
+          orderItems: [],
+          status: "error",
+          ...(await serverSideTranslations(getLanguageValue, ["common"])),
+        },
+      };
+    });
+  return response;
 }

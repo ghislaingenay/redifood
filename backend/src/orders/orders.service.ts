@@ -88,16 +88,8 @@ export class OrdersService {
         foodResults,
         orderItemsResults,
       );
-
-      console.log(
-        '%c updatedFoodWithQuantity',
-        'color: #00e600',
-        updatedFoodWithQuantity,
-      );
-
       const foodList = await Foods.findAllFoods(userId);
       const foodSection = await Foods.getSectionList(userId);
-
       return {
         results: {
           foodList,
