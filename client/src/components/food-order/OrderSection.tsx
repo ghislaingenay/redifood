@@ -1,7 +1,7 @@
 import { Divider, Space, Typography } from "antd";
 import { useTranslation } from "next-i18next";
 import { Else, If, Then } from "react-if";
-import { IFoodApi } from "../../../redifood-module/src/interfaces";
+import { IFoodApi, IOrderApi } from "../../../redifood-module/src/interfaces";
 import { ORANGE, RED } from "../../constants";
 import { useFood } from "../../contexts/food.context";
 import { calculateTotal } from "../../functions/order.fn";
@@ -21,9 +21,10 @@ interface IOrderSectionProps {
   handleSubmit: (foodOrder: IFoodApi[]) => void;
   handleCancel: (url: string) => void;
   loading?: boolean;
+  transaction?: IOrderApi;
 }
 
-const OrderSection = ({ tableNumber, mode, handleSubmit, handleCancel, loading }: IOrderSectionProps) => {
+const OrderSection = ({ tableNumber, mode, handleSubmit, handleCancel, loading, transaction }: IOrderSectionProps) => {
   const { t } = useTranslation("common");
   const { convertPrice } = useCurrency();
   const { foodOrder } = useFood();
@@ -31,13 +32,16 @@ const OrderSection = ({ tableNumber, mode, handleSubmit, handleCancel, loading }
   const isVisible = foodOrder.length > 0 ? "visible" : "hidden";
   const isDisabled = foodOrder.length === 0 ? true : false;
 
+  const orderNo: string = transaction?.orderNo || "#NA";
+  const tableNumberValue = isCreateMode ? tableNumber : transaction?.orderTableNumber || 0;
+
   return (
     <>
       <Space>
         <Title level={5} aria-label="Table number">
           {t("orders.table-number")}:
         </Title>
-        <Title level={5}>{tableNumber}</Title>
+        <Title level={5}>{tableNumberValue}</Title>
       </Space>
       <If condition={isCreateMode}>
         <Then>
@@ -46,14 +50,14 @@ const OrderSection = ({ tableNumber, mode, handleSubmit, handleCancel, loading }
         <Else>
           <RowCenter>
             <Title style={{ margin: 0 }} level={5} aria-label="Order #">
-              {t("orders.order")} #
+              {t("orders.order")} # {orderNo}
             </Title>
           </RowCenter>
         </Else>
       </If>
-      <CenteredTitle level={5} aria-label="Order List">
-        {t("orders.order-list")}
-      </CenteredTitle>
+      <Divider dashed style={{ borderColor: "black" }} aria-label="Order List">
+        {t("orders.order-list").toUpperCase()}
+      </Divider>
       <Scroll>
         {foodOrder?.map((food) => (
           <FoodOrderCard key={food.id} food={food} />

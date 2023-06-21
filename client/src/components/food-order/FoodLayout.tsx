@@ -91,6 +91,7 @@ const FoodLayout = ({ foods, mode, sectionList, mainTitle, transaction }: IFoodL
             <OrderSection
               tableNumber={tableNo}
               mode={mode}
+              transaction={transaction}
               loading={loading}
               handleSubmit={handleSubmit}
               handleCancel={handleCancel}
