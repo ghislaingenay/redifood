@@ -3,11 +3,19 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Alert, Space } from "antd";
 import { useState } from "react";
 
+import { AxiosResponse } from "axios";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
-import { EOrderStatus, EPaymentType, IFoodOrder, IOrderApi } from "../../redifood-module/src/interfaces";
+import {
+  EOrderStatus,
+  EPaymentType,
+  IFoodOrder,
+  IGetOneOrder,
+  IGetServerSideData,
+  IOrderApi,
+} from "../../redifood-module/src/interfaces";
 import SummaryTable from "../../src/components/food-order/SummaryTable";
 import { RediIconButton } from "../../src/components/styling/Button.style";
 import RediRadioButton from "../../src/components/styling/RediRadioButton";
@@ -22,10 +30,9 @@ import buildClient from "../api/build-client";
 import { buildLanguage } from "../api/build-language";
 
 interface ICurrentOrderProps {
-  currentOrder: IOrderApi<IFoodOrder[]>
+  currentOrder: IOrderApi<IFoodOrder[]>;
   status: string;
 }
-
 
 const CurrentOrder = ({ currentOrder, status }: ICurrentOrderProps) => {
   const { t } = useTranslation("common");
@@ -133,24 +140,33 @@ export default CurrentOrder;
 export async function getServerSideProps(appContext: any) {
   const { locale, req } = appContext;
   const getLanguageValue = buildLanguage(locale, req);
-    const client = buildClient(appContext);
+  const client = buildClient(appContext);
   const id: string = appContext.query["id"];
-  const res: any = await client
-      .get(`/api/orders/${id}`)
-      .catch(async () => {
-        return {
-          props: {
-            currentOrder: [],
-            status: 'error',
-            ...(await serverSideTranslations(getLanguageValue, ["common"])),
-          },
-        };
-      });
-    const {data: {results: {currentOrder}}} = res;
-    return {
-      props: {
-        currentOrder, status:'success',
-        ...(await serverSideTranslations(getLanguageValue, ["common"])),
-      }
-    }
+  const url = `/api/orders/${id}`;
+  const response = await client
+    .get(url)
+    .then(async (res: AxiosResponse<IGetServerSideData<IGetOneOrder>>) => {
+      const {
+        data: { results },
+      } = res;
+      const { currentOrder, foodList } = results as IGetOneOrder;
+      return {
+        props: {
+          currentOrder,
+          foodList,
+          ...(await serverSideTranslations(getLanguageValue, ["common"])),
+        },
+      };
+    })
+    .catch(async () => {
+      return {
+        props: {
+          currentOrder: [],
+          foodList: [],
+          ...(await serverSideTranslations(getLanguageValue, ["common"])),
+        },
+      };
+    });
+
+  return response;
 }

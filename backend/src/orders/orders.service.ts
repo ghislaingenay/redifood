@@ -10,6 +10,7 @@ import {
   EPaymentStatus,
   IFoodOrder,
   IGetEditOrderRes,
+  IGetOneOrder,
   IGetServerSideData,
   IOrderApi,
   IOrderItemsApi,
@@ -57,15 +58,20 @@ export class OrdersService {
   async getOneOrder(
     orderId: number,
     userId: UserPayload['id'],
-  ): Promise<IGetServerSideData<IOrderApi<IFoodOrder[]>>> {
+  ): Promise<IGetServerSideData<IGetOneOrder>> {
     const orderResult = await Orders.findOne({ orderId, userId });
+    // need to parse the orderItems
+    const parsedOrderItems = JSON.parse(orderResult.orderItems);
     const parsedOrderResult: IOrderApi<IFoodOrder[]> = {
       ...orderResult,
       orderItems: JSON.parse(orderResult.orderItems),
     };
+
+    const foodIdArray = parsedOrderItems.map((item) => item.id);
+    const foodList = await Foods.getFoodGetByFoodIdArray(foodIdArray, userId);
     return {
       statusCode: 200,
-      results: parsedOrderResult,
+      results: { currentOrder: parsedOrderResult, foodList },
       message: 'Order recovered',
     };
   }
