@@ -22,18 +22,8 @@ export class CreateOrderDto {
   // orderCurrency: ECurrency; // block the currency from the frontend
 }
 
-export class UpdateOrderDto extends CreateOrderDto {
-  // @IsInt()
-  // @IsNotEmpty()
-  // id: number;
-
-  // @IsPositive()
-  // @IsInt()
-  // @IsNotEmpty()
-  // orderTotal: number;
-
-  @IsEnum(EOrderStatus)
-  orderStatus: EOrderStatus;
+export class UpdateOrderDto {
+  orderItems: IFoodOrder[];
 }
 
 export class AwaitPaymenDto {

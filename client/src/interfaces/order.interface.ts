@@ -1,4 +1,4 @@
-import { EOrderStatus, IFoodOrder } from "../../redifood-module/src/interfaces";
+import { IFoodOrder } from "../../redifood-module/src/interfaces";
 
 export interface IErrorTableInput {
   alreadyInDb: boolean;
@@ -8,7 +8,5 @@ export interface IErrorTableInput {
 export type TCreateOrderBody = { orderTableNumber: number; orderItems: IFoodOrder[] };
 
 export type TUpdateOrderBody = {
-  orderTableNumber: number;
   orderItems: IFoodOrder[];
-  orderStatus: EOrderStatus;
 };

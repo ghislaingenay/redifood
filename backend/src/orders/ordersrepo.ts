@@ -137,14 +137,12 @@ class Orders {
   }
 
   static async updateOrder(
-    body: any,
+    orderItems: IFoodOrder[],
     orderId: number,
     userId: UserPayload['id'],
   ) {
-    const { orderItems } = body;
     const totalPrice = await Orders.calculateAmountFromMenu(orderItems, userId);
     const updatedDataApi: Partial<IOrderApi<string>> = {
-      ...body,
       orderItems: JSON.stringify(orderItems),
       orderTotal: totalPrice,
     };
