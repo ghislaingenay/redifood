@@ -1,7 +1,7 @@
 import { faCartShopping, faCashRegister, faCreditCard, faReceipt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Alert, Space } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { AxiosResponse } from "axios";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -11,10 +11,10 @@ import { useTranslation } from "react-i18next";
 import {
   EOrderStatus,
   EPaymentType,
+  IFoodGetApi,
   IFoodOrder,
   IGetOneOrder,
   IGetServerSideData,
-  IOrderApi,
 } from "../../redifood-module/src/interfaces";
 import SummaryTable from "../../src/components/food-order/SummaryTable";
 import { RediIconButton } from "../../src/components/styling/Button.style";
@@ -30,18 +30,34 @@ import buildClient from "../api/build-client";
 import { buildLanguage } from "../api/build-language";
 
 interface ICurrentOrderProps {
-  currentOrder: IOrderApi<IFoodOrder[]>;
-  status: string;
+  currentOrder: IGetOneOrder["currentOrder"];
+  foodList: IGetOneOrder["foodList"];
 }
 
-const CurrentOrder = ({ currentOrder, status }: ICurrentOrderProps) => {
+const CurrentOrder = ({ currentOrder, foodList }: ICurrentOrderProps) => {
   const { t } = useTranslation("common");
   const router = useRouter();
-  console.log(status);
-  const { orderCreatedDate, id, orderTableNumber, orderStatus } = currentOrder;
+  const { orderCreatedDate, orderNo, orderTableNumber, orderStatus, id, orderFinished } = currentOrder;
+
+  const COL_ID_SPAN = { xs: 12, sm: 12, md: 8, lg: 8 };
+
   const [paymentChoice, setPaymentChoice] = useState<EPaymentType | null>(null);
+  const [displayedFoods, setDisplayedFoods] = useState<IGetOneOrder["foodList"]>(foodList);
+
+  console.log({ orderCreatedDate, orderFinished });
+
+  const appliedDate = orderStatus === EOrderStatus.COMPLETE ? orderFinished : orderCreatedDate;
+  const humanFormattedAppliedDate = new Intl.DateTimeFormat("en-GB", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(new Date(appliedDate));
 
   const isDisabled = paymentChoice === null ? true : false;
+  const isOrderCompleted = orderStatus === EOrderStatus.COMPLETE;
+  const alertMessage = isOrderCompleted ? t("orders.paid") : t("orders.not-paid");
+  const messageType = isOrderCompleted ? "success" : "error";
+  const colorAlert = !isOrderCompleted && hexToRgba(RED, 0.7);
+
   const radioPaymentOptions = [
     {
       label: EPaymentType.CASH,
@@ -58,12 +74,25 @@ const CurrentOrder = ({ currentOrder, status }: ICurrentOrderProps) => {
   ];
 
   const changePaymentChoice = (e: EPaymentType) => setPaymentChoice(e);
+  const recoverQuantityFromOrderItems = (orderItems: IFoodOrder[], foodList: IFoodGetApi[]) => {
+    return [...foodList].map((food) => {
+      const foodInOrder = [...orderItems].find((orderItem) => orderItem.id === food.id);
+      return {
+        ...food,
+        quantity: foodInOrder?.itemQuantity,
+      };
+    });
+  };
 
-  const alertMessage = orderStatus === EOrderStatus.COMPLETE ? t("orders.paid") : t("orders.not-paid");
-  const messageType = orderStatus === EOrderStatus.COMPLETE ? "success" : "error";
-  const colorAlert = orderStatus !== EOrderStatus.COMPLETE && hexToRgba(RED, 0.7);
+  useEffect(() => {
+    const orderItemsInOrder = currentOrder.orderItems;
+    const updatedFoodList = recoverQuantityFromOrderItems(orderItemsInOrder, foodList);
+    setDisplayedFoods(updatedFoodList);
 
-  const colIdSpan = { xs: 12, sm: 12, md: 8, lg: 8 };
+    // move this logic in server side => better that way
+    so client can ony focuses on what matters
+  }, []);
+
   return (
     <>
       <Head>
@@ -75,17 +104,17 @@ const CurrentOrder = ({ currentOrder, status }: ICurrentOrderProps) => {
           <SpacingDiv5X>
             <LGCard style={{ padding: "0 1rem" }}>
               <RowSpaceBetween>
-                <CenteredCol {...colIdSpan}>
+                <CenteredCol {...COL_ID_SPAN}>
                   <b>{t("glossary.order")} #</b>
-                  {id}
+                  {orderNo}
                 </CenteredCol>
-                <CenteredCol {...colIdSpan}>
+                <CenteredCol {...COL_ID_SPAN}>
                   <b aria-label="Table number">{t("glossary.table")}</b> {orderTableNumber}
                 </CenteredCol>
-                <CenteredCol {...colIdSpan}>
-                  <b>{t("glossary.date")}</b> {orderCreatedDate}
+                <CenteredCol {...COL_ID_SPAN}>
+                  <b>{t("glossary.date")}</b> {humanFormattedAppliedDate}
                 </CenteredCol>
-                <CenteredCol {...colIdSpan}>
+                <CenteredCol {...COL_ID_SPAN}>
                   <Alert
                     type={messageType}
                     message={alertMessage}
