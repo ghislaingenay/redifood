@@ -205,15 +205,6 @@ class Foods {
       return convertKeys<IFoodDB, IFoodApi>(item, 'dbToApi');
     });
   }
-
-  static async getFoodGetByFoodIdArray(
-    foodArray: number[],
-    userId: UserPayload['id'],
-  ): Promise<IFoodGetApi[]> {
-    const response = await Foods.getFoodApiByFoodIdArray(foodArray, userId);
-    const updatedResponse = response.map((item: any) => this.formatFood(item));
-    return updatedResponse;
-  }
 }
 
 export default Foods;
