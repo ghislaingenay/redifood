@@ -1,6 +1,7 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import * as moment from 'moment';
 import { BadRequestError } from 'redifood-module/src/errors/bad-request-error';
+import { DatabaseConnectionError } from 'redifood-module/src/errors/database-connection-error';
 import Foods from 'src/foods/foodsrepo';
 import { Setting } from 'src/models/settings.model';
 import Payments from 'src/payments/paymentsrepo';
@@ -59,21 +60,27 @@ export class OrdersService {
     orderId: number,
     userId: UserPayload['id'],
   ): Promise<IGetServerSideData<IGetOneOrder>> {
-    const orderResult = await Orders.findOne({ orderId, userId });
-    // need to parse the orderItems
-    const parsedOrderItems = JSON.parse(orderResult.orderItems);
-    const parsedOrderResult: IOrderApi<IFoodOrder[]> = {
-      ...orderResult,
-      orderItems: JSON.parse(orderResult.orderItems),
-    };
+    try {
+      const orderResult = await Orders.findOne({ orderId, userId });
+      // need to parse the orderItems
+      const parsedOrderItems = JSON.parse(orderResult.orderItems);
+      const parsedOrderResult: IOrderApi<IFoodOrder[]> = {
+        ...orderResult,
+        orderItems: JSON.parse(orderResult.orderItems),
+      };
 
-    const foodIdArray = parsedOrderItems.map((item) => item.id);
-    const foodList = await Foods.getFoodGetByFoodIdArray(foodIdArray, userId);
-    return {
-      statusCode: 200,
-      results: { currentOrder: parsedOrderResult, foodList },
-      message: 'Order recovered',
-    };
+      const foodIdArray = parsedOrderItems.map((item) => item.id);
+      const foodList = await Foods.getFoodGetByFoodIdArray(foodIdArray, userId);
+      return {
+        statusCode: 200,
+        results: { currentOrder: parsedOrderResult, foodList },
+        message: 'Order recovered',
+      };
+    } catch (err) {
+      if (err instanceof BadRequestError)
+        throw new BadRequestError(err.message);
+      throw new DatabaseConnectionError();
+    }
   }
 
   async getEditOrder(
