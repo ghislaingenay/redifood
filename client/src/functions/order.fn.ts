@@ -1,4 +1,4 @@
-import { IFoodApi, IFoodGetApi, IFoodOrder } from "../../redifood-module/src/interfaces";
+import { IFoodApi, IFoodOrder } from "../../redifood-module/src/interfaces";
 import { IErrorTableInput } from "../interfaces";
 
 export const sendErrorTableInput = (tableNumber: number | null, tableArray: number[]) => {
@@ -31,12 +31,12 @@ export const checkIfArrayAreTheSame = (array1: IFoodApi[], array2: IFoodApi[]) =
   return true;
 };
 
-export const recoverQuantityFromOrderItems = (orderItems: IFoodOrder[], foodList: IFoodGetApi[]): IFoodGetApi[] => {
+export const recoverQuantityFromOrderItems = (orderItems: IFoodOrder[], foodList: IFoodApi[]): IFoodApi[] => {
   return [...foodList].map((food) => {
     const foodInOrder = [...orderItems].find((orderItem) => orderItem.id === food.id);
     return {
       ...food,
       itemQuantity: foodInOrder?.itemQuantity,
-    } as IFoodGetApi;
+    } as IFoodApi;
   });
 };

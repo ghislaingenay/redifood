@@ -1,27 +1,22 @@
 import { faCartShopping, faCashRegister, faCreditCard, faReceipt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Alert, Space } from "antd";
-import { useEffect, useState } from "react";
+import moment from "moment";
+import { useState } from "react";
 
 import { AxiosResponse } from "axios";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
-import {
-  EOrderStatus,
-  EPaymentType,
-  IFoodGetApi,
-  IFoodOrder,
-  IGetOneOrder,
-  IGetServerSideData,
-} from "../../redifood-module/src/interfaces";
+import { EOrderStatus, EPaymentType, IGetOneOrder, IGetServerSideData } from "../../redifood-module/src/interfaces";
 import SummaryTable from "../../src/components/food-order/SummaryTable";
 import { RediIconButton } from "../../src/components/styling/Button.style";
 import RediRadioButton from "../../src/components/styling/RediRadioButton";
 import { CenteredCol, RowSpaceBetween } from "../../src/components/styling/grid.styled";
 import { RED } from "../../src/constants";
 import { hexToRgba } from "../../src/functions/global.fn";
+import { recoverQuantityFromOrderItems } from "../../src/functions/order.fn";
 import { EButtonType } from "../../src/interfaces";
 import { LGCard } from "../../src/styles";
 import { AnimToTop } from "../../src/styles/animations/global.anim";
@@ -37,23 +32,18 @@ interface ICurrentOrderProps {
 const CurrentOrder = ({ currentOrder, foodList }: ICurrentOrderProps) => {
   const { t } = useTranslation("common");
   const router = useRouter();
-  const { orderCreatedDate, orderNo, orderTableNumber, orderStatus, id, orderFinished } = currentOrder;
-
+  const { orderCreatedDate, orderNo, orderTableNumber, orderStatus, id, orderFinished, orderTotal } = currentOrder;
+  console.log({ orderFinished, orderCreatedDate, orderStatus });
   const COL_ID_SPAN = { xs: 12, sm: 12, md: 8, lg: 8 };
 
+  console.log({ foodList });
+
   const [paymentChoice, setPaymentChoice] = useState<EPaymentType | null>(null);
-  const [displayedFoods, setDisplayedFoods] = useState<IGetOneOrder["foodList"]>(foodList);
 
-  console.log({ orderCreatedDate, orderFinished });
-
-  const appliedDate = orderStatus === EOrderStatus.COMPLETE ? orderFinished : orderCreatedDate;
-  const humanFormattedAppliedDate = new Intl.DateTimeFormat("en-GB", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(appliedDate));
+  const isOrderCompleted = orderStatus === EOrderStatus.COMPLETE;
+  const appliedDate = moment(orderFinished || orderCreatedDate).format("DD/MM/YYYY HH:mm");
 
   const isDisabled = paymentChoice === null ? true : false;
-  const isOrderCompleted = orderStatus === EOrderStatus.COMPLETE;
   const alertMessage = isOrderCompleted ? t("orders.paid") : t("orders.not-paid");
   const messageType = isOrderCompleted ? "success" : "error";
   const colorAlert = !isOrderCompleted && hexToRgba(RED, 0.7);
@@ -74,24 +64,6 @@ const CurrentOrder = ({ currentOrder, foodList }: ICurrentOrderProps) => {
   ];
 
   const changePaymentChoice = (e: EPaymentType) => setPaymentChoice(e);
-  const recoverQuantityFromOrderItems = (orderItems: IFoodOrder[], foodList: IFoodGetApi[]) => {
-    return [...foodList].map((food) => {
-      const foodInOrder = [...orderItems].find((orderItem) => orderItem.id === food.id);
-      return {
-        ...food,
-        quantity: foodInOrder?.itemQuantity,
-      };
-    });
-  };
-
-  useEffect(() => {
-    const orderItemsInOrder = currentOrder.orderItems;
-    const updatedFoodList = recoverQuantityFromOrderItems(orderItemsInOrder, foodList);
-    setDisplayedFoods(updatedFoodList);
-
-    // move this logic in server side => better that way
-    so client can ony focuses on what matters
-  }, []);
 
   return (
     <>
@@ -112,7 +84,7 @@ const CurrentOrder = ({ currentOrder, foodList }: ICurrentOrderProps) => {
                   <b aria-label="Table number">{t("glossary.table")}</b> {orderTableNumber}
                 </CenteredCol>
                 <CenteredCol {...COL_ID_SPAN}>
-                  <b>{t("glossary.date")}</b> {humanFormattedAppliedDate}
+                  <b>{t("glossary.date")}</b> {appliedDate}
                 </CenteredCol>
                 <CenteredCol {...COL_ID_SPAN}>
                   <Alert
@@ -123,7 +95,7 @@ const CurrentOrder = ({ currentOrder, foodList }: ICurrentOrderProps) => {
                 </CenteredCol>
               </RowSpaceBetween>
             </LGCard>
-            <SummaryTable order={currentOrder} />
+            <SummaryTable orderTotal={orderTotal} foodList={foodList} />
             {orderStatus !== EOrderStatus.COMPLETE && (
               <>
                 <RediRadioButton
@@ -178,11 +150,13 @@ export async function getServerSideProps(appContext: any) {
       const {
         data: { results },
       } = res;
-      const { currentOrder, foodList } = results as IGetOneOrder;
+      const { currentOrder, foodList: allFoods } = results as IGetOneOrder;
+      const orderItems = currentOrder.orderItems;
+      const updatedFoods = recoverQuantityFromOrderItems(orderItems, [...allFoods]);
       return {
         props: {
           currentOrder,
-          foodList,
+          foodList: updatedFoods,
           ...(await serverSideTranslations(getLanguageValue, ["common"])),
         },
       };
