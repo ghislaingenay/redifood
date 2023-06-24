@@ -19,12 +19,7 @@ import {
   TOrderType,
   UserPayload,
 } from '../../redifood-module/src/interfaces';
-import {
-  AwaitPaymenDto,
-  CreateOrderDto,
-  ReceiptBodyDto,
-  UpdateOrderDto,
-} from './orders.dto';
+import { AwaitPaymenDto, CreateOrderDto, UpdateOrderDto } from './orders.dto';
 import Orders from './ordersrepo';
 
 @Injectable()
@@ -243,7 +238,7 @@ export class OrdersService {
       user_id: userId,
       order_id: orderId,
       payment_stripe_id: '',
-      payment_status: EPaymentStatus.AWAITING,
+      payment_status: EPaymentStatus.COMPLETED, //EPaymentStatus.AWAITING
       payment_type: paymentType,
       payment_amount: orderData.orderTotal,
       payment_date: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
@@ -253,6 +248,7 @@ export class OrdersService {
     };
     const paymentResult = await Payments.createOne(dataForPayment);
     if (paymentResult.created) {
+      await Orders.validatePayment(orderId); // For now validate the order directly to avoid problems
       return {
         statusCode: HttpStatus.OK,
         results: dataForPayment,
@@ -265,10 +261,5 @@ export class OrdersService {
         message: `Payment not created from order ${orderId}`,
       };
     }
-  }
-
-  async sendReceipt(sendReceiptDto: ReceiptBodyDto, orderId: number) {
-    // empty
-    console.log(sendReceiptDto, orderId);
   }
 }

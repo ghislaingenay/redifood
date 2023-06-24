@@ -173,6 +173,14 @@ class Orders {
     return response;
   }
 
+  static async validatePayment(orderId: number) {
+    const response = await pool.query(
+      `UPDATE orders SET order_status = 'completed' WHERE id = $1`,
+      [orderId],
+    );
+    return response;
+  }
+
   static async setOrderItems(idList: IMenuId, orderItems: string) {
     const { userId, orderId } = idList;
     const orderMenu: IFoodOrder[] = JSON.parse(orderItems);

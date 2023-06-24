@@ -22,12 +22,7 @@ import GoogleSheetService, {
 } from '../../src/definitions/googlesheet';
 import { AuthGuard } from '../../src/global/auth-guard';
 import { ValidationPipe } from '../../src/global/validation.pipe';
-import {
-  AwaitPaymenDto,
-  CreateOrderDto,
-  ReceiptBodyDto,
-  UpdateOrderDto,
-} from './orders.dto';
+import { AwaitPaymenDto, CreateOrderDto, UpdateOrderDto } from './orders.dto';
 import { OrdersService } from './orders.service';
 
 @Controller('api/orders')
@@ -118,18 +113,18 @@ export class OrdersController {
     return await this.ordersService.awaitPayment(body);
   }
 
-  @UseGuards(new AuthGuard())
-  @Post('receipt/:id')
-  async sendReceipt(
-    @Param(
-      'id',
-      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
-    )
-    orderId: number,
-    @Body(new ValidationPipe()) sendReceiptDto: ReceiptBodyDto,
-  ) {
-    return await this.ordersService.sendReceipt(sendReceiptDto, orderId);
-  }
+  // @UseGuards(new AuthGuard())
+  // @Post('receipt/:id')
+  // async sendReceipt(
+  //   @Param(
+  //     'id',
+  //     new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+  //   )
+  //   orderId: number,
+  //   @Body(new ValidationPipe()) sendReceiptDto: ReceiptBodyDto,
+  // ) {
+  //   return await this.ordersService.sendReceipt(sendReceiptDto, orderId);
+  // }
 
   @UseGuards(new AuthGuard())
   @Post()
