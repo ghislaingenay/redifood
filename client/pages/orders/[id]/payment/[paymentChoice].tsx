@@ -43,41 +43,11 @@ const PaymentSystem = ({ paymentType, currentOrder }: IPaymentProps) => {
 
   const [payOrderLoading, setPayOrderLoading] = useState(false);
 
-  const onAdd = (val: string) => setSelectAmount((prevValue: TStrNum) => prevValue + val);
-  const onConfirm = () => {
-    setSelectedAmount(() => convertAmount(selectAmount));
-    setSelectAmount("");
-  };
-
-  const havePoint = (str: string) => {
-    if (typeof selectAmount === "string" && selectAmount?.includes(".")) {
-      return str.indexOf(".") === str.lastIndexOf(".");
-    }
-    return true;
-  };
-  const haveValueSeparated = (str: string) => {
-    if (typeof selectAmount === "string" && selectAmount?.includes(".")) {
-      return /(\d+).(\d+)/i.test(str);
-    }
-    return true;
-  };
-
   const totalAmount = orderTotal * (1 + vat / 100);
 
   const diffAmount = Number(selectedAmount) - totalAmount;
   const amountToGive = diffAmount === totalAmount || diffAmount < 0 ? 0 : diffAmount;
   const isDisabled = selectedAmount && Number(selectedAmount) >= orderTotal && diffAmount > 0 ? false : true;
-  const confirmDisabled =
-    selectAmount === "" ||
-    selectAmount === "." ||
-    !havePoint(selectAmount as string) ||
-    !haveValueSeparated(selectAmount as string);
-
-  const clearDisabled = selectAmount === "";
-
-  const renderedValue = useCallback(() => {
-    return selectAmount;
-  }, [selectAmount]);
 
   const handlePayOrder = () => {
     setPayOrderLoading(true);
@@ -119,73 +89,7 @@ const PaymentSystem = ({ paymentType, currentOrder }: IPaymentProps) => {
           <If condition={paymentType === EPaymentType.CASH}>
             <Then>
               <RowSpaceAround>
-                <Col md={11}>
-                  <LGCard>
-                    <RowCenter style={{ marginBottom: "1rem" }}>
-                      <LRoundedInput readOnly={true} aria-label="select amount" value={renderedValue()} />
-                    </RowCenter>
-                    <RowCenter gutter={20}>
-                      {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num: number) => {
-                        return (
-                          <Col span={8} key={num} style={{ marginBottom: "1.5rem", textAlign: "center" }}>
-                            <RediButton
-                              value={`${String(num)}`}
-                              buttonType={EButtonType.INFO}
-                              onClick={(e) => {
-                                const target = e.target as HTMLButtonElement;
-                                onAdd(target.value!);
-                              }}
-                              style={{ width: "100%", padding: "1rem 3rem", fontSize: "2rem" }}
-                              aria-label={`${String(num)}`}
-                            >
-                              {num}
-                            </RediButton>
-                          </Col>
-                        );
-                      })}
-                      {/* <Col span={8}></Col> */}
-                      <Col span={8} style={{ marginBottom: "1.5rem", textAlign: "center" }}>
-                        <RediButton
-                          buttonType={EButtonType.INFO}
-                          aria-label="0"
-                          onClick={() => setSelectAmount((prevValue: TStrNum) => prevValue + "0")}
-                          value="0"
-                        >
-                          0
-                        </RediButton>
-                      </Col>
-                      <Col span={8} style={{ marginBottom: "1.5rem", textAlign: "center" }}>
-                        <RediButton
-                          buttonType={EButtonType.INFO}
-                          aria-label="point"
-                          value={"."}
-                          onClick={() => setSelectAmount((prevValue: TStrNum) => prevValue + ".")}
-                        >
-                          .
-                        </RediButton>
-                      </Col>
-                      <RowCenterSp>
-                        <RediButton
-                          buttonType={EButtonType.SUCCESS}
-                          disabled={confirmDisabled}
-                          onClick={() => onConfirm()}
-                        >
-                          {t("buttons.confirm")}
-                        </RediButton>
-                        <RediIconButton
-                          buttonType={EButtonType.ERROR}
-                          iconFt={faBan}
-                          aria-label="Clear"
-                          disabled={clearDisabled}
-                          onClick={() => setSelectAmount("")}
-                        >
-                          {t("buttons.clear")}
-                        </RediIconButton>
-                      </RowCenterSp>
-                    </RowCenter>
-                  </LGCard>
-                </Col>
-                <Col md={11}>
+                <Col span={24}>
                   <RowCenter>
                     <CenteredLabel htmlFor="transactionAmount" aria-label="transaction amount">
                       {t("payments.transaction-amount")} ({displayCurrency()})
