@@ -233,6 +233,7 @@ export class OrdersService {
     const { orderId, userId, paymentType } = body;
     console.log('%c params', 'color: #00e600', body);
     const orderData = await Orders.findOne({ orderId, userId });
+    const { orderTotal, orderItems } = orderData;
     const settingData = await Setting.findOne({ user: userId });
     const dataForPayment: IPaymentDB = {
       user_id: userId,
@@ -240,15 +241,16 @@ export class OrdersService {
       payment_stripe_id: '',
       payment_status: EPaymentStatus.COMPLETED, //EPaymentStatus.AWAITING
       payment_type: paymentType,
-      payment_amount: orderData.orderTotal,
+      payment_amount: orderTotal,
       payment_date: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
       payment_discount_applied: false,
       payment_discount_id: 0,
-      payment_tax_amount: orderData.orderTotal * (settingData.vat / 100),
+      payment_tax_amount: orderTotal * (settingData.vat / 100),
     };
     const paymentResult = await Payments.createOne(dataForPayment);
     if (paymentResult.created) {
       await Orders.validatePayment(orderId); // For now validate the order directly to avoid problems
+      await Orders.setOrderItems({ orderId, userId }, orderItems);
       return {
         statusCode: HttpStatus.OK,
         results: dataForPayment,
