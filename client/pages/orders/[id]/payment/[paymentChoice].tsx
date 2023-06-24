@@ -1,20 +1,21 @@
-import { faBan, faCancel, faCartShopping } from "@fortawesome/free-solid-svg-icons";
-import { Alert, Col, Divider, Typography } from "antd";
+import { faCancel, faCartShopping } from "@fortawesome/free-solid-svg-icons";
+import { Divider, Typography } from "antd";
 import { AxiosResponse } from "axios";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useContext, useState } from "react";
+import React, { useContext, useDeferredValue, useState } from "react";
 import { Else, If, Then } from "react-if";
 import { EPaymentType, IGetOneOrder, IGetServerSideData, IOrderApi } from "../../../../redifood-module/src/interfaces";
-import { RediButton, RediIconButton } from "../../../../src/components/styling/Button.style";
-import { RowCenter, RowCenterSp, RowSpaceAround } from "../../../../src/components/styling/grid.styled";
+import { RediIconButton } from "../../../../src/components/styling/Button.style";
+import { RowAroundSp, RowCenter, RowCenterSp } from "../../../../src/components/styling/grid.styled";
 import AppContext from "../../../../src/contexts/app.context";
 import { NotificationRes } from "../../../../src/definitions/notification.class";
+import { roundTwoDecimals } from "../../../../src/functions/payment.fn";
 import useCurrency from "../../../../src/hooks/useCurrency.hook";
 import { EButtonType } from "../../../../src/interfaces";
-import { CenteredLabel, LGCard, LRoundedInput } from "../../../../src/styles";
+import { CenteredLabel, LRoundedInput } from "../../../../src/styles";
 import { AnimToTop } from "../../../../src/styles/animations/global.anim";
 import { AxiosFunction } from "../../../api/axios-request";
 import buildClient from "../../../api/build-client";
@@ -38,16 +39,24 @@ const PaymentSystem = ({ paymentType, currentOrder }: IPaymentProps) => {
   const orderId = useSearchParams().get("id");
   console.log("selected id", orderId);
 
-  const [selectAmount, setSelectAmount] = useState<TStrNum>("");
-  const [selectedAmount, setSelectedAmount] = useState<TStrNum>("");
+  const SIZE_SPACE_ROWS = 10;
+
+  const isCashPayment = paymentType === EPaymentType.CASH;
+
+  const [selectedAmount, setSelectedAmount] = useState<number>(0);
+  const selectAmount = useDeferredValue(selectedAmount);
 
   const [payOrderLoading, setPayOrderLoading] = useState(false);
 
-  const totalAmount = orderTotal * (1 + vat / 100);
+  const totalAmount = roundTwoDecimals(orderTotal * (1 + vat / 100));
 
   const diffAmount = Number(selectedAmount) - totalAmount;
   const amountToGive = diffAmount === totalAmount || diffAmount < 0 ? 0 : diffAmount;
-  const isDisabled = selectedAmount && Number(selectedAmount) >= orderTotal && diffAmount > 0 ? false : true;
+  const isDisabled = diffAmount < 0;
+
+  const isEnoughMoney = isCashPayment ? isDisabled : true;
+
+  const changeGivenAmount = (e) => {};
 
   const handlePayOrder = () => {
     setPayOrderLoading(true);
@@ -88,57 +97,36 @@ const PaymentSystem = ({ paymentType, currentOrder }: IPaymentProps) => {
         <AnimToTop>
           <If condition={paymentType === EPaymentType.CASH}>
             <Then>
-              <RowSpaceAround>
-                <Col span={24}>
-                  <RowCenter>
-                    <CenteredLabel htmlFor="transactionAmount" aria-label="transaction amount">
-                      {t("payments.transaction-amount")} ({displayCurrency()})
-                    </CenteredLabel>
-                    <LRoundedInput
-                      readOnly={true}
-                      aria-label="transactionAmount"
-                      id="transactionAmount"
-                      value={convertPrice(totalAmount, "backToFront", false)}
-                    />
-                  </RowCenter>
-                  <RowCenter>
-                    <CenteredLabel htmlFor="selected amount" aria-label="given amount">
-                      {t("payments.given-amount")} ({displayCurrency()})
-                    </CenteredLabel>
-                    <LRoundedInput
-                      readOnly={true}
-                      aria-label="selected amount"
-                      id="selected amount"
-                      value={selectedAmount}
-                    />
-                  </RowCenter>
-                  <RowCenter>
-                    <CenteredLabel htmlFor="render" aria-label="amount to give">
-                      {t("payments.amount-to-give")} ({displayCurrency()})
-                    </CenteredLabel>
-                    <LRoundedInput
-                      readOnly={true}
-                      aria-label="render"
-                      id="render"
-                      value={convertAmount(amountToGive)}
-                    />
-                  </RowCenter>
-                  <RowCenter style={{ marginTop: "2rem" }}>
-                    {isDisabled && selectedAmount !== "" && (
-                      <Alert type="error" style={{ margin: "1rem 2rem" }} message={t("payments.funds-error")} />
-                    )}
-                    <RediIconButton
-                      iconFt={faCartShopping}
-                      aria-label="finalize payment"
-                      buttonType={EButtonType.SUCCESS}
-                      disabled={isDisabled}
-                    >
-                      {" "}
-                      {t("buttons.finalize-payment")}
-                    </RediIconButton>
-                  </RowCenter>
-                </Col>
-              </RowSpaceAround>
+              <RowAroundSp size={SIZE_SPACE_ROWS}>
+                <CenteredLabel aria-label="transaction amount">
+                  {t("payments.transaction-amount")} ({displayCurrency()})
+                </CenteredLabel>
+                <LRoundedInput
+                  readOnly={true}
+                  aria-label="transactionAmount"
+                  id="transactionAmount"
+                  value={convertPrice(totalAmount, "backToFront", false)}
+                />
+              </RowAroundSp>
+              <Divider />
+              <RowAroundSp size={SIZE_SPACE_ROWS}>
+                <CenteredLabel htmlFor="selected amount" aria-label="given amount">
+                  {t("payments.given-amount")} ({displayCurrency()})
+                </CenteredLabel>
+                <LRoundedInput
+                  onChange={changeGivenAmount}
+                  aria-label="selected amount"
+                  id="selected amount"
+                  value={selectAmount}
+                />
+              </RowAroundSp>
+              <Divider />
+              <RowAroundSp size={SIZE_SPACE_ROWS}>
+                <CenteredLabel htmlFor="render" aria-label="amount to give">
+                  {t("payments.amount-to-give")} ({displayCurrency()})
+                </CenteredLabel>
+                <LRoundedInput readOnly={true} aria-label="render" id="render" value={convertAmount(amountToGive)} />
+              </RowAroundSp>
             </Then>
             <Else>
               <RowCenter>
@@ -146,31 +134,34 @@ const PaymentSystem = ({ paymentType, currentOrder }: IPaymentProps) => {
               </RowCenter>
               <RowCenter>
                 <Title>
-                  Amount : {convertAmount(orderTotal)}
+                  Amount : {convertAmount(totalAmount)}
                   {displayCurrency()}
                 </Title>
               </RowCenter>
               <Divider />
-              <RowCenterSp>
-                <RediIconButton
-                  iconFt={faCancel}
-                  buttonType={EButtonType.ERROR}
-                  onClick={() => router.replace(`/orders/${orderId}`)}
-                  loading={payOrderLoading}
-                >
-                  {t("buttons.cancel")}
-                </RediIconButton>
-                <RediIconButton
-                  iconFt={faCartShopping}
-                  buttonType={EButtonType.CREATE}
-                  loading={payOrderLoading}
-                  onClick={() => handlePayOrder()}
-                >
-                  {t("buttons.pay")}
-                </RediIconButton>
-              </RowCenterSp>
             </Else>
           </If>
+
+          {/* cancel and confirm buttons */}
+          <RowCenterSp>
+            <RediIconButton
+              iconFt={faCancel}
+              buttonType={EButtonType.ERROR}
+              onClick={() => router.replace(`/orders/${orderId}`)}
+              loading={payOrderLoading}
+            >
+              {t("buttons.cancel")}
+            </RediIconButton>
+            <RediIconButton
+              iconFt={faCartShopping}
+              buttonType={EButtonType.CREATE}
+              loading={payOrderLoading}
+              disabled={!isEnoughMoney}
+              onClick={() => handlePayOrder()}
+            >
+              {t("buttons.pay")}
+            </RediIconButton>
+          </RowCenterSp>
         </AnimToTop>
       </main>
     </>
