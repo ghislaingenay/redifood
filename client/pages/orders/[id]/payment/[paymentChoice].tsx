@@ -40,26 +40,23 @@ const PaymentSystem = ({ paymentType, currentOrder }: IPaymentProps) => {
   console.log("selected id", orderId);
 
   const SIZE_SPACE_ROWS = 10;
-
   const isCashPayment = paymentType === EPaymentType.CASH;
 
   const [selectedAmount, setSelectedAmount] = useState<number>(0);
-  const selectAmount = useDeferredValue(selectedAmount);
-
   const [payOrderLoading, setPayOrderLoading] = useState(false);
 
+  const selectAmount = useDeferredValue(selectedAmount);
   const totalAmount = roundTwoDecimals(orderTotal * (1 + vat / 100));
-
   const diffAmount = Number(selectedAmount) - totalAmount;
   const amountToGive = diffAmount === totalAmount || diffAmount < 0 ? 0 : diffAmount;
   const isDisabled = diffAmount < 0;
-
-  const isEnoughMoney = isCashPayment ? isDisabled : true;
+  const isEnoughMoney = isCashPayment ? !isDisabled : true;
 
   const changeGivenAmount = (e: React.ChangeEvent<HTMLInputElement>) => {
     const recoveredValue = keepDigitsInText(e.target.value);
+    console.log("value", recoveredValue);
     if (!recoveredValue || recoveredValue === "") setSelectedAmount(0);
-    else setSelectedAmount;
+    else setSelectedAmount(Number(recoveredValue));
   };
 
   const handlePayOrder = () => {
@@ -131,6 +128,7 @@ const PaymentSystem = ({ paymentType, currentOrder }: IPaymentProps) => {
                 </CenteredLabel>
                 <LRoundedInput readOnly={true} aria-label="render" id="render" value={convertAmount(amountToGive)} />
               </RowAroundSp>
+              <Divider />
             </Then>
             <Else>
               <RowCenter>
