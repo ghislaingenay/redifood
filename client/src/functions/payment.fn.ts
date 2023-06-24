@@ -13,3 +13,5 @@ export const haveValueSeparated = (str: string, selectAmount: string | number) =
 };
 
 export const roundTwoDecimals = (number: string | number): number => Number(Number(number).toFixed(2));
+
+export const keepDigitsInText = (text: string) => text.replaceAll(/(?!\d+)/gi, "");

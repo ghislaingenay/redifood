@@ -12,7 +12,7 @@ import { RediIconButton } from "../../../../src/components/styling/Button.style"
 import { RowAroundSp, RowCenter, RowCenterSp } from "../../../../src/components/styling/grid.styled";
 import AppContext from "../../../../src/contexts/app.context";
 import { NotificationRes } from "../../../../src/definitions/notification.class";
-import { roundTwoDecimals } from "../../../../src/functions/payment.fn";
+import { keepDigitsInText, roundTwoDecimals } from "../../../../src/functions/payment.fn";
 import useCurrency from "../../../../src/hooks/useCurrency.hook";
 import { EButtonType } from "../../../../src/interfaces";
 import { CenteredLabel, LRoundedInput } from "../../../../src/styles";
@@ -56,7 +56,11 @@ const PaymentSystem = ({ paymentType, currentOrder }: IPaymentProps) => {
 
   const isEnoughMoney = isCashPayment ? isDisabled : true;
 
-  const changeGivenAmount = (e) => {};
+  const changeGivenAmount = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const recoveredValue = keepDigitsInText(e.target.value);
+    if (!recoveredValue || recoveredValue === "") setSelectedAmount(0);
+    else setSelectedAmount;
+  };
 
   const handlePayOrder = () => {
     setPayOrderLoading(true);
