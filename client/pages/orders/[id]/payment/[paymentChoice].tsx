@@ -11,6 +11,7 @@ import { EPaymentType, IGetOneOrder, IGetServerSideData, IOrderApi } from "../..
 import { RediButton, RediIconButton } from "../../../../src/components/styling/Button.style";
 import { RowCenter, RowCenterSp, RowSpaceAround } from "../../../../src/components/styling/grid.styled";
 import AppContext from "../../../../src/contexts/app.context";
+import { NotificationRes } from "../../../../src/definitions/notification.class";
 import useCurrency from "../../../../src/hooks/useCurrency.hook";
 import { EButtonType } from "../../../../src/interfaces";
 import { CenteredLabel, LGCard, LRoundedInput } from "../../../../src/styles";
@@ -80,9 +81,31 @@ const PaymentSystem = ({ paymentType, currentOrder }: IPaymentProps) => {
 
   const handlePayOrder = () => {
     setPayOrderLoading(true);
-    AxiosFunction({})
-      .then(() => {})
-      .catch(() => {});
+    AxiosFunction({
+      url: `api/orders/${orderId}`,
+      body: {},
+      queryParams: { paymentType },
+      method: "post",
+    })
+      .then(() => {
+        NotificationRes.onSuccess({
+          placement: "top",
+          title: "Payment successful",
+          description: "You will be redirected to the main page",
+        });
+        setTimeout(() => {
+          router.replace("/");
+          setPayOrderLoading(false);
+        }, 1000);
+      })
+      .catch(() => {
+        NotificationRes.onFailure({
+          placement: "top",
+          title: "Please try again",
+          description:
+            "An error occured during the process. If this issue occur multiple times, please contact Redifood team",
+        });
+      });
   };
 
   return (
