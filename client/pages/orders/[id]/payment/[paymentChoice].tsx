@@ -1,11 +1,13 @@
-import { faBan, faCartShopping } from "@fortawesome/free-solid-svg-icons";
-import { Alert, Col } from "antd";
+import { faBan, faCancel, faCartShopping } from "@fortawesome/free-solid-svg-icons";
+import { Alert, Col, Divider, Typography } from "antd";
+import { AxiosResponse } from "axios";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useContext, useState } from "react";
 import { Else, If, Then } from "react-if";
-import { EPaymentType, IOrderApi } from "../../../../redifood-module/src/interfaces";
+import { EPaymentType, IGetOneOrder, IGetServerSideData, IOrderApi } from "../../../../redifood-module/src/interfaces";
 import { RediButton, RediIconButton } from "../../../../src/components/styling/Button.style";
 import { RowCenter, RowCenterSp, RowSpaceAround } from "../../../../src/components/styling/grid.styled";
 import AppContext from "../../../../src/contexts/app.context";
@@ -13,8 +15,10 @@ import useCurrency from "../../../../src/hooks/useCurrency.hook";
 import { EButtonType } from "../../../../src/interfaces";
 import { CenteredLabel, LGCard, LRoundedInput } from "../../../../src/styles";
 import { AnimToTop } from "../../../../src/styles/animations/global.anim";
-import { mockOneOrder } from "../../../../test/mocks/mockOrdersData";
+import { AxiosFunction } from "../../../api/axios-request";
+import buildClient from "../../../api/build-client";
 import { buildLanguage } from "../../../api/build-language";
+const { Title } = Typography;
 
 type TStrNum = string | number;
 
@@ -29,10 +33,14 @@ const PaymentSystem = ({ paymentType, currentOrder }: IPaymentProps) => {
   } = useContext(AppContext);
   const { convertPrice, displayCurrency, convertAmount } = useCurrency();
   const { orderTotal } = currentOrder;
-  console.log(orderTotal);
+  const router = useRouter();
+  const orderId = useSearchParams().get("id");
+  console.log("selected id", orderId);
 
   const [selectAmount, setSelectAmount] = useState<TStrNum>("");
   const [selectedAmount, setSelectedAmount] = useState<TStrNum>("");
+
+  const [payOrderLoading, setPayOrderLoading] = useState(false);
 
   const onAdd = (val: string) => setSelectAmount((prevValue: TStrNum) => prevValue + val);
   const onConfirm = () => {
@@ -57,19 +65,26 @@ const PaymentSystem = ({ paymentType, currentOrder }: IPaymentProps) => {
 
   const diffAmount = Number(selectedAmount) - totalAmount;
   const amountToGive = diffAmount === totalAmount || diffAmount < 0 ? 0 : diffAmount;
-  const isDisabled = selectedAmount && selectedAmount >= orderTotal && diffAmount > 0 ? false : true;
+  const isDisabled = selectedAmount && Number(selectedAmount) >= orderTotal && diffAmount > 0 ? false : true;
   const confirmDisabled =
     selectAmount === "" ||
     selectAmount === "." ||
     !havePoint(selectAmount as string) ||
-    !haveValueSeparated(selectAmount as string)
-      ? true
-      : false;
-  const clearDisabled = selectAmount === "" ? true : false;
+    !haveValueSeparated(selectAmount as string);
+
+  const clearDisabled = selectAmount === "";
 
   const renderedValue = useCallback(() => {
     return selectAmount;
   }, [selectAmount]);
+
+  const handlePayOrder = () => {
+    setPayOrderLoading(true);
+    AxiosFunction({})
+      .then(() => {})
+      .catch(() => {});
+  };
+
   return (
     <>
       <Head>
@@ -199,7 +214,34 @@ const PaymentSystem = ({ paymentType, currentOrder }: IPaymentProps) => {
               </RowSpaceAround>
             </Then>
             <Else>
-              <p>credit</p>
+              <RowCenter>
+                <Title style={{ textAlign: "center" }}>This application doesn't contain a direct payment system.</Title>
+              </RowCenter>
+              <RowCenter>
+                <Title>
+                  Amount : {convertAmount(orderTotal)}
+                  {displayCurrency()}
+                </Title>
+              </RowCenter>
+              <Divider />
+              <RowCenterSp>
+                <RediIconButton
+                  iconFt={faCancel}
+                  buttonType={EButtonType.ERROR}
+                  onClick={() => router.replace(`/orders/${orderId}`)}
+                  loading={payOrderLoading}
+                >
+                  {t("buttons.cancel")}
+                </RediIconButton>
+                <RediIconButton
+                  iconFt={faCartShopping}
+                  buttonType={EButtonType.CREATE}
+                  loading={payOrderLoading}
+                  onClick={() => handlePayOrder()}
+                >
+                  {t("buttons.pay")}
+                </RediIconButton>
+              </RowCenterSp>
             </Else>
           </If>
         </AnimToTop>
@@ -208,28 +250,39 @@ const PaymentSystem = ({ paymentType, currentOrder }: IPaymentProps) => {
   );
 };
 export default PaymentSystem;
-export async function getServerSideProps(context: any) {
-  const { locale, req } = context;
+
+export async function getServerSideProps(appContext: any) {
+  const { locale, req } = appContext;
   const getLanguageValue = buildLanguage(locale, req);
-  console.log("connected");
-  // const id: string = context.query['id'];
-  const paymentChoice: string = context.query["paymentChoice"];
-  return {
-    props: {
-      paymentType: paymentChoice,
-      currentOrder: mockOneOrder,
-      ...(await serverSideTranslations(getLanguageValue, ["common"])),
-    },
-  };
-  // const url = String(`${process.env.BACK_END}/payment/${id}`)
-  // const response = await axios.get(url, { params: { orderId : id } })
-  // if (response.status === 200) {
-  //   const oneOrder: Order = response.data
-  //   return {
-  //     props: {
-  //       order: oneOrder
-  //     }
-  //   }
-  // return response.data
-  // }
+  const client = buildClient(appContext);
+  const id: string = appContext.query["id"];
+  const paymentType: string = appContext.query["paymentChoice"];
+  const url = `/api/orders/${id}`;
+  const response = await client
+    .get(url)
+    .then(async (res: AxiosResponse<IGetServerSideData<IGetOneOrder>>) => {
+      const {
+        data: { results },
+      } = res;
+      const { currentOrder } = results as IGetOneOrder;
+      return {
+        props: {
+          paymentType,
+          currentOrder,
+          ...(await serverSideTranslations(getLanguageValue, ["common"])),
+        },
+      };
+    })
+    .catch(async () => {
+      return {
+        props: {
+          currentOrder: [],
+          paymentType: "",
+          foodList: [],
+          ...(await serverSideTranslations(getLanguageValue, ["common"])),
+        },
+      };
+    });
+
+  return response;
 }
