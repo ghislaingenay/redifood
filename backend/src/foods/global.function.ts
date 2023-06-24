@@ -107,14 +107,9 @@ export const convertKeys = <T extends RecordAny, K extends RecordAny>(
 ): ResKeys<T, K> => {
   const keyValuePairs = Object.entries(data).map(([key, value]) => {
     if (direction === 'dbToApi') {
-      if (key === 'id') {
-        return [key, value];
-      }
-      if (!/([_][a-z])/g.test(key)) {
-        console.log('not valid', key);
+      if (key === 'id') return [key, value];
+      if (!/([_][a-z])/g.test(key))
         throw new Error(`${key} should be snake case and not be null`);
-      }
-
       return [
         (key as string).replace(/([_][a-z])/g, ($1) => {
           return $1.toUpperCase().replace('_', '');

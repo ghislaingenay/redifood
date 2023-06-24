@@ -235,12 +235,9 @@ class Orders {
       return item;
     });
     const filteredMenu = updatedMenu.filter((item) => item.itemQuantity > 0);
-    console.log('filteredMenu', filteredMenu);
     const totalAmount = filteredMenu.reduce((acc, item) => {
       return acc + item.itemPrice * item.itemQuantity;
     }, 0);
-    console.log('totalAmount', totalAmount);
-
     return totalAmount;
   }
 

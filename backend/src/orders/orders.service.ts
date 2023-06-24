@@ -63,11 +63,8 @@ export class OrdersService {
         ...orderResult,
         orderItems: JSON.parse(orderResult.orderItems),
       };
-
       const foodIdArray = parsedOrderItems.map((item) => item.id);
       const foodList = await Foods.getFoodApiByFoodIdArray(foodIdArray, userId);
-
-      console.log('%c foodList', 'color: #00e600', foodList);
       return {
         statusCode: 200,
         results: { currentOrder: parsedOrderResult, foodList },
