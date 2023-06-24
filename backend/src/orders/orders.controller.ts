@@ -100,15 +100,14 @@ export class OrdersController {
       new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
     )
     orderId: number,
-    @Query('paymentType') paymentType: EPaymentType,
     @User() user: UserPayload,
-    @Body() data: any,
+    @Body() data: { paymentType: EPaymentType },
   ) {
     const body: AwaitPaymenDto = {
       ...data,
       orderId,
       userId: user.id,
-      paymentType,
+      paymentType: data.paymentType,
     };
     return await this.ordersService.awaitPayment(body);
   }

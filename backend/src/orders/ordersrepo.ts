@@ -173,47 +173,55 @@ class Orders {
     return response;
   }
 
-  static async validatePayment(orderId: number) {
-    const response = await pool.query(
-      `UPDATE orders SET order_status = 'completed' WHERE id = $1`,
-      [orderId],
-    );
-    return response;
+  static async validatePayment(orderId: number): Promise<{ updated: boolean }> {
+    try {
+      await pool.query(
+        `UPDATE orders SET order_status = 'finished' WHERE id = $1`,
+        [orderId],
+      );
+      return { updated: true };
+    } catch (err) {
+      throw new BadRequestException('Not update');
+    }
   }
 
   static async setOrderItems(idList: IMenuId, orderItems: string) {
-    const { userId, orderId } = idList;
-    const orderMenu: IFoodOrder[] = JSON.parse(orderItems);
-    const foodList = await Foods.findAllFormatted(userId);
-    const updatedMenu: IFoodGetApi[] = foodList.map((item: IFoodGetApi) => {
-      const foundItem = orderMenu.find(
-        (orderItem: IFoodOrder) => orderItem.id === item.id,
-      );
-      if (foundItem) {
+    try {
+      const { userId, orderId } = idList;
+      const orderMenu: IFoodOrder[] = JSON.parse(orderItems);
+      const foodList = await Foods.findAllFormatted(userId);
+      const updatedMenu: IFoodGetApi[] = foodList.map((item: IFoodGetApi) => {
+        const foundItem = orderMenu.find(
+          (orderItem: IFoodOrder) => orderItem.id === item.id,
+        );
+        if (foundItem) {
+          return {
+            ...item,
+            itemQuantity: foundItem.itemQuantity,
+          };
+        }
+        return item;
+      });
+      const completedMenu: IOrderItemsDB[] = updatedMenu.map((item) => {
         return {
-          ...item,
-          itemQuantity: foundItem.itemQuantity,
+          order_id: orderId,
+          user_id: userId,
+          food_id: item.id,
+          order_item_quantity: item.itemQuantity,
+          order_item_price: item.itemPrice,
+          order_item_name: item.itemName,
         };
-      }
-      return item;
-    });
-    const completedMenu: IOrderItemsDB[] = updatedMenu.map((item) => {
-      return {
-        order_id: orderId,
-        user_id: userId,
-        food_id: item.id,
-        order_item_quantity: item.itemQuantity,
-        order_item_price: item.itemPrice,
-        order_item_name: item.itemName,
-      };
-    });
+      });
 
-    const createdQuery = createQuery<IOrderItemsDB[]>(
-      completedMenu,
-      'order_items',
-    );
-    const response = await pool.query(createdQuery);
-    return response;
+      const createdQuery = createQuery<IOrderItemsDB[]>(
+        completedMenu,
+        'order_items',
+      );
+      const response = await pool.query(createdQuery);
+      return response;
+    } catch (err) {
+      throw new BadRequestException("Can't create order items");
+    }
   }
 
   static async calculateAmountFromMenu(
