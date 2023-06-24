@@ -1,4 +1,4 @@
-import { faCartShopping, faCashRegister, faCreditCard, faReceipt } from "@fortawesome/free-solid-svg-icons";
+import { faCartShopping, faCashRegister, faCreditCard } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Alert, Space } from "antd";
 import moment from "moment";
@@ -120,7 +120,7 @@ const CurrentOrder = ({ currentOrder, foodList }: ICurrentOrderProps) => {
                 </Space>
               </>
             )}
-            {orderStatus === EOrderStatus.COMPLETE && (
+            {/* {orderStatus === EOrderStatus.COMPLETE && (
               <RediIconButton
                 // onClick={() => router.push(`/orders/${orderId}/payment/${paymentChoice}`)}
                 iconFt={faReceipt}
@@ -129,7 +129,7 @@ const CurrentOrder = ({ currentOrder, foodList }: ICurrentOrderProps) => {
               >
                 {t("buttons.receipt")}
               </RediIconButton>
-            )}
+            )} */}
           </SpacingDiv5X>
         </AnimToTop>
       </body>

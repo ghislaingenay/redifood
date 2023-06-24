@@ -5,14 +5,21 @@ import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useRouter, useSearchParams } from "next/navigation";
-import React, { useContext, useDeferredValue, useState } from "react";
+import React, { useContext, useDeferredValue, useEffect, useState } from "react";
 import { Else, If, Then } from "react-if";
-import { EPaymentType, IGetOneOrder, IGetServerSideData, IOrderApi } from "../../../../redifood-module/src/interfaces";
+import { roundTwoDecimals } from "../../../../redifood-module/src/global.functions";
+import {
+  EOrderStatus,
+  EPaymentType,
+  IGetOneOrder,
+  IGetServerSideData,
+  IOrderApi,
+} from "../../../../redifood-module/src/interfaces";
 import { RediIconButton } from "../../../../src/components/styling/Button.style";
 import { RowAroundSp, RowCenter, RowCenterSp } from "../../../../src/components/styling/grid.styled";
 import AppContext from "../../../../src/contexts/app.context";
 import { NotificationRes } from "../../../../src/definitions/notification.class";
-import { keepDigitsInText, roundTwoDecimals } from "../../../../src/functions/payment.fn";
+import { keepDigitsInText } from "../../../../src/functions/payment.fn";
 import useCurrency from "../../../../src/hooks/useCurrency.hook";
 import { EButtonType } from "../../../../src/interfaces";
 import { CenteredLabel, LRoundedInput } from "../../../../src/styles";
@@ -21,8 +28,6 @@ import { AxiosFunction } from "../../../api/axios-request";
 import buildClient from "../../../api/build-client";
 import { buildLanguage } from "../../../api/build-language";
 const { Title } = Typography;
-
-type TStrNum = string | number;
 
 interface IPaymentProps {
   paymentType: EPaymentType;
@@ -34,10 +39,9 @@ const PaymentSystem = ({ paymentType, currentOrder }: IPaymentProps) => {
     state: { vat },
   } = useContext(AppContext);
   const { convertPrice, displayCurrency, convertAmount } = useCurrency();
-  const { orderTotal } = currentOrder;
+  const { orderTotal, orderStatus } = currentOrder;
   const router = useRouter();
   const orderId = useSearchParams().get("id");
-  console.log("selected id", orderId);
 
   const SIZE_SPACE_ROWS = 10;
   const isCashPayment = paymentType === EPaymentType.CASH;
@@ -54,17 +58,22 @@ const PaymentSystem = ({ paymentType, currentOrder }: IPaymentProps) => {
 
   const changeGivenAmount = (e: React.ChangeEvent<HTMLInputElement>) => {
     const recoveredValue = keepDigitsInText(e.target.value);
-    console.log("value", recoveredValue);
     if (!recoveredValue || recoveredValue === "") setSelectedAmount(0);
     else setSelectedAmount(Number(recoveredValue));
   };
+
+  useEffect(() => {
+    const isOrderCompleted = orderStatus === EOrderStatus.COMPLETE;
+    console.log(isOrderCompleted, orderStatus);
+    if (isOrderCompleted) return router.replace(`/orders/${orderId}`);
+  }, []);
 
   const handlePayOrder = () => {
     setPayOrderLoading(true);
     AxiosFunction({
       url: `api/orders/${orderId}`,
-      body: {},
-      queryParams: { paymentType },
+      body: { paymentType },
+      queryParams: {},
       method: "post",
     })
       .then(() => {
@@ -85,6 +94,7 @@ const PaymentSystem = ({ paymentType, currentOrder }: IPaymentProps) => {
           description:
             "An error occured during the process. If this issue occur multiple times, please contact Redifood team",
         });
+        setPayOrderLoading(false);
       });
   };
 
