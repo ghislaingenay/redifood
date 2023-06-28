@@ -4,7 +4,7 @@ import { useTranslation } from "next-i18next";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { recoverCookie } from "../../../pages/api/build-language";
-import { IOrderApi } from "../../../redifood-module/src/interfaces";
+import { IFoodOrder, IOrderApi } from "../../../redifood-module/src/interfaces";
 import useCurrency from "../../hooks/useCurrency.hook";
 import { EButtonType } from "../../interfaces";
 import { CenteredPBold } from "../../styles";
@@ -13,10 +13,12 @@ import { RediIconButton } from "../styling/Button.style";
 import { RowCenter } from "../styling/grid.styled";
 
 interface IOrderHistoryCard {
-  foodOrder: IOrderApi;
+  order: IOrderApi<IFoodOrder[]>;
 }
-const OrderHistoryCard = ({ foodOrder }: IOrderHistoryCard) => {
+const OrderHistoryCard = ({ order }: IOrderHistoryCard) => {
   const { t, i18n } = useTranslation("common");
+
+  const { orderNo, orderTotal, id } = order;
 
   useEffect(() => {
     i18n.changeLanguage(recoverCookie());
@@ -38,12 +40,12 @@ const OrderHistoryCard = ({ foodOrder }: IOrderHistoryCard) => {
           <RowCenter>
             <Col {...colSpan}>
               <CenteredPBold>
-                {t("history.order-number")}: {foodOrder?.orderNo}
+                {t("history.order-number")}: {orderNo}
               </CenteredPBold>
             </Col>
             <Col {...colSpan}>
               <CenteredPBold>
-                {t("glossary.amount")}: {convertPrice(foodOrder?.orderTotal, "backToFront", true)}
+                {t("glossary.amount")}: {convertPrice(orderTotal, "backToFront", true)}
               </CenteredPBold>
             </Col>
             <Col {...colSpan}>
@@ -51,17 +53,13 @@ const OrderHistoryCard = ({ foodOrder }: IOrderHistoryCard) => {
             </Col>
             <Col {...colSpan}>
               <CenteredPBold>
-                {t("glossary.amount")}: {foodOrder?.orderTotal}
+                {t("glossary.amount")}: {orderTotal}
               </CenteredPBold>
             </Col>
           </RowCenter>
         </Col>
         <Col xs={24} lg={6} style={{ textAlign: "center" }}>
-          <RediIconButton
-            iconFt={faList}
-            buttonType={EButtonType.EDIT}
-            onClick={() => router.push(`/orders/${foodOrder?.id}`)}
-          >
+          <RediIconButton iconFt={faList} buttonType={EButtonType.EDIT} onClick={() => router.push(`/orders/${id}`)}>
             {t("buttons.view-order")}
           </RediIconButton>
         </Col>
