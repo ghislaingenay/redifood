@@ -4,7 +4,7 @@ import { useTranslation } from "next-i18next";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { recoverCookie } from "../../../pages/api/build-language";
-import { IFoodOrder, IOrderApi } from "../../../redifood-module/src/interfaces";
+import { IOrderApi } from "../../../redifood-module/src/interfaces";
 import useCurrency from "../../hooks/useCurrency.hook";
 import { EButtonType } from "../../interfaces";
 import { CenteredPBold } from "../../styles";
@@ -13,7 +13,7 @@ import { RediIconButton } from "../styling/Button.style";
 import { RowCenter } from "../styling/grid.styled";
 
 interface IOrderHistoryCard {
-  order: IOrderApi<IFoodOrder[]>;
+  order: IOrderApi<string>;
 }
 const OrderHistoryCard = ({ order }: IOrderHistoryCard) => {
   const { t, i18n } = useTranslation("common");
