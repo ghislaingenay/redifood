@@ -1,47 +1,68 @@
-import { Col, DatePicker, Form } from "antd";
+import { Alert, Col, DatePicker, Form, Pagination, Spin } from "antd";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { IOrderApi } from "../redifood-module/src/interfaces";
+import { Case, Default, Switch } from "react-if";
+import { IGetHistoryOrders, IOrderApi, IPagination } from "../redifood-module/src/interfaces";
 import OrderHistoryCard from "../src/components/food-order/OrderHistoryCard";
 import { RowCenter } from "../src/components/styling/grid.styled";
-import { ServerInfo } from "../src/interfaces";
+import { NotificationRes } from "../src/definitions/notification.class";
 import { AnimToTop } from "../src/styles/animations/global.anim";
-import { mockOneOrder } from "../test/mocks/mockOrdersData";
+import { AxiosFunction } from "./api/axios-request";
+import buildClient from "./api/build-client";
 import { buildLanguage } from "./api/build-language";
 // import useRequest from "./api/useRequest";
 
-interface IHistoryProps {
-  FoodOrderList: IOrderApi[];
-}
-const History = ({ FoodOrderList }: IHistoryProps) => {
+type THistoryProps = IGetHistoryOrders;
+
+const History = ({ orders, meta }: THistoryProps) => {
   const { t } = useTranslation("common");
   const [form] = Form.useForm();
   const [params, setParams] = useState({ startDate: undefined, endDate: undefined });
 
-  const [
-    paidOrdersList,
-    // , setPaidOrdersList
-  ] = useState(FoodOrderList);
-
   // const { res, doRequest, loading } = useRequest<IOrder[]>({
   //   url: "/api/orders/paid",
-  //   method: "get",
-  //   queryParams: params,
-  //   body: {},
-  // });
+  const [pagination, setPagination] = useState<IPagination>(meta);
+  const [pageSize, setPageSize] = useState(20);
 
-  // const loadData = async () => {
-  //   await doRequest();
-  //   if (res) {
-  //     setPaidOrdersList(res);
-  //   }
-  // };
+  const [allOrders, setAllOrders] = useState<IOrderApi<string>[]>(orders || []);
+  const [loading, setLoading] = useState(false);
 
-  // useEffect(() => {
-  //   loadData();
-  // }, [params]);
+  const haveOrders = allOrders.length > 0;
+  const isFetchWithOrders = haveOrders && !loading;
+  const isFetchWithoutOrders = !haveOrders && !loading;
+
+  useEffect(() => {
+    AxiosFunction({
+      url: "/api/orders/history",
+      method: "get",
+      queryParams: { params },
+      body: {},
+    })
+      .then((res: IGetHistoryOrders) => {
+        const { orders, meta } = res;
+        setAllOrders(orders);
+        setPagination(meta);
+        setLoading(false);
+      })
+      .catch(() => {
+        NotificationRes.onFailure({
+          title: "Impossible to get paid orders list",
+          description: "Please try again later",
+          placement: "topRight",
+        });
+      });
+  }, [params]);
+
+  const handlePagination = (page: number, pageResults?: number) => {
+    if (pageResults !== pageSize) {
+      setParams(() => Object.assign({ params }, { page: 1, results: pageResults } as any));
+      setPageSize(pageResults || 20);
+    } else {
+      setParams(() => Object.assign({ params }, { page, results: pageSize } as any));
+    }
+  };
 
   return (
     <>
@@ -84,19 +105,29 @@ const History = ({ FoodOrderList }: IHistoryProps) => {
               </Col>
             </RowCenter>
           </Form>
-          {/* <Switch>
+          <Switch>
             <Case condition={loading}>
-              <p>{t("glossary.loading")}</p>
+              <Spin size="large" />
             </Case>
-            <Case condition={!loading && paidOrdersList.length === 0}>
+            <Case condition={isFetchWithoutOrders}>
               <Alert message={t("history.alert-no-orders")} type="info" />
             </Case>
-            <Case condition={!loading && paidOrdersList.length > 0}> */}
-          {paidOrdersList.map((foodOrder: IOrderApi, index: number) => {
-            return <OrderHistoryCard key={index} foodOrder={foodOrder} />;
-          })}
-          {/* </Case>
-          </Switch>  */}
+            <Case condition={isFetchWithOrders}>
+              {allOrders.map((order, index: number) => {
+                return <OrderHistoryCard key={index} order={order} />;
+              })}
+            </Case>
+            <Default>
+              <p>Forget to catch this error</p>
+            </Default>
+          </Switch>
+          <Pagination
+            onChange={(page, pageSize) => handlePagination(page, pageSize)}
+            pageSize={pageSize}
+            pageSizeOptions={["10", "20"]}
+            current={pagination.page}
+            total={pagination.total}
+          />
         </AnimToTop>
       </main>
     </>
@@ -105,30 +136,36 @@ const History = ({ FoodOrderList }: IHistoryProps) => {
 
 export default History;
 
-export async function getStaticProps({ locale, req }: ServerInfo) {
+export async function getServerSideProps(appContext: any) {
+  const { locale, req } = appContext;
+  const client = buildClient(appContext);
   const getLanguageValue = buildLanguage(locale, req);
-  return {
-    props: {
-      FoodOrderList: [mockOneOrder],
-      status: "success",
-      ...(await serverSideTranslations(getLanguageValue, ["common"])),
-    },
-  };
-  // const url = "/api/orders/paid";
-  // await axios
-  //   .get(url, params: { startDate: undefined, endDate: undefined }})
-  //   .then(async (res) => {
-  //     const {
-  //       data: { results: {paidOrders} },
-  //     } = res;
-  //     return {
-  //       props: { paidOrders: paidOrders, status: "success", ...(await serverSideTranslations(getLanguageValue, ["common"])) },
-  //     };
-  //   })
-  //   .catch((err) => {
-  //     console.log("err", err);
-  //   });
-  // return {
-  //   props: { paidOrders: [], status: "error", ...(await serverSideTranslations(getLanguageValue, ["common"])) },
-  // };
+  const url = "/api/orders/history";
+  const res = await client
+    .get(url, { params: { page: 1, results: 20 } })
+    .then(async (res) => {
+      const {
+        data: {
+          results: { orders, meta },
+        },
+      } = res;
+      return {
+        props: {
+          orders,
+          meta,
+          ...(await serverSideTranslations(getLanguageValue, ["common"])),
+        },
+      };
+    })
+    .catch(async () => {
+      return {
+        props: {
+          allOrders: [],
+          getList: [],
+          ...(await serverSideTranslations(getLanguageValue, ["common"])),
+        },
+      };
+    });
+
+  return res;
 }
