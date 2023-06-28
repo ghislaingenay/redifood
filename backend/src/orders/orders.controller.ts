@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 import {
   EPaymentType,
+  TGetHistoryParams,
   TOrderType,
   UserPayload,
 } from '../../redifood-module/src/interfaces';
@@ -38,6 +39,15 @@ export class OrdersController {
   ) {
     const userId = user.id;
     return await this.ordersService.getOrders(orderType, userId);
+  }
+
+  @Get('history')
+  async getHistoryOrders(
+    @Param() historyParams: TGetHistoryParams,
+    @User() user: UserPayload,
+  ) {
+    const userId = user.id;
+    return await this.ordersService.getHistoryOrders(historyParams, userId);
   }
 
   @UseGuards(new AuthGuard())

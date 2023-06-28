@@ -12,11 +12,13 @@ import {
   EPaymentStatus,
   IFoodOrder,
   IGetEditOrderRes,
+  IGetHistoryOrders,
   IGetOneOrder,
   IGetServerSideData,
   IOrderApi,
   IOrderItemsApi,
   IPaymentDB,
+  TGetHistoryParams,
   TOrderType,
   UserPayload,
 } from '../../redifood-module/src/interfaces';
@@ -49,6 +51,19 @@ export class OrdersService {
       statusCode: 200,
       results: { orders: ordersWithItems, unPaidOrdersNo },
       message: 'Orders recovered',
+    };
+  }
+
+  async getHistoryOrders(
+    params: TGetHistoryParams,
+    userId: UserPayload['id'],
+  ): Promise<IGetServerSideData<IGetHistoryOrders>> {
+    const meta = await Orders.getPaginationOrdersHistory(params, userId);
+    const orders = await Orders.getPaidOrdersFromHistoryParams(params, userId);
+    return {
+      message: 'Orders recovered',
+      results: { meta, orders },
+      statusCode: HttpStatus.OK,
     };
   }
 

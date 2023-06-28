@@ -1,4 +1,5 @@
 import { BadRequestException } from '@nestjs/common';
+import * as moment from 'moment';
 import {
   IFoodApi,
   IFoodGetApi,
@@ -7,6 +8,8 @@ import {
   IOrderDB,
   IOrderItemsApi,
   IOrderItemsDB,
+  IPagination,
+  TGetHistoryParams,
   TOrderType,
   UserPayload,
 } from 'redifood-module/src/interfaces';
@@ -18,7 +21,6 @@ import {
 } from 'src/foods/global.function';
 import { DatabaseError } from '../../redifood-module/src/handling-nestjs/database-error.exception';
 import { pool } from '../pool.pg';
-
 interface IMenuId {
   orderId: number;
   userId: string;
@@ -269,6 +271,68 @@ class Orders {
       }
       return item;
     });
+  }
+
+  static createHistorySqlQuery(
+    params: TGetHistoryParams,
+    userId: UserPayload['id'],
+  ): string {
+    const { startDate, endDate } = params;
+    const queryConditions = [`ord.user_id = ${userId}`];
+    if (startDate) {
+      queryConditions.push(
+        `ord.order_date >= '${moment(startDate).format('YYYY-MM-DD')}'`,
+      );
+    } // need to finish this
+    if (endDate) {
+      queryConditions.push(
+        `ord.order_date <= '${moment(endDate).format('YYYY-MM-DD')}'`,
+      );
+    }
+    const joinedQueryConditions = queryConditions.join(' AND ');
+    return joinedQueryConditions;
+  }
+
+  static async getPaidOrdersFromHistoryParams(
+    params: TGetHistoryParams,
+    userId: UserPayload['id'],
+  ): Promise<IOrderApi<string>[]> {
+    const { results } = params;
+    const page = Number(params.page || 1);
+    const offset = (page - 1) * results;
+    const sqlConditions = Orders.createHistorySqlQuery(params, userId);
+    const response: IOrderDB[] = (
+      await pool.query(
+        `SELECT * FROM (SELECT *, TO_CHAR(order_finished, 'YYYY-MM-DD') AS order_date FROM orders) AS ord WHERE ${sqlConditions} AND ord.order_status = 'finished' ORDER BY ord.order.order_finished DESC LIMIT ${results} OFFSET ${offset}`,
+      )
+    ).rows;
+    if (!response) throw new BadRequestException('No orders found');
+    const updatedResponse: IOrderApi<string>[] = response.map((item) =>
+      convertKeys(item, 'dbToApi'),
+    );
+    return updatedResponse;
+  }
+
+  static async getPaginationOrdersHistory(
+    params: TGetHistoryParams,
+    userId: UserPayload['id'],
+  ): Promise<IPagination> {
+    const sqlConditions = Orders.createHistorySqlQuery(params, userId);
+    const response = (
+      await pool.query(
+        `SELECT COUNT(*) AS count FROM (SELECT *, TO_CHAR(order_finished, 'YYYY-MM-DD') AS order_date FROM orders) AS ord WHERE ${sqlConditions} AND ord.order_status = 'finished'`,
+      )
+    ).rows[0];
+    if (!response) throw new BadRequestException('No count recovered');
+    console.log('res pagination', response);
+    const total = Number(response.count);
+    const pages = Math.ceil(total / Number(params.results));
+    return {
+      page: Number(params.page),
+      results: Number(params.results),
+      pages,
+      total,
+    };
   }
 }
 
