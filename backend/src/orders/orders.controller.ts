@@ -43,7 +43,7 @@ export class OrdersController {
 
   @Get('history')
   async getHistoryOrders(
-    @Param() historyParams: TGetHistoryParams,
+    @Query() historyParams: TGetHistoryParams,
     @User() user: UserPayload,
   ) {
     const userId = user.id;

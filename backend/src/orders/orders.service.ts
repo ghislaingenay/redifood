@@ -1,7 +1,6 @@
 import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
 import * as moment from 'moment';
 import { BadRequestError } from 'redifood-module/src/errors/bad-request-error';
-import { DatabaseConnectionError } from 'redifood-module/src/errors/database-connection-error';
 import { roundTwoDecimals } from 'redifood-module/src/global.functions';
 import Foods from 'src/foods/foodsrepo';
 import { Setting } from 'src/models/settings.model';
@@ -58,13 +57,20 @@ export class OrdersService {
     params: TGetHistoryParams,
     userId: UserPayload['id'],
   ): Promise<IGetServerSideData<IGetHistoryOrders>> {
-    const meta = await Orders.getPaginationOrdersHistory(params, userId);
-    const orders = await Orders.getPaidOrdersFromHistoryParams(params, userId);
-    return {
-      message: 'Orders recovered',
-      results: { meta, orders },
-      statusCode: HttpStatus.OK,
-    };
+    try {
+      const meta = await Orders.getPaginationOrdersHistory(params, userId);
+      const orders = await Orders.getPaidOrdersFromHistoryParams(
+        params,
+        userId,
+      );
+      return {
+        message: 'Orders recovered',
+        results: { meta, orders },
+        statusCode: HttpStatus.OK,
+      };
+    } catch (err) {
+      throw new BadRequestError(err.message);
+    }
   }
 
   async getOneOrder(
@@ -87,9 +93,7 @@ export class OrdersService {
         message: 'Order recovered',
       };
     } catch (err) {
-      if (err instanceof BadRequestError)
-        throw new BadRequestError(err.message);
-      throw new DatabaseConnectionError();
+      throw new BadRequestError(err.message);
     }
   }
 

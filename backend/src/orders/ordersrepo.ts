@@ -278,7 +278,7 @@ class Orders {
     userId: UserPayload['id'],
   ): string {
     const { startDate, endDate } = params;
-    const queryConditions = [`ord.user_id = ${userId}`];
+    const queryConditions = [`ord.user_id = '${userId}'`];
     if (startDate) {
       queryConditions.push(
         `ord.order_date >= '${moment(startDate).format('YYYY-MM-DD')}'`,
@@ -299,13 +299,14 @@ class Orders {
   ): Promise<IOrderApi<string>[]> {
     const { results } = params;
     const page = Number(params.page || 1);
-    const offset = (page - 1) * results;
+    const offset = (page - 1) * Number(results);
     const sqlConditions = Orders.createHistorySqlQuery(params, userId);
     const response: IOrderDB[] = (
       await pool.query(
-        `SELECT * FROM (SELECT *, TO_CHAR(order_finished, 'YYYY-MM-DD') AS order_date FROM orders) AS ord WHERE ${sqlConditions} AND ord.order_status = 'finished' ORDER BY ord.order.order_finished DESC LIMIT ${results} OFFSET ${offset}`,
+        `SELECT * FROM (SELECT *, TO_CHAR(order_finished, 'YYYY-MM-DD') AS order_date FROM orders) AS ord WHERE ${sqlConditions} AND ord.order_status = 'finished' ORDER BY ord.order_finished DESC LIMIT ${results} OFFSET ${offset}`,
       )
     ).rows;
+    console.log({ response });
     if (!response) throw new BadRequestException('No orders found');
     const updatedResponse: IOrderApi<string>[] = response.map((item) =>
       convertKeys(item, 'dbToApi'),
@@ -318,20 +319,17 @@ class Orders {
     userId: UserPayload['id'],
   ): Promise<IPagination> {
     const sqlConditions = Orders.createHistorySqlQuery(params, userId);
-    const response = (
-      await pool.query(
-        `SELECT COUNT(*) AS count FROM (SELECT *, TO_CHAR(order_finished, 'YYYY-MM-DD') AS order_date FROM orders) AS ord WHERE ${sqlConditions} AND ord.order_status = 'finished'`,
-      )
-    ).rows[0];
+    const response = await pool.query(
+      `SELECT id FROM (SELECT *, TO_CHAR(order_finished, 'YYYY-MM-DD') AS order_date FROM orders) AS ord WHERE ${sqlConditions} AND ord.order_status = 'finished'`,
+    );
+    const count = response.rowCount;
     if (!response) throw new BadRequestException('No count recovered');
-    console.log('res pagination', response);
-    const total = Number(response.count);
-    const pages = Math.ceil(total / Number(params.results));
+    const pages = Math.ceil(count / Number(params.results));
     return {
       page: Number(params.page),
       results: Number(params.results),
       pages,
-      total,
+      total: count,
     };
   }
 }
