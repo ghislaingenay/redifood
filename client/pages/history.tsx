@@ -1,10 +1,12 @@
 import { Alert, Col, DatePicker, Form, Pagination, Spin } from "antd";
 import dayjs from "dayjs";
+import moment from "moment";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Case, Default, Else, If, Switch, Then } from "react-if";
+import { toast } from "react-toastify";
 import { IGetHistoryOrders, IOrderApi, IPagination, TGetHistoryParams } from "../redifood-module/src/interfaces";
 import OrderHistoryCard from "../src/components/food-order/OrderHistoryCard";
 import { RowCenter } from "../src/components/styling/grid.styled";
@@ -13,7 +15,8 @@ import { NotificationRes } from "../src/definitions/notification.class";
 import { AnimToTop } from "../src/styles/animations/global.anim";
 import { AxiosFunction } from "./api/axios-request";
 import { buildLanguage } from "./api/build-language";
-// import useRequest from "./api/useRequest";
+
+type TDateFormat = dayjs.Dayjs | undefined | string;
 
 const History = ({}) => {
   const { t } = useTranslation("common");
@@ -78,6 +81,19 @@ const History = ({}) => {
     }
   };
 
+  const verifyForm = (dates: { startDate: any; endDate: any }) => {
+    let startingDate: TDateFormat = dates.startDate;
+    let endingDate: TDateFormat = dates.endDate;
+    if (startingDate) startingDate = dayjs(startingDate).format(DATE_FORMAT_WITHOUT_TIME);
+    if (endingDate) endingDate = dayjs(endingDate).format(DATE_FORMAT_WITHOUT_TIME);
+    if (moment(startingDate).isAfter(endingDate)) {
+      form.resetFields();
+      setParams({ ...params, startDate: undefined, endDate: undefined });
+      toast.error("Start date cannot be after end date");
+    }
+    return { startDate: startingDate, endDate: endingDate };
+  };
+
   return (
     <>
       <Head>
@@ -91,25 +107,20 @@ const History = ({}) => {
             form={form}
             labelWrap={false}
             layout="horizontal"
-            onValuesChange={(_, all) => setParams({ ...params, ...all })}
+            onValuesChange={(_, all) => {
+              const updatedDates = verifyForm(all);
+              setParams({ ...params, ...updatedDates });
+            }}
           >
             <RowCenter style={{ margin: 0, height: "100%", padding: 0 }}>
               <Col span={11} style={{ margin: 0, height: "100%", padding: 0 }}>
-                <Form.Item
-                  name="startDate"
-                  label={t("history.form-label.from")}
-                  getValueFromEvent={(onChange) => dayjs(onChange).format(DATE_FORMAT_WITHOUT_TIME)}
-                >
-                  <DatePicker picker="date" showNow />
+                <Form.Item name="startDate" label={t("history.form-label.from")}>
+                  <DatePicker showToday showNow format={DATE_FORMAT_WITHOUT_TIME} />
                 </Form.Item>
               </Col>
               <Col span={11} style={{ margin: 0, height: "100%", padding: 0 }}>
-                <Form.Item
-                  name="endDate"
-                  label={t("history.form-label.to")}
-                  getValueFromEvent={(onChange) => dayjs(onChange).format(DATE_FORMAT_WITHOUT_TIME)}
-                >
-                  <DatePicker picker="date" showNow />
+                <Form.Item name="endDate" label={t("history.form-label.to")}>
+                  <DatePicker showToday showNow format={DATE_FORMAT_WITHOUT_TIME} />
                 </Form.Item>
               </Col>
             </RowCenter>
