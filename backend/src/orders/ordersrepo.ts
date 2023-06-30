@@ -310,7 +310,6 @@ class Orders {
         `SELECT * FROM (SELECT *, TO_CHAR(order_finished, 'YYYY-MM-DD') AS order_date FROM orders) AS ord WHERE ${sqlConditions} AND ord.order_status = 'finished' ORDER BY ord.order_finished DESC LIMIT ${results} OFFSET ${offset}`,
       )
     ).rows;
-    console.log({ response });
     if (!response) throw new BadRequestException('No orders found');
     const updatedResponse: IOrderApi<string>[] = response.map((item) =>
       convertKeys(item, 'dbToApi'),

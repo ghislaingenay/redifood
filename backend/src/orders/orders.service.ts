@@ -62,7 +62,7 @@ export class OrdersService {
       );
       return {
         message: 'Orders recovered',
-        results: { meta, orders },
+        results: { orders, meta },
         statusCode: HttpStatus.OK,
       };
     } catch (err) {
