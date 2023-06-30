@@ -33,6 +33,12 @@ export class FoodController {
   }
 
   @UseGuards(new AuthGuard())
+  @Get('section/information')
+  async getSectionInfo(@User() user: UserPayload) {
+    return await this.foodService.getSectionInfo(user.id);
+  }
+
+  @UseGuards(new AuthGuard())
   @Get('section/:id')
   async getFoodBySectionId(
     @Param(

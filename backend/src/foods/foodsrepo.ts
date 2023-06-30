@@ -1,3 +1,4 @@
+import { BadRequestException } from '@nestjs/common';
 import { DatabaseError } from '../../redifood-module/src/handling-nestjs/database-error.exception';
 import {
   IExtraApi,
@@ -5,6 +6,7 @@ import {
   IFoodDB,
   IFoodGetApi,
   IFoodSectionList,
+  IGetSectionInfo,
   ISectionFoodApi,
   UserPayload,
 } from '../../redifood-module/src/interfaces';
@@ -41,14 +43,10 @@ class Foods {
         userId,
       ])
     ).rows;
-
-    if (!response) {
-      throw new DatabaseError();
-    }
-
-    const updatedResponse: IFoodGetApi[] = response.map((item: any) => {
-      return this.formatFood(item);
-    });
+    if (!response) throw new DatabaseError();
+    const updatedResponse: IFoodGetApi[] = response.map((item: any) =>
+      this.formatFood(item),
+    );
     return updatedResponse;
   }
 
@@ -99,10 +97,11 @@ class Foods {
         [userId],
       )
     ).rows;
-    return response.map((item) => {
+    if (!response) throw new DatabaseError();
+    return response.map(({ section_name, id }) => {
       return {
-        sectionName: item.section_name,
-        id: item.id,
+        sectionName: section_name,
+        id,
       } as IFoodSectionList;
     });
   }
@@ -167,10 +166,11 @@ class Foods {
   static async getAllSectionName(
     userId: UserPayload['id'],
   ): Promise<Pick<ISectionFoodApi, 'sectionName'>[]> {
-    const response = await pool.query(
-      `SELECT * FROM food_section  WHERE user_id = $1`,
-      [userId],
-    );
+    const response = (
+      await pool.query(`SELECT * FROM food_section  WHERE user_id = $1`, [
+        userId,
+      ])
+    ).rows;
     const updatedResponseDB = response.map((item: any) => item.section_name);
     const updatedResponseApi = updatedResponseDB.map((item: any) =>
       convertKeys(item, 'dbToApi'),
@@ -204,6 +204,49 @@ class Foods {
     return [...dbResponse]?.map((item) => {
       return convertKeys<IFoodDB, IFoodApi>(item, 'dbToApi');
     });
+  }
+
+  static async getExtraListBySectionId(
+    userId: UserPayload['id'],
+    sectionId: number,
+  ): Promise<IExtraApi[]> {
+    const response = await pool.query(
+      `SELECT * FROM food_extra WHERE section_id = $1 AND user_id = $2`,
+      [sectionId, userId],
+    );
+    const dbResponse: IExtraApi[] = response.rows;
+    return [...dbResponse]?.map((item) => {
+      return convertKeys<IExtraApi, IExtraApi>(item, 'dbToApi');
+    });
+  }
+
+  static extraInformationToSectionList = (
+    userId: UserPayload['id'],
+    sectionList: IFoodSectionList[],
+  ) => {
+    try {
+      return Promise.all(
+        sectionList.map(async (section) => {
+          return {
+            ...section,
+            extraList: await Foods.getExtraListBySectionId(userId, section.id),
+          };
+        }),
+      );
+    } catch (err) {
+      throw new BadRequestException('Impossible to get the lisy of extra');
+    }
+  };
+  static async getAllInformationBySection(
+    userId: UserPayload['id'],
+  ): Promise<IGetSectionInfo> {
+    const sectionListing = await Foods.getSectionList(userId);
+    const extraSectionList = await Foods.extraInformationToSectionList(
+      userId,
+      sectionListing,
+    );
+    const formattedFoods = await Foods.findAllFormatted(userId);
+    return { listing: extraSectionList, foods: formattedFoods };
   }
 }
 

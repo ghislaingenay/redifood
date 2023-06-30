@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
 import axios from 'axios';
 import { DatabaseError } from '../../redifood-module/src/handling-nestjs/database-error.exception';
 import {
@@ -7,6 +7,7 @@ import {
   IExtraDB,
   IFoodGetApi,
   IFoodSectionList,
+  IGetSectionInfo,
   IGetServerSideData,
   ISectionFoodApi,
   UserPayload,
@@ -58,7 +59,21 @@ export class FoodService {
     };
   }
 
-  // @Post('/section')
+  async getSectionInfo(
+    userId: UserPayload['id'],
+  ): Promise<IGetServerSideData<IGetSectionInfo>> {
+    try {
+      const res = await Foods.getAllInformationBySection(userId);
+      return {
+        statusCode: HttpStatus.OK,
+        results: res,
+        message: EFoodMessage.FOOD_RECOVERED,
+      };
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
+  }
+
   async createSection(
     body: CreateSectionDto,
     userId: UserPayload['id'],
