@@ -358,24 +358,26 @@ const FoodForm = () => {
               }}
             >
               <Form.Item style={{ display: "none" }} name="itemPhoto" />
-              {optionsCreateFood(displayCurrency)?.map(({ label, name, component, rules }: IFormInterface) => {
-                return (
-                  <>
-                    <LabelFormBlack htmlFor={name}>
-                      {label} <RedSpan>*</RedSpan>
-                    </LabelFormBlack>
-                    <Form.Item
-                      id={name}
-                      style={{ fontWeight: 700, marginBottom: "0.5rem" }}
-                      key={name}
-                      name={name}
-                      rules={rules}
-                    >
-                      {component}
-                    </Form.Item>
-                  </>
-                );
-              })}
+              {optionsCreateFood(displayCurrency)?.map(
+                ({ label, name, component, rules }: IFormInterface, index: number) => {
+                  return (
+                    <>
+                      <LabelFormBlack htmlFor={name} key={index}>
+                        {label} <RedSpan>*</RedSpan>
+                      </LabelFormBlack>
+                      <Form.Item
+                        id={name}
+                        style={{ fontWeight: 700, marginBottom: "0.5rem" }}
+                        key={name}
+                        name={name}
+                        rules={rules}
+                      >
+                        {component}
+                      </Form.Item>
+                    </>
+                  );
+                },
+              )}
               <LabelFormBlack htmlFor="itemSection">
                 {t("foods.form-label.section")} <RedSpan>*</RedSpan>
               </LabelFormBlack>
