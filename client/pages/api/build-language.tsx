@@ -1,5 +1,5 @@
 import Cookies from "js-cookie";
-import { ELanguage } from "../../src/interfaces";
+import { ELanguage } from "../../redifood-module/src/interfaces";
 
 export const encodeCookie = (str: string | ELanguage) => {
   const buff = Buffer.from(str);

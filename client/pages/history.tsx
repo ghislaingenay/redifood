@@ -1,47 +1,98 @@
-import { Col, DatePicker, Form } from "antd";
+import { Alert, Col, DatePicker, Form, Pagination, Spin } from "antd";
+import dayjs from "dayjs";
+import moment from "moment";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { IOrderApi } from "../redifood-module/src/interfaces";
+import { Case, Default, Else, If, Switch, Then } from "react-if";
+import { toast } from "react-toastify";
+import { IGetHistoryOrders, IOrderApi, IPagination, TGetHistoryParams } from "../redifood-module/src/interfaces";
 import OrderHistoryCard from "../src/components/food-order/OrderHistoryCard";
 import { RowCenter } from "../src/components/styling/grid.styled";
-import { ServerInfo } from "../src/interfaces";
+import { DATE_FORMAT_WITHOUT_TIME } from "../src/constants";
+import { NotificationRes } from "../src/definitions/notification.class";
 import { AnimToTop } from "../src/styles/animations/global.anim";
-import { mockOneOrder } from "../test/mocks/mockOrdersData";
+import { AxiosFunction } from "./api/axios-request";
 import { buildLanguage } from "./api/build-language";
-// import useRequest from "./api/useRequest";
 
-interface IHistoryProps {
-  FoodOrderList: IOrderApi[];
-}
-const History = ({ FoodOrderList }: IHistoryProps) => {
+type TDateFormat = dayjs.Dayjs | undefined | string;
+
+const History = ({}) => {
   const { t } = useTranslation("common");
   const [form] = Form.useForm();
-  const [params, setParams] = useState({ startDate: undefined, endDate: undefined });
+  const PAGE_SIZE_OPTIONS = ["10", "20"];
 
-  const [
-    paidOrdersList,
-    // , setPaidOrdersList
-  ] = useState(FoodOrderList);
+  const [params, setParams] = useState<TGetHistoryParams>({
+    startDate: undefined,
+    endDate: undefined,
+    results: 20,
+    page: 1,
+  });
 
-  // const { res, doRequest, loading } = useRequest<IOrder[]>({
-  //   url: "/api/orders/paid",
-  //   method: "get",
-  //   queryParams: params,
-  //   body: {},
-  // });
+  const [pagination, setPagination] = useState<IPagination>({
+    page: 1,
+    results: 20,
+    total: 0,
+    pages: 1,
+  });
+  const [pageSize, setPageSize] = useState(20);
+  const [allOrders, setAllOrders] = useState<IOrderApi<string>[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  // const loadData = async () => {
-  //   await doRequest();
-  //   if (res) {
-  //     setPaidOrdersList(res);
-  //   }
-  // };
+  const haveOrders = allOrders?.length > 0;
+  const isFetchWithOrders = haveOrders && !loading;
+  const isFetchWithoutOrders = !haveOrders && !loading;
+  const selectedPage = pagination?.page || 1;
+  const totalResults = pagination?.total || 0;
+  const showPagination = totalResults > pageSize;
 
-  // useEffect(() => {
-  //   loadData();
-  // }, [params]);
+  useEffect(() => {
+    setLoading(true);
+    AxiosFunction({
+      url: "/api/orders/history",
+      method: "get",
+      queryParams: { ...params },
+      body: {},
+    })
+      .then((res) => {
+        const { results } = res;
+        const { orders, meta } = results as IGetHistoryOrders;
+        orders && setAllOrders(orders);
+        meta && setPagination(meta);
+        setLoading(false);
+      })
+      .catch(() => {
+        NotificationRes.onFailure({
+          title: "Impossible to get paid orders list",
+          description: "Please try again later",
+          placement: "topRight",
+        });
+        setLoading(false);
+      });
+  }, [params]);
+
+  const handlePagination = (page: number, pageResults?: number) => {
+    if (pageResults !== pageSize) {
+      setParams(() => Object.assign({ params }, { page: 1, results: pageResults } as any));
+      setPageSize(pageResults || 20);
+    } else {
+      setParams(() => Object.assign({ params }, { page, results: pageSize } as any));
+    }
+  };
+
+  const verifyForm = (dates: { startDate: any; endDate: any }) => {
+    let startingDate: TDateFormat = dates.startDate;
+    let endingDate: TDateFormat = dates.endDate;
+    if (startingDate) startingDate = dayjs(startingDate).format(DATE_FORMAT_WITHOUT_TIME);
+    if (endingDate) endingDate = dayjs(endingDate).format(DATE_FORMAT_WITHOUT_TIME);
+    if (moment(startingDate).isAfter(endingDate)) {
+      form.resetFields();
+      setParams({ ...params, startDate: undefined, endDate: undefined });
+      toast.error("Start date cannot be after end date");
+    }
+    return { startDate: startingDate, endDate: endingDate };
+  };
 
   return (
     <>
@@ -57,46 +108,52 @@ const History = ({ FoodOrderList }: IHistoryProps) => {
             labelWrap={false}
             layout="horizontal"
             onValuesChange={(_, all) => {
-              console.log("all", all);
-              const { startDate, endDate } = all;
-              console.log(startDate, endDate);
-              let startingDate: Date | undefined = undefined;
-              let endingDate: Date | undefined = undefined;
-              if (startDate) {
-                startingDate = startDate["$d"];
-              }
-              if (endDate) {
-                endingDate = endDate["$d"];
-              }
-              setParams(() => Object.assign({ params }, { startDate: startingDate, endDate: endingDate } as any));
+              const updatedDates = verifyForm(all);
+              setParams({ ...params, ...updatedDates });
             }}
           >
             <RowCenter style={{ margin: 0, height: "100%", padding: 0 }}>
               <Col span={11} style={{ margin: 0, height: "100%", padding: 0 }}>
                 <Form.Item name="startDate" label={t("history.form-label.from")}>
-                  <DatePicker picker="date" />
+                  <DatePicker showToday showNow format={DATE_FORMAT_WITHOUT_TIME} />
                 </Form.Item>
               </Col>
               <Col span={11} style={{ margin: 0, height: "100%", padding: 0 }}>
                 <Form.Item name="endDate" label={t("history.form-label.to")}>
-                  <DatePicker picker="date" />
+                  <DatePicker showToday showNow format={DATE_FORMAT_WITHOUT_TIME} />
                 </Form.Item>
               </Col>
             </RowCenter>
           </Form>
-          {/* <Switch>
+          <Switch>
             <Case condition={loading}>
-              <p>{t("glossary.loading")}</p>
+              <Spin size="large" />
             </Case>
-            <Case condition={!loading && paidOrdersList.length === 0}>
+            <Case condition={isFetchWithoutOrders}>
               <Alert message={t("history.alert-no-orders")} type="info" />
             </Case>
-            <Case condition={!loading && paidOrdersList.length > 0}> */}
-          {paidOrdersList.map((foodOrder: IOrderApi, index: number) => {
-            return <OrderHistoryCard key={index} foodOrder={foodOrder} />;
-          })}
-          {/* </Case>
-          </Switch>  */}
+            <Case condition={isFetchWithOrders}>
+              {allOrders?.map((order, index: number) => {
+                return <OrderHistoryCard key={index} order={order} />;
+              })}
+            </Case>
+            <Default>
+              <p>Forget to catch this error</p>
+            </Default>
+          </Switch>
+          <If condition={showPagination}>
+            <Then>
+              <Pagination
+                style={{ marginTop: "1rem" }}
+                onChange={(page, pageSize) => handlePagination(page, pageSize)}
+                pageSize={pageSize}
+                pageSizeOptions={PAGE_SIZE_OPTIONS}
+                current={selectedPage}
+                total={totalResults}
+              />
+            </Then>
+            <Else></Else>
+          </If>
         </AnimToTop>
       </main>
     </>
@@ -105,30 +162,12 @@ const History = ({ FoodOrderList }: IHistoryProps) => {
 
 export default History;
 
-export async function getStaticProps({ locale, req }: ServerInfo) {
+export async function getServerSideProps(appContext: any) {
+  const { locale, req } = appContext;
   const getLanguageValue = buildLanguage(locale, req);
   return {
     props: {
-      FoodOrderList: [mockOneOrder],
-      status: "success",
       ...(await serverSideTranslations(getLanguageValue, ["common"])),
     },
   };
-  // const url = "/api/orders/paid";
-  // await axios
-  //   .get(url, params: { startDate: undefined, endDate: undefined }})
-  //   .then(async (res) => {
-  //     const {
-  //       data: { results: {paidOrders} },
-  //     } = res;
-  //     return {
-  //       props: { paidOrders: paidOrders, status: "success", ...(await serverSideTranslations(getLanguageValue, ["common"])) },
-  //     };
-  //   })
-  //   .catch((err) => {
-  //     console.log("err", err);
-  //   });
-  // return {
-  //   props: { paidOrders: [], status: "error", ...(await serverSideTranslations(getLanguageValue, ["common"])) },
-  // };
 }

@@ -110,10 +110,8 @@ class GoogleSheetService {
   }
 
   async createRow(data: IOrderData): Promise<IGetServerSideData<any>> {
-    console.log('data', data);
     const orderArray = this.headers.map((item) => item.apiKey);
     const orderData = orderArray.map((item) => data[item]);
-    console.log('orderData', orderData);
     try {
       await this.googleSheets.spreadsheets.values.append({
         auth: this.auth,

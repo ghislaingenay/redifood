@@ -1,19 +1,22 @@
-import { faCartShopping, faCashRegister, faCreditCard, faReceipt } from "@fortawesome/free-solid-svg-icons";
+import { faCartShopping, faCashRegister, faCreditCard } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Alert, Space } from "antd";
+import moment from "moment";
 import { useState } from "react";
 
+import { AxiosResponse } from "axios";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
-import { EOrderStatus, EPaymentType, IFoodOrder, IOrderApi } from "../../redifood-module/src/interfaces";
+import { EOrderStatus, EPaymentType, IGetOneOrder, IGetServerSideData } from "../../redifood-module/src/interfaces";
 import SummaryTable from "../../src/components/food-order/SummaryTable";
 import { RediIconButton } from "../../src/components/styling/Button.style";
 import RediRadioButton from "../../src/components/styling/RediRadioButton";
 import { CenteredCol, RowSpaceBetween } from "../../src/components/styling/grid.styled";
 import { RED } from "../../src/constants";
 import { hexToRgba } from "../../src/functions/global.fn";
+import { recoverQuantityFromOrderItems } from "../../src/functions/order.fn";
 import { EButtonType } from "../../src/interfaces";
 import { LGCard } from "../../src/styles";
 import { AnimToTop } from "../../src/styles/animations/global.anim";
@@ -22,19 +25,29 @@ import buildClient from "../api/build-client";
 import { buildLanguage } from "../api/build-language";
 
 interface ICurrentOrderProps {
-  currentOrder: IOrderApi<IFoodOrder[]>
-  status: string;
+  currentOrder: IGetOneOrder["currentOrder"];
+  foodList: IGetOneOrder["foodList"];
 }
 
-
-const CurrentOrder = ({ currentOrder, status }: ICurrentOrderProps) => {
+const CurrentOrder = ({ currentOrder, foodList }: ICurrentOrderProps) => {
   const { t } = useTranslation("common");
   const router = useRouter();
-  console.log(status);
-  const { orderCreatedDate, id, orderTableNumber, orderStatus } = currentOrder;
+  const { orderCreatedDate, orderNo, orderTableNumber, orderStatus, id, orderFinished, orderTotal } = currentOrder;
+  console.log({ orderFinished, orderCreatedDate, orderStatus });
+  const COL_ID_SPAN = { xs: 12, sm: 12, md: 8, lg: 8 };
+
+  console.log({ foodList });
+
   const [paymentChoice, setPaymentChoice] = useState<EPaymentType | null>(null);
 
+  const isOrderCompleted = orderStatus === EOrderStatus.COMPLETE;
+  const appliedDate = moment(orderFinished || orderCreatedDate).format("DD/MM/YYYY HH:mm");
+
   const isDisabled = paymentChoice === null ? true : false;
+  const alertMessage = isOrderCompleted ? t("orders.paid") : t("orders.not-paid");
+  const messageType = isOrderCompleted ? "success" : "error";
+  const colorAlert = !isOrderCompleted && hexToRgba(RED, 0.7);
+
   const radioPaymentOptions = [
     {
       label: EPaymentType.CASH,
@@ -52,11 +65,6 @@ const CurrentOrder = ({ currentOrder, status }: ICurrentOrderProps) => {
 
   const changePaymentChoice = (e: EPaymentType) => setPaymentChoice(e);
 
-  const alertMessage = orderStatus === EOrderStatus.COMPLETE ? t("orders.paid") : t("orders.not-paid");
-  const messageType = orderStatus === EOrderStatus.COMPLETE ? "success" : "error";
-  const colorAlert = orderStatus !== EOrderStatus.COMPLETE && hexToRgba(RED, 0.7);
-
-  const colIdSpan = { xs: 12, sm: 12, md: 8, lg: 8 };
   return (
     <>
       <Head>
@@ -68,17 +76,17 @@ const CurrentOrder = ({ currentOrder, status }: ICurrentOrderProps) => {
           <SpacingDiv5X>
             <LGCard style={{ padding: "0 1rem" }}>
               <RowSpaceBetween>
-                <CenteredCol {...colIdSpan}>
+                <CenteredCol {...COL_ID_SPAN}>
                   <b>{t("glossary.order")} #</b>
-                  {id}
+                  {orderNo}
                 </CenteredCol>
-                <CenteredCol {...colIdSpan}>
+                <CenteredCol {...COL_ID_SPAN}>
                   <b aria-label="Table number">{t("glossary.table")}</b> {orderTableNumber}
                 </CenteredCol>
-                <CenteredCol {...colIdSpan}>
-                  <b>{t("glossary.date")}</b> {orderCreatedDate}
+                <CenteredCol {...COL_ID_SPAN}>
+                  <b>{t("glossary.date")}</b> {appliedDate}
                 </CenteredCol>
-                <CenteredCol {...colIdSpan}>
+                <CenteredCol {...COL_ID_SPAN}>
                   <Alert
                     type={messageType}
                     message={alertMessage}
@@ -87,7 +95,7 @@ const CurrentOrder = ({ currentOrder, status }: ICurrentOrderProps) => {
                 </CenteredCol>
               </RowSpaceBetween>
             </LGCard>
-            <SummaryTable order={currentOrder} />
+            <SummaryTable orderTotal={orderTotal} foodList={foodList} />
             {orderStatus !== EOrderStatus.COMPLETE && (
               <>
                 <RediRadioButton
@@ -112,7 +120,7 @@ const CurrentOrder = ({ currentOrder, status }: ICurrentOrderProps) => {
                 </Space>
               </>
             )}
-            {orderStatus === EOrderStatus.COMPLETE && (
+            {/* {orderStatus === EOrderStatus.COMPLETE && (
               <RediIconButton
                 // onClick={() => router.push(`/orders/${orderId}/payment/${paymentChoice}`)}
                 iconFt={faReceipt}
@@ -121,7 +129,7 @@ const CurrentOrder = ({ currentOrder, status }: ICurrentOrderProps) => {
               >
                 {t("buttons.receipt")}
               </RediIconButton>
-            )}
+            )} */}
           </SpacingDiv5X>
         </AnimToTop>
       </body>
@@ -133,24 +141,35 @@ export default CurrentOrder;
 export async function getServerSideProps(appContext: any) {
   const { locale, req } = appContext;
   const getLanguageValue = buildLanguage(locale, req);
-    const client = buildClient(appContext);
+  const client = buildClient(appContext);
   const id: string = appContext.query["id"];
-  const res: any = await client
-      .get(`/api/orders/${id}`)
-      .catch(async () => {
-        return {
-          props: {
-            currentOrder: [],
-            status: 'error',
-            ...(await serverSideTranslations(getLanguageValue, ["common"])),
-          },
-        };
-      });
-    const {data: {results: {currentOrder}}} = res;
-    return {
-      props: {
-        currentOrder, status:'success',
-        ...(await serverSideTranslations(getLanguageValue, ["common"])),
-      }
-    }
+  const url = `/api/orders/${id}`;
+  const response = await client
+    .get(url)
+    .then(async (res: AxiosResponse<IGetServerSideData<IGetOneOrder>>) => {
+      const {
+        data: { results },
+      } = res;
+      const { currentOrder, foodList: allFoods } = results as IGetOneOrder;
+      const orderItems = currentOrder.orderItems;
+      const updatedFoods = recoverQuantityFromOrderItems(orderItems, [...allFoods]);
+      return {
+        props: {
+          currentOrder,
+          foodList: updatedFoods,
+          ...(await serverSideTranslations(getLanguageValue, ["common"])),
+        },
+      };
+    })
+    .catch(async () => {
+      return {
+        props: {
+          currentOrder: [],
+          foodList: [],
+          ...(await serverSideTranslations(getLanguageValue, ["common"])),
+        },
+      };
+    });
+
+  return response;
 }

@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 import {
   EPaymentType,
+  TGetHistoryParams,
   TOrderType,
   UserPayload,
 } from '../../redifood-module/src/interfaces';
@@ -22,12 +23,7 @@ import GoogleSheetService, {
 } from '../../src/definitions/googlesheet';
 import { AuthGuard } from '../../src/global/auth-guard';
 import { ValidationPipe } from '../../src/global/validation.pipe';
-import {
-  AwaitPaymenDto,
-  CreateOrderDto,
-  ReceiptBodyDto,
-  UpdateOrderDto,
-} from './orders.dto';
+import { AwaitPaymentDto, CreateOrderDto, UpdateOrderDto } from './orders.dto';
 import { OrdersService } from './orders.service';
 
 @Controller('api/orders')
@@ -43,6 +39,15 @@ export class OrdersController {
   ) {
     const userId = user.id;
     return await this.ordersService.getOrders(orderType, userId);
+  }
+
+  @Get('history')
+  async getHistoryOrders(
+    @Query() historyParams: TGetHistoryParams,
+    @User() user: UserPayload,
+  ) {
+    const userId = user.id;
+    return await this.ordersService.getHistoryOrders(historyParams, userId);
   }
 
   @UseGuards(new AuthGuard())
@@ -62,6 +67,19 @@ export class OrdersController {
     @User() user: UserPayload,
   ) {
     return await this.ordersService.getOneOrder(id, user.id);
+  }
+
+  @UseGuards(new AuthGuard())
+  @Get(':id/edit')
+  async getEditOrder(
+    @Param(
+      'id',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    id: number,
+    @User() user: UserPayload,
+  ) {
+    return await this.ordersService.getEditOrder(id, user.id);
   }
 
   @UseGuards(new AuthGuard())
@@ -92,31 +110,30 @@ export class OrdersController {
       new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
     )
     orderId: number,
-    @Query('paymentType') paymentType: EPaymentType,
     @User() user: UserPayload,
-    @Body() data: any,
+    @Body() data: { paymentType: EPaymentType },
   ) {
-    const body: AwaitPaymenDto = {
+    const body: AwaitPaymentDto = {
       ...data,
       orderId,
       userId: user.id,
-      paymentType,
+      paymentType: data.paymentType,
     };
     return await this.ordersService.awaitPayment(body);
   }
 
-  @UseGuards(new AuthGuard())
-  @Post('receipt/:id')
-  async sendReceipt(
-    @Param(
-      'id',
-      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
-    )
-    orderId: number,
-    @Body(new ValidationPipe()) sendReceiptDto: ReceiptBodyDto,
-  ) {
-    return await this.ordersService.sendReceipt(sendReceiptDto, orderId);
-  }
+  // @UseGuards(new AuthGuard())
+  // @Post('receipt/:id')
+  // async sendReceipt(
+  //   @Param(
+  //     'id',
+  //     new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+  //   )
+  //   orderId: number,
+  //   @Body(new ValidationPipe()) sendReceiptDto: ReceiptBodyDto,
+  // ) {
+  //   return await this.ordersService.sendReceipt(sendReceiptDto, orderId);
+  // }
 
   @UseGuards(new AuthGuard())
   @Post()
@@ -124,7 +141,6 @@ export class OrdersController {
     @Body(new ValidationPipe()) createOrderDto: CreateOrderDto,
     @User() user: UserPayload,
   ) {
-    // get order tot and set it to the order
     return await this.ordersService.createOrder(createOrderDto, user.id);
   }
 

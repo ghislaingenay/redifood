@@ -18,7 +18,6 @@ export class EmailService {
   ): Promise<
     IGetServerSideData<{ isValidated: boolean; expiresAt: Date | null }>
   > {
-    console.log('id', userId);
     const emailData = await Email.findOne({ user: userId });
     if (!emailData) {
       return {

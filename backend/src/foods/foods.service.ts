@@ -30,7 +30,7 @@ export class FoodService {
       sectionList: IFoodSectionList[];
     }>
   > {
-    const foodResults = await Foods.findAll(userId);
+    const foodResults = await Foods.findAllFormatted(userId);
     if (!foodResults) {
       throw new DatabaseError();
     }

@@ -1,11 +1,18 @@
 import { BadRequestException } from '@nestjs/common';
+import * as moment from 'moment';
+import { roundTwoDecimals } from 'redifood-module/src/global.functions';
 import {
+  EPaymentStatus,
+  IFoodApi,
   IFoodGetApi,
   IFoodOrder,
   IOrderApi,
   IOrderDB,
   IOrderItemsApi,
   IOrderItemsDB,
+  IPagination,
+  IPaymentDB,
+  TGetHistoryParams,
   TOrderType,
   UserPayload,
 } from 'redifood-module/src/interfaces';
@@ -17,7 +24,7 @@ import {
 } from 'src/foods/global.function';
 import { DatabaseError } from '../../redifood-module/src/handling-nestjs/database-error.exception';
 import { pool } from '../pool.pg';
-
+import { AwaitPaymentDto } from './orders.dto';
 interface IMenuId {
   orderId: number;
   userId: string;
@@ -113,9 +120,7 @@ class Orders {
       `SELECT * FROM orders WHERE user_id = $1 AND id = $2`,
       [userId, orderId],
     );
-    if (!orderDB.rows[0]) {
-      throw new BadRequestException('Order not found');
-    }
+    if (!orderDB.rows[0]) throw new BadRequestException('Order not found');
     return convertKeys(orderDB.rows[0], 'dbToApi') as IOrderApi<string>;
   }
 
@@ -138,14 +143,12 @@ class Orders {
   }
 
   static async updateOrder(
-    body: any,
+    orderItems: IFoodOrder[],
     orderId: number,
     userId: UserPayload['id'],
   ) {
-    const { orderItems } = body;
     const totalPrice = await Orders.calculateAmountFromMenu(orderItems, userId);
     const updatedDataApi: Partial<IOrderApi<string>> = {
-      ...body,
       orderItems: JSON.stringify(orderItems),
       orderTotal: totalPrice,
     };
@@ -176,47 +179,64 @@ class Orders {
     return response;
   }
 
-  static async setOrderItems(idList: IMenuId, orderItems: string) {
-    const { userId, orderId } = idList;
-    const orderMenu: IFoodOrder[] = JSON.parse(orderItems);
-    const foodList = await Foods.findAll(userId);
-    const updatedMenu: IFoodGetApi[] = foodList.map((item: IFoodGetApi) => {
-      const foundItem = orderMenu.find(
-        (orderItem: IFoodOrder) => orderItem.id === item.id,
+  static async validatePayment(orderId: number): Promise<{ updated: boolean }> {
+    try {
+      await pool.query(
+        `UPDATE orders SET order_status = 'finished' WHERE id = $1`,
+        [orderId],
       );
-      if (foundItem) {
-        return {
-          ...item,
-          itemQuantity: foundItem.itemQuantity,
-        };
-      }
-      return item;
-    });
-    const completedMenu: IOrderItemsDB[] = updatedMenu.map((item) => {
-      return {
-        order_id: orderId,
-        user_id: userId,
-        food_id: item.id,
-        order_item_quantity: item.itemQuantity,
-        order_item_price: item.itemPrice,
-        order_item_name: item.itemName,
-      };
-    });
+      return { updated: true };
+    } catch (err) {
+      throw new BadRequestException('Not update');
+    }
+  }
 
-    const createdQuery = createQuery<IOrderItemsDB[]>(
-      completedMenu,
-      'order_items',
-    );
-    const response = await pool.query(createdQuery);
-    return response;
+  static async setOrderItems(idList: IMenuId, orderItems: string) {
+    try {
+      const { userId, orderId } = idList;
+      const orderMenu: IFoodOrder[] = JSON.parse(orderItems);
+      const foodList = await Foods.findAllFormatted(userId);
+      const updatedMenu: IFoodGetApi[] = foodList.map((item: IFoodGetApi) => {
+        const foundItem = orderMenu.find(
+          (orderItem: IFoodOrder) => orderItem.id === item.id,
+        );
+        if (foundItem) {
+          return {
+            ...item,
+            itemQuantity: foundItem.itemQuantity,
+          };
+        }
+        return item;
+      });
+      const completedMenu: IOrderItemsDB[] = updatedMenu.map((item) => {
+        return {
+          order_id: orderId,
+          user_id: userId,
+          food_id: item.id,
+          order_item_quantity: item.itemQuantity,
+          order_item_price: item.itemPrice,
+          order_item_name: item.itemName,
+        };
+      });
+
+      const createdQuery = createQuery<IOrderItemsDB[]>(
+        completedMenu,
+        'order_items',
+      );
+      const response = await pool.query(createdQuery);
+      return response;
+    } catch (err) {
+      throw new BadRequestException("Can't create order items");
+    }
   }
 
   static async calculateAmountFromMenu(
     orderItems: IFoodOrder[],
     userId: UserPayload['id'],
   ): Promise<number> {
-    const foodList = await Foods.findAll(userId);
-    const updatedMenu: IFoodGetApi[] = foodList.map((item: IFoodGetApi) => {
+    const foodList = await Foods.findAllFoods(userId);
+    console.log({ foodList, orderItems });
+    const updatedMenu: IFoodApi[] = foodList.map((item) => {
       const foundItem = [...orderItems].find(
         (orderItem: IFoodOrder) => orderItem.id === item.id,
       );
@@ -229,13 +249,111 @@ class Orders {
       return item;
     });
     const filteredMenu = updatedMenu.filter((item) => item.itemQuantity > 0);
-    console.log('filteredMenu', filteredMenu);
     const totalAmount = filteredMenu.reduce((acc, item) => {
       return acc + item.itemPrice * item.itemQuantity;
     }, 0);
-    console.log('totalAmount', totalAmount);
-
     return totalAmount;
+  }
+
+  static getFoodIdArrayFromOrderItems(orderItems: IFoodOrder[]) {
+    return orderItems.map((item) => item.id);
+  }
+
+  static addFoodQuantityToOrderItems(
+    foodList: Omit<IFoodApi[], 'itemQuantity'>,
+    orderItems: IFoodOrder[],
+  ): IFoodApi[] {
+    return [...foodList].map((item) => {
+      const foundItem = orderItems.find(
+        (orderItem) => orderItem.id === item.id,
+      );
+      if (foundItem) {
+        return {
+          ...item,
+          itemQuantity: foundItem.itemQuantity,
+        };
+      }
+      return item;
+    });
+  }
+
+  static createHistorySqlQuery(
+    params: TGetHistoryParams,
+    userId: UserPayload['id'],
+  ): string {
+    const { startDate, endDate } = params;
+    const queryConditions = [`ord.user_id = '${userId}'`];
+    if (startDate) {
+      queryConditions.push(
+        `ord.order_date >= '${moment(startDate).format('YYYY-MM-DD')}'`,
+      );
+    } // need to finish this
+    if (endDate) {
+      queryConditions.push(
+        `ord.order_date <= '${moment(endDate).format('YYYY-MM-DD')}'`,
+      );
+    }
+    const joinedQueryConditions = queryConditions.join(' AND ');
+    return joinedQueryConditions;
+  }
+
+  static async getPaidOrdersFromHistoryParams(
+    params: TGetHistoryParams,
+    userId: UserPayload['id'],
+  ): Promise<IOrderApi<string>[]> {
+    const { results } = params;
+    const page = Number(params.page || 1);
+    const offset = (page - 1) * Number(results);
+    const sqlConditions = Orders.createHistorySqlQuery(params, userId);
+    const response: IOrderDB[] = (
+      await pool.query(
+        `SELECT * FROM (SELECT *, TO_CHAR(order_finished, 'YYYY-MM-DD') AS order_date FROM orders) AS ord WHERE ${sqlConditions} AND ord.order_status = 'finished' ORDER BY ord.order_finished DESC LIMIT ${results} OFFSET ${offset}`,
+      )
+    ).rows;
+    if (!response) throw new BadRequestException('No orders found');
+    const updatedResponse: IOrderApi<string>[] = response.map((item) =>
+      convertKeys(item, 'dbToApi'),
+    );
+    return updatedResponse;
+  }
+
+  static async getPaginationOrdersHistory(
+    params: TGetHistoryParams,
+    userId: UserPayload['id'],
+  ): Promise<IPagination> {
+    const sqlConditions = Orders.createHistorySqlQuery(params, userId);
+    const response = await pool.query(
+      `SELECT id FROM (SELECT *, TO_CHAR(order_finished, 'YYYY-MM-DD') AS order_date FROM orders) AS ord WHERE ${sqlConditions} AND ord.order_status = 'finished'`,
+    );
+    const count = response.rowCount;
+    if (!response) throw new BadRequestException('No count recovered');
+    const pages = Math.ceil(count / Number(params.results));
+    return {
+      page: Number(params.page),
+      results: Number(params.results),
+      pages,
+      total: count,
+    };
+  }
+
+  static buildDataForPayment(
+    body: AwaitPaymentDto,
+    orderTotal: number,
+    vat: number,
+  ): IPaymentDB {
+    const { orderId, userId, paymentType } = body;
+    return {
+      user_id: userId,
+      order_id: orderId,
+      payment_stripe_id: '',
+      payment_status: EPaymentStatus.COMPLETED, //EPaymentStatus.AWAITING
+      payment_type: paymentType,
+      payment_amount: orderTotal,
+      payment_date: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+      payment_discount_applied: false,
+      payment_discount_id: 0,
+      payment_tax_amount: roundTwoDecimals(orderTotal * (vat / 100)),
+    };
   }
 }
 

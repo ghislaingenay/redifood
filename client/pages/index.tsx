@@ -1,21 +1,24 @@
 import { faCartShopping, faPenToSquare, faPlusCircle, faUtensils } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Alert, Col, Space, Table, Typography } from "antd";
+import { Alert, Col, Form, InputNumber, Modal, Space, Table, Typography } from "antd";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useRouter } from "next/navigation";
 import { AlignType } from "rc-table/lib/interface";
 import { useEffect, useMemo, useState } from "react";
-import { IFoodOrder, IOrderApi } from "../redifood-module/src/interfaces";
+import { toast } from "react-toastify";
+import { IFoodOrder, IGetServerSideData, IOrderApi } from "../redifood-module/src/interfaces";
 import { RediSelect } from "../src/components/RediSelect";
 import { RediIconButton } from "../src/components/styling/Button.style";
-import { RowSpaceAround, RowSpaceBetween } from "../src/components/styling/grid.styled";
+import { RowCenterSp, RowSpaceAround, RowSpaceBetween } from "../src/components/styling/grid.styled";
 import { BACKGROUND_COLOR } from "../src/constants";
 import { getOptions } from "../src/functions/global.fn";
 import useCurrency from "../src/hooks/useCurrency.hook";
 import { EButtonType } from "../src/interfaces";
+import { LabelFormBlack } from "../src/styles";
 import { AnimToTop } from "../src/styles/animations/global.anim";
+import { AxiosFunction } from "./api/axios-request";
 import buildClient from "./api/build-client";
 import { buildLanguage } from "./api/build-language";
 
@@ -26,7 +29,9 @@ interface IAllOrdersPageProps {
 const AllOrdersPage = ({ allOrders, getList }: IAllOrdersPageProps) => {
   const { t } = useTranslation("common");
   const { displayCurrency } = useCurrency();
-  const haveOrders = allOrders.length > 0
+  const haveOrders = allOrders.length > 0;
+  const [tableForm] = Form.useForm();
+  const tableValue = Form.useWatch("tableNumber", tableForm);
 
   const router = useRouter();
 
@@ -34,6 +39,8 @@ const AllOrdersPage = ({ allOrders, getList }: IAllOrdersPageProps) => {
   const [selectedOption, setSelectedOption] = useState("ALL");
   const [filteredOrders, setFilteredOrders] = useState<IOrderApi[]>([]);
   const [spinLoading, setSpinLoading] = useState(true);
+  const [tableTakenList, setTableTakenList] = useState<number[]>([]);
+  const [viewTableNumberModal, setViewTableNumberModal] = useState(false);
   const { Title } = Typography;
 
   const columns = [
@@ -70,14 +77,14 @@ const AllOrdersPage = ({ allOrders, getList }: IAllOrdersPageProps) => {
       render: (item: IOrderApi) => (
         <Space>
           <RediIconButton
-            onClick={() => router.push(`/orders/${item.id}/edit`)}
+            onClick={() => router.push(`/orders/${item}/edit`)}
             buttonType={EButtonType.EDIT}
             iconFt={faPenToSquare}
           >
             {t("buttons.edit")}
           </RediIconButton>
           <RediIconButton
-            onClick={() => router.push(`/orders/${item.id}`)}
+            onClick={() => router.push(`/orders/${item}`)}
             iconFt={faCartShopping}
             buttonType={EButtonType.SUCCESS}
           >
@@ -88,12 +95,32 @@ const AllOrdersPage = ({ allOrders, getList }: IAllOrdersPageProps) => {
     },
   ];
 
+  const getTakenTableNumber = async () => {
+    AxiosFunction({
+      method: "get",
+      url: "api/orders/table",
+      body: {},
+      queryParams: {},
+    })
+      .then((res: IGetServerSideData<number[]>) => {
+        const { results } = res;
+        results && setTableTakenList(results);
+      })
+      .catch(() => toast.error("Error getting table number"));
+  };
+
+  const removeTableNumberModal = () => {
+    tableForm.resetFields();
+    setViewTableNumberModal(false);
+  };
+
   const option = useMemo(() => {
     return selectedOption;
   }, [selectedOption]);
 
   useEffect(() => {
     setSpinLoading(true);
+    getTakenTableNumber();
     const sortedData = [...allOrders].map((order: IOrderApi) => {
       return {
         ...order,
@@ -141,44 +168,85 @@ const AllOrdersPage = ({ allOrders, getList }: IAllOrdersPageProps) => {
                 buttonType={EButtonType.CREATE}
                 aria-label="create order"
                 iconFt={faPlusCircle}
-                onClick={() => router.push("/orders/create")}
+                onClick={() => setViewTableNumberModal(true)}
               >
                 {t("index.orderButton")}
               </RediIconButton>
             </Col>
           </RowSpaceBetween>
-          {haveOrders ? (<>
-          <Table
-            loading={spinLoading}
-            rowKey="id"
-            columns={columns}
-            dataSource={filteredOrders}
-            pagination={false}
-            expandable={{
-              expandedRowRender: (record: IOrderApi<IFoodOrder[]>) => {
-                return (
-                  <RowSpaceAround>
-                    {record.orderItems.map(({ id, itemName, itemQuantity }) => {
-                      return (
-                        <Col span={6} key={id} style={{ color: BACKGROUND_COLOR }}>
-                          <b>
-                            <Space>
-                              <FontAwesomeIcon icon={faUtensils} />
-                              {itemName}
-                            </Space>
-                          </b>{" "}
-                          (<em>{itemQuantity}</em>)
-                        </Col>
-                      );
-                    })}
-                  </RowSpaceAround>
-                );
-              },
-            }}
-          />
-          </>): (<>
-          <Alert type='info' style={{width: '100%', textAlign: 'center'}} showIcon message='No orders found'/></>)}
+          {haveOrders ? (
+            <>
+              <Table
+                loading={spinLoading}
+                rowKey="id"
+                columns={columns}
+                dataSource={filteredOrders}
+                pagination={false}
+                expandable={{
+                  expandedRowRender: (record: IOrderApi<IFoodOrder[]>) => {
+                    return (
+                      <RowSpaceAround>
+                        {record.orderItems.map(({ id, itemName, itemQuantity }) => {
+                          return (
+                            <Col span={6} key={id} style={{ color: BACKGROUND_COLOR }}>
+                              <b>
+                                <Space>
+                                  <FontAwesomeIcon icon={faUtensils} />
+                                  {itemName}
+                                </Space>
+                              </b>{" "}
+                              (<em>{itemQuantity}</em>)
+                            </Col>
+                          );
+                        })}
+                      </RowSpaceAround>
+                    );
+                  },
+                }}
+              />
+            </>
+          ) : (
+            <>
+              <Alert type="info" style={{ width: "100%", textAlign: "center" }} showIcon message="No orders found" />
+            </>
+          )}
         </AnimToTop>
+        <Modal open={viewTableNumberModal} footer={false} onCancel={() => removeTableNumberModal()} centered>
+          <Form form={tableForm} onFinish={() => router.push(`/orders/create/${tableValue}`)}>
+            <RowSpaceBetween style={{ width: "100%" }}>
+              <Col span={12}>
+                <LabelFormBlack>Table no</LabelFormBlack>
+              </Col>
+              <Col span={12}>
+                <Form.Item
+                  style={{ margin: 0, padding: 0 }}
+                  name="tableNumber"
+                  rules={[
+                    { required: true, message: "Please input table number" },
+                    {
+                      pattern: /^\d+$/,
+                      message: "Please input only number",
+                    },
+                    () => ({
+                      validator(_, value) {
+                        const tableNumberIsAlreadyTaken = value && tableTakenList.includes(Number(value));
+                        if (tableNumberIsAlreadyTaken) return Promise.reject(new Error("Table number already taken"));
+                        return Promise.resolve();
+                      },
+                    }),
+                  ]}
+                >
+                  <InputNumber />
+                </Form.Item>
+              </Col>
+            </RowSpaceBetween>
+            <RowCenterSp style={{ marginTop: "1rem" }}>
+              <RediIconButton buttonType={EButtonType.CREATE} iconFt={faPlusCircle} onClick={() => tableForm.submit()}>
+                {t("buttons.create")}
+              </RediIconButton>
+            </RowCenterSp>
+          </Form>
+        </Modal>
       </main>
     </>
   );

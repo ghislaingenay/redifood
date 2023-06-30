@@ -1,7 +1,7 @@
 import { Col } from "antd";
 import { useTranslation } from "next-i18next";
 import { useContext } from "react";
-import { IFoodApi, IOrderApi } from "../../../redifood-module/src/interfaces";
+import { IFoodApi } from "../../../redifood-module/src/interfaces";
 import { BACKGROUND_COLOR, GREY, ORANGE_DARK } from "../../constants";
 import AppContext from "../../contexts/app.context";
 import { hexToRgba } from "../../functions/global.fn";
@@ -10,14 +10,15 @@ import { CenteredP, CenteredTitle } from "../../styles";
 import { RowSpaceAround } from "../styling/grid.styled";
 
 interface ISummaryTable {
-  order: IOrderApi;
+  orderTotal: number;
+  foodList: IFoodApi[];
   xSize?: number;
   sSize?: number;
   mSize?: number;
   lSize?: number;
 }
 
-const SummaryTable = ({ order, xSize, sSize, mSize, lSize }: ISummaryTable) => {
+const SummaryTable = ({ orderTotal, xSize, sSize, mSize, lSize, foodList }: ISummaryTable) => {
   const noMP = { margin: 0, padding: 0 };
   const { t } = useTranslation("common");
   const {
@@ -34,7 +35,6 @@ const SummaryTable = ({ order, xSize, sSize, mSize, lSize }: ISummaryTable) => {
     { key: t("orders.summary-table.price"), label: "PRICE" },
     { key: t("orders.summary-table.total"), label: "TOTAL" },
   ];
-  const { orderItems, orderTotal } = order;
   const sizeProps = { lg: lgValue, xs: xsValue, sm: sValue, md: mdValue };
   return (
     <div role="table" style={{ width: "100%", margin: "2rem 0" }}>
@@ -55,7 +55,7 @@ const SummaryTable = ({ order, xSize, sSize, mSize, lSize }: ISummaryTable) => {
         </RowSpaceAround>
       </div>
       <div role="rowgroup">
-        {orderItems.map((food: IFoodApi, index: number) => {
+        {foodList.map((food, index: number) => {
           const indexEven = index % 2 === 0 ? hexToRgba(ORANGE_DARK, 0.3) : hexToRgba(ORANGE_DARK, 0.5);
           return (
             <RowSpaceAround

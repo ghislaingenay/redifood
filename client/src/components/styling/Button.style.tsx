@@ -13,29 +13,17 @@ interface IRediButtonProps extends ButtonProps {
 export const RediButton = ({ buttonType, children, ...props }: IRediButtonProps) => {
   const handleButtonColor = (buttonColor: IRediButtonProps["buttonType"]) => {
     const basicStyling = { margin: 0 };
-    switch (buttonColor) {
-      case EButtonType.CREATE: {
-        return { ...basicStyling, backgroundColor: BLUE };
-      }
-      case EButtonType.DISPLAY: {
-        return { ...basicStyling, backgroundColor: ORANGE };
-      }
-      case EButtonType.EDIT: {
-        return { ...basicStyling, backgroundColor: PURPLE };
-      }
-      case EButtonType.ERROR: {
-        return { ...basicStyling, backgroundColor: RED };
-      }
-      case EButtonType.SUCCESS: {
-        return { ...basicStyling, backgroundColor: GREEN_A };
-      }
-      case EButtonType.INFO: {
-        return { ...basicStyling, backgroundColor: GREY };
-      }
-      case EButtonType.NONE: {
-        return { ...basicStyling };
-      }
-    }
+
+    const colorDictionary: Record<EButtonType, Record<string, string>> = {
+      [EButtonType.CREATE]: { backgroundColor: BLUE },
+      [EButtonType.DISPLAY]: { backgroundColor: ORANGE },
+      [EButtonType.EDIT]: { backgroundColor: PURPLE },
+      [EButtonType.ERROR]: { backgroundColor: RED },
+      [EButtonType.SUCCESS]: { backgroundColor: GREEN_A },
+      [EButtonType.INFO]: { backgroundColor: GREY },
+      [EButtonType.NONE]: {},
+    };
+    return { ...basicStyling, ...colorDictionary[buttonColor] };
   };
 
   return (
