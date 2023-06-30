@@ -7,18 +7,15 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: caching
+      - name: Caching
         uses: actions/cache@v3
         with:
           path: |
             ~/.npm
             ${{ github.workspace }}/.next/cache
-            paths:
-              - ./node_modules
-              - ./.next/cache
-            key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.[jt]s', '**/*.[jt]sx') }}
-            restore-keys: |
-              ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.[jt]s', '**/*.[jt]sx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
       - name: Checkout 
         uses: actions/checkout@v3
         with:
@@ -26,4 +23,5 @@ jobs:
       - name: Install dependencies
         run: npm install
       #- run: cd client && npm ci --ignore-scripts && npm run test:ci
-      - run: cd client && npm run build
+      - name: Build
+        run: cd client && npm run build
