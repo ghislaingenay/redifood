@@ -1,49 +1,62 @@
 import { Alert, Col, DatePicker, Form, Pagination, Spin } from "antd";
+import dayjs from "dayjs";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Case, Default, Switch } from "react-if";
-import { IGetHistoryOrders, IOrderApi, IPagination } from "../redifood-module/src/interfaces";
+import { Case, Default, Else, If, Switch, Then } from "react-if";
+import { IGetHistoryOrders, IOrderApi, IPagination, TGetHistoryParams } from "../redifood-module/src/interfaces";
 import OrderHistoryCard from "../src/components/food-order/OrderHistoryCard";
 import { RowCenter } from "../src/components/styling/grid.styled";
+import { DATE_FORMAT_WITHOUT_TIME } from "../src/constants";
 import { NotificationRes } from "../src/definitions/notification.class";
 import { AnimToTop } from "../src/styles/animations/global.anim";
 import { AxiosFunction } from "./api/axios-request";
-import buildClient from "./api/build-client";
 import { buildLanguage } from "./api/build-language";
 // import useRequest from "./api/useRequest";
 
-type THistoryProps = IGetHistoryOrders;
-
-const History = ({ orders, meta }: THistoryProps) => {
+const History = ({}) => {
   const { t } = useTranslation("common");
   const [form] = Form.useForm();
-  const [params, setParams] = useState({ startDate: undefined, endDate: undefined });
+  const PAGE_SIZE_OPTIONS = ["10", "20"];
 
-  // const { res, doRequest, loading } = useRequest<IOrder[]>({
-  //   url: "/api/orders/paid",
-  const [pagination, setPagination] = useState<IPagination>(meta);
+  const [params, setParams] = useState<TGetHistoryParams>({
+    startDate: undefined,
+    endDate: undefined,
+    results: 20,
+    page: 1,
+  });
+
+  const [pagination, setPagination] = useState<IPagination>({
+    page: 1,
+    results: 20,
+    total: 0,
+    pages: 1,
+  });
   const [pageSize, setPageSize] = useState(20);
-
-  const [allOrders, setAllOrders] = useState<IOrderApi<string>[]>(orders || []);
+  const [allOrders, setAllOrders] = useState<IOrderApi<string>[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const haveOrders = allOrders.length > 0;
+  const haveOrders = allOrders?.length > 0;
   const isFetchWithOrders = haveOrders && !loading;
   const isFetchWithoutOrders = !haveOrders && !loading;
+  const selectedPage = pagination?.page || 1;
+  const totalResults = pagination?.total || 0;
+  const showPagination = totalResults > pageSize;
 
   useEffect(() => {
+    setLoading(true);
     AxiosFunction({
       url: "/api/orders/history",
       method: "get",
-      queryParams: { params },
+      queryParams: { ...params },
       body: {},
     })
-      .then((res: IGetHistoryOrders) => {
-        const { orders, meta } = res;
-        setAllOrders(orders);
-        setPagination(meta);
+      .then((res) => {
+        const { results } = res;
+        const { orders, meta } = results as IGetHistoryOrders;
+        orders && setAllOrders(orders);
+        meta && setPagination(meta);
         setLoading(false);
       })
       .catch(() => {
@@ -52,6 +65,7 @@ const History = ({ orders, meta }: THistoryProps) => {
           description: "Please try again later",
           placement: "topRight",
         });
+        setLoading(false);
       });
   }, [params]);
 
@@ -77,30 +91,25 @@ const History = ({ orders, meta }: THistoryProps) => {
             form={form}
             labelWrap={false}
             layout="horizontal"
-            onValuesChange={(_, all) => {
-              console.log("all", all);
-              const { startDate, endDate } = all;
-              console.log(startDate, endDate);
-              let startingDate: Date | undefined = undefined;
-              let endingDate: Date | undefined = undefined;
-              if (startDate) {
-                startingDate = startDate["$d"];
-              }
-              if (endDate) {
-                endingDate = endDate["$d"];
-              }
-              setParams(() => Object.assign({ params }, { startDate: startingDate, endDate: endingDate } as any));
-            }}
+            onValuesChange={(_, all) => setParams({ ...params, ...all })}
           >
             <RowCenter style={{ margin: 0, height: "100%", padding: 0 }}>
               <Col span={11} style={{ margin: 0, height: "100%", padding: 0 }}>
-                <Form.Item name="startDate" label={t("history.form-label.from")}>
-                  <DatePicker picker="date" />
+                <Form.Item
+                  name="startDate"
+                  label={t("history.form-label.from")}
+                  getValueFromEvent={(onChange) => dayjs(onChange).format(DATE_FORMAT_WITHOUT_TIME)}
+                >
+                  <DatePicker picker="date" showNow />
                 </Form.Item>
               </Col>
               <Col span={11} style={{ margin: 0, height: "100%", padding: 0 }}>
-                <Form.Item name="endDate" label={t("history.form-label.to")}>
-                  <DatePicker picker="date" />
+                <Form.Item
+                  name="endDate"
+                  label={t("history.form-label.to")}
+                  getValueFromEvent={(onChange) => dayjs(onChange).format(DATE_FORMAT_WITHOUT_TIME)}
+                >
+                  <DatePicker picker="date" showNow />
                 </Form.Item>
               </Col>
             </RowCenter>
@@ -113,7 +122,7 @@ const History = ({ orders, meta }: THistoryProps) => {
               <Alert message={t("history.alert-no-orders")} type="info" />
             </Case>
             <Case condition={isFetchWithOrders}>
-              {allOrders.map((order, index: number) => {
+              {allOrders?.map((order, index: number) => {
                 return <OrderHistoryCard key={index} order={order} />;
               })}
             </Case>
@@ -121,13 +130,19 @@ const History = ({ orders, meta }: THistoryProps) => {
               <p>Forget to catch this error</p>
             </Default>
           </Switch>
-          <Pagination
-            onChange={(page, pageSize) => handlePagination(page, pageSize)}
-            pageSize={pageSize}
-            pageSizeOptions={["10", "20"]}
-            current={pagination.page}
-            total={pagination.total}
-          />
+          <If condition={showPagination}>
+            <Then>
+              <Pagination
+                style={{ marginTop: "1rem" }}
+                onChange={(page, pageSize) => handlePagination(page, pageSize)}
+                pageSize={pageSize}
+                pageSizeOptions={PAGE_SIZE_OPTIONS}
+                current={selectedPage}
+                total={totalResults}
+              />
+            </Then>
+            <Else></Else>
+          </If>
         </AnimToTop>
       </main>
     </>
@@ -138,34 +153,10 @@ export default History;
 
 export async function getServerSideProps(appContext: any) {
   const { locale, req } = appContext;
-  const client = buildClient(appContext);
   const getLanguageValue = buildLanguage(locale, req);
-  const url = "/api/orders/history";
-  const res = await client
-    .get(url, { params: { page: 1, results: 20 } })
-    .then(async (res) => {
-      const {
-        data: {
-          results: { orders, meta },
-        },
-      } = res;
-      return {
-        props: {
-          orders,
-          meta,
-          ...(await serverSideTranslations(getLanguageValue, ["common"])),
-        },
-      };
-    })
-    .catch(async () => {
-      return {
-        props: {
-          allOrders: [],
-          getList: [],
-          ...(await serverSideTranslations(getLanguageValue, ["common"])),
-        },
-      };
-    });
-
-  return res;
+  return {
+    props: {
+      ...(await serverSideTranslations(getLanguageValue, ["common"])),
+    },
+  };
 }

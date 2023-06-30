@@ -1,10 +1,12 @@
 import { faList } from "@fortawesome/free-solid-svg-icons";
 import { Col } from "antd";
+import dayjs from "dayjs";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { recoverCookie } from "../../../pages/api/build-language";
 import { IOrderApi } from "../../../redifood-module/src/interfaces";
+import { DATE_FORMAT_WITHOUT_TIME } from "../../constants";
 import useCurrency from "../../hooks/useCurrency.hook";
 import { EButtonType } from "../../interfaces";
 import { CenteredPBold } from "../../styles";
@@ -18,7 +20,7 @@ interface IOrderHistoryCard {
 const OrderHistoryCard = ({ order }: IOrderHistoryCard) => {
   const { t, i18n } = useTranslation("common");
 
-  const { orderNo, orderTotal, id } = order;
+  const { orderNo, orderTotal, id, orderFinished } = order;
 
   useEffect(() => {
     i18n.changeLanguage(recoverCookie());
@@ -26,6 +28,8 @@ const OrderHistoryCard = ({ order }: IOrderHistoryCard) => {
 
   const { convertPrice } = useCurrency();
   const router = useRouter();
+
+  const humanReadableDate = dayjs(orderFinished).format(DATE_FORMAT_WITHOUT_TIME);
 
   const colSpan = {
     xs: 24,
@@ -49,7 +53,7 @@ const OrderHistoryCard = ({ order }: IOrderHistoryCard) => {
               </CenteredPBold>
             </Col>
             <Col {...colSpan}>
-              <CenteredPBold>Date: </CenteredPBold>
+              <CenteredPBold>Date: {humanReadableDate} </CenteredPBold>
             </Col>
             <Col {...colSpan}>
               <CenteredPBold>
