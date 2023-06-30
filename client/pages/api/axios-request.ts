@@ -24,19 +24,19 @@ const returnAxiosCall = (data: IAxiosRequest) => {
       return axiosFn.get(url, {
         withCredentials: true,
         // headers,
-        params: { queryParams },
+        params: queryParams,
       });
     case "post":
       return axiosFn.post(url, body, {
         withCredentials: true,
         // headers,
-        params: { queryParams },
+        params: queryParams,
       });
     case "put":
       return axiosFn.put(url, body, {
         withCredentials: true,
         // headers,
-        params: { queryParams },
+        params: queryParams,
       });
     case "delete":
       return axiosFn.delete(url, {
