@@ -1,21 +1,21 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import { AxiosResponse } from "axios";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useEffect } from "react";
-import { IFoodApi } from "../redifood-module/src/interfaces";
+import { IFoodApi, IFoodSectionList } from "../redifood-module/src/interfaces";
 import FoodLayout from "../src/components/food-order/FoodLayout";
 import { useFood } from "../src/contexts/food.context";
-import { EFoodMode, ServerInfo } from "../src/interfaces";
-import { foodSectionArray, mockedFoodData } from "../test/mocks/mockFoodData";
+import { EFoodMode } from "../src/interfaces";
+import buildClient from "./api/build-client";
 import { buildLanguage } from "./api/build-language";
 
 interface IFoodProps {
   foodList: IFoodApi[];
-  foodSection: string[];
-  status: string;
+  foodSection: IFoodSectionList[];
 }
-const FoodPage = ({ foodList, foodSection, status }: IFoodProps) => {
+const FoodPage = ({ foodList, foodSection }: IFoodProps) => {
   const { t } = useTranslation("common");
   const { setFoodOrder } = useFood();
 
@@ -29,45 +29,42 @@ const FoodPage = ({ foodList, foodSection, status }: IFoodProps) => {
         <title>{t("foods.head.title")}</title>
         <meta name="description" content={t("foods.head.description") as string} />
       </Head>
-      <FoodLayout
-        status={status}
-        sectionList={foodSection}
-        foods={foodList}
-        mode={EFoodMode.ALTER}
-        mainTitle={t("foods.title")}
-      />
+      <FoodLayout sectionList={foodSection} foods={foodList} mode={EFoodMode.ALTER} mainTitle={t("foods.title")} />
     </>
   );
 };
 
 export default FoodPage;
 
-export async function getServerSideProps({ locale, req }: ServerInfo) {
+export async function getServerSideProps(appContext: any) {
+  const { locale, req } = appContext;
+  const client = buildClient(appContext);
   const getLanguageValue = buildLanguage(locale, req);
-  return {
-    props: {
-      foodList: mockedFoodData,
-      foodSection: foodSectionArray,
-      status: "success",
-      ...(await serverSideTranslations(getLanguageValue, ["common"])),
-    },
-  };
-
-  // const url = "/api/foods/all";
-  // await axios
-  //   .get(url })
-  //   .then(async (res) => {
-  //     const {
-  //       data: { results: {foodList, foodSectionList} },
-  //     } = res;
-  //     return {
-  //       props: { foodList: foodList, foodSectionList: foodSectionList, status: "success", ...(await serverSideTranslations(getLanguageValue, ["common"])) },
-  //     };
-  //   })
-  //   .catch((err) => {
-  //     console.log("erre", err);
-  //   });
-  // return {
-  //   props: { foodList: [], foodSectionList: [], status: "error", ...(await serverSideTranslations(getLanguageValue, ["common"])) },
-  // };
+  const url = "/api/foods/all";
+  const res: any = await client
+    .get(url)
+    .then(async (res) => {
+      const {
+        data: {
+          results: { foodResults, sectionList },
+        },
+      } = res as AxiosResponse<{ results: { foodResults: IFoodApi[]; sectionList: IFoodSectionList[] } }>;
+      return {
+        props: {
+          foodList: foodResults,
+          foodSection: sectionList,
+          ...(await serverSideTranslations(getLanguageValue, ["common"])),
+        },
+      };
+    })
+    .catch(async () => {
+      return {
+        props: {
+          foodList: [],
+          foodSection: [],
+          ...(await serverSideTranslations(getLanguageValue, ["common"])),
+        },
+      };
+    });
+  return res;
 }

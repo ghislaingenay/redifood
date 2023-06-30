@@ -3,25 +3,22 @@ import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useEffect } from "react";
-import { IFoodApi, IFoodSectionList } from "../../redifood-module/src/interfaces";
-import FoodLayout from "../../src/components/food-order/FoodLayout";
-import { useFood } from "../../src/contexts/food.context";
-import { EFoodMode } from "../../src/interfaces/food.interface";
-import buildClient from "../api/build-client";
-import { buildLanguage } from "../api/build-language";
+import { IFoodApi, IFoodSectionList } from "../../../redifood-module/src/interfaces";
+import FoodLayout from "../../../src/components/food-order/FoodLayout";
+import { useFood } from "../../../src/contexts/food.context";
+import { EFoodMode } from "../../../src/interfaces/food.interface";
+import buildClient from "../../api/build-client";
+import { buildLanguage } from "../../api/build-language";
 
 interface ICreateOrderProps {
   foodList: IFoodApi[];
   foodSection: IFoodSectionList[];
-  status: string;
 }
-const CreateOrder = ({ foodList, foodSection, status }: ICreateOrderProps) => {
+const CreateOrder = ({ foodList, foodSection }: ICreateOrderProps) => {
   const { setFoodOrder } = useFood();
   const { t } = useTranslation("common");
 
-  useEffect(() => {
-    setFoodOrder([]);
-  }, []);
+  useEffect(() => setFoodOrder([]), []);
 
   return (
     <>
@@ -31,7 +28,6 @@ const CreateOrder = ({ foodList, foodSection, status }: ICreateOrderProps) => {
       </Head>
       <main>
         <FoodLayout
-          status={status}
           sectionList={foodSection}
           foods={foodList}
           mode={EFoodMode.CREATE}
@@ -51,6 +47,20 @@ export async function getServerSideProps(appContext: any) {
   const url = "/api/foods/all";
   const res: any = await client
     .get(url)
+    .then(async (res) => {
+      const {
+        data: {
+          results: { foodResults, sectionList },
+        },
+      } = res as AxiosResponse<{ results: { foodResults: IFoodApi[]; sectionList: IFoodSectionList[] } }>;
+      return {
+        props: {
+          foodList: foodResults,
+          foodSection: sectionList,
+          ...(await serverSideTranslations(getLanguageValue, ["common"])),
+        },
+      };
+    })
     .catch(async () => {
       return {
         props: {
@@ -60,17 +70,5 @@ export async function getServerSideProps(appContext: any) {
         },
       };
     });
-      const {
-        data: {
-          results: { foodResults, sectionList },
-        },
-      } = res as AxiosResponse<{ results: { foodResults: IFoodApi[], sectionList: IFoodSectionList[] } }>;
-      return {
-        props: {
-          foodList: foodResults,
-          foodSection: sectionList,
-          ...(await serverSideTranslations(getLanguageValue, ["common"])),
-        },
-      };
-    }
-
+  return res;
+}

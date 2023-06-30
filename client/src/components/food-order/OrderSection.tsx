@@ -1,6 +1,7 @@
-import { Alert, Divider, InputNumber, Space, Typography } from "antd";
+import { Divider, Space, Typography } from "antd";
 import { useTranslation } from "next-i18next";
-import { IFoodApi } from "../../../redifood-module/src/interfaces";
+import { Else, If, Then } from "react-if";
+import { IFoodApi, IOrderApi } from "../../../redifood-module/src/interfaces";
 import { ORANGE, RED } from "../../constants";
 import { useFood } from "../../contexts/food.context";
 import { calculateTotal } from "../../functions/order.fn";
@@ -16,23 +17,14 @@ const { Title } = Typography;
 
 interface IOrderSectionProps {
   tableNumber: number | null;
-  setTableNumber: (value: number | null) => void;
   mode: EFoodMode;
-  errorTable: { alreadyInDb: boolean; missingValue: boolean };
   handleSubmit: (foodOrder: IFoodApi[]) => void;
   handleCancel: (url: string) => void;
   loading?: boolean;
+  transaction?: IOrderApi;
 }
 
-const OrderSection = ({
-  tableNumber,
-  setTableNumber,
-  mode,
-  errorTable,
-  handleSubmit,
-  handleCancel,
-  loading
-}: IOrderSectionProps) => {
+const OrderSection = ({ tableNumber, mode, handleSubmit, handleCancel, loading, transaction }: IOrderSectionProps) => {
   const { t } = useTranslation("common");
   const { convertPrice } = useCurrency();
   const { foodOrder } = useFood();
@@ -40,43 +32,32 @@ const OrderSection = ({
   const isVisible = foodOrder.length > 0 ? "visible" : "hidden";
   const isDisabled = foodOrder.length === 0 ? true : false;
 
+  const orderNo: string = transaction?.orderNo || "#NA";
+  const tableNumberValue = isCreateMode ? tableNumber : transaction?.orderTableNumber || 0;
+
   return (
     <>
-      <RowCenter>
+      <Space>
         <Title level={5} aria-label="Table number">
           {t("orders.table-number")}:
         </Title>
-        <InputNumber
-          type="number"
-          value={tableNumber}
-          onChange={(e) => {
-            if (typeof e === "number") {
-              setTableNumber(Number(e));
-            } else {
-              setTableNumber(null);
-            }
-          }}
-          disabled={!isCreateMode ? true : false}
-          name="tableNumber"
-          min={0}
-          aria-label="tableNumber"
-          style={{ height: "50%", top: "0.5rem", marginLeft: "1rem" }}
-          placeholder="Select a table number"
-        />
-        {errorTable.alreadyInDb && <Alert type="error" message={t("orders.error-type.allocated-table")} />}
-        {errorTable.missingValue && <Alert type="error" message={t("orders.error-type.missing-table")} />}
-      </RowCenter>
-      {mode === EFoodMode.EDIT && (
-        <RowCenter>
-          <Title style={{ margin: 0 }} level={5} aria-label="Order #">
-            {t("orders.order")} #
-          </Title>
-        </RowCenter>
-      )}
-      {mode !== EFoodMode.EDIT && <Divider style={{ border: `0.125rem solid ${ORANGE}` }} />}
-      <CenteredTitle level={5} aria-label="Order List">
-        {t("orders.order-list")}
-      </CenteredTitle>
+        <Title level={5}>{tableNumberValue}</Title>
+      </Space>
+      <If condition={isCreateMode}>
+        <Then>
+          <Divider style={{ border: `0.125rem solid ${ORANGE}` }} />
+        </Then>
+        <Else>
+          <RowCenter>
+            <Title style={{ margin: 0 }} level={5} aria-label="Order #">
+              {t("orders.order")} # {orderNo}
+            </Title>
+          </RowCenter>
+        </Else>
+      </If>
+      <Divider dashed style={{ borderColor: "black" }} aria-label="Order List">
+        {t("orders.order-list").toUpperCase()}
+      </Divider>
       <Scroll>
         {foodOrder?.map((food) => (
           <FoodOrderCard key={food.id} food={food} />

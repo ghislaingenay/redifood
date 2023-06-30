@@ -1,6 +1,8 @@
 import { DatabaseError } from '../../redifood-module/src/handling-nestjs/database-error.exception';
 import {
   IExtraApi,
+  IFoodApi,
+  IFoodDB,
   IFoodGetApi,
   IFoodSectionList,
   ISectionFoodApi,
@@ -31,7 +33,9 @@ class Foods {
   };
 
   private static find_foods_query = `SELECT * FROM food as f INNER JOIN food_section fs on fs.id = f.section_id INNER JOIN food_extra fe ON f.extra_id = fe.id`;
-  static async findAll(userId: UserPayload['id']): Promise<IFoodGetApi[]> {
+  static async findAllFormatted(
+    userId: UserPayload['id'],
+  ): Promise<IFoodGetApi[]> {
     const response = (
       await pool.query(`${this.find_foods_query} WHERE f.user_id = $1`, [
         userId,
@@ -46,6 +50,18 @@ class Foods {
       return this.formatFood(item);
     });
     return updatedResponse;
+  }
+
+  static async findAllFoods(userId: UserPayload['id']): Promise<IFoodApi[]> {
+    const response: IFoodDB[] = (
+      await pool.query(`${this.find_foods_query} WHERE f.user_id = $1`, [
+        userId,
+      ])
+    ).rows;
+    if (!response) throw new DatabaseError();
+    return [...response].map((item: any) => {
+      return convertKeys<IFoodDB, IFoodApi>(item, 'dbToApi');
+    });
   }
 
   static async findBySectionId(
@@ -173,6 +189,21 @@ class Foods {
       convertKeys(item, 'dbToApi'),
     );
     return updatedResponseApi;
+  }
+
+  static async getFoodApiByFoodIdArray(
+    foodArray: number[],
+    userId: UserPayload['id'],
+  ): Promise<IFoodApi[]> {
+    const arrayString = `(${foodArray.join(',')})`;
+    const response = await pool.query(
+      `SELECT * FROM food WHERE id IN ${arrayString} AND user_id = $1`,
+      [userId],
+    );
+    const dbResponse: IFoodDB[] = response.rows;
+    return [...dbResponse]?.map((item) => {
+      return convertKeys<IFoodDB, IFoodApi>(item, 'dbToApi');
+    });
   }
 }
 

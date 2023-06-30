@@ -31,6 +31,21 @@ export const RowSpaceBetween = ({ children, ...props }: any) => {
   );
 };
 
+export const RowBetweenSp = ({ children, size, ...props }: any) => {
+  return (
+    <Row {...props} align="middle" justify="space-between">
+      <Space size={size}>{children}</Space>
+    </Row>
+  );
+};
+export const RowAroundSp = ({ children, size, ...props }: any) => {
+  return (
+    <Row {...props} align="middle" justify="space-around">
+      <Space size={size}>{children}</Space>
+    </Row>
+  );
+};
+
 export const CenteredCol = ({ children, ...props }: any) => {
   return (
     <Col {...props} style={{ textAlign: "center" }}>

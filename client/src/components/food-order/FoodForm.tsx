@@ -36,18 +36,18 @@ interface IFoodForm {
 }
 
 interface IFoodFormValues {
-  itemName: string,
-  itemPrice: number,
-  sectionId: EHandleType,
-  extraId: EHandleType,
-  itemPhoto: string,
-  itemDescription?: string,
-  itemQuantity: number,
-  id?: undefined,
+  itemName: string;
+  itemPrice: number;
+  sectionId: EHandleType;
+  extraId: EHandleType;
+  itemPhoto: string;
+  itemDescription?: string;
+  itemQuantity: number;
+  id?: undefined;
 }
 
 type PartialFormFood = Partial<IFoodFormValues>;
-type PartialFood = Partial<IFoodApi>| null
+type PartialFood = Partial<IFoodApi> | null;
 
 enum EHandleType {
   NONE = "NONE",
@@ -107,7 +107,6 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
     itemQuantity: undefined,
     id: undefined,
   };
-
 
   const [handleType, setHandleType] = useState<EHandleType>(EHandleType.NONE);
   const [sortedFood, setSortedFood] = useState<Record<string, string[]>>({});
@@ -370,7 +369,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
           options={foodRadioOptions}
           haveIcon={"true"}
           selectedButton={editMode}
-          setSelectedButton={setEditMode}
+          // setSelectedButton={setEditMode}
           clickedFn={() => {
             setFoodOrder([]);
             form.setFieldsValue({
@@ -486,9 +485,9 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                 >
                   <Option value={EHandleType.NONE}>{t("foods.form-label.select")}</Option>
                   {foodSection &&
-                    foodSection.map((section, index) => (
-                      <Option key={index} value={section}>
-                        {capitalize(section)}
+                    foodSection.map(({ id, sectionName }, index) => (
+                      <Option key={index} value={id}>
+                        {capitalize(sectionName)}
                       </Option>
                     ))}
                   <Option value={EHandleType.ADDSECTION}>{t("foods.form-label.add-section")}</Option>
@@ -657,7 +656,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
               {foodList &&
                 foodList
                   .filter((food) => {
-                    return food.sectionId === delSection as any;
+                    return food.sectionId === (delSection as any);
                   })
                   .map((food: IFoodApi) => {
                     return <p key={food.id}>{food.itemName}</p>;
@@ -671,7 +670,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
               <p>These foods will be deleted</p>
               {foodList &&
                 foodList
-                  .filter((food) => food.extraId === delExtra as any)
+                  .filter((food) => food.extraId === (delExtra as any))
                   .map((food: IFoodApi) => {
                     return <p key={food.id}>{food.itemName}</p>;
                   })}

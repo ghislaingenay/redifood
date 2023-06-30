@@ -170,7 +170,7 @@ const Auth = () => {
                 radioGroupName="auth"
                 haveIcon="true"
                 selectedButton={selectedOption}
-                setSelectedButton={setSelectedOption}
+                clickedFn={(e) => setSelectedOption(e)}
               />
             </RowCenter>
             <Divider style={{ border: "1px solid white" }} />
