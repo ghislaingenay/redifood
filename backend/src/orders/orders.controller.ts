@@ -23,7 +23,7 @@ import GoogleSheetService, {
 } from '../../src/definitions/googlesheet';
 import { AuthGuard } from '../../src/global/auth-guard';
 import { ValidationPipe } from '../../src/global/validation.pipe';
-import { AwaitPaymenDto, CreateOrderDto, UpdateOrderDto } from './orders.dto';
+import { AwaitPaymentDto, CreateOrderDto, UpdateOrderDto } from './orders.dto';
 import { OrdersService } from './orders.service';
 
 @Controller('api/orders')
@@ -113,7 +113,7 @@ export class OrdersController {
     @User() user: UserPayload,
     @Body() data: { paymentType: EPaymentType },
   ) {
-    const body: AwaitPaymenDto = {
+    const body: AwaitPaymentDto = {
       ...data,
       orderId,
       userId: user.id,

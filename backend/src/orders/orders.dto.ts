@@ -26,7 +26,7 @@ export class UpdateOrderDto {
   orderItems: IFoodOrder[];
 }
 
-export class AwaitPaymenDto {
+export class AwaitPaymentDto {
   @IsInt()
   @IsNotEmpty()
   orderId: number;

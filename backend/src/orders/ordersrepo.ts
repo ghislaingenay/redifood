@@ -1,6 +1,8 @@
 import { BadRequestException } from '@nestjs/common';
 import * as moment from 'moment';
+import { roundTwoDecimals } from 'redifood-module/src/global.functions';
 import {
+  EPaymentStatus,
   IFoodApi,
   IFoodGetApi,
   IFoodOrder,
@@ -9,6 +11,7 @@ import {
   IOrderItemsApi,
   IOrderItemsDB,
   IPagination,
+  IPaymentDB,
   TGetHistoryParams,
   TOrderType,
   UserPayload,
@@ -21,6 +24,7 @@ import {
 } from 'src/foods/global.function';
 import { DatabaseError } from '../../redifood-module/src/handling-nestjs/database-error.exception';
 import { pool } from '../pool.pg';
+import { AwaitPaymentDto } from './orders.dto';
 interface IMenuId {
   orderId: number;
   userId: string;
@@ -330,6 +334,26 @@ class Orders {
       results: Number(params.results),
       pages,
       total: count,
+    };
+  }
+
+  static buildDataForPayment(
+    body: AwaitPaymentDto,
+    orderTotal: number,
+    vat: number,
+  ): IPaymentDB {
+    const { orderId, userId, paymentType } = body;
+    return {
+      user_id: userId,
+      order_id: orderId,
+      payment_stripe_id: '',
+      payment_status: EPaymentStatus.COMPLETED, //EPaymentStatus.AWAITING
+      payment_type: paymentType,
+      payment_amount: orderTotal,
+      payment_date: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+      payment_discount_applied: false,
+      payment_discount_id: 0,
+      payment_tax_amount: roundTwoDecimals(orderTotal * (vat / 100)),
     };
   }
 }

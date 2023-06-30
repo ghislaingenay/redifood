@@ -1,14 +1,11 @@
 import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
-import * as moment from 'moment';
 import { BadRequestError } from 'redifood-module/src/errors/bad-request-error';
-import { roundTwoDecimals } from 'redifood-module/src/global.functions';
 import Foods from 'src/foods/foodsrepo';
 import { Setting } from 'src/models/settings.model';
 import Payments from 'src/payments/paymentsrepo';
 import {
   AsyncServer,
   EOrderStatus,
-  EPaymentStatus,
   IFoodOrder,
   IGetEditOrderRes,
   IGetHistoryOrders,
@@ -21,7 +18,7 @@ import {
   TOrderType,
   UserPayload,
 } from '../../redifood-module/src/interfaces';
-import { AwaitPaymenDto, CreateOrderDto, UpdateOrderDto } from './orders.dto';
+import { AwaitPaymentDto, CreateOrderDto, UpdateOrderDto } from './orders.dto';
 import Orders from './ordersrepo';
 
 @Injectable()
@@ -245,28 +242,18 @@ export class OrdersService {
   }
 
   async awaitPayment(
-    body: AwaitPaymenDto,
+    body: AwaitPaymentDto,
   ): Promise<IGetServerSideData<IPaymentDB>> {
-    const { orderId, userId, paymentType } = body;
+    const { orderId, userId } = body;
     const orderData = await Orders.findOne({ orderId, userId });
     const { orderTotal, orderItems } = orderData;
     const settingData = await Setting.findOne({ user: userId });
-    const dataForPayment: IPaymentDB = {
-      user_id: userId,
-      order_id: orderId,
-      payment_stripe_id: '',
-      payment_status: EPaymentStatus.COMPLETED, //EPaymentStatus.AWAITING
-      payment_type: paymentType,
-      payment_amount: orderTotal,
-      payment_date: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
-      payment_discount_applied: false,
-      payment_discount_id: 0,
-      payment_tax_amount: roundTwoDecimals(
-        orderTotal * (settingData.vat / 100),
-      ),
-    };
+    const dataForPayment: IPaymentDB = Orders.buildDataForPayment(
+      body,
+      orderTotal,
+      settingData.vat,
+    );
     const paymentResult = await Payments.createOne(dataForPayment);
-    console.log('pay', paymentResult);
     if (paymentResult.created) {
       try {
         await Orders.validatePayment(orderId); // For now validate the order directly to avoid problems
