@@ -16,8 +16,6 @@ import { AnimToTop } from "../src/styles/animations/global.anim";
 import { AxiosFunction } from "./api/axios-request";
 import { buildLanguage } from "./api/build-language";
 
-type TDateFormat = dayjs.Dayjs | undefined | string;
-
 const History = ({}) => {
   const { t } = useTranslation("common");
   const [form] = Form.useForm();
@@ -82,8 +80,8 @@ const History = ({}) => {
   };
 
   const verifyForm = (dates: { startDate: any; endDate: any }) => {
-    let startingDate: TDateFormat = dates.startDate;
-    let endingDate: TDateFormat = dates.endDate;
+    let startingDate = dates.startDate;
+    let endingDate = dates.endDate;
     if (startingDate) startingDate = dayjs(startingDate).format(DATE_FORMAT_WITHOUT_TIME);
     if (endingDate) endingDate = dayjs(endingDate).format(DATE_FORMAT_WITHOUT_TIME);
     if (moment(startingDate).isAfter(endingDate)) {
