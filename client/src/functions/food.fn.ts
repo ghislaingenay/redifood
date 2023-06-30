@@ -1,4 +1,5 @@
 import { IFoodApi, IFoodOrder, IFoodSectionList } from "../../redifood-module/src/interfaces";
+import { EHandleType } from "../interfaces";
 
 export const convertFoodToSection = (foodList: IFoodApi[], foodSection: IFoodSectionList[]) => {
   let foodObject: Record<string, number[]> = {};
@@ -30,4 +31,16 @@ export const setOptionsSelection = (foodSection: IFoodSectionList[]) => {
     };
   });
   return [...newFoodSection, ...options];
+};
+
+// For FOOD FORM
+export const checkDisability = (sectionValue: EHandleType, extraValue: EHandleType) => {
+  return (
+    sectionValue === EHandleType.NONE ||
+    sectionValue === EHandleType.ADDSECTION ||
+    sectionValue === EHandleType.DELETESECTION ||
+    extraValue === EHandleType.NONE ||
+    extraValue === EHandleType.ADDEXTRA ||
+    extraValue === EHandleType.DELETEEXTRA
+  );
 };

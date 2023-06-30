@@ -8,13 +8,13 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Case, Default, Else, If, Switch, Then } from "react-if";
-import { IFoodApi, IFoodSectionList } from "../../../redifood-module/src/interfaces";
+import { IFoodApi } from "../../../redifood-module/src/interfaces";
 import { GREY, ORANGE_DARK } from "../../constants";
 import { useFood } from "../../contexts/food.context";
-import { convertFoodToSection } from "../../functions/food.fn";
+import { checkDisability, convertFoodToSection } from "../../functions/food.fn";
 import { capitalize } from "../../functions/global.fn";
 import useCurrency from "../../hooks/useCurrency.hook";
-import { EButtonType, IFormInterface } from "../../interfaces";
+import { EButtonType, EHandleType, IFoodForm, IFormInterface, PartialFood, PartialFormFood } from "../../interfaces";
 import { SpacingDiv5X } from "../../styles/styledComponents/div.styled";
 import { RedSpan } from "../../styles/styledComponents/span.styled";
 import {
@@ -30,34 +30,7 @@ import { RediButton, RediIconButton } from "../styling/Button.style";
 import RediRadioButton, { Booleanish } from "../styling/RediRadioButton";
 import { RowCenter, RowCenterSp } from "../styling/grid.styled";
 const { Option } = Select;
-interface IFoodForm {
-  foodSection: IFoodSectionList[];
-  foodList: IFoodApi[];
-}
 
-interface IFoodFormValues {
-  itemName: string;
-  itemPrice: number;
-  sectionId: EHandleType;
-  extraId: EHandleType;
-  itemPhoto: string;
-  itemDescription?: string;
-  itemQuantity: number;
-  id?: undefined;
-}
-
-type PartialFormFood = Partial<IFoodFormValues>;
-type PartialFood = Partial<IFoodApi> | null;
-
-enum EHandleType {
-  NONE = "NONE",
-  CREATE = "CREATE",
-  EDIT = "EDIT",
-  ADDSECTION = "ADDSECTION",
-  DELETESECTION = "DELETESECTION",
-  ADDEXTRA = "ADDEXTRA",
-  DELETEEXTRA = "DELETEEXTRA",
-}
 // const getBase64 = (img: RcFile, callback: (url: string) => void) => {
 //   const reader = new FileReader();
 //   reader.addEventListener("load", () => callback(reader.result as string));
@@ -124,66 +97,6 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
   const [cancelModal, setCancelModal] = useState(false);
 
   const [currentFood, setCurrentFood] = useState<PartialFood>(foodOrder[0]);
-  // const [modifiedFood, setModifiedFood] = useState<PartialFood>(null);
-  // const {
-  //   res: resImage,
-  //   doRequest: doRequestUpload,
-  //   loading: uploading,
-  // } = useRequest<string>({
-  //   url: "/api/upload",
-  //   method: "post",
-  //   body: {
-  //     files,
-  //   },
-  //   queryParams: {},
-  // });
-
-  // const { res: resData, doRequest: refreshData } = useRequest<{foodList: IFoods[], foodSection: string[]}>({
-  //   url: "/api/food/alter",
-  //   method: "post",
-  //   body: { newSection: inputSection },
-  //   queryParams: {},
-  // });
-  // const { res: resAddSection, doRequest: doRequestAddSection } = useRequest<{result: true}>({
-  //   url: "/api/food/add-section",
-  //   method: "post",
-  //   body: { newSection: inputSection },
-  //   queryParams: {},
-  // });
-  // const { res: resDelSection, doRequest: doRequestDelSection } = useRequest<{result: true}>({
-  //   url: "/api/food/add-section",
-  //   method: "post",
-  //   body: { deletedSection: delSection },
-  //   queryParams: {},
-  // });
-  // const { res: resAddExtra, doRequest: doRequestAddExtra } = useRequest<{result: true}>({
-  //   url: "/api/food/add-extra",
-  //   method: "post",
-  //   body: { newExtra: addSection },
-  //   queryParams: {},
-  // });
-  // const { res: resDelExtra, doRequest: doRequestDelExtra } = useRequest<{result: true}>({
-  //   url: "/api/food/delete-extra",
-  //   method: "post",
-  //   body: { deletedExtra: delExtra },
-  //   queryParams: {},
-  // });
-  // const { res: resCreate, doRequest: doRequestCreate} = useRequest<{result: true}>({
-  //   url: "/api/food/create",
-  //   method: "post",
-  //   body: fromData,
-  //   queryParams: {},
-  // });
-
-  const isDisabled =
-    sectionValue === EHandleType.NONE ||
-    sectionValue === EHandleType.ADDSECTION ||
-    sectionValue === EHandleType.DELETESECTION ||
-    extraValue === EHandleType.NONE ||
-    extraValue === EHandleType.ADDEXTRA ||
-    extraValue === EHandleType.DELETEEXTRA
-      ? true
-      : false;
 
   const styleNoM = { margin: 0 };
   const optionsCreateFood = (fn: Function): IFormInterface[] => [
@@ -339,7 +252,6 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
 
   useEffect(() => {
     if (editMode === "true" && foodOrder.length !== 0) {
-      console.log("fdp", foodOrder[0]);
       setCurrentFood(foodOrder[0]);
       form.setFieldsValue({
         itemQuantity: 0,
@@ -611,14 +523,11 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
               <RowCenterSp style={{ marginTop: "1rem" }}>
                 <RediIconButton
                   buttonType={EButtonType.SUCCESS}
-                  disabled={isDisabled}
+                  disabled={checkDisability(sectionValue, extraValue)}
                   iconFt={faFileCircleCheck}
                   onClick={() => {
-                    if (editMode === "true") {
-                      setHandleType(EHandleType.EDIT);
-                    } else {
-                      setHandleType(EHandleType.CREATE);
-                    }
+                    if (editMode === "true") setHandleType(EHandleType.EDIT);
+                    else setHandleType(EHandleType.CREATE);
                     setConfirmModal(true);
                   }}
                 >
@@ -628,11 +537,8 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                   buttonType={EButtonType.ERROR}
                   iconFt={faBan}
                   onClick={() => {
-                    if (checkFood()) {
-                      router.replace("/");
-                    } else {
-                      setCancelModal(true);
-                    }
+                    if (checkFood()) router.replace("/");
+                    else setCancelModal(true);
                   }}
                 >
                   {t("buttons.cancel")}
