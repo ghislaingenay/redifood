@@ -1,11 +1,11 @@
 import { ButtonProps, Col } from "antd";
-import { Dispatch, SetStateAction, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { BACKGROUND_COLOR, LIGHT_GREY, ORANGE_DARK, ORANGE_LIGHT } from "../../constants";
 import { hexToRgba } from "../../functions/global.fn";
 import { RadioButton } from "../../styles";
 import { AnimRadioButton } from "../../styles/animations/styled.anim";
 import { SpanBlockM02Y } from "../../styles/styledComponents/span.styled";
-import { RowSpaceAround } from "./grid.styled";
+import { RowSpaceBetween } from "./grid.styled";
 
 interface IRediRadio {
   value: string;
@@ -28,15 +28,12 @@ export type TIconDataMap = {
 export type Booleanish = "true" | "false";
 
 interface IRediRadioButtonProps<T extends Booleanish> extends ButtonProps {
-  // radioSize: "small" | "middle" | "large";
-  // widthButton: string | number;
   radioGroupName: string;
   options: TIconDataMap[T];
   haveIcon: T;
   selectedButton: any;
-  setSelectedButton: Dispatch<SetStateAction<any>>;
   disabled?: boolean;
-  clickedFn?: () => void;
+  clickedFn?: (element?: any) => void;
   padding?: string;
   fontSize?: string;
 }
@@ -46,43 +43,27 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
     options,
     haveIcon,
     selectedButton,
-    setSelectedButton,
     radioGroupName,
     clickedFn,
     padding,
     fontSize,
   }: IRediRadioButtonProps<Booleanish> = props;
 
-  const isSelected = (radioValue: string) => {
-    return selectedButton === radioValue;
-  };
+  const [selectedValue, setSelectedValue] = useState(options[0].value)
+  useEffect(() => setSelectedValue(selectedButton), [selectedButton])
 
-  // const isSelected = useCallback(
-  //   (radioValue: string) => {
-  //     return selectedButton === radioValue;
-  //   },
-  //   [selectedButton],
-  // );
+
+  const isSelected = (radioValue: string | number) => selectedValue === radioValue;
 
   const spanValue = (options: IRediRadio[] | IRediRadioWithIcon[]) => {
     switch (options.length) {
-      case 2: {
-        return 11;
-      }
-      case 3: {
-        return 7;
-      }
-      default: {
-        return 5;
-      }
+      case 2: return 11;
+      case 3: return 7;
+      default: return 5; 
     }
   };
 
-  const selectedValue = useMemo(() => {
-    return selectedButton;
-  }, [selectedButton]);
-
-  const colorStyle = (currentButton: string) => {
+  const colorStyle = (currentButton: string | number) => { 
     return {
       fontSize: fontSize || "1.5rem",
       padding: padding || "1rem 3rem",
@@ -94,12 +75,13 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
       boxShadow: isSelected(currentButton)
         ? `0px 0px 10px 2px ${hexToRgba(ORANGE_LIGHT, 0.25)}`
         : `inset 0 0 10px  ${hexToRgba(BACKGROUND_COLOR, 0.2)}`,
-    };
+    }
   };
 
   return (
-    <RowSpaceAround>
-      {options.map(({ label, value, icon, ariaLabel }: any, index: number) => (
+    <RowSpaceBetween style={{ width: "100%" }}>
+      {options.map(({ label, value, icon, ariaLabel }: any, index: number) => {
+        return (
         <>
           <Col
             xs={24}
@@ -109,13 +91,8 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
             key={index}
             onClick={(e) => {
               const target = e.target as HTMLButtonElement;
-              if (!target) {
-                console.log("ente");
-                return setSelectedButton(selectedValue);
-              }
-              if (clickedFn) clickedFn();
-
-              return setSelectedButton(target.value as any);
+              if (!target) throw new Error('Error while selecting an option')
+              clickedFn && clickedFn(target.value);
             }}
           >
             <AnimRadioButton>
@@ -125,7 +102,6 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
                 role="radio"
                 name={radioGroupName}
                 value={value}
-                // aria-checked={isSelected(value)}
                 aria-checked={isSelected(value)}
               >
                 {haveIcon === "true" && <SpanBlockM02Y>{icon}</SpanBlockM02Y>}
@@ -133,10 +109,10 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
               </RadioButton>
             </AnimRadioButton>
           </Col>
-        </>
-      ))}
-    </RowSpaceAround>
-  );
+        </>)
+    })}
+    </RowSpaceBetween>)
 };
+
 
 export default RediRadioButton;

@@ -1,34 +1,53 @@
-import { faCartShopping, faCashRegister, faCreditCard, faReceipt } from "@fortawesome/free-solid-svg-icons";
+import { faCartShopping, faCashRegister, faCreditCard } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Alert, Space } from "antd";
+import moment from "moment";
 import { useState } from "react";
 
+import { AxiosResponse } from "axios";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
+import { EOrderStatus, EPaymentType, IGetOneOrder, IGetServerSideData } from "../../redifood-module/src/interfaces";
 import SummaryTable from "../../src/components/food-order/SummaryTable";
 import { RediIconButton } from "../../src/components/styling/Button.style";
-import { CenteredCol, RowSpaceBetween } from "../../src/components/styling/grid.styled";
 import RediRadioButton from "../../src/components/styling/RediRadioButton";
+import { CenteredCol, RowSpaceBetween } from "../../src/components/styling/grid.styled";
 import { RED } from "../../src/constants";
 import { hexToRgba } from "../../src/functions/global.fn";
-import { EButtonType, ServerInfo } from "../../src/interfaces";
+import { recoverQuantityFromOrderItems } from "../../src/functions/order.fn";
+import { EButtonType } from "../../src/interfaces";
 import { LGCard } from "../../src/styles";
 import { AnimToTop } from "../../src/styles/animations/global.anim";
 import { SpacingDiv5X } from "../../src/styles/styledComponents/div.styled";
-import { mockOneOrder } from "../../test/mocks/mockOrdersData";
+import buildClient from "../api/build-client";
 import { buildLanguage } from "../api/build-language";
-import { EPaymentType } from "../../redifood-module/src/interfaces";
 
-const CurrentOrder = ({ currentOrder, status }: any) => {
+interface ICurrentOrderProps {
+  currentOrder: IGetOneOrder["currentOrder"];
+  foodList: IGetOneOrder["foodList"];
+}
+
+const CurrentOrder = ({ currentOrder, foodList }: ICurrentOrderProps) => {
   const { t } = useTranslation("common");
   const router = useRouter();
-  console.log(status);
-  const { orderDate, orderId, tableNumber, orderStatus } = currentOrder;
+  const { orderCreatedDate, orderNo, orderTableNumber, orderStatus, id, orderFinished, orderTotal } = currentOrder;
+  console.log({ orderFinished, orderCreatedDate, orderStatus });
+  const COL_ID_SPAN = { xs: 12, sm: 12, md: 8, lg: 8 };
+
+  console.log({ foodList });
+
   const [paymentChoice, setPaymentChoice] = useState<EPaymentType | null>(null);
 
+  const isOrderCompleted = orderStatus === EOrderStatus.COMPLETE;
+  const appliedDate = moment(orderFinished || orderCreatedDate).format("DD/MM/YYYY HH:mm");
+
   const isDisabled = paymentChoice === null ? true : false;
+  const alertMessage = isOrderCompleted ? t("orders.paid") : t("orders.not-paid");
+  const messageType = isOrderCompleted ? "success" : "error";
+  const colorAlert = !isOrderCompleted && hexToRgba(RED, 0.7);
+
   const radioPaymentOptions = [
     {
       label: EPaymentType.CASH,
@@ -44,34 +63,30 @@ const CurrentOrder = ({ currentOrder, status }: any) => {
     },
   ];
 
-  const alertMessage = orderStatus === "COMPLETE" ? t("orders.paid") : t("orders.not-paid");
-  const messageType = orderStatus === "COMPLETE" ? "success" : "error";
-  const colorAlert = orderStatus !== "COMPLETE" && hexToRgba(RED, 0.7);
+  const changePaymentChoice = (e: EPaymentType) => setPaymentChoice(e);
 
-  const colIdSpan = { xs: 12, sm: 12, md: 8, lg: 8 };
   return (
     <>
       <Head>
         <title>{t("orders.head-view.title")}</title>
         <meta name="description" content={t("orders.head-view.description") as string} />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
       <body>
         <AnimToTop>
           <SpacingDiv5X>
             <LGCard style={{ padding: "0 1rem" }}>
               <RowSpaceBetween>
-                <CenteredCol {...colIdSpan}>
+                <CenteredCol {...COL_ID_SPAN}>
                   <b>{t("glossary.order")} #</b>
-                  {orderId}
+                  {orderNo}
                 </CenteredCol>
-                <CenteredCol {...colIdSpan}>
-                  <b aria-label="Table number">{t("glossary.table")}</b> {tableNumber}
+                <CenteredCol {...COL_ID_SPAN}>
+                  <b aria-label="Table number">{t("glossary.table")}</b> {orderTableNumber}
                 </CenteredCol>
-                <CenteredCol {...colIdSpan}>
-                  <b>{t("glossary.date")}</b> {orderDate}
+                <CenteredCol {...COL_ID_SPAN}>
+                  <b>{t("glossary.date")}</b> {appliedDate}
                 </CenteredCol>
-                <CenteredCol {...colIdSpan}>
+                <CenteredCol {...COL_ID_SPAN}>
                   <Alert
                     type={messageType}
                     message={alertMessage}
@@ -80,8 +95,8 @@ const CurrentOrder = ({ currentOrder, status }: any) => {
                 </CenteredCol>
               </RowSpaceBetween>
             </LGCard>
-            <SummaryTable order={currentOrder} />
-            {orderStatus !== "COMPLETE" && (
+            <SummaryTable orderTotal={orderTotal} foodList={foodList} />
+            {orderStatus !== EOrderStatus.COMPLETE && (
               <>
                 <RediRadioButton
                   radioGroupName="payment"
@@ -89,12 +104,12 @@ const CurrentOrder = ({ currentOrder, status }: any) => {
                   fontSize="1rem"
                   options={radioPaymentOptions}
                   haveIcon="true"
-                  setSelectedButton={setPaymentChoice}
+                  clickedFn={changePaymentChoice}
                   selectedButton={paymentChoice}
                 />
                 <Space>
                   <RediIconButton
-                    onClick={() => router.push(`/orders/${orderId}/payment/${paymentChoice}`)}
+                    onClick={() => router.push(`/orders/${id}/payment/${paymentChoice}`)}
                     iconFt={faCartShopping}
                     disabled={isDisabled}
                     buttonType={EButtonType.SUCCESS}
@@ -105,7 +120,7 @@ const CurrentOrder = ({ currentOrder, status }: any) => {
                 </Space>
               </>
             )}
-            {orderStatus === "COMPLETE" && (
+            {/* {orderStatus === EOrderStatus.COMPLETE && (
               <RediIconButton
                 // onClick={() => router.push(`/orders/${orderId}/payment/${paymentChoice}`)}
                 iconFt={faReceipt}
@@ -114,7 +129,7 @@ const CurrentOrder = ({ currentOrder, status }: any) => {
               >
                 {t("buttons.receipt")}
               </RediIconButton>
-            )}
+            )} */}
           </SpacingDiv5X>
         </AnimToTop>
       </body>
@@ -123,32 +138,38 @@ const CurrentOrder = ({ currentOrder, status }: any) => {
 };
 export default CurrentOrder;
 
-export async function getServerSideProps({ locale, req }: ServerInfo) {
+export async function getServerSideProps(appContext: any) {
+  const { locale, req } = appContext;
   const getLanguageValue = buildLanguage(locale, req);
-  // context: any
-  // const id: string = context.query["id"];
-  return {
-    props: {
-      currentOrder: mockOneOrder,
-      status: "success",
-      ...(await serverSideTranslations(getLanguageValue, ["common"])),
-    },
-  };
-  // const url = "/api/orders/:id/info";
-  // await axios
-  //   .get(url)
-  //   .then(async (res) => {
-  //     const {
-  //       data: { results: {currentOrder} },
-  //     } = res;
-  //     return {
-  //       props: {  currentOrder: currentOrder,  status: "success", ...(await serverSideTranslations(getLanguageValue, ["common"])) },
-  //     };
-  //   })
-  //   .catch((err) => {
-  //     console.log("erre", err);
-  //   });
-  // return {
-  //   props: {  currentOrder: [],status: "error", ...(await serverSideTranslations(getLanguageValue, ["common"])) },
-  // };
+  const client = buildClient(appContext);
+  const id: string = appContext.query["id"];
+  const url = `/api/orders/${id}`;
+  const response = await client
+    .get(url)
+    .then(async (res: AxiosResponse<IGetServerSideData<IGetOneOrder>>) => {
+      const {
+        data: { results },
+      } = res;
+      const { currentOrder, foodList: allFoods } = results as IGetOneOrder;
+      const orderItems = currentOrder.orderItems;
+      const updatedFoods = recoverQuantityFromOrderItems(orderItems, [...allFoods]);
+      return {
+        props: {
+          currentOrder,
+          foodList: updatedFoods,
+          ...(await serverSideTranslations(getLanguageValue, ["common"])),
+        },
+      };
+    })
+    .catch(async () => {
+      return {
+        props: {
+          currentOrder: [],
+          foodList: [],
+          ...(await serverSideTranslations(getLanguageValue, ["common"])),
+        },
+      };
+    });
+
+  return response;
 }

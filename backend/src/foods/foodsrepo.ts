@@ -1,7 +1,10 @@
 import { DatabaseError } from '../../redifood-module/src/handling-nestjs/database-error.exception';
 import {
   IExtraApi,
+  IFoodApi,
+  IFoodDB,
   IFoodGetApi,
+  IFoodSectionList,
   ISectionFoodApi,
   UserPayload,
 } from '../../redifood-module/src/interfaces';
@@ -29,10 +32,14 @@ class Foods {
     };
   };
 
-  private static find_foods_query = `SELECT * FROM foods as f INNER JOIN food_section ON food_section.id = f.section_id INNER JOIN food_extra ON f.extra_id = food_extra.id`;
-  static async findAll(userId: UserPayload['id']): Promise<IFoodGetApi[]> {
+  private static find_foods_query = `SELECT * FROM food as f INNER JOIN food_section fs on fs.id = f.section_id INNER JOIN food_extra fe ON f.extra_id = fe.id`;
+  static async findAllFormatted(
+    userId: UserPayload['id'],
+  ): Promise<IFoodGetApi[]> {
     const response = (
-      await pool.query(`${this.find_foods_query} WHERE user_id = $1`, [userId])
+      await pool.query(`${this.find_foods_query} WHERE f.user_id = $1`, [
+        userId,
+      ])
     ).rows;
 
     if (!response) {
@@ -45,13 +52,25 @@ class Foods {
     return updatedResponse;
   }
 
+  static async findAllFoods(userId: UserPayload['id']): Promise<IFoodApi[]> {
+    const response: IFoodDB[] = (
+      await pool.query(`${this.find_foods_query} WHERE f.user_id = $1`, [
+        userId,
+      ])
+    ).rows;
+    if (!response) throw new DatabaseError();
+    return [...response].map((item: any) => {
+      return convertKeys<IFoodDB, IFoodApi>(item, 'dbToApi');
+    });
+  }
+
   static async findBySectionId(
     id: number,
     userId: UserPayload['id'],
   ): Promise<IFoodGetApi[]> {
     const response = (
       await pool.query(
-        `${this.find_foods_query} WHERE f.section_id = $1 AND user_id = $2`,
+        `${this.find_foods_query} WHERE f.section_id = $1 AND f.user_id = $2`,
         [id, userId],
       )
     ).rows;
@@ -71,17 +90,26 @@ class Foods {
     return query;
   }
 
-  static async getSectionList(userId: UserPayload['id']) {
-    const response = await pool.query(
-      `SELECT * FROM food_extra INNER JOIN food_section ON food_section.id = food.extra.section_id AND user_id = $1`,
-      [userId],
-    );
-    return response;
+  static async getSectionList(
+    userId: UserPayload['id'],
+  ): Promise<IFoodSectionList[]> {
+    const response: { section_name: string; id: number }[] = (
+      await pool.query(
+        `SELECT section_name, id FROM food_section fs WHERE fs.user_id = $1`,
+        [userId],
+      )
+    ).rows;
+    return response.map((item) => {
+      return {
+        sectionName: item.section_name,
+        id: item.id,
+      } as IFoodSectionList;
+    });
   }
 
   static async deleteExtra(id: number) {
     try {
-      await pool.query(`DELETE FROM foods WHERE extra_id = $1`, [id]);
+      await pool.query(`DELETE FROM food WHERE extra_id = $1`, [id]);
       await pool.query(`DELETE FROM food_extra WHERE id = $1`, [id]);
       return { deleted: true };
     } catch (error) {
@@ -91,7 +119,7 @@ class Foods {
 
   static async deleteSection(id: number) {
     try {
-      await pool.query(`DELETE FROM foods WHERE section_id = $1`, [id]);
+      await pool.query(`DELETE FROM food WHERE section_id = $1`, [id]);
       await pool.query(`DELETE FROM food_extra WHERE section_id = $1`, [id]);
       await pool.query(`DELETE FROM food_section WHERE id = $1`, [id]);
       return { deleted: true };
@@ -102,7 +130,7 @@ class Foods {
 
   static async deleteFood(id: number) {
     try {
-      await pool.query(`DELETE FROM foods WHERE id = $1`, [id]);
+      await pool.query(`DELETE FROM food WHERE id = $1`, [id]);
       return { deleted: true };
     } catch (err) {
       throw new DatabaseError();
@@ -130,9 +158,7 @@ class Foods {
   }
   static async countFoods(userId: UserPayload['id']): Promise<number> {
     const res = (
-      await pool.query(`SELECT COUNT(*) FROM foods  WHERE user_id = $1`, [
-        userId,
-      ])
+      await pool.query(`SELECT COUNT(*) FROM food WHERE user_id = $1`, [userId])
     ).rows[0].count;
     if (!res) throw new DatabaseError();
     return Number(res);
@@ -163,6 +189,21 @@ class Foods {
       convertKeys(item, 'dbToApi'),
     );
     return updatedResponseApi;
+  }
+
+  static async getFoodApiByFoodIdArray(
+    foodArray: number[],
+    userId: UserPayload['id'],
+  ): Promise<IFoodApi[]> {
+    const arrayString = `(${foodArray.join(',')})`;
+    const response = await pool.query(
+      `SELECT * FROM food WHERE id IN ${arrayString} AND user_id = $1`,
+      [userId],
+    );
+    const dbResponse: IFoodDB[] = response.rows;
+    return [...dbResponse]?.map((item) => {
+      return convertKeys<IFoodDB, IFoodApi>(item, 'dbToApi');
+    });
   }
 }
 

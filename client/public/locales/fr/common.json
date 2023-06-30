@@ -69,6 +69,8 @@
   },
 
   "auth": {
+    "first-name": "Prénom",
+    "last-name": "Nom de famille",
     "email": "Email",
     "signin": "SE CONNECTER",
     "register": "S'INSCRIRE",

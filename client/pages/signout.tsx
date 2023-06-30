@@ -1,5 +1,6 @@
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import Loading from "../src/components/Loading";
 import { NotificationRes } from "../src/definitions/notification.class";
 import { AxiosFunction } from "./api/axios-request";
 
@@ -39,10 +40,9 @@ const SignOut = () => {
   };
   useEffect(() => {
     logOut();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return <div>Signing you out ...</div>;
+  return <Loading />;
 };
 
 export default SignOut;

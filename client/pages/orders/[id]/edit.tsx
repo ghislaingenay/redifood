@@ -2,38 +2,23 @@ import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useEffect } from "react";
+import { IGetEditOrderRes } from "../../../redifood-module/src/interfaces";
 import FoodLayout from "../../../src/components/food-order/FoodLayout";
 import { useFood } from "../../../src/contexts/food.context";
-import { NotificationRes } from "../../../src/definitions/notification.class";
-import { EFoodMode, IFood, ServerInfo } from "../../../src/interfaces";
-import { foodSectionArray, mockedFoodData, mockOrderEdit } from "../../../test/mocks/mockFoodData";
+import { EFoodMode } from "../../../src/interfaces";
+import buildClient from "../../api/build-client";
 import { buildLanguage } from "../../api/build-language";
 
-interface IEditOrderProps {
-  foodList: IFood[];
-  currentFoodOrder: IFood[];
-  foodSection: string[];
-  status: string;
-}
+type IEditOrderProps = IGetEditOrderRes;
 
-const EditOrder = ({ foodList, currentFoodOrder, foodSection, status }: IEditOrderProps) => {
+const EditOrder = ({ foodList, orderItems, foodSection, order }: IEditOrderProps) => {
   const { setFoodOrder } = useFood();
   const { t } = useTranslation("common");
-  const editOrder = (foodOrder: IFood[]) => {
-    console.log("order edites", foodOrder);
-    NotificationRes.onSuccess({
-      title: "Order was succesfully created",
-      description: "You will be redirected in 2 seconds",
-      placement: "topRight",
-    });
-    // Recover info
-    // Add missing data
-    // axios
-  };
+
+  const haveOrders = orderItems.length > 0;
 
   useEffect(() => {
-    setFoodOrder(currentFoodOrder);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    haveOrders && setFoodOrder(orderItems);
   }, []);
 
   return (
@@ -41,16 +26,14 @@ const EditOrder = ({ foodList, currentFoodOrder, foodSection, status }: IEditOrd
       <Head>
         <title>{t("orders.head-edit.title")}</title>
         <meta name="description" content={t("orders.head-edit.description") as string} />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
       <body>
         <FoodLayout
-          status={status}
           sectionList={foodSection}
           foods={foodList}
           mode={EFoodMode.EDIT}
           mainTitle={t("orders.edit-order")}
-          editOrder={editOrder}
+          transaction={order}
         />
       </body>
     </>
@@ -59,32 +42,40 @@ const EditOrder = ({ foodList, currentFoodOrder, foodSection, status }: IEditOrd
 
 export default EditOrder;
 
-export async function getServerSideProps({ locale, req }: ServerInfo) {
+export async function getServerSideProps(appContext: any) {
+  const { locale, req } = appContext;
   const getLanguageValue = buildLanguage(locale, req);
-  return {
-    props: {
-      foodList: mockedFoodData,
-      currentFoodOrder: mockOrderEdit,
-      foodSection: foodSectionArray,
-      status: "success",
-      ...(await serverSideTranslations(getLanguageValue, ["common"])),
-    },
-  };
-  // const url = "/api/orders/:id/foods";
-  // await axios
-  //   .get(url })
-  //   .then(async (res) => {
-  //     const {
-  //       data: { results: {foodList, foodSectionList, currentOrder} },
-  //     } = res;
-  //     return {
-  //       props: { foodList: foodList, foodSectionList: foodSectionList, currentOrder: currentOrder,  status: "success", ...(await serverSideTranslations(getLanguageValue, ["common"])) },
-  //     };
-  //   })
-  //   .catch((err) => {
-  //     console.log("erre", err);
-  //   });
-  // return {
-  //   props: { foodList: [], foodSectionList: [],  currentOrder: [],status: "error", ...(await serverSideTranslations(getLanguageValue, ["common"])) },
-  // };
+  const client = buildClient(appContext);
+  const id: string = appContext.query["id"];
+  const url = `/api/orders/${id}/edit`;
+  const response: any = await client
+    .get(url)
+    .then(async (res) => {
+      const {
+        data: {
+          results: { order, orderItems, foodList, foodSection },
+        },
+      } = res as any;
+
+      return {
+        props: {
+          order,
+          orderItems,
+          foodList,
+          foodSection,
+          ...(await serverSideTranslations(getLanguageValue, ["common"])),
+        },
+      };
+    })
+    .catch(async () => {
+      return {
+        props: {
+          order: [],
+          orderItems: [],
+          status: "error",
+          ...(await serverSideTranslations(getLanguageValue, ["common"])),
+        },
+      };
+    });
+  return response;
 }

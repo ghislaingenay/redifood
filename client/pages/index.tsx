@@ -1,61 +1,65 @@
 import { faCartShopping, faPenToSquare, faPlusCircle, faUtensils } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Col, Space, Table, Typography } from "antd";
+import { Alert, Col, Form, InputNumber, Modal, Space, Table, Typography } from "antd";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useRouter } from "next/navigation";
 import { AlignType } from "rc-table/lib/interface";
-import { useContext, useEffect, useState } from "react";
-import { IOrderApi } from "../redifood-module/src/interfaces";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "react-toastify";
+import { IFoodOrder, IGetServerSideData, IOrderApi } from "../redifood-module/src/interfaces";
 import { RediSelect } from "../src/components/RediSelect";
 import { RediIconButton } from "../src/components/styling/Button.style";
-import { RowSpaceAround, RowSpaceBetween } from "../src/components/styling/grid.styled";
+import { RowCenterSp, RowSpaceAround, RowSpaceBetween } from "../src/components/styling/grid.styled";
 import { BACKGROUND_COLOR } from "../src/constants";
-import AppContext from "../src/contexts/app.context";
 import { getOptions } from "../src/functions/global.fn";
 import useCurrency from "../src/hooks/useCurrency.hook";
-import { EButtonType, ServerInfo } from "../src/interfaces";
+import { EButtonType } from "../src/interfaces";
+import { LabelFormBlack } from "../src/styles";
 import { AnimToTop } from "../src/styles/animations/global.anim";
-import { allDataOrders, getListUnpaidOrders } from "../test/mocks/mockOrdersData";
+import { AxiosFunction } from "./api/axios-request";
+import buildClient from "./api/build-client";
 import { buildLanguage } from "./api/build-language";
 
 interface IAllOrdersPageProps {
-  allOrders: IOrderApi[];
+  allOrders: IOrderApi<IFoodOrder[]>[];
   getList: string[];
-  status: string;
 }
-const AllOrdersPage = ({ allOrders, getList, status }: IAllOrdersPageProps) => {
+const AllOrdersPage = ({ allOrders, getList }: IAllOrdersPageProps) => {
   const { t } = useTranslation("common");
   const { displayCurrency } = useCurrency();
-  const { setStatus } = useContext(AppContext);
+  const haveOrders = allOrders.length > 0;
+  const [tableForm] = Form.useForm();
+  const tableValue = Form.useWatch("tableNumber", tableForm);
 
   const router = useRouter();
-  const [listAllOrders] = useState(allOrders);
+
+  const [orderNoList] = useState(getList);
   const [selectedOption, setSelectedOption] = useState("ALL");
   const [filteredOrders, setFilteredOrders] = useState<IOrderApi[]>([]);
   const [spinLoading, setSpinLoading] = useState(true);
+  const [tableTakenList, setTableTakenList] = useState<number[]>([]);
+  const [viewTableNumberModal, setViewTableNumberModal] = useState(false);
   const { Title } = Typography;
 
-  // const [response, doRequest, loading] = useRequest({
-  //   url: "/api/orders/all",
-  //   method: "get",
-  //   queryParams: {selectedOption},
-  //   body: {},
-  // });
-
-  const renderAmount = (orderTotal: number) => (displayCurrency() === "$" ? orderTotal : 0.85 * orderTotal);
   const columns = [
     {
       title: "ID",
-      dataIndex: "_id",
-      key: "_id",
+      dataIndex: "id",
+      key: "id",
+      align: "center" as AlignType,
+    },
+    {
+      title: "No",
+      dataIndex: "orderNo",
+      key: "orderNo",
       align: "center" as AlignType,
     },
     {
       title: "Table",
-      dataIndex: "tableNumber",
-      key: "tableNumber",
+      dataIndex: "orderTableNumber",
+      key: "orderTableNumber",
       align: "center" as AlignType,
     },
     {
@@ -63,24 +67,24 @@ const AllOrdersPage = ({ allOrders, getList, status }: IAllOrdersPageProps) => {
       dataIndex: "orderTotal",
       key: "orderTotal",
       align: "center" as AlignType,
-      render: (item: number) => renderAmount(item).toFixed(2),
+      render: (amount: IOrderApi["orderTotal"]) => <>{Number(amount).toFixed(2)}</>,
     },
     {
       title: "Action",
-      dataIndex: "_id",
+      dataIndex: "id",
       align: "center" as AlignType,
-      key: "_id",
+      key: "id",
       render: (item: IOrderApi) => (
         <Space>
           <RediIconButton
-            onClick={() => router.push(`/orders/${item._id}/edit`)}
+            onClick={() => router.push(`/orders/${item}/edit`)}
             buttonType={EButtonType.EDIT}
             iconFt={faPenToSquare}
           >
             {t("buttons.edit")}
           </RediIconButton>
           <RediIconButton
-            onClick={() => router.push(`/orders/${item._id}`)}
+            onClick={() => router.push(`/orders/${item}`)}
             iconFt={faCartShopping}
             buttonType={EButtonType.SUCCESS}
           >
@@ -91,40 +95,55 @@ const AllOrdersPage = ({ allOrders, getList, status }: IAllOrdersPageProps) => {
     },
   ];
 
-  const showProperData = (option: string) => {
-    // replace later by axios get
-    setSelectedOption(option);
-    if (option === "ALL") {
-      return setFilteredOrders(listAllOrders);
-    }
-    const newList = listAllOrders.filter((order) => order._id === option);
-    if (newList) {
-      return setFilteredOrders(newList);
-    }
+  const getTakenTableNumber = async () => {
+    AxiosFunction({
+      method: "get",
+      url: "api/orders/table",
+      body: {},
+      queryParams: {},
+    })
+      .then((res: IGetServerSideData<number[]>) => {
+        const { results } = res;
+        results && setTableTakenList(results);
+      })
+      .catch(() => toast.error("Error getting table number"));
   };
 
+  const removeTableNumberModal = () => {
+    tableForm.resetFields();
+    setViewTableNumberModal(false);
+  };
+
+  const option = useMemo(() => {
+    return selectedOption;
+  }, [selectedOption]);
+
   useEffect(() => {
-    setStatus(status);
-    // data coming from backend
-    const sortedData = allOrders.map((order: IOrderApi) => {
+    setSpinLoading(true);
+    getTakenTableNumber();
+    const sortedData = [...allOrders].map((order: IOrderApi) => {
       return {
         ...order,
-        key: order._id,
-        orderTotal: renderAmount(order.orderTotal),
+        key: order.id,
+        orderTotal: order.orderTotal,
       };
     });
-    setFilteredOrders(sortedData);
+    if (selectedOption === "ALL") {
+      console.log("here");
+      setFilteredOrders(() => sortedData);
+    } else {
+      const newList = [...sortedData].filter((order) => order?.orderNo === option);
+      console.log("nl", newList);
+      setFilteredOrders(() => newList);
+    }
     setSpinLoading(false);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status, selectedOption]);
+  }, [selectedOption]);
 
   return (
     <>
       <Head>
         <title>{t("index.head.title")}</title>
         <meta name="description" content={t("index.head.description") as string} />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
         <AnimToTop>
@@ -137,8 +156,10 @@ const AllOrdersPage = ({ allOrders, getList, status }: IAllOrdersPageProps) => {
                 initialOption={{ value: "ALL", label: t("glossary.all") }}
                 style={{ width: "8rem" }}
                 value={selectedOption}
-                onChange={(e: any) => showProperData(e)}
-                options={getOptions(getList)}
+                onChange={(e) => {
+                  setSelectedOption(e as string);
+                }}
+                options={getOptions(orderNoList)}
               />
             </Col>
             <Col span={11} style={{ textAlign: "right" }}>
@@ -147,41 +168,85 @@ const AllOrdersPage = ({ allOrders, getList, status }: IAllOrdersPageProps) => {
                 buttonType={EButtonType.CREATE}
                 aria-label="create order"
                 iconFt={faPlusCircle}
-                onClick={() => router.push("/orders/create")}
+                onClick={() => setViewTableNumberModal(true)}
               >
                 {t("index.orderButton")}
               </RediIconButton>
             </Col>
           </RowSpaceBetween>
-          <Table
-            loading={spinLoading}
-            rowKey="_id"
-            columns={columns}
-            dataSource={filteredOrders}
-            pagination={false}
-            expandable={{
-              expandedRowRender: (record: IOrderApi) => {
-                return (
-                  <RowSpaceAround>
-                    {record.orderItems.map((item) => {
-                      return (
-                        <Col span={6} key={item.itemId} style={{ color: BACKGROUND_COLOR }}>
-                          <b>
-                            <Space>
-                              <FontAwesomeIcon icon={faUtensils} />
-                              {item.itemName}
-                            </Space>
-                          </b>{" "}
-                          (<em>{item.itemQuantity}</em>)
-                        </Col>
-                      );
-                    })}
-                  </RowSpaceAround>
-                );
-              },
-            }}
-          />
+          {haveOrders ? (
+            <>
+              <Table
+                loading={spinLoading}
+                rowKey="id"
+                columns={columns}
+                dataSource={filteredOrders}
+                pagination={false}
+                expandable={{
+                  expandedRowRender: (record: IOrderApi<IFoodOrder[]>) => {
+                    return (
+                      <RowSpaceAround>
+                        {record.orderItems.map(({ id, itemName, itemQuantity }) => {
+                          return (
+                            <Col span={6} key={id} style={{ color: BACKGROUND_COLOR }}>
+                              <b>
+                                <Space>
+                                  <FontAwesomeIcon icon={faUtensils} />
+                                  {itemName}
+                                </Space>
+                              </b>{" "}
+                              (<em>{itemQuantity}</em>)
+                            </Col>
+                          );
+                        })}
+                      </RowSpaceAround>
+                    );
+                  },
+                }}
+              />
+            </>
+          ) : (
+            <>
+              <Alert type="info" style={{ width: "100%", textAlign: "center" }} showIcon message="No orders found" />
+            </>
+          )}
         </AnimToTop>
+        <Modal open={viewTableNumberModal} footer={false} onCancel={() => removeTableNumberModal()} centered>
+          <Form form={tableForm} onFinish={() => router.push(`/orders/create/${tableValue}`)}>
+            <RowSpaceBetween style={{ width: "100%" }}>
+              <Col span={12}>
+                <LabelFormBlack>Table no</LabelFormBlack>
+              </Col>
+              <Col span={12}>
+                <Form.Item
+                  style={{ margin: 0, padding: 0 }}
+                  name="tableNumber"
+                  rules={[
+                    { required: true, message: "Please input table number" },
+                    {
+                      pattern: /^\d+$/,
+                      message: "Please input only number",
+                    },
+                    () => ({
+                      validator(_, value) {
+                        const tableNumberIsAlreadyTaken = value && tableTakenList.includes(Number(value));
+                        if (tableNumberIsAlreadyTaken) return Promise.reject(new Error("Table number already taken"));
+                        return Promise.resolve();
+                      },
+                    }),
+                  ]}
+                >
+                  <InputNumber />
+                </Form.Item>
+              </Col>
+            </RowSpaceBetween>
+            <RowCenterSp style={{ marginTop: "1rem" }}>
+              <RediIconButton buttonType={EButtonType.CREATE} iconFt={faPlusCircle} onClick={() => tableForm.submit()}>
+                {t("buttons.create")}
+              </RediIconButton>
+            </RowCenterSp>
+          </Form>
+        </Modal>
       </main>
     </>
   );
@@ -189,31 +254,38 @@ const AllOrdersPage = ({ allOrders, getList, status }: IAllOrdersPageProps) => {
 
 export default AllOrdersPage;
 
-export async function getServerSideProps({ locale, req }: ServerInfo) {
+export async function getServerSideProps(appContext: any) {
+  const { locale, req } = appContext;
+  const client = buildClient(appContext);
   const getLanguageValue = buildLanguage(locale, req);
-  return {
-    props: {
-      allOrders: allDataOrders,
-      getList: getListUnpaidOrders,
-      status: "success",
-      ...(await serverSideTranslations(getLanguageValue, ["common"])),
-    },
-  };
-  // const url = "/api/orders/all";
-  // await axios
-  //   .get(url, { params: { selectedOption: "ALL" } })
-  //   .then(async (res) => {
-  //     const {
-  //       data: { results: {allDataOrders, getListUnpaidOrders} },
-  //     } = res;
-  //     return {
-  //       props: { allOrders: allDataOrders, getList: getListUnpaidOrders, status: "success", ...(await serverSideTranslations(getLanguageValue, ["common"])) },
-  //     };
-  //   })
-  //   .catch((err) => {
-  //     console.log("erre", err);
-  //   });
-  // return {
-  //   props: { allOrders: [], getList: [], status: "error", ...(await serverSideTranslations(getLanguageValue, ["common"])) },
-  // };
+  const url = "/api/orders/";
+  const res = await client
+    .get(url, { params: { orderType: "NOT_PAID" } })
+    .then(async (res) => {
+      const {
+        data: {
+          results: { orders, unPaidOrdersNo },
+        },
+      } = res;
+      const listingStringFormat = [];
+      for (let i = 0; i < unPaidOrdersNo.length; i++) listingStringFormat.push(String(unPaidOrdersNo[i]));
+      return {
+        props: {
+          allOrders: orders,
+          getList: listingStringFormat,
+          ...(await serverSideTranslations(getLanguageValue, ["common"])),
+        },
+      };
+    })
+    .catch(async () => {
+      return {
+        props: {
+          allOrders: [],
+          getList: [],
+          ...(await serverSideTranslations(getLanguageValue, ["common"])),
+        },
+      };
+    });
+
+  return res;
 }

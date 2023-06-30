@@ -1,136 +1,106 @@
 import { Col, Modal, Row, Typography } from "antd";
 import { useRouter } from "next/navigation";
-import { useContext, useEffect, useState } from "react";
+import { useRouter as Router } from "next/router";
+import { useEffect, useState } from "react";
 import { Else, If, Then } from "react-if";
-import { IFoodApi } from "../../../redifood-module/src/interfaces";
-import { noErrorInTable } from "../../constants";
-import AppContext from "../../contexts/app.context";
+import { IFoodApi, IFoodSectionList, IOrderApi } from "../../../redifood-module/src/interfaces";
 import { useFood } from "../../contexts/food.context";
-import { getOptions } from "../../functions/global.fn";
-import { checkIfArrayAreTheSame, sendErrorTableInput } from "../../functions/order.fn";
+import { handleCreateOrder } from "../../functions/create-order.fn";
+import { setOptionsSelection } from "../../functions/food.fn";
+import { checkIfArrayAreTheSame } from "../../functions/order.fn";
+import { handleUpdateOrder } from "../../functions/update-order.fn";
 import { useWindowSize } from "../../hooks/useWindowSIze.hook";
-import { IErrorTableInput } from "../../interfaces";
 import { EFoodMode } from "../../interfaces/food.interface";
 import { LGCard } from "../../styles";
 import { AnimToTop } from "../../styles/animations/global.anim";
-import { RowCenter } from "../styling/grid.styled";
 import RediRadioButton from "../styling/RediRadioButton";
+import { RowCenter } from "../styling/grid.styled";
 import FoodCard from "./FoodCard";
 import FoodForm from "./FoodForm";
 import OrderSection from "./OrderSection";
 
 const { Title } = Typography;
 interface IFoodLayoutProps {
-  status?: string;
+  transaction?: IOrderApi;
   foods: IFoodApi[];
   mode: EFoodMode;
-  handleOrderCreate?: (foodOrder: IFoodApi[]) => any;
-  editOrder?: (foodOrder: IFoodApi[]) => any;
   updateFood?: (food: IFoodApi) => any;
-  sectionList: string[];
+  sectionList: IFoodSectionList[];
   mainTitle: string;
 }
 
-const FoodLayout = ({
-  foods,
-  mode,
-  sectionList,
-  mainTitle,
-  handleOrderCreate,
-  status,
-  editOrder,
-}: IFoodLayoutProps) => {
+const FoodLayout = ({ foods, mode, sectionList, mainTitle, transaction }: IFoodLayoutProps) => {
+  const WIDTH_BREAKPOINT = 768;
+
   const router = useRouter();
-  const tableTaken = [1, 4, 5];
+  const routerClient = Router();
+  const tableNo = Number(routerClient.query.tableNumber) || 0;
 
-  const { setStatus } = useContext(AppContext);
   const { foodOrder } = useFood();
-
-  const [foodSection] = useState<string[]>(sectionList);
-  const [foodList] = useState(foods);
-
   const [width] = useWindowSize();
-  const widthBreakPoint = 768;
-  const isLargeScreen = width && width > widthBreakPoint;
 
+  const [foodSection] = useState<IFoodSectionList[]>(sectionList);
+  const [foodList] = useState(foods);
+  const [loading, setLoading] = useState(false);
   const [sortedFoods, setSortedFoods] = useState(foodList);
-  const [selectedSection, setSelectedSection] = useState("all");
-
-  const [tableNumberValue, setTableNumberValue] = useState<null | number>(null);
-  const [errorTable, setErrorTable] = useState<IErrorTableInput>({ alreadyInDb: false, missingValue: false });
-  const isDisabled = foodOrder.length === 0 ? true : false;
-
+  const [selectedSectionId, setSelectedSectionId] = useState(0);
   const [currentOrder, setCurrentOrder] = useState<IFoodApi[]>([]);
   const [cancelOrderModal, setCancelOrderModal] = useState(false);
 
-  const changeActiveButton = (sectionName: string) => {
-    if (sectionName === "all") {
-      return setSortedFoods(foodList);
-    }
-    let filteredfoods = foodList?.filter((food) => food.itemSection === sectionName);
-    setSortedFoods(filteredfoods);
+  const isLargeScreen = width && width > WIDTH_BREAKPOINT;
+  const isDisabled = foodOrder.length === 0 ? true : false;
+  const isCreateMode = mode === EFoodMode.CREATE;
+  const isAlterMode = mode === EFoodMode.ALTER;
+  const ariaLabelMainTitle = isAlterMode ? "FOOD SECTION" : isCreateMode ? "CREATE ORDER" : "EDIT ORDER";
+
+  const changeActiveButton = (sectionId: number) => {
+    setSelectedSectionId(sectionId);
+    if (sectionId === 0) return setSortedFoods([...foodList]);
+    const filteredfoods = [...foodList]?.filter((food) => food.sectionId === sectionId);
+    return setSortedFoods([...filteredfoods]);
   };
 
-  const handleSubmit = (foodOrder: IFoodApi[]) => {
-    switch (mode) {
-      case EFoodMode.CREATE: {
-        const result = sendErrorTableInput(tableNumberValue as number, tableTaken);
-        if (result === noErrorInTable) {
-          if (handleOrderCreate) handleOrderCreate(foodOrder);
-        } else {
-          setErrorTable(result);
-        }
-      }
-      case EFoodMode.EDIT: {
-        if (editOrder) editOrder(foodOrder);
-      }
-      default: {
-      }
+  const handleSubmit = async (foodOrder: IFoodApi[]) => {
+    setLoading(true);
+    if (isCreateMode) {
+      const res = await handleCreateOrder(foodOrder, Number(tableNo));
+      if (res.success) return router.replace("/");
+    } else {
+      const res = await handleUpdateOrder(foodOrder, transaction as IOrderApi);
+      if (res.success) return router.replace("/");
     }
+    setLoading(false);
   };
-  // function that check if two array are the same
 
   const handleCancel = (link: string) => {
-    if (!checkIfArrayAreTheSame(foodOrder, currentOrder)) {
-      return setCancelOrderModal(true);
-    }
+    if (!checkIfArrayAreTheSame(foodOrder, currentOrder)) return setCancelOrderModal(true);
     router.push(link);
     return setCancelOrderModal(false);
   };
 
-  const loadData = async () => {
-    setStatus(status as string);
-    setCurrentOrder(foodOrder);
-  };
-  useEffect(() => {
-    loadData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  useEffect(() => setCurrentOrder(foodOrder), []);
 
-  const renderLGCard = () => {
+  const RenderLGCard = () => {
     return (
       <LGCard style={{ height: "100%", width: "100%" }}>
-        <If condition={mode !== EFoodMode.ALTER}>
+        <If condition={isAlterMode}>
           <Then>
+            <FoodForm foodSection={foodSection} foodList={foodList} />
+          </Then>
+          <Else>
             <OrderSection
-              tableNumber={tableNumberValue}
-              setTableNumber={setTableNumberValue}
+              tableNumber={tableNo}
               mode={mode}
-              errorTable={errorTable}
+              transaction={transaction}
+              loading={loading}
               handleSubmit={handleSubmit}
               handleCancel={handleCancel}
             />
-          </Then>
-          <Else>
-            <FoodForm foodSection={foodSection} foodList={foodList} />
           </Else>
         </If>
       </LGCard>
     );
   };
-
-  const ariaLabelMainTitle =
-    mode === EFoodMode.ALTER ? "FOOD SECTION" : mode === EFoodMode.CREATE ? "CREATE ORDER" : "EDIT ORDER";
 
   return (
     <>
@@ -138,18 +108,17 @@ const FoodLayout = ({
         <Title level={2} aria-label={ariaLabelMainTitle}>
           {mainTitle}
         </Title>
-        <Row gutter={[0, 20]} justify="space-between" style={{ width: "100%" }}>
+        <Row justify="space-around" gutter={[0, 20]} style={{ width: "100%" }}>
           <Col md={24} lg={15}>
             <RediRadioButton
               fontSize="1rem"
               padding="0.5rem 0.5rem"
               disabled={isDisabled}
-              options={getOptions(foodSection) as any}
+              options={setOptionsSelection(foodSection) as any}
               radioGroupName="food"
               haveIcon="false"
-              selectedButton={selectedSection}
-              setSelectedButton={setSelectedSection}
-              clickedFn={() => changeActiveButton(selectedSection)}
+              selectedButton={selectedSectionId}
+              clickedFn={changeActiveButton}
             />
             <Row gutter={[5, 10]}>
               {sortedFoods?.map((food, index) => (
@@ -160,13 +129,19 @@ const FoodLayout = ({
             </Row>
           </Col>
 
-          {isLargeScreen && (
-            <Col md={24} lg={8}>
-              {renderLGCard()}
-            </Col>
-          )}
+          <If condition={isLargeScreen}>
+            <Then>
+              <Col md={24} lg={8}>
+                <RenderLGCard />
+              </Col>
+            </Then>
+            <Else>
+              <RowCenter style={{ marginTop: "1rem" }}>
+                <RenderLGCard />
+              </RowCenter>
+            </Else>
+          </If>
         </Row>
-        {!isLargeScreen && <RowCenter style={{ marginTop: "1rem" }}>{renderLGCard()}</RowCenter>}
         <Modal
           title="Are u sure you want to cancel?"
           open={cancelOrderModal}

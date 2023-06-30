@@ -1,7 +1,7 @@
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 // import { rest } from "msw";
-import CreateOrder from "../../../pages/orders/create"; // { getServerSideProps }
+import CreateOrder from "../../../pages/orders/create/[tableNumber]"; // { getServerSideProps }
 import { convertApiDataToDbData } from "../../../src/functions/db.fn";
 import { sendErrorTableInput } from "../../../src/functions/order.fn";
 import {
