@@ -2,6 +2,7 @@
 import { faBan, faFileCircleCheck, faFilePen, faSquarePlus, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Alert, Form, Modal, Select } from "antd";
+import axios from "axios";
 import { useTranslation } from "next-i18next";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -9,12 +10,12 @@ import { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Case, Default, Else, If, Switch, Then } from "react-if";
 import { IFoodApi } from "../../../redifood-module/src/interfaces";
-import { GREY, ORANGE_DARK } from "../../constants";
+import { GREY, ORANGE_DARK, initialFormValues } from "../../constants";
 import { useFood } from "../../contexts/food.context";
 import { checkDisability, convertFoodToSection } from "../../functions/food.fn";
 import { capitalize } from "../../functions/global.fn";
 import useCurrency from "../../hooks/useCurrency.hook";
-import { EButtonType, EHandleType, IFoodForm, IFormInterface, PartialFood, PartialFormFood } from "../../interfaces";
+import { EButtonType, EHandleType, IFoodForm, IFormInterface, PartialFood } from "../../interfaces";
 import { SpacingDiv5X } from "../../styles/styledComponents/div.styled";
 import { RedSpan } from "../../styles/styledComponents/span.styled";
 import {
@@ -58,54 +59,35 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
     functions: { selectFood },
   } = useFood();
   const { displayCurrency, convertPrice } = useCurrency();
+
   const [form] = Form.useForm();
-  const pictureSize = 150;
   const pictureValue = Form.useWatch("itemPhoto", form);
   const sectionValue = Form.useWatch("itemSection", form);
   const extraValue = Form.useWatch("itemExtra", form);
-  const [editMode, setEditMode] = useState<Booleanish>("true");
 
+  const PICTURE_SIZE = 150;
+  const styleNoM = { margin: 0 };
   const foodRadioOptions = [
     { label: t("buttons.edit"), value: "true", icon: <FontAwesomeIcon icon={faFilePen} />, ariaLabel: "EDIT" },
     { label: t("buttons.create"), value: "false", icon: <FontAwesomeIcon icon={faSquarePlus} />, ariaLabel: "CREATE" },
   ];
 
-  const initialFormValues: PartialFormFood = {
-    itemName: undefined,
-    itemPrice: undefined,
-    sectionId: EHandleType.NONE,
-    extraId: EHandleType.NONE,
-    itemPhoto: undefined,
-    itemDescription: undefined,
-    itemQuantity: undefined,
-    id: undefined,
-  };
-
+  const [editMode, setEditMode] = useState<Booleanish>("true");
   const [handleType, setHandleType] = useState<EHandleType>(EHandleType.NONE);
   const [sortedFood, setSortedFood] = useState<Record<string, string[]>>({});
-
   const [newFoodData, setNewFoodData] = useState<IFoodApi | null>(null);
   const [inputSection, setInputSection] = useState<string>("");
   const [delSection, setDelSection] = useState<string>("");
   const [inputExtra, setInputExtra] = useState<string>("");
   const [delExtra, setDelExtra] = useState<string>("");
   const [error, setError] = useState(false);
-
   const [files, setFiles] = useState<any[]>([]);
-
+  const [urlFile, setUrlFile] = useState<string>("");
   const [confirmModal, setConfirmModal] = useState(false);
   const [cancelModal, setCancelModal] = useState(false);
-
   const [currentFood, setCurrentFood] = useState<PartialFood>(foodOrder[0]);
 
-  const styleNoM = { margin: 0 };
   const optionsCreateFood = (fn: Function): IFormInterface[] => [
-    // {
-    //   label: "Picture",
-    //   name: "itemPhoto",
-    //   component: <RoundedInput style={styleNoM} />,
-    //   rules: [{ required: true, message: "A picture is required" }],
-    // },
     {
       label: t("foods.form-label.name"),
       name: "itemName",
@@ -164,25 +146,22 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
       // This is working for now
       formData.append("file", acceptedFiles[0]);
       console.log("acc", acceptedFiles);
-      // formData.append("upload_preset", String(process.env.NEXT_PUBLIC_UPLOAD_PRESET));
-      // const response = await axios.post(
-      //   `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_NAME}/image/upload`,
-      //   formData,
-      // );
-      // const { statusText, data } = response;
-      // console.log(data.secure_url);
-      // if (statusText === "OK") {
-      // return setUrlFile(data.secure_url);
-      // }
+      formData.append("upload_preset", String(process.env.NEXT_PUBLIC_UPLOAD_PRESET));
+      const response = await axios.post(
+        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_NAME}/image/upload`,
+        formData,
+      );
+      const { statusText, data } = response;
+      console.log(data.secure_url);
+      if (statusText === "OK") {
+        return setUrlFile(data.secure_url);
+      }
     },
   });
 
   const checkFood = () => {
-    if (editMode === "true") {
-      return currentFood === newFoodData;
-    } else {
-      return foodOrder[0] === form.getFieldsValue();
-    }
+    if (editMode === "true") return currentFood === newFoodData;
+    else return foodOrder[0] === form.getFieldsValue();
   };
 
   const handleCancel = () => {
@@ -253,14 +232,10 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
   useEffect(() => {
     if (editMode === "true" && foodOrder.length !== 0) {
       setCurrentFood(foodOrder[0]);
+      const { itemPrice, ...rest } = foodOrder[0];
       form.setFieldsValue({
-        itemQuantity: 0,
-        itemName: foodOrder[0].itemName,
-        itemDescription: foodOrder[0].itemDescription,
         itemPrice: convertPrice(foodOrder[0].itemPrice, "backToFront", false),
-        itemPhoto: foodOrder[0].itemPhoto,
-        sectionId: foodOrder[0].sectionId,
-        extraId: foodOrder[0].extraId,
+        ...rest,
       } as any);
       setFiles([foodOrder[0].itemPhoto]);
       setSortedFood(convertFoodToSection(foodList, foodSection) as any);
@@ -326,8 +301,8 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                 <RowCenter style={{ marginTop: "1rem" }}>
                   {pictureValue && (
                     <Image
-                      height={pictureSize}
-                      width={pictureSize}
+                      height={PICTURE_SIZE}
+                      width={PICTURE_SIZE}
                       style={{ borderRadius: "50%", border: `1px dashed ${GREY}`, margin: "0 auto 1rem" }}
                       src={pictureValue}
                       alt="new food picture"
