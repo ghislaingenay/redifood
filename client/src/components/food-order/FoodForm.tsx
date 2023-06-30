@@ -6,16 +6,18 @@ import axios from "axios";
 import { useTranslation } from "next-i18next";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Case, Default, Else, If, Switch, Then } from "react-if";
-import { IFoodApi } from "../../../redifood-module/src/interfaces";
+import { toast } from "react-toastify";
+import { AxiosFunction } from "../../../pages/api/axios-request";
+import { IFoodApi, IGetSectionInfo } from "../../../redifood-module/src/interfaces";
 import { GREY, ORANGE_DARK, initialFormValues } from "../../constants";
 import { useFood } from "../../contexts/food.context";
-import { checkDisability, convertFoodToSection } from "../../functions/food.fn";
+import { checkDisability } from "../../functions/food.fn";
 import { capitalize } from "../../functions/global.fn";
 import useCurrency from "../../hooks/useCurrency.hook";
-import { EButtonType, EHandleType, IFoodForm, IFormInterface, PartialFood } from "../../interfaces";
+import { EButtonType, EHandleType, IFormInterface } from "../../interfaces";
 import { SpacingDiv5X } from "../../styles/styledComponents/div.styled";
 import { RedSpan } from "../../styles/styledComponents/span.styled";
 import {
@@ -50,7 +52,7 @@ const { Option } = Select;
 //   return isJpgOrPng && isLt2M;
 // };
 
-const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
+const FoodForm = () => {
   const router = useRouter();
   const { t } = useTranslation();
   const {
@@ -73,6 +75,15 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
   ];
 
   const [editMode, setEditMode] = useState<Booleanish>("true");
+  const switchMode = editMode === "true" ? "false" : "true";
+  const isEditModeWithoutFood = editMode === "true" && foodOrder.length === 0;
+
+  const isDeleteExtraMode = extraValue === EHandleType.DELETEEXTRA;
+  const isAddExtraMode = extraValue === EHandleType.ADDEXTRA;
+  const isDeleteSectionMode = sectionValue === EHandleType.DELETESECTION;
+  const isAddSectionMode = sectionValue === EHandleType.ADDSECTION;
+
+  const [loading, setLoading] = useState(false);
   const [handleType, setHandleType] = useState<EHandleType>(EHandleType.NONE);
   const [sortedFood, setSortedFood] = useState<Record<string, string[]>>({});
   const [newFoodData, setNewFoodData] = useState<IFoodApi | null>(null);
@@ -85,7 +96,6 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
   const [urlFile, setUrlFile] = useState<string>("");
   const [confirmModal, setConfirmModal] = useState(false);
   const [cancelModal, setCancelModal] = useState(false);
-  const [currentFood, setCurrentFood] = useState<PartialFood>(foodOrder[0]);
 
   const optionsCreateFood = (fn: Function): IFormInterface[] => [
     {
@@ -229,23 +239,36 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
   //   return isJpgOrPng && isLt2M;
   // };
 
-  useEffect(() => {
+  const currentFood = useMemo(() => {
     if (editMode === "true" && foodOrder.length !== 0) {
-      setCurrentFood(foodOrder[0]);
       const { itemPrice, ...rest } = foodOrder[0];
       form.setFieldsValue({
         itemPrice: convertPrice(foodOrder[0].itemPrice, "backToFront", false),
         ...rest,
       } as any);
       setFiles([foodOrder[0].itemPhoto]);
-      setSortedFood(convertFoodToSection(foodList, foodSection) as any);
+      return foodOrder[0];
     } else {
       setFiles([]);
       form.setFieldsValue(initialFormValues);
-      setCurrentFood(initialFormValues as PartialFood);
+      return initialFormValues;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectFood, editMode]);
+  }, [selectFood, editMode]); // add section list extended from useEffect and add with state
+
+  useEffect(() => {
+    AxiosFunction({
+      method: "get",
+      url: "api/foods/section/information",
+      body: {},
+      queryParams: {},
+    })
+      .then((res: IGetSectionInfo) => {
+        console.log("res", res);
+        // const { listing, foods } = res;
+      })
+      .catch((err) => toast.error(err.message));
+  }, []);
+
   return (
     <>
       <SpacingDiv5X>
@@ -256,21 +279,14 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
           options={foodRadioOptions}
           haveIcon={"true"}
           selectedButton={editMode}
-          // setSelectedButton={setEditMode}
           clickedFn={() => {
             setFoodOrder([]);
-            form.setFieldsValue({
-              itemPhoto: "",
-              itemName: "",
-              itemPrice: "",
-              itemDescription: "",
-              itemSection: EHandleType.NONE,
-              itemExtra: EHandleType.NONE,
-            });
+            form.setFieldsValue(initialFormValues);
+            setEditMode(switchMode);
           }}
         />
         <Switch>
-          <Case condition={editMode === "true" && foodOrder.length === 0}>
+          <Case condition={isEditModeWithoutFood}>
             <Alert
               type="warning"
               style={{ fontWeight: 700, height: "80vh", textAlign: "center", fontSize: "1rem", marginTop: "1.5rem" }}
@@ -371,18 +387,18 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                   }}
                 >
                   <Option value={EHandleType.NONE}>{t("foods.form-label.select")}</Option>
-                  {foodSection &&
+                  {/* {foodSection &&
                     foodSection.map(({ id, sectionName }, index) => (
                       <Option key={index} value={id}>
                         {capitalize(sectionName)}
                       </Option>
-                    ))}
+                    ))} */}
                   <Option value={EHandleType.ADDSECTION}>{t("foods.form-label.add-section")}</Option>
                   <Option value={EHandleType.DELETESECTION}>{t("foods.form-label.delete-section")}</Option>
                 </Select>
               </Form.Item>
               <Switch>
-                <Case condition={sectionValue === EHandleType.ADDSECTION}>
+                <Case condition={isAddSectionMode}>
                   <>
                     <LabelFormBlue>{t("foods.form-label.create-new-section")}</LabelFormBlue>
                     <RowCenterSp>
@@ -401,7 +417,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                     </RowCenterSp>
                   </>
                 </Case>
-                <Case condition={sectionValue === EHandleType.DELETESECTION}>
+                <Case condition={isDeleteSectionMode}>
                   <>
                     <LabelFormRed>{t("foods.form-label.delete-current-section")}</LabelFormRed>
                     <RowCenterSp>
@@ -447,7 +463,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                       </Select>
                     </Form.Item>
                   </>
-                  {extraValue === EHandleType.ADDEXTRA && (
+                  {isAddExtraMode && (
                     <>
                       <LabelFormBlue>{t("foods.form-label.create-new-extra")}</LabelFormBlue>
                       <RowCenterSp>
@@ -466,7 +482,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                       </RowCenterSp>
                     </>
                   )}
-                  {extraValue === EHandleType.DELETEEXTRA && (
+                  {isDeleteExtraMode && (
                     <>
                       <LabelFormRed>{t("foods.form-label.delete-current-extra")}</LabelFormRed>
                       <RowCenterSp style={{ marginBottom: 0 }}>
@@ -534,14 +550,14 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
             <>
               <p>Do you want to delete {delSection} section ?</p>
               <p>These foods will be deleted</p>
-              {foodList &&
+              {/* {foodList &&
                 foodList
                   .filter((food) => {
                     return food.sectionId === (delSection as any);
                   })
                   .map((food: IFoodApi) => {
                     return <p key={food.id}>{food.itemName}</p>;
-                  })}
+                  })} */}
             </>
           </Case>
           <Case condition={handleType === EHandleType.ADDEXTRA}>Do you want to create {inputExtra} section ?</Case>
@@ -549,12 +565,12 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
             <>
               <p>Do you want to delete {delExtra} extra ?</p>
               <p>These foods will be deleted</p>
-              {foodList &&
+              {/* {foodList &&
                 foodList
                   .filter((food) => food.extraId === (delExtra as any))
                   .map((food: IFoodApi) => {
                     return <p key={food.id}>{food.itemName}</p>;
-                  })}
+                  })} */}
             </>
           </Case>
         </Switch>
