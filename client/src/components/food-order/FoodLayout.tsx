@@ -43,7 +43,7 @@ const FoodLayout = ({ foods, mode, sectionList, mainTitle, transaction }: IFoodL
   const [loading, setLoading] = useState(false);
   const [sortedFoods, setSortedFoods] = useState(foodList);
   const [selectedSectionId, setSelectedSectionId] = useState(0);
-  const [currentOrder, setCurrentOrder] = useState<IFoodApi[]>([]);
+  const [currentOrder, setCurrentOrder] = useState<IFoodGetApi[]>([]);
   const [cancelOrderModal, setCancelOrderModal] = useState(false);
 
   const isLargeScreen = width && width > WIDTH_BREAKPOINT;
