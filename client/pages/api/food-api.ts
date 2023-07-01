@@ -72,7 +72,7 @@ export const handleCreateExtra = (
   return createdRes;
 };
 
-export const deleteSection = (sectionId: number): PromiseDeleted => {
+export const handleDeleteSection = (sectionId: number): PromiseDeleted => {
   const deleteRes = AxiosFunction({
     url: `api/foods/section/${sectionId}`,
     method: "delete",
@@ -88,7 +88,7 @@ export const deleteSection = (sectionId: number): PromiseDeleted => {
   return deleteRes;
 };
 
-export const deleteExtra = (extraId: number): PromiseDeleted => {
+export const handleDeleteExtra = (extraId: number): PromiseDeleted => {
   const deleteRes = AxiosFunction({
     url: `api/foods/extra/${extraId}`,
     method: "delete",
