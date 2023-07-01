@@ -233,9 +233,24 @@ const FoodForm = () => {
       default: {
       }
     }
-    console.log("submitted", values);
     handleCancel();
   };
+
+  const getExtraOptions = useMemo(() => {
+    return getDataBySectionId(listSectionExtra, sectionValue as number)?.extraList?.map(({ id, extraName }, index) => (
+      <Option key={index} value={id}>
+        {capitalize(extraName)}
+      </Option>
+    ));
+  }, [listSectionExtra]);
+
+  const getSectionOptions = sectionIdName?.map(({ id, name }, index) => (
+    <Option key={index} value={id}>
+      {capitalize(name)}
+    </Option>
+  ));
+
+  const getDeletedSectionName = delSection && sectionIdName?.find(({ id }) => id === Number(delSection))?.name;
 
   // const beforeUpload = (file: RcFile) => {
   //   const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
@@ -400,11 +415,7 @@ const FoodForm = () => {
                   }}
                 >
                   <Option value={EHandleType.NONE}>{t("foods.form-label.select")}</Option>
-                  {sectionIdName?.map(({ id, name }, index) => (
-                    <Option key={index} value={id}>
-                      {capitalize(name)}
-                    </Option>
-                  ))}
+                  {getSectionOptions}
                   <Option value={EHandleType.ADDSECTION}>{t("foods.form-label.add-section")}</Option>
                   <Option value={EHandleType.DELETESECTION}>{t("foods.form-label.delete-section")}</Option>
                 </Select>
@@ -433,13 +444,13 @@ const FoodForm = () => {
                   <>
                     <LabelFormRed>{t("foods.form-label.delete-current-section")}</LabelFormRed>
                     <RowCenterSp>
-                      <Select value={delSection} style={{ marginBottom: "0.5rem" }} onChange={(e) => setDelSection(e)}>
+                      <Select
+                        value={delSection}
+                        style={{ marginBottom: "0.5rem", width: "100%" }}
+                        onChange={(e) => setDelSection(e)}
+                      >
                         <Option value={EHandleType.NONE}>Select ...</Option>
-                        {Object.keys(sortedFood)?.map((section, index) => (
-                          <Option key={index} value={section}>
-                            {capitalize(section)}
-                          </Option>
-                        ))}
+                        {getSectionOptions}
                       </Select>
                       <RediButton
                         aria-label="Delete section"
@@ -555,7 +566,7 @@ const FoodForm = () => {
           <Case condition={handleType === EHandleType.ADDSECTION}>Do you want to create {inputSection} section ?</Case>
           <Case condition={handleType === EHandleType.DELETESECTION}>
             <>
-              <p>Do you want to delete {delSection} section ?</p>
+              <p>Do you want to delete {getDeletedSectionName} section ?</p>
               <p>These foods will be deleted</p>
               {/* {foodList &&
                 foodList
