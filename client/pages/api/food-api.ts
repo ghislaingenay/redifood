@@ -2,8 +2,8 @@ import { IFoodApi, IFoodSectionListWithExtra } from "../../redifood-module/src/i
 import { NotificationRes } from "../../src/definitions/notification.class";
 import { AxiosFunction } from "./axios-request";
 
-type TCreated = { created: boolean | "existed" };
-type TDeleted = { deleted: boolean | "existed" };
+type TCreated = { created: boolean };
+type TDeleted = { deleted: boolean };
 type TUpdated = { updated: boolean };
 
 type PromiseCreated = Promise<TCreated> | TCreated;
@@ -12,7 +12,14 @@ type PromiseUpdated = Promise<TUpdated>;
 
 export const handleCreateSection = (sectionName: string, listing: IFoodSectionListWithExtra[]): PromiseCreated => {
   const existed = listing.find((item) => new RegExp(sectionName, "i").test(item.sectionName));
-  if (existed) return { created: "existed" } as TCreated;
+  if (existed) {
+    NotificationRes.onFailure({
+      title: "Section existed",
+      description: "Please try again",
+      placement: "bottomRight",
+    });
+    return { created: false } as TCreated;
+  }
   const createdRes = AxiosFunction({
     url: "api/foods/section",
     method: "post",
@@ -45,13 +52,20 @@ export const handleCreateExtra = (
 ): PromiseCreated => {
   const existed = listing
     .find((item) => item.id === sectionId)
-    ?.extraList.find((item) => new RegExp(extraName, "i").test(item.extraName));
-  if (existed) return { created: "existed" } as TCreated;
+    ?.extraList?.find((item) => new RegExp(extraName, "i").test(item.extraName));
+  if (existed) {
+    NotificationRes.onFailure({
+      title: "Extra existed",
+      description: "Please try again",
+      placement: "bottomRight",
+    });
+    return { created: false } as TCreated;
+  }
   const createdRes = AxiosFunction({
     url: "api/foods/extra",
     method: "post",
     queryParams: {},
-    body: { extraName },
+    body: { extraName, sectionId },
   })
     .then(() => {
       NotificationRes.onSuccess({
@@ -61,7 +75,7 @@ export const handleCreateExtra = (
       });
       return { created: true };
     })
-    .catch(() => {
+    .catch((err) => {
       NotificationRes.onFailure({
         title: "Failed to create extra",
         description: "Please try again",

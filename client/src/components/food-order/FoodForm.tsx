@@ -12,6 +12,12 @@ import { Case, Default, Else, If, Switch, Then } from "react-if";
 import { toast } from "react-toastify";
 import { AxiosFunction } from "../../../pages/api/axios-request";
 import {
+  handleCreateExtra,
+  handleCreateSection,
+  handleDeleteExtra,
+  handleDeleteSection,
+} from "../../../pages/api/food-api";
+import {
   IFoodApi,
   IFoodGetApi,
   IFoodSectionListWithExtra,
@@ -198,9 +204,11 @@ const FoodForm = () => {
     } else {
       form.setFieldsValue({});
     }
+    router.refresh();
   };
 
-  const onFinish = (values: any) => {
+  const onFinish = async (values: any) => {
+    console.log("values onFinish", values);
     console.log("validated");
     if (files.length === 0) {
       return setError(true);
@@ -209,23 +217,31 @@ const FoodForm = () => {
     switch (handleType) {
       case EHandleType.ADDSECTION: {
         console.log("new section added", inputSection);
+        const createdSectionRes = await handleCreateSection(inputSection.toLowerCase(), listSectionExtra);
+        if (!createdSectionRes.created) return setConfirmModal(false);
         setInputSection("");
         break;
       }
       case EHandleType.DELETESECTION: {
         console.log("deleted section", delSection);
+        const deleteSectionRes = await handleDeleteSection(Number(delSection));
+        if (!deleteSectionRes.deleted) return setConfirmModal(false);
         setDelSection("");
         form.setFieldValue("itemSection", EHandleType.NONE);
         break;
       }
       case EHandleType.ADDEXTRA: {
         console.log("created extra", inputExtra);
+        const createExtraRes = await handleCreateExtra(inputExtra.toLowerCase(), sectionValue, listSectionExtra);
+        if (!createExtraRes.created) return setConfirmModal(false);
         form.setFieldValue("itemExtra", EHandleType.NONE);
         setInputExtra("");
         break;
       }
       case EHandleType.DELETEEXTRA: {
         console.log("deleted extra", delExtra);
+        const deleteExtraRes = await handleDeleteExtra(Number(delExtra));
+        if (!deleteExtraRes.deleted) return setConfirmModal(false);
         form.setFieldValue("itemExtra", EHandleType.NONE);
         setDelExtra("");
         break;
@@ -237,12 +253,13 @@ const FoodForm = () => {
   };
 
   const getExtraOptions = useMemo(() => {
+    if (sectionValue === EHandleType.NONE) return;
     return getDataBySectionId(listSectionExtra, sectionValue as number)?.extraList?.map(({ id, extraName }, index) => (
       <Option key={index} value={id}>
         {capitalize(extraName)}
       </Option>
     ));
-  }, [listSectionExtra]);
+  }, [listSectionExtra, sectionValue]);
 
   const getSectionOptions = sectionIdName?.map(({ id, name }, index) => (
     <Option key={index} value={id}>
@@ -251,6 +268,9 @@ const FoodForm = () => {
   ));
 
   const getDeletedSectionName = delSection && sectionIdName?.find(({ id }) => id === Number(delSection))?.name;
+  const getDeletedExtraName = getDataBySectionId(listSectionExtra, sectionValue as number)?.extraList?.find(
+    (item) => item.id === Number(delExtra),
+  )?.extraName;
 
   // const beforeUpload = (file: RcFile) => {
   //   const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
@@ -476,13 +496,7 @@ const FoodForm = () => {
                     <Form.Item name="itemExtra" id="itemExtra" style={{ fontWeight: 700, marginBottom: "0.5rem" }}>
                       <Select>
                         <Option value={EHandleType.NONE}> {t("foods.form-label.select")}</Option>
-                        {getDataBySectionId(listSectionExtra, sectionValue as number)?.extraList?.map(
-                          ({ id, extraName }, index) => (
-                            <Option key={index} value={id}>
-                              {capitalize(extraName)}
-                            </Option>
-                          ),
-                        )}
+                        {getExtraOptions}
                         <Option value={EHandleType.ADDEXTRA}>{t("foods.form-label.add-extra")}</Option>
                         <Option value={EHandleType.DELETEEXTRA}>{t("foods.form-label.delete-extra")}</Option>
                       </Select>
@@ -513,11 +527,7 @@ const FoodForm = () => {
                       <RowCenterSp style={{ marginBottom: 0 }}>
                         <Select value={delExtra} onChange={(e) => setDelExtra(e)}>
                           <Option value="">{t("foods.form-label.select")}</Option>
-                          {sortedFood[sectionValue]?.map((section, index) => (
-                            <Option key={index} value={section}>
-                              {capitalize(section)}
-                            </Option>
-                          ))}
+                          {getExtraOptions}
                         </Select>
                         <RediButton
                           aria-label="Delete extra"
@@ -563,19 +573,21 @@ const FoodForm = () => {
         onOk={() => form.submit()}
       >
         <Switch>
-          <Case condition={handleType === EHandleType.ADDSECTION}>Do you want to create {inputSection} section ?</Case>
+          <Case condition={handleType === EHandleType.ADDSECTION}>
+            Do you want to create {capitalize(inputSection)} section ?
+          </Case>
           <Case condition={handleType === EHandleType.DELETESECTION}>
             <>
-              <p>Do you want to delete {getDeletedSectionName} section ?</p>
+              <p>Do you want to delete {getDeletedExtraName} section ?</p>
               <p>These foods will be deleted</p>
-              {/* {foodList &&
-                foodList
+              {allFoods &&
+                allFoods
                   .filter((food) => {
-                    return food.sectionId === (delSection as any);
+                    return food.itemSection.id === Number(delSection);
                   })
-                  .map((food: IFoodApi) => {
+                  .map((food) => {
                     return <p key={food.id}>{food.itemName}</p>;
-                  })} */}
+                  })}
             </>
           </Case>
           <Case condition={handleType === EHandleType.ADDEXTRA}>Do you want to create {inputExtra} section ?</Case>
@@ -583,12 +595,12 @@ const FoodForm = () => {
             <>
               <p>Do you want to delete {delExtra} extra ?</p>
               <p>These foods will be deleted</p>
-              {/* {foodList &&
-                foodList
-                  .filter((food) => food.extraId === (delExtra as any))
-                  .map((food: IFoodApi) => {
+              {allFoods &&
+                allFoods
+                  .filter((food) => food.itemExtra.id === Number(delExtra))
+                  .map((food) => {
                     return <p key={food.id}>{food.itemName}</p>;
-                  })} */}
+                  })}
             </>
           </Case>
         </Switch>
