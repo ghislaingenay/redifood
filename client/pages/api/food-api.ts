@@ -1,4 +1,5 @@
 import { IFoodApi, IFoodSectionListWithExtra } from "../../redifood-module/src/interfaces";
+import { NotificationRes } from "../../src/definitions/notification.class";
 import { AxiosFunction } from "./axios-request";
 
 type TCreated = { created: boolean | "existed" };
@@ -19,9 +20,19 @@ export const handleCreateSection = (sectionName: string, listing: IFoodSectionLi
     body: { sectionName },
   })
     .then(() => {
+      NotificationRes.onSuccess({
+        title: "Section created",
+        description: "New section has been created",
+        placement: "bottomRight",
+      });
       return { created: true };
     })
     .catch(() => {
+      NotificationRes.onFailure({
+        title: "Failed to create section",
+        description: "Please try again",
+        placement: "bottomRight",
+      });
       return { created: false };
     });
   return createdRes;
@@ -43,9 +54,19 @@ export const handleCreateExtra = (
     body: { extraName },
   })
     .then(() => {
+      NotificationRes.onSuccess({
+        title: "Extra created",
+        description: "New extra has been created",
+        placement: "bottomRight",
+      });
       return { created: true };
     })
     .catch(() => {
+      NotificationRes.onFailure({
+        title: "Failed to create extra",
+        description: "Please try again",
+        placement: "bottomRight",
+      });
       return { created: false };
     });
   return createdRes;
