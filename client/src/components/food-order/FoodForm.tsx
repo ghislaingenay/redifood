@@ -19,7 +19,7 @@ import {
 } from "../../../redifood-module/src/interfaces";
 import { GREY, ORANGE_DARK, initialFormValues } from "../../constants";
 import { useFood } from "../../contexts/food.context";
-import { checkDisability, initializeDataForFoodForm, recoverIdName } from "../../functions/food.fn";
+import { checkDisability, getDataBySectionId, initializeDataForFoodForm, recoverIdName } from "../../functions/food.fn";
 import { capitalize } from "../../functions/global.fn";
 import useCurrency from "../../hooks/useCurrency.hook";
 import { EButtonType, EHandleType, IFormInterface } from "../../interfaces";
@@ -105,6 +105,8 @@ const FoodForm = () => {
   const [confirmModal, setConfirmModal] = useState(false);
   const [cancelModal, setCancelModal] = useState(false);
 
+  const haveFile = files.length !== 0;
+
   const optionsCreateFood = (fn: Function): IFormInterface[] => [
     {
       label: t("foods.form-label.name"),
@@ -177,20 +179,20 @@ const FoodForm = () => {
     },
   });
 
-  const checkFood = () => {
-    if (editMode === "true") return currentFood === newFoodData;
-    else return foodOrder[0] === form.getFieldsValue();
-  };
+  // const checkFood = () => {
+  //   if (editMode === "true") return currentFood === newFoodData;
+  //   else return foodOrder[0] === form.getFieldsValue();
+  // };
 
   const handleCancel = () => {
     if (handleType === EHandleType.ADDSECTION || handleType === EHandleType.DELETESECTION) {
       setInputSection("");
       setDelSection("");
-      form.setFieldsValue({ itemSection: foodOrder[0].sectionId });
+      form.setFieldsValue({ itemSection: foodOrder[0].itemSection.id });
     } else if (handleType === EHandleType.ADDEXTRA || handleType === EHandleType.DELETEEXTRA) {
       setInputExtra("");
       setDelExtra("");
-      form.setFieldsValue({ itemExtra: foodOrder[0].extraId });
+      form.setFieldsValue({ itemExtra: foodOrder[0].itemExtra.id });
     } else if (handleType === EHandleType.EDIT) {
       form.setFieldsValue(foodOrder[0]);
     } else {
@@ -256,7 +258,7 @@ const FoodForm = () => {
     } else {
       setFiles([]);
       form.setFieldsValue(initialFormValues);
-      return initialFormValues;
+      return undefined;
     }
   }, [selectFood, editMode]); // add section list extended from useEffect and add with state
 
@@ -304,7 +306,7 @@ const FoodForm = () => {
             />
           </Case>
           <Default>
-            <If condition={files.length === 0}>
+            <If condition={!haveFile}>
               <Then>
                 <RowCenter style={{ margin: "1rem 0" }}>
                   <div
@@ -463,11 +465,13 @@ const FoodForm = () => {
                     <Form.Item name="itemExtra" id="itemExtra" style={{ fontWeight: 700, marginBottom: "0.5rem" }}>
                       <Select>
                         <Option value={EHandleType.NONE}> {t("foods.form-label.select")}</Option>
-                        {sortedFood[sectionValue]?.map((extra, index) => (
-                          <Option key={index} value={extra}>
-                            {capitalize(extra)}
-                          </Option>
-                        ))}
+                        {getDataBySectionId(listSectionExtra, sectionValue as number)?.extraList?.map(
+                          ({ id, extraName }, index) => (
+                            <Option key={index} value={id}>
+                              {capitalize(extraName)}
+                            </Option>
+                          ),
+                        )}
                         <Option value={EHandleType.ADDEXTRA}>{t("foods.form-label.add-extra")}</Option>
                         <Option value={EHandleType.DELETEEXTRA}>{t("foods.form-label.delete-extra")}</Option>
                       </Select>
@@ -534,14 +538,7 @@ const FoodForm = () => {
                 >
                   {t("buttons.confirm")}
                 </RediIconButton>
-                <RediIconButton
-                  buttonType={EButtonType.ERROR}
-                  iconFt={faBan}
-                  onClick={() => {
-                    if (checkFood()) router.replace("/");
-                    else setCancelModal(true);
-                  }}
-                >
+                <RediIconButton buttonType={EButtonType.ERROR} iconFt={faBan} onClick={() => router.replace("/")}>
                   {t("buttons.cancel")}
                 </RediIconButton>
               </RowCenterSp>
