@@ -11,10 +11,15 @@ import { useDropzone } from "react-dropzone";
 import { Case, Default, Else, If, Switch, Then } from "react-if";
 import { toast } from "react-toastify";
 import { AxiosFunction } from "../../../pages/api/axios-request";
-import { IFoodApi, IGetSectionInfo } from "../../../redifood-module/src/interfaces";
+import {
+  IFoodApi,
+  IFoodGetApi,
+  IFoodSectionListWithExtra,
+  IGetSectionInfo,
+} from "../../../redifood-module/src/interfaces";
 import { GREY, ORANGE_DARK, initialFormValues } from "../../constants";
 import { useFood } from "../../contexts/food.context";
-import { checkDisability } from "../../functions/food.fn";
+import { checkDisability, initializeDataForFoodForm, recoverIdName } from "../../functions/food.fn";
 import { capitalize } from "../../functions/global.fn";
 import useCurrency from "../../hooks/useCurrency.hook";
 import { EButtonType, EHandleType, IFormInterface } from "../../interfaces";
@@ -83,6 +88,9 @@ const FoodForm = () => {
   const isDeleteSectionMode = sectionValue === EHandleType.DELETESECTION;
   const isAddSectionMode = sectionValue === EHandleType.ADDSECTION;
 
+  const [sectionIdName, setSectionIdName] = useState<{ id: number; name: string }[]>([]);
+  const [allFoods, setAllFoods] = useState<IFoodGetApi[]>([]);
+  const [listSectionExtra, setListSectionExtra] = useState<IFoodSectionListWithExtra[]>([]);
   const [loading, setLoading] = useState(false);
   const [handleType, setHandleType] = useState<EHandleType>(EHandleType.NONE);
   const [sortedFood, setSortedFood] = useState<Record<string, string[]>>({});
@@ -241,11 +249,8 @@ const FoodForm = () => {
 
   const currentFood = useMemo(() => {
     if (editMode === "true" && foodOrder.length !== 0) {
-      const { itemPrice, ...rest } = foodOrder[0];
-      form.setFieldsValue({
-        itemPrice: convertPrice(foodOrder[0].itemPrice, "backToFront", false),
-        ...rest,
-      } as any);
+      form.setFieldsValue(initializeDataForFoodForm(foodOrder[0]));
+      console.log(form.getFieldsValue());
       setFiles([foodOrder[0].itemPhoto]);
       return foodOrder[0];
     } else {
@@ -262,9 +267,13 @@ const FoodForm = () => {
       body: {},
       queryParams: {},
     })
-      .then((res: IGetSectionInfo) => {
-        console.log("res", res);
-        // const { listing, foods } = res;
+      .then((res: { results: IGetSectionInfo }) => {
+        const {
+          results: { listing, foods },
+        } = res;
+        setAllFoods(foods);
+        setListSectionExtra(listing);
+        setSectionIdName(recoverIdName(listing));
       })
       .catch((err) => toast.error(err.message));
   }, []);
@@ -361,8 +370,8 @@ const FoodForm = () => {
               {optionsCreateFood(displayCurrency)?.map(
                 ({ label, name, component, rules }: IFormInterface, index: number) => {
                   return (
-                    <>
-                      <LabelFormBlack htmlFor={name} key={index}>
+                    <div key={index}>
+                      <LabelFormBlack htmlFor={name}>
                         {label} <RedSpan>*</RedSpan>
                       </LabelFormBlack>
                       <Form.Item
@@ -374,7 +383,7 @@ const FoodForm = () => {
                       >
                         {component}
                       </Form.Item>
-                    </>
+                    </div>
                   );
                 },
               )}
@@ -389,12 +398,11 @@ const FoodForm = () => {
                   }}
                 >
                   <Option value={EHandleType.NONE}>{t("foods.form-label.select")}</Option>
-                  {/* {foodSection &&
-                    foodSection.map(({ id, sectionName }, index) => (
-                      <Option key={index} value={id}>
-                        {capitalize(sectionName)}
-                      </Option>
-                    ))} */}
+                  {sectionIdName?.map(({ id, name }, index) => (
+                    <Option key={index} value={id}>
+                      {capitalize(name)}
+                    </Option>
+                  ))}
                   <Option value={EHandleType.ADDSECTION}>{t("foods.form-label.add-section")}</Option>
                   <Option value={EHandleType.DELETESECTION}>{t("foods.form-label.delete-section")}</Option>
                 </Select>

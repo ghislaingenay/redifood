@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { useRouter as Router } from "next/router";
 import { useEffect, useState } from "react";
 import { Else, If, Then } from "react-if";
-import { IFoodApi, IFoodSectionList, IOrderApi } from "../../../redifood-module/src/interfaces";
+import { IFoodApi, IFoodGetApi, IFoodSectionList, IOrderApi } from "../../../redifood-module/src/interfaces";
 import { useFood } from "../../contexts/food.context";
 import { handleCreateOrder } from "../../functions/create-order.fn";
 import { setOptionsSelection } from "../../functions/food.fn";
@@ -22,7 +22,7 @@ import OrderSection from "./OrderSection";
 const { Title } = Typography;
 interface IFoodLayoutProps {
   transaction?: IOrderApi;
-  foods: IFoodApi[];
+  foods: IFoodGetApi[];
   mode: EFoodMode;
   updateFood?: (food: IFoodApi) => any;
   sectionList: IFoodSectionList[];
@@ -38,7 +38,6 @@ const FoodLayout = ({ foods, mode, sectionList, mainTitle, transaction }: IFoodL
 
   const { foodOrder } = useFood();
   const [width] = useWindowSize();
-
   const [foodSection] = useState<IFoodSectionList[]>(sectionList);
   const [foodList] = useState(foods);
   const [loading, setLoading] = useState(false);
@@ -56,7 +55,7 @@ const FoodLayout = ({ foods, mode, sectionList, mainTitle, transaction }: IFoodL
   const changeActiveButton = (sectionId: number) => {
     setSelectedSectionId(sectionId);
     if (sectionId === 0) return setSortedFoods([...foodList]);
-    const filteredfoods = [...foodList]?.filter((food) => food.sectionId === sectionId);
+    const filteredfoods = [...foodList]?.filter((food) => food.itemSection.id === sectionId);
     return setSortedFoods([...filteredfoods]);
   };
 

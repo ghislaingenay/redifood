@@ -1,4 +1,10 @@
-import { IFoodApi, IFoodOrder, IFoodSectionList } from "../../redifood-module/src/interfaces";
+import {
+  IFoodApi,
+  IFoodGetApi,
+  IFoodOrder,
+  IFoodSectionList,
+  IFoodSectionListWithExtra,
+} from "../../redifood-module/src/interfaces";
 import { EHandleType } from "../interfaces";
 
 export const convertFoodToSection = (foodList: IFoodApi[], foodSection: IFoodSectionList[]) => {
@@ -43,4 +49,30 @@ export const checkDisability = (sectionValue: EHandleType, extraValue: EHandleTy
     extraValue === EHandleType.ADDEXTRA ||
     extraValue === EHandleType.DELETEEXTRA
   );
+};
+
+export const recoverIdName = (listing: IFoodSectionListWithExtra[] | IFoodSectionList[]) => {
+  return [...listing]?.map((item) => {
+    return { id: item.id, name: item.sectionName };
+  });
+};
+
+export const getDataBySectionId = (
+  listSectionExtra: IFoodSectionListWithExtra[],
+  sectionId: IFoodSectionList["id"],
+): IFoodSectionListWithExtra | undefined => {
+  return listSectionExtra?.find((item) => item.id === sectionId);
+};
+
+export const initializeDataForFoodForm = (food: IFoodGetApi) => {
+  const { id, itemName, itemPrice, itemSection, itemExtra, itemPhoto } = food;
+  console.log("food", food);
+  return {
+    id,
+    itemPhoto,
+    itemName,
+    itemPrice: Number(itemPrice),
+    itemSection: itemSection.id,
+    itemExtra: itemExtra.id,
+  };
 };
