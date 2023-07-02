@@ -13,9 +13,11 @@ import { toast } from "react-toastify";
 import { AxiosFunction } from "../../../pages/api/axios-request";
 import {
   handleCreateExtra,
+  handleCreateFood,
   handleCreateSection,
   handleDeleteExtra,
   handleDeleteSection,
+  handleUpdatedFood,
 } from "../../../pages/api/food-api";
 import {
   IFoodApi,
@@ -25,7 +27,13 @@ import {
 } from "../../../redifood-module/src/interfaces";
 import { GREY, ORANGE_DARK, initialFormValues } from "../../constants";
 import { useFood } from "../../contexts/food.context";
-import { checkDisability, getDataBySectionId, initializeDataForFoodForm, recoverIdName } from "../../functions/food.fn";
+import {
+  checkDisability,
+  formDataToFood,
+  getDataBySectionId,
+  initializeDataForFoodForm,
+  recoverIdName,
+} from "../../functions/food.fn";
 import { capitalize } from "../../functions/global.fn";
 import useCurrency from "../../hooks/useCurrency.hook";
 import { EButtonType, EHandleType, IFormInterface } from "../../interfaces";
@@ -94,12 +102,15 @@ const FoodForm = () => {
   const isDeleteSectionMode = sectionValue === EHandleType.DELETESECTION;
   const isAddSectionMode = sectionValue === EHandleType.ADDSECTION;
 
+  const relatedToSectionAndExtra = isDeleteExtraMode || isAddExtraMode || isDeleteSectionMode || isAddSectionMode;
+  const isCreateNewFood = editMode === "false" && !relatedToSectionAndExtra;
+  const isEditFood = editMode === "true" && !relatedToSectionAndExtra;
+
   const [sectionIdName, setSectionIdName] = useState<{ id: number; name: string }[]>([]);
   const [allFoods, setAllFoods] = useState<IFoodGetApi[]>([]);
   const [listSectionExtra, setListSectionExtra] = useState<IFoodSectionListWithExtra[]>([]);
   const [loading, setLoading] = useState(false);
   const [handleType, setHandleType] = useState<EHandleType>(EHandleType.NONE);
-  const [sortedFood, setSortedFood] = useState<Record<string, string[]>>({});
   const [newFoodData, setNewFoodData] = useState<IFoodApi | null>(null);
   const [inputSection, setInputSection] = useState<string>("");
   const [delSection, setDelSection] = useState<string>("");
@@ -185,11 +196,6 @@ const FoodForm = () => {
     },
   });
 
-  // const checkFood = () => {
-  //   if (editMode === "true") return currentFood === newFoodData;
-  //   else return foodOrder[0] === form.getFieldsValue();
-  // };
-
   const handleCancel = () => {
     if (handleType === EHandleType.ADDSECTION || handleType === EHandleType.DELETESECTION) {
       setInputSection("");
@@ -208,11 +214,8 @@ const FoodForm = () => {
   };
 
   const onFinish = async (values: any) => {
-    console.log("values onFinish", values);
-    console.log("validated");
-    if (files.length === 0) {
-      return setError(true);
-    }
+    const formattedFoodData = formDataToFood(values);
+    if (files.length === 0) return setError(true);
     setError(false);
     switch (handleType) {
       case EHandleType.ADDSECTION: {
@@ -248,6 +251,14 @@ const FoodForm = () => {
       }
       default: {
       }
+    }
+    if (isCreateNewFood) {
+      const createdFoodRes = await handleCreateFood(formattedFoodData);
+      if (!createdFoodRes.created) return setConfirmModal(false);
+    }
+    if (isEditFood) {
+      const updateRes = await handleUpdatedFood(addAdditionnalFoodInfo(formattedFoodData), foodOrder[0].id);
+      if (!updateRes.updated) return setConfirmModal(false);
     }
     handleCancel();
   };
@@ -289,6 +300,7 @@ const FoodForm = () => {
       form.setFieldsValue(initializeDataForFoodForm(foodOrder[0]));
       console.log(form.getFieldsValue());
       setFiles([foodOrder[0].itemPhoto]);
+      console.log("foodOrder", foodOrder);
       return foodOrder[0];
     } else {
       setFiles([]);
@@ -296,6 +308,10 @@ const FoodForm = () => {
       return undefined;
     }
   }, [selectFood, editMode]); // add section list extended from useEffect and add with state
+
+  const addAdditionnalFoodInfo = (food: Omit<IFoodApi, "id" | "userId">): IFoodApi => {
+    return (currentFood && { ...food, id: currentFood.id, userId: currentFood.userId }) as IFoodApi;
+  };
 
   useEffect(() => {
     AxiosFunction({
@@ -308,6 +324,7 @@ const FoodForm = () => {
         const {
           results: { listing, foods },
         } = res;
+        console.log({res})
         setAllFoods(foods);
         setListSectionExtra(listing);
         setSectionIdName(recoverIdName(listing));
@@ -573,12 +590,12 @@ const FoodForm = () => {
         onOk={() => form.submit()}
       >
         <Switch>
-          <Case condition={handleType === EHandleType.ADDSECTION}>
-            Do you want to create {capitalize(inputSection)} section ?
-          </Case>
+          <Case condition={isCreateNewFood}>Do you want to confirm new food ?</Case>
+          <Case condition={isEditFood}>Do you want to confirm update food ?</Case>
+          <Case condition={handleType === EHandleType.ADDSECTION}>Do you want to create {inputSection} section ?</Case>
           <Case condition={handleType === EHandleType.DELETESECTION}>
             <>
-              <p>Do you want to delete {getDeletedExtraName} section ?</p>
+              <p>Do you want to delete {getDeletedSectionName} section ?</p>
               <p>These foods will be deleted</p>
               {allFoods &&
                 allFoods
@@ -593,7 +610,7 @@ const FoodForm = () => {
           <Case condition={handleType === EHandleType.ADDEXTRA}>Do you want to create {inputExtra} section ?</Case>
           <Case condition={handleType === EHandleType.DELETEEXTRA}>
             <>
-              <p>Do you want to delete {delExtra} extra ?</p>
+              <p>Do you want to delete {getDeletedExtraName} extra ?</p>
               <p>These foods will be deleted</p>
               {allFoods &&
                 allFoods
