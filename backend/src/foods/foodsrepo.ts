@@ -88,6 +88,24 @@ class Foods {
     return query;
   }
 
+  static async getOneFoodDBFormat(
+    foodId: IFoodApi['id'] | IFoodDB['id'],
+    userId: UserPayload['id'],
+  ): Promise<IFoodDB> {
+    return (await pool.query(
+      'SELECT * FROM food WHERE id = $1 SND user_id = $2',
+      [foodId, userId],
+    ).rows) as IFoodDB;
+  }
+
+  static async getOneFoodApiFormat(
+    foodId: IFoodApi['id'] | IFoodDB['id'],
+    userId: UserPayload['id'],
+  ): Promise<IFoodApi> {
+    const res = await Foods.getOneFoodDBFormat(foodId, userId);
+    return convertKeys<IFoodDB, IFoodApi>(res, 'dbToApi');
+  }
+
   static async getSectionList(
     userId: UserPayload['id'],
   ): Promise<IFoodSectionList[]> {
@@ -245,6 +263,7 @@ class Foods {
       userId,
       sectionListing,
     );
+    console.log('extra', extraSectionList);
     const formattedFoods = await Foods.findAllFormatted(userId);
     return { listing: extraSectionList, foods: formattedFoods };
   }
