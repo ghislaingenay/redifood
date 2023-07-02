@@ -6,10 +6,9 @@ import axios from "axios";
 import { useTranslation } from "next-i18next";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Case, Default, Else, If, Switch, Then } from "react-if";
-import { toast } from "react-toastify";
 import { AxiosFunction } from "../../../pages/api/axios-request";
 import {
   handleCreateExtra,
@@ -79,7 +78,7 @@ const FoodForm = () => {
     setFoodOrder,
     functions: { selectFood },
   } = useFood();
-  const { displayCurrency, convertPrice } = useCurrency();
+  const { displayCurrency } = useCurrency();
 
   const [form] = Form.useForm();
   const pictureValue = Form.useWatch("itemPhoto", form);
@@ -93,9 +92,10 @@ const FoodForm = () => {
     { label: t("buttons.create"), value: "false", icon: <FontAwesomeIcon icon={faSquarePlus} />, ariaLabel: "CREATE" },
   ];
 
-  const [editMode, setEditMode] = useState<Booleanish>("true");
-  const switchMode = editMode === "true" ? "false" : "true";
+  const [editMode, setEditMode] = useState<Booleanish>("false");
+  const currentMode = useDeferredValue(editMode);
   const isEditModeWithoutFood = editMode === "true" && foodOrder.length === 0;
+  const isEditModeWithFood = editMode === "true" && foodOrder.length !== 0;
 
   const isDeleteExtraMode = extraValue === EHandleType.DELETEEXTRA;
   const isAddExtraMode = extraValue === EHandleType.ADDEXTRA;
@@ -110,8 +110,8 @@ const FoodForm = () => {
   const [allFoods, setAllFoods] = useState<IFoodGetApi[]>([]);
   const [listSectionExtra, setListSectionExtra] = useState<IFoodSectionListWithExtra[]>([]);
   const [loading, setLoading] = useState(false);
+  const [onFinishLoading, setOnFinishLoading] = useState(false);
   const [handleType, setHandleType] = useState<EHandleType>(EHandleType.NONE);
-  const [newFoodData, setNewFoodData] = useState<IFoodApi | null>(null);
   const [inputSection, setInputSection] = useState<string>("");
   const [delSection, setDelSection] = useState<string>("");
   const [inputExtra, setInputExtra] = useState<string>("");
@@ -184,13 +184,16 @@ const FoodForm = () => {
       formData.append("file", acceptedFiles[0]);
       console.log("acc", acceptedFiles);
       formData.append("upload_preset", String(process.env.NEXT_PUBLIC_UPLOAD_PRESET));
-      const response = await axios.post(
-        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_NAME}/image/upload`,
-        formData,
-      );
+      const response: any = await axios
+        .post(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_NAME}/image/upload`, formData)
+        .catch((err) => {
+          console.log("err", err);
+        });
+      console.log("res", response);
       const { statusText, data } = response;
       console.log(data.secure_url);
       if (statusText === "OK") {
+        form.setFieldValue("itemPhoto", data.secure_url);
         return setUrlFile(data.secure_url);
       }
     },
@@ -210,25 +213,34 @@ const FoodForm = () => {
     } else {
       form.setFieldsValue({});
     }
+    setOnFinishLoading(false);
     router.refresh();
   };
 
+  const failToSave = () => {
+    setConfirmModal(false);
+    setOnFinishLoading(false);
+    return;
+  };
+
   const onFinish = async (values: any) => {
-    const formattedFoodData = formDataToFood(values);
+    setOnFinishLoading(true);
     if (files.length === 0) return setError(true);
+    const formattedFoodData = formDataToFood(values);
+    console.log("updated", formattedFoodData);
     setError(false);
     switch (handleType) {
       case EHandleType.ADDSECTION: {
         console.log("new section added", inputSection);
         const createdSectionRes = await handleCreateSection(inputSection.toLowerCase(), listSectionExtra);
-        if (!createdSectionRes.created) return setConfirmModal(false);
+        if (!createdSectionRes.created) return failToSave();
         setInputSection("");
         break;
       }
       case EHandleType.DELETESECTION: {
         console.log("deleted section", delSection);
         const deleteSectionRes = await handleDeleteSection(Number(delSection));
-        if (!deleteSectionRes.deleted) return setConfirmModal(false);
+        if (!deleteSectionRes.deleted) return failToSave();
         setDelSection("");
         form.setFieldValue("itemSection", EHandleType.NONE);
         break;
@@ -236,7 +248,7 @@ const FoodForm = () => {
       case EHandleType.ADDEXTRA: {
         console.log("created extra", inputExtra);
         const createExtraRes = await handleCreateExtra(inputExtra.toLowerCase(), sectionValue, listSectionExtra);
-        if (!createExtraRes.created) return setConfirmModal(false);
+        if (!createExtraRes.created) return failToSave();
         form.setFieldValue("itemExtra", EHandleType.NONE);
         setInputExtra("");
         break;
@@ -244,7 +256,7 @@ const FoodForm = () => {
       case EHandleType.DELETEEXTRA: {
         console.log("deleted extra", delExtra);
         const deleteExtraRes = await handleDeleteExtra(Number(delExtra));
-        if (!deleteExtraRes.deleted) return setConfirmModal(false);
+        if (!deleteExtraRes.deleted) return failToSave();
         form.setFieldValue("itemExtra", EHandleType.NONE);
         setDelExtra("");
         break;
@@ -254,11 +266,11 @@ const FoodForm = () => {
     }
     if (isCreateNewFood) {
       const createdFoodRes = await handleCreateFood(formattedFoodData);
-      if (!createdFoodRes.created) return setConfirmModal(false);
+      if (!createdFoodRes.created) return failToSave();
     }
     if (isEditFood) {
       const updateRes = await handleUpdatedFood(addAdditionnalFoodInfo(formattedFoodData), foodOrder[0].id);
-      if (!updateRes.updated) return setConfirmModal(false);
+      if (!updateRes.updated) return failToSave();
     }
     handleCancel();
   };
@@ -294,9 +306,8 @@ const FoodForm = () => {
   //   }
   //   return isJpgOrPng && isLt2M;
   // };
-
   const currentFood = useMemo(() => {
-    if (editMode === "true" && foodOrder.length !== 0) {
+    if (isEditModeWithFood) {
       form.setFieldsValue(initializeDataForFoodForm(foodOrder[0]));
       console.log(form.getFieldsValue());
       setFiles([foodOrder[0].itemPhoto]);
@@ -314,6 +325,7 @@ const FoodForm = () => {
   };
 
   useEffect(() => {
+    setLoading(true);
     AxiosFunction({
       method: "get",
       url: "api/foods/section/information",
@@ -324,12 +336,15 @@ const FoodForm = () => {
         const {
           results: { listing, foods },
         } = res;
-        console.log({res})
         setAllFoods(foods);
         setListSectionExtra(listing);
         setSectionIdName(recoverIdName(listing));
+        setLoading(false);
       })
-      .catch((err) => toast.error(err.message));
+      .catch(() => {
+        setLoading(false);
+        // toast.error(err.message)
+      });
   }, []);
 
   return (
@@ -341,11 +356,11 @@ const FoodForm = () => {
           fontSize="0.75rem"
           options={foodRadioOptions}
           haveIcon={"true"}
-          selectedButton={editMode}
-          clickedFn={() => {
+          selectedButton={currentMode}
+          clickedFn={(e) => {
             setFoodOrder([]);
             form.setFieldsValue(initialFormValues);
-            setEditMode(switchMode);
+            setEditMode(() => e);
           }}
         />
         <Switch>
@@ -412,12 +427,9 @@ const FoodForm = () => {
               onFinish={onFinish}
               layout="vertical"
               onValuesChange={(e, all) => {
-                console.log("all", all);
+                console.log("onFinish - all", all);
                 console.log(e);
                 form.setFieldsValue(all);
-                if (editMode === "true") {
-                  setNewFoodData(all);
-                }
               }}
             >
               <Form.Item style={{ display: "none" }} name="itemPhoto" />
@@ -495,7 +507,6 @@ const FoodForm = () => {
                         style={{ marginTop: "0.5rem" }}
                         disabled={delSection === "" || delSection === "all" ? true : false}
                         onClick={() => {
-                          // ViewSectionModel
                           setHandleType(EHandleType.DELETESECTION);
                           setConfirmModal(true);
                         }}
