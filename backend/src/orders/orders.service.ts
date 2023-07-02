@@ -112,14 +112,13 @@ export class OrdersService {
         foodResults,
         orderItemsResults,
       );
-      const foodList = await Foods.findAllFoods(userId);
-      const foodSection = await Foods.getSectionList(userId);
+      const { foods, listing } = await Foods.getAllInformationBySection(userId);
       return {
         results: {
-          foodList,
-          foodSection,
+          foodList: foods,
+          foodSectionExtra: listing,
           order,
-          orderItems: updatedFoodWithQuantity,
+          orderFoodItems: updatedFoodWithQuantity,
         },
         statusCode: HttpStatus.OK,
         message: 'Order recovered',

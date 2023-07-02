@@ -259,9 +259,9 @@ class Orders {
   }
 
   static addFoodQuantityToOrderItems(
-    foodList: Omit<IFoodApi[], 'itemQuantity'>,
+    foodList: Omit<IFoodGetApi[], 'itemQuantity'>,
     orderItems: IFoodOrder[],
-  ): IFoodApi[] {
+  ): IFoodGetApi[] {
     return [...foodList].map((item) => {
       const foundItem = orderItems.find(
         (orderItem) => orderItem.id === item.id,

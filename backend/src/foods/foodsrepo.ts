@@ -215,16 +215,9 @@ class Foods {
   static async getFoodApiByFoodIdArray(
     foodArray: number[],
     userId: UserPayload['id'],
-  ): Promise<IFoodApi[]> {
-    const arrayString = `(${foodArray.join(',')})`;
-    const response = await pool.query(
-      `SELECT * FROM food WHERE id IN ${arrayString} AND user_id = $1`,
-      [userId],
-    );
-    const dbResponse: IFoodDB[] = response.rows;
-    return [...dbResponse]?.map((item) => {
-      return convertKeys<IFoodDB, IFoodApi>(item, 'dbToApi');
-    });
+  ): Promise<IFoodGetApi[]> {
+    const foodsGet = await Foods.findAllFormatted(userId);
+    return [...foodsGet]?.filter((item) => foodArray.includes(item.id));
   }
 
   static async getExtraListBySectionId(
