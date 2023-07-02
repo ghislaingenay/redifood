@@ -3,7 +3,13 @@ import { useRouter } from "next/navigation";
 import { useRouter as Router } from "next/router";
 import { useEffect, useState } from "react";
 import { Else, If, Then } from "react-if";
-import { IFoodApi, IFoodGetApi, IFoodSectionList, IOrderApi } from "../../../redifood-module/src/interfaces";
+import {
+  IFoodApi,
+  IFoodGetApi,
+  IFoodSectionList,
+  IFoodSectionListWithExtra,
+  IOrderApi,
+} from "../../../redifood-module/src/interfaces";
 import { useFood } from "../../contexts/food.context";
 import { handleCreateOrder } from "../../functions/create-order.fn";
 import { setOptionsSelection } from "../../functions/food.fn";
@@ -25,7 +31,7 @@ interface IFoodLayoutProps {
   foods: IFoodGetApi[];
   mode: EFoodMode;
   updateFood?: (food: IFoodApi) => any;
-  sectionList: IFoodSectionList[];
+  sectionList: IFoodSectionListWithExtra[];
   mainTitle: string;
 }
 

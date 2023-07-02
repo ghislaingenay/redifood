@@ -7,7 +7,7 @@ import {
   IExtraDB,
   IFoodApi,
   IFoodGetApi,
-  IFoodSectionList,
+  IFoodSectionListWithExtra,
   IGetSectionInfo,
   IGetServerSideData,
   ISectionFoodApi,
@@ -29,17 +29,13 @@ export class FoodService {
   async getAllFoods(userId: UserPayload['id']): Promise<
     IGetServerSideData<{
       foodResults: IFoodGetApi[];
-      sectionList: IFoodSectionList[];
+      sectionExtraList: IFoodSectionListWithExtra[];
     }>
   > {
-    const foodResults = await Foods.findAllFormatted(userId);
-    if (!foodResults) {
-      throw new DatabaseError();
-    }
-    const sectionList = await Foods.getSectionList(userId);
+    const { listing, foods } = await Foods.getAllInformationBySection(userId);
     return {
       statusCode: EStatusCodes.SUCCESS,
-      results: { foodResults, sectionList },
+      results: { foodResults: foods, sectionExtraList: listing },
       message: EFoodMessage.FOOD_RECOVERED,
     };
   }
