@@ -65,14 +65,28 @@ export const getDataBySectionId = (
 };
 
 export const initializeDataForFoodForm = (food: IFoodGetApi) => {
-  const { id, itemName, itemPrice, itemSection, itemExtra, itemPhoto } = food;
+  const { id, itemName, itemPrice, itemSection, itemExtra, itemPhoto, itemDescription } = food;
   console.log("food", food);
   return {
     id,
     itemPhoto,
     itemName,
+    itemDescription,
     itemPrice: Number(itemPrice),
     itemSection: itemSection.id,
     itemExtra: itemExtra.id,
+  };
+};
+
+export const formDataToFood = (formData: any): Omit<IFoodApi, "id" | "userId"> => {
+  const { itemSection, itemExtra, itemName, itemPrice, itemPhoto, itemDescription } = formData;
+  return {
+    itemName,
+    itemDescription,
+    itemQuantity: 0,
+    itemPrice,
+    sectionId: itemSection,
+    extraId: itemExtra,
+    itemPhoto,
   };
 };
