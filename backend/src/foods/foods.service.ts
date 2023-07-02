@@ -5,6 +5,7 @@ import {
   EStatusCodes,
   IExtraApi,
   IExtraDB,
+  IFoodApi,
   IFoodGetApi,
   IFoodSectionList,
   IGetSectionInfo,
@@ -40,6 +41,18 @@ export class FoodService {
       statusCode: EStatusCodes.SUCCESS,
       results: { foodResults, sectionList },
       message: EFoodMessage.FOOD_RECOVERED,
+    };
+  }
+
+  async getOneFood(
+    foodId: number,
+    userId: UserPayload['id'],
+  ): Promise<IGetServerSideData<IFoodApi>> {
+    const food = await Foods.getOneFoodApiFormat(foodId, userId);
+    return {
+      results: food,
+      statusCode: HttpStatus.OK,
+      message: `Recovered food ${food.itemName} id #${food.id}`,
     };
   }
 
@@ -144,18 +157,21 @@ export class FoodService {
         message: `${body.itemName} was properly created`,
       };
     } catch (error) {
-      return {
-        results: {},
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: `Impossible to create ${body.itemName}. Please try again later`,
-      };
+      console.log(error);
+      throw new DatabaseError();
     }
   }
 
-  async updateFood(body: UpdateFoodDto, id: number) {
-    const postgresQuery = updateQuery(convertKeys(body, 'apiToDb'), 'food');
+  async updateFood(body: UpdateFoodDto, foodId: number) {
+    const foundFound = await Foods.getOneFoodApiFormat(foodId, body.userId);
+    // send update only input that changed
+    const updatedBody = Foods.returnModifiedElements(body, foundFound);
+    const postgresQuery = updateQuery(
+      convertKeys(updatedBody, 'apiToDb'),
+      'food',
+    );
     console.log('postgresQuery', postgresQuery);
-    const response = await Foods.updateRow(postgresQuery, id);
+    const response = await Foods.updateRow(postgresQuery, foodId);
 
     if (!response) {
       throw new DatabaseError();

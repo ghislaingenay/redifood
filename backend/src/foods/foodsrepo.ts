@@ -92,10 +92,13 @@ class Foods {
     foodId: IFoodApi['id'] | IFoodDB['id'],
     userId: UserPayload['id'],
   ): Promise<IFoodDB> {
-    return (await pool.query(
+    const res = (await pool.query(
       'SELECT * FROM food WHERE id = $1 SND user_id = $2',
       [foodId, userId],
     ).rows) as IFoodDB;
+    console.log('get one food', res);
+    if (!res) throw new BadRequestException('No found found with this id');
+    return res[0];
   }
 
   static async getOneFoodApiFormat(
@@ -266,6 +269,18 @@ class Foods {
     console.log('extra', extraSectionList);
     const formattedFoods = await Foods.findAllFormatted(userId);
     return { listing: extraSectionList, foods: formattedFoods };
+  }
+
+  static returnModifiedElements(
+    foodForm: Partial<IFoodApi>,
+    foodApi: Partial<IFoodApi>,
+  ) {
+    const newModifiedObj: Partial<IFoodApi> = {};
+    for (const key in foodApi) {
+      if (foodApi[key] !== foodForm[key]) newModifiedObj[key] = foodForm[key];
+    }
+    if (!newModifiedObj) throw new BadRequestException('No changes was made');
+    return newModifiedObj;
   }
 }
 
