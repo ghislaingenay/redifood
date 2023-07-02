@@ -17,11 +17,7 @@ import {
   UserPayload,
 } from 'redifood-module/src/interfaces';
 import Foods from 'src/foods/foodsrepo';
-import {
-  convertKeys,
-  createQuery,
-  updateQuery,
-} from 'src/foods/global.function';
+import { convertKeys, updateQuery } from 'src/foods/global.function';
 import { DatabaseError } from '../../redifood-module/src/handling-nestjs/database-error.exception';
 import { pool } from '../pool.pg';
 import { AwaitPaymentDto } from './orders.dto';
@@ -191,9 +187,10 @@ class Orders {
     }
   }
 
-  static async setOrderItems(idList: IMenuId, orderItems: string) {
+  static async setOrderItems(idList: IMenuId) {
     try {
       const { userId, orderId } = idList;
+      const { orderItems } = await Orders.findOne(idList);
       const orderMenu: IFoodOrder[] = JSON.parse(orderItems);
       const foodList = await Foods.findAllFormatted(userId);
       const updatedMenu: IFoodGetApi[] = foodList.map((item: IFoodGetApi) => {
@@ -219,12 +216,14 @@ class Orders {
         };
       });
 
-      const createdQuery = createQuery<IOrderItemsDB[]>(
-        completedMenu,
-        'order_items',
-      );
-      const response = await pool.query(createdQuery);
-      return response;
+      console.log('cmp menu', completedMenu);
+      // const createdQuery = createQuery<IOrderItemsDB[]>(
+      //   completedMenu,
+      //   'order_items',
+      // );
+      // const response = await pool.query(createdQuery);
+      // return response;
+      return true;
     } catch (err) {
       throw new BadRequestException("Can't create order items");
     }

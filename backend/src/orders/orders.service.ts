@@ -191,21 +191,16 @@ export class OrdersService {
   }
 
   async createOrderItems({
-    orderItems,
     userId,
     orderId,
   }: {
-    orderItems: string;
     userId: UserPayload['id'];
     orderId: number;
   }) {
-    const orderItemsResults = await Orders.setOrderItems(
-      {
-        userId,
-        orderId,
-      },
-      orderItems,
-    );
+    const orderItemsResults = await Orders.setOrderItems({
+      userId,
+      orderId,
+    });
     return {
       statusCode: HttpStatus.CREATED,
       results: orderItemsResults,
@@ -246,7 +241,7 @@ export class OrdersService {
   ): Promise<IGetServerSideData<IPaymentDB>> {
     const { orderId, userId } = body;
     const orderData = await Orders.findOne({ orderId, userId });
-    const { orderTotal, orderItems } = orderData;
+    const { orderTotal } = orderData;
     const settingData = await Setting.findOne({ user: userId });
     const dataForPayment: IPaymentDB = Orders.buildDataForPayment(
       body,
@@ -257,7 +252,7 @@ export class OrdersService {
     if (paymentResult.created) {
       try {
         await Orders.validatePayment(orderId); // For now validate the order directly to avoid problems
-        await Orders.setOrderItems({ orderId, userId }, orderItems);
+        await Orders.setOrderItems({ orderId, userId });
         return {
           statusCode: HttpStatus.OK,
           results: dataForPayment,

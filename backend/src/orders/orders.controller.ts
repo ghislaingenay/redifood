@@ -23,7 +23,12 @@ import GoogleSheetService, {
 } from '../../src/definitions/googlesheet';
 import { AuthGuard } from '../../src/global/auth-guard';
 import { ValidationPipe } from '../../src/global/validation.pipe';
-import { AwaitPaymentDto, CreateOrderDto, UpdateOrderDto } from './orders.dto';
+import {
+  AwaitPaymentDto,
+  CreateOrderDto,
+  CreateOrderItemsDto,
+  UpdateOrderDto,
+} from './orders.dto';
 import { OrdersService } from './orders.service';
 
 @Controller('api/orders')
@@ -122,19 +127,6 @@ export class OrdersController {
     return await this.ordersService.awaitPayment(body);
   }
 
-  // @UseGuards(new AuthGuard())
-  // @Post('receipt/:id')
-  // async sendReceipt(
-  //   @Param(
-  //     'id',
-  //     new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
-  //   )
-  //   orderId: number,
-  //   @Body(new ValidationPipe()) sendReceiptDto: ReceiptBodyDto,
-  // ) {
-  //   return await this.ordersService.sendReceipt(sendReceiptDto, orderId);
-  // }
-
   @UseGuards(new AuthGuard())
   @Post()
   async createOrder(
@@ -171,9 +163,16 @@ export class OrdersController {
     return await this.ordersService.cancelOrder(orderId, user.id);
   }
 
-  // update order and update order item // send back the menu
-  // cancel order apin and update order item
-  // add await payment api
-  // add to google sheet as well to have all the data
-  // add information for receipt as well
+  @UseGuards(new AuthGuard())
+  @Post('items')
+  async createOrderItems(
+    @User() user: UserPayload,
+    @Body(new ValidationPipe()) createOrderItemsDto: CreateOrderItemsDto,
+  ) {
+    const { orderId } = createOrderItemsDto;
+    return await this.ordersService.createOrderItems({
+      orderId,
+      userId: user.id,
+    });
+  }
 }

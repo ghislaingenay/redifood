@@ -73,3 +73,9 @@ export class ReceiptBodyDto {
   @IsString()
   orderItems: string;
 }
+
+export class CreateOrderItemsDto {
+  @IsInt()
+  @IsNotEmpty()
+  orderId: number;
+}
