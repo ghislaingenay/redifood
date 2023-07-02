@@ -75,7 +75,7 @@ export const handleCreateExtra = (
       });
       return { created: true };
     })
-    .catch((err) => {
+    .catch(() => {
       NotificationRes.onFailure({
         title: "Failed to create extra",
         description: "Please try again",
@@ -94,9 +94,19 @@ export const handleDeleteSection = (sectionId: number): PromiseDeleted => {
     body: {},
   })
     .then(() => {
+      NotificationRes.onSuccess({
+        title: "Section deleted",
+        description: "Section has been deleted",
+        placement: "bottomRight",
+      });
       return { deleted: true };
     })
     .catch(() => {
+      NotificationRes.onFailure({
+        title: "Failed to delete section",
+        description: "Please try again",
+        placement: "bottomRight",
+      });
       return { deleted: false };
     });
   return deleteRes;
@@ -110,9 +120,19 @@ export const handleDeleteExtra = (extraId: number): PromiseDeleted => {
     body: {},
   })
     .then(() => {
+      NotificationRes.onSuccess({
+        title: "Extra deleted",
+        description: "Extra has been deleted",
+        placement: "bottomRight",
+      });
       return { deleted: true };
     })
     .catch(() => {
+      NotificationRes.onFailure({
+        title: "Failed to delete extra",
+        description: "Please try again",
+        placement: "bottomRight",
+      });
       return { deleted: false };
     });
   return deleteRes;
@@ -126,15 +146,26 @@ export const handleCreateFood = (food: Omit<IFoodApi, "id" | "userId">): Promise
     body: { ...food },
   })
     .then(() => {
+      NotificationRes.onSuccess({
+        title: "Food created",
+        description: "New food has been created",
+        placement: "bottomRight",
+      });
       return { created: true };
     })
     .catch(() => {
+      NotificationRes.onFailure({
+        title: "Failed to create food",
+        description: "Please try again",
+        placement: "bottomRight",
+      });
       return { created: false };
     });
   return createdRes;
 };
 
 export const handleUpdatedFood = (food: IFoodApi, foodId: IFoodApi["id"]): PromiseUpdated => {
+  console.log({ food }, foodId);
   const updatedRes = AxiosFunction({
     url: `api/foods/${foodId}`,
     method: "put",
@@ -142,9 +173,19 @@ export const handleUpdatedFood = (food: IFoodApi, foodId: IFoodApi["id"]): Promi
     body: { ...food },
   })
     .then(() => {
+      NotificationRes.onSuccess({
+        title: "Food updated",
+        description: "Food has been updated",
+        placement: "bottomRight",
+      });
       return { updated: true };
     })
     .catch(() => {
+      NotificationRes.onFailure({
+        title: "Failed to update food",
+        description: "Please try again",
+        placement: "bottomRight",
+      });
       return { updated: false };
     });
   return updatedRes;
