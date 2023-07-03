@@ -1,6 +1,6 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import moment from 'moment';
-import { DatabaseError } from 'src/others/database-error.exception';
+import { DatabaseError } from 'src/global/database-error.exception';
 import Stripe from 'stripe';
 import {
   EPaymentStatus,

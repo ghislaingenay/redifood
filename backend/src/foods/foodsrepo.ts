@@ -1,5 +1,5 @@
 import { BadRequestException } from '@nestjs/common';
-import { DatabaseError } from 'src/others/database-error.exception';
+import { DatabaseError } from 'src/global/database-error.exception';
 import {
   IExtraApi,
   IFoodApi,

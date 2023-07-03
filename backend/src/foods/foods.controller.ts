@@ -10,8 +10,8 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
-import { User } from 'redifood-module/src/handling-nestjs/user-decorator';
 import { UserPayload } from 'redifood-module/src/interfaces';
+import { User } from 'src/global/user-decorator';
 import { AuthGuard } from '../../src/global/auth-guard';
 import { ValidationPipe } from '../global/validation.pipe';
 import {

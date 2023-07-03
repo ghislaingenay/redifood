@@ -8,7 +8,7 @@ import {
   UserPayload,
 } from '../../redifood-module/src/interfaces';
 import { Email } from '../models/email.model';
-import { DatabaseError } from './../others/database-error.exception';
+import { DatabaseError } from '../global/database-error.exception';
 import { ForgetPasswordDto, ValidateEmailDto } from './email.dto';
 
 @Injectable()

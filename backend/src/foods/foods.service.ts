@@ -1,6 +1,6 @@
 import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
 import axios from 'axios';
-import { DatabaseError } from 'src/others/database-error.exception';
+import { DatabaseError } from 'src/global/database-error.exception';
 import {
   EStatusCodes,
   IExtraApi,
