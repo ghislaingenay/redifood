@@ -13,11 +13,11 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   verifyKeys();
-  app.enableCors({
-    allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept',
-    origin: 'http://localhost:3001',
-    credentials: true,
-  });
+  // app.enableCors({
+  //   allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept',
+  //   origin: 'http://localhost:3001',
+  //   credentials: true,
+  // });
   app.use(
     urlencoded({
       extended: true,
