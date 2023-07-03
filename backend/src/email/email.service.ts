@@ -2,13 +2,13 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import * as moment from 'moment';
 import EmailProvider from 'src/definitions/email-provider';
 import { User } from 'src/models/users.model';
-import { DatabaseError } from '../../redifood-module/src/handling-nestjs/database-error.exception';
 import {
   ELanguage,
   IGetServerSideData,
   UserPayload,
 } from '../../redifood-module/src/interfaces';
 import { Email } from '../models/email.model';
+import { DatabaseError } from './../others/database-error.exception';
 import { ForgetPasswordDto, ValidateEmailDto } from './email.dto';
 
 @Injectable()

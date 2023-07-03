@@ -1,5 +1,5 @@
 import { BadRequestException } from '@nestjs/common';
-import { DatabaseError } from '../../redifood-module/src/handling-nestjs/database-error.exception';
+import { DatabaseError } from 'src/others/database-error.exception';
 import {
   IExtraApi,
   IFoodApi,

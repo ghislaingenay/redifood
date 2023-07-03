@@ -1,5 +1,4 @@
 import StripePayService from 'src/definitions/stripe-service';
-import { DatabaseError } from '../../redifood-module/src/handling-nestjs/database-error.exception';
 import {
   IPaymentApi,
   IPaymentDB,
@@ -7,6 +6,7 @@ import {
 } from '../../redifood-module/src/interfaces';
 import { convertKeys, createQuery } from '../../src/foods/global.function';
 import { pool } from '../../src/pool.pg';
+import { DatabaseError } from 'src/others/database-error.exception';
 
 class Payments {
   static async findAllByUser(

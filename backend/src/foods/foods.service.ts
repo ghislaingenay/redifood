@@ -1,6 +1,6 @@
 import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
 import axios from 'axios';
-import { DatabaseError } from '../../redifood-module/src/handling-nestjs/database-error.exception';
+import { DatabaseError } from 'src/others/database-error.exception';
 import {
   EStatusCodes,
   IExtraApi,

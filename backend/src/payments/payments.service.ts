@@ -1,8 +1,6 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import moment from 'moment';
-import { DatabaseError } from '../../redifood-module/src/handling-nestjs/database-error.exception';
-import StripePayService from '../../src/definitions/stripe-service';
-import { convertKeys } from '../../src/foods/global.function';
+import { DatabaseError } from 'src/others/database-error.exception';
 import Stripe from 'stripe';
 import {
   EPaymentStatus,
@@ -12,6 +10,8 @@ import {
   IPaymentDB,
   UserPayload,
 } from '../../redifood-module/src/interfaces';
+import StripePayService from '../../src/definitions/stripe-service';
+import { convertKeys } from '../../src/foods/global.function';
 import { CreatePaymentDto, PayPaymentDto } from './payments.dto';
 import Payments from './paymentsrepo';
 

@@ -18,7 +18,7 @@ import {
 } from 'redifood-module/src/interfaces';
 import Foods from 'src/foods/foodsrepo';
 import { convertKeys, updateQuery } from 'src/foods/global.function';
-import { DatabaseError } from '../../redifood-module/src/handling-nestjs/database-error.exception';
+import { DatabaseError } from 'src/others/database-error.exception';
 import { pool } from '../pool.pg';
 import { AwaitPaymentDto } from './orders.dto';
 interface IMenuId {
