@@ -5,7 +5,7 @@ const { Title } = Typography;
 interface IOrderCardProps {
   order: IOrderApi;
 }
-const OrderCard = ({ order }: IOrderCardProps) => {
+const OrderCard = ({ order: { orderItems, orderTableNumber, id, orderTotal } }: IOrderCardProps) => {
   const currency = "$";
 
   const columns = [
@@ -36,20 +36,20 @@ const OrderCard = ({ order }: IOrderCardProps) => {
       <Row justify="space-between" align="middle">
         <Col md={6}>
           <Title className="mt-0" level={5}>
-            Order ID: <em>{order._id}</em>
+            Order ID: <em>{id}</em>
           </Title>
         </Col>
         <Col md={6}>
           <Title className="mt-0" level={5}>
             Order Total:{" "}
             <em>
-              {order.orderTotal} {currency}
+              {orderTotal} {currency}
             </em>
           </Title>
         </Col>
         <Col md={6}>
           <Title className="mt-0" level={5}>
-            Table Number: <em>{order.tableNumber}</em>
+            Table Number: <em>{orderTableNumber}</em>
           </Title>
         </Col>
         <Col md={6}>
@@ -63,7 +63,7 @@ const OrderCard = ({ order }: IOrderCardProps) => {
       <Title level={5} className="mt-0 text-center">
         MENU
       </Title>
-      <Table dataSource={order.orderItems} rowKey="itemId" columns={columns} pagination={false} />
+      <Table dataSource={orderItems} rowKey="itemId" columns={columns} pagination={false} />
     </Card>
   );
 };

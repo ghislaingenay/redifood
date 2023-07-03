@@ -226,7 +226,7 @@ const FoodForm = () => {
   const onFinish = async (values: any) => {
     setOnFinishLoading(true);
     if (files.length === 0) return setError(true);
-    const formattedFoodData = formDataToFood(values);
+    const formattedFoodData = formDataToFood({ ...values, itemPhoto: urlFile });
     console.log("updated", formattedFoodData);
     setError(false);
     switch (handleType) {
@@ -346,6 +346,8 @@ const FoodForm = () => {
         // toast.error(err.message)
       });
   }, []);
+
+  if (loading) return <p>Loading...</p>;
 
   return (
     <>
@@ -599,6 +601,7 @@ const FoodForm = () => {
         open={confirmModal}
         onCancel={() => setConfirmModal((prevValue: boolean) => !prevValue)}
         onOk={() => form.submit()}
+        confirmLoading={onFinishLoading}
       >
         <Switch>
           <Case condition={isCreateNewFood}>Do you want to confirm new food ?</Case>

@@ -17,7 +17,7 @@ export const convertFoodToSection = (foodList: IFoodApi[], foodSection: IFoodSec
   return foodObject;
 };
 
-export const setFoodItemsForDb = (foodOrder: IFoodApi[]): IFoodOrder[] => {
+export const setFoodItemsForDb = (foodOrder: IFoodGetApi[]): IFoodOrder[] => {
   return [...foodOrder].map(({ itemName, itemQuantity, id }) => {
     return {
       itemName,

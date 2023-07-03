@@ -59,7 +59,7 @@ const FoodLayout = ({ foods, mode, sectionList, mainTitle, transaction }: IFoodL
     return setSortedFoods([...filteredfoods]);
   };
 
-  const handleSubmit = async (foodOrder: IFoodApi[]) => {
+  const handleSubmit = async (foodOrder: IFoodGetApi[]) => {
     setLoading(true);
     if (isCreateMode) {
       const res = await handleCreateOrder(foodOrder, Number(tableNo));
