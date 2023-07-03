@@ -1,10 +1,13 @@
 import { AxiosFunction } from "../../pages/api/axios-request";
-import { IFoodApi } from "../../redifood-module/src/interfaces";
+import { IFoodGetApi } from "../../redifood-module/src/interfaces";
 import { NotificationRes } from "../definitions/notification.class";
 import { TCreateOrderBody } from "../interfaces";
 import { setFoodItemsForDb } from "./food.fn";
 
-export const handleCreateOrder = async (foodOrder: IFoodApi[], tableNumber: number): Promise<{ success: boolean }> => {
+export const handleCreateOrder = async (
+  foodOrder: IFoodGetApi[],
+  tableNumber: number,
+): Promise<{ success: boolean }> => {
   const updatedFoodList = setFoodItemsForDb([...foodOrder]);
   console.log("updated food list", updatedFoodList);
   const bodyCreateOrder: TCreateOrderBody = {

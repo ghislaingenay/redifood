@@ -1,13 +1,13 @@
 import Image from "next/image";
-import { IFoodApi } from "../../../redifood-module/src/interfaces";
+import { IFoodGetApi } from "../../../redifood-module/src/interfaces";
 import { BACKGROUND_COLOR } from "../../constants";
 import { useFood } from "../../contexts/food.context";
 import { EFoodMode } from "../../interfaces";
 import { AnimCard } from "../../styles/animations/global.anim";
 
 interface IFoodCard {
-  food: IFoodApi;
-  foodList: IFoodApi[];
+  food: IFoodGetApi;
+  foodList: IFoodGetApi[];
   mode: EFoodMode;
 }
 const FoodCard = ({ food, foodList, mode }: IFoodCard) => {

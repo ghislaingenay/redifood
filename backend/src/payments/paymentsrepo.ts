@@ -1,5 +1,5 @@
 import StripePayService from 'src/definitions/stripe-service';
-import { DatabaseError } from '../../redifood-module/src/handling-nestjs/database-error.exception';
+import { DatabaseError } from 'src/global/database-error.exception';
 import {
   IPaymentApi,
   IPaymentDB,

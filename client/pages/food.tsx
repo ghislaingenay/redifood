@@ -4,7 +4,7 @@ import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useEffect } from "react";
-import { IFoodApi, IFoodSectionList } from "../redifood-module/src/interfaces";
+import { IFoodGetApi, IFoodSectionListWithExtra } from "../redifood-module/src/interfaces";
 import FoodLayout from "../src/components/food-order/FoodLayout";
 import { useFood } from "../src/contexts/food.context";
 import { EFoodMode } from "../src/interfaces";
@@ -12,10 +12,10 @@ import buildClient from "./api/build-client";
 import { buildLanguage } from "./api/build-language";
 
 interface IFoodProps {
-  foodList: IFoodApi[];
-  foodSection: IFoodSectionList[];
+  foodList: IFoodGetApi[];
+  sectionExtraList: IFoodSectionListWithExtra[];
 }
-const FoodPage = ({ foodList, foodSection }: IFoodProps) => {
+const FoodPage = ({ foodList, sectionExtraList }: IFoodProps) => {
   const { t } = useTranslation("common");
   const { setFoodOrder } = useFood();
 
@@ -29,7 +29,7 @@ const FoodPage = ({ foodList, foodSection }: IFoodProps) => {
         <title>{t("foods.head.title")}</title>
         <meta name="description" content={t("foods.head.description") as string} />
       </Head>
-      <FoodLayout sectionList={foodSection} foods={foodList} mode={EFoodMode.ALTER} mainTitle={t("foods.title")} />
+      <FoodLayout sectionList={sectionExtraList} foods={foodList} mode={EFoodMode.ALTER} mainTitle={t("foods.title")} />
     </>
   );
 };
@@ -46,13 +46,15 @@ export async function getServerSideProps(appContext: any) {
     .then(async (res) => {
       const {
         data: {
-          results: { foodResults, sectionList },
+          results: { foodResults, sectionExtraList },
         },
-      } = res as AxiosResponse<{ results: { foodResults: IFoodApi[]; sectionList: IFoodSectionList[] } }>;
+      } = res as AxiosResponse<{
+        results: { foodResults: IFoodGetApi[]; sectionExtraList: IFoodSectionListWithExtra[] };
+      }>;
       return {
         props: {
           foodList: foodResults,
-          foodSection: sectionList,
+          sectionExtraList,
           ...(await serverSideTranslations(getLanguageValue, ["common"])),
         },
       };
@@ -61,7 +63,7 @@ export async function getServerSideProps(appContext: any) {
       return {
         props: {
           foodList: [],
-          foodSection: [],
+          sectionExtraList: [],
           ...(await serverSideTranslations(getLanguageValue, ["common"])),
         },
       };

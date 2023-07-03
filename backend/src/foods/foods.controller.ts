@@ -10,8 +10,8 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
-import { User } from 'redifood-module/src/handling-nestjs/user-decorator';
 import { UserPayload } from 'redifood-module/src/interfaces';
+import { User } from 'src/global/user-decorator';
 import { AuthGuard } from '../../src/global/auth-guard';
 import { ValidationPipe } from '../global/validation.pipe';
 import {
@@ -30,6 +30,25 @@ export class FoodController {
   @Get('all')
   async getAllFoods(@User() user: UserPayload) {
     return await this.foodService.getAllFoods(user.id);
+  }
+
+  @UseGuards(new AuthGuard())
+  @Get(':id')
+  async getOneFood(
+    @Param(
+      'id',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    foodId: number,
+    @User() user: UserPayload,
+  ) {
+    return await this.foodService.getOneFood(foodId, user.id);
+  }
+
+  @UseGuards(new AuthGuard())
+  @Get('section/information')
+  async getSectionInfo(@User() user: UserPayload) {
+    return await this.foodService.getSectionInfo(user.id);
   }
 
   @UseGuards(new AuthGuard())
@@ -79,10 +98,10 @@ export class FoodController {
       'id',
       new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
     )
-    id: number,
+    foodId: number,
     @Body(new ValidationPipe()) foodDto: UpdateFoodDto,
   ) {
-    return await this.foodService.updateFood(foodDto, id);
+    return await this.foodService.updateFood(foodDto, foodId);
   }
 
   @UseGuards(new AuthGuard())

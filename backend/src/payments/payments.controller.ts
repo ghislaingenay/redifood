@@ -10,7 +10,7 @@ import {
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
-import { User } from 'redifood-module/src/handling-nestjs/user-decorator';
+import { User } from 'src/global/user-decorator';
 import Stripe from 'stripe';
 import {
   EPaymentType,

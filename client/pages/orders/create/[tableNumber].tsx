@@ -3,7 +3,7 @@ import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useEffect } from "react";
-import { IFoodApi, IFoodSectionList } from "../../../redifood-module/src/interfaces";
+import { IFoodGetApi, IFoodSectionListWithExtra } from "../../../redifood-module/src/interfaces";
 import FoodLayout from "../../../src/components/food-order/FoodLayout";
 import { useFood } from "../../../src/contexts/food.context";
 import { EFoodMode } from "../../../src/interfaces/food.interface";
@@ -11,10 +11,10 @@ import buildClient from "../../api/build-client";
 import { buildLanguage } from "../../api/build-language";
 
 interface ICreateOrderProps {
-  foodList: IFoodApi[];
-  foodSection: IFoodSectionList[];
+  foodList: IFoodGetApi[];
+  sectionExtraList: IFoodSectionListWithExtra[];
 }
-const CreateOrder = ({ foodList, foodSection }: ICreateOrderProps) => {
+const CreateOrder = ({ foodList, sectionExtraList }: ICreateOrderProps) => {
   const { setFoodOrder } = useFood();
   const { t } = useTranslation("common");
 
@@ -28,7 +28,7 @@ const CreateOrder = ({ foodList, foodSection }: ICreateOrderProps) => {
       </Head>
       <main>
         <FoodLayout
-          sectionList={foodSection}
+          sectionList={sectionExtraList}
           foods={foodList}
           mode={EFoodMode.CREATE}
           mainTitle={t("orders.create-order")}
@@ -50,13 +50,15 @@ export async function getServerSideProps(appContext: any) {
     .then(async (res) => {
       const {
         data: {
-          results: { foodResults, sectionList },
+          results: { foodResults, sectionExtraList },
         },
-      } = res as AxiosResponse<{ results: { foodResults: IFoodApi[]; sectionList: IFoodSectionList[] } }>;
+      } = res as AxiosResponse<{
+        results: { foodResults: IFoodGetApi[]; sectionExtraList: IFoodSectionListWithExtra[] };
+      }>;
       return {
         props: {
           foodList: foodResults,
-          foodSection: sectionList,
+          sectionExtraList,
           ...(await serverSideTranslations(getLanguageValue, ["common"])),
         },
       };
@@ -65,7 +67,7 @@ export async function getServerSideProps(appContext: any) {
       return {
         props: {
           foodList: [],
-          foodSection: [],
+          sectionExtraList: [],
           ...(await serverSideTranslations(getLanguageValue, ["common"])),
         },
       };

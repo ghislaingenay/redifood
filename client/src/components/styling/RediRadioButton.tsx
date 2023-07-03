@@ -49,21 +49,23 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
     fontSize,
   }: IRediRadioButtonProps<Booleanish> = props;
 
-  const [selectedValue, setSelectedValue] = useState(options[0].value)
-  useEffect(() => setSelectedValue(selectedButton), [selectedButton])
-
+  const [selectedValue, setSelectedValue] = useState(options[0].value);
+  useEffect(() => setSelectedValue(selectedButton), [selectedButton]);
 
   const isSelected = (radioValue: string | number) => selectedValue === radioValue;
 
   const spanValue = (options: IRediRadio[] | IRediRadioWithIcon[]) => {
     switch (options.length) {
-      case 2: return 11;
-      case 3: return 7;
-      default: return 5; 
+      case 2:
+        return 11;
+      case 3:
+        return 7;
+      default:
+        return 5;
     }
   };
 
-  const colorStyle = (currentButton: string | number) => { 
+  const colorStyle = (currentButton: string | number) => {
     return {
       fontSize: fontSize || "1.5rem",
       padding: padding || "1rem 3rem",
@@ -75,44 +77,48 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
       boxShadow: isSelected(currentButton)
         ? `0px 0px 10px 2px ${hexToRgba(ORANGE_LIGHT, 0.25)}`
         : `inset 0 0 10px  ${hexToRgba(BACKGROUND_COLOR, 0.2)}`,
-    }
+    };
   };
 
-  return (
-    <RowSpaceBetween style={{ width: "100%" }}>
-      {options.map(({ label, value, icon, ariaLabel }: any, index: number) => {
-        return (
-        <>
-          <Col
-            xs={24}
-            sm={24}
-            md={spanValue(options)}
-            style={{ width: "100%" }}
-            key={index}
-            onClick={(e) => {
-              const target = e.target as HTMLButtonElement;
-              if (!target) throw new Error('Error while selecting an option')
-              clickedFn && clickedFn(target.value);
-            }}
-          >
-            <AnimRadioButton>
-              <RadioButton
-                aria-label={ariaLabel}
-                style={{ ...colorStyle(value) }}
-                role="radio"
-                name={radioGroupName}
-                value={value}
-                aria-checked={isSelected(value)}
-              >
-                {haveIcon === "true" && <SpanBlockM02Y>{icon}</SpanBlockM02Y>}
-                {label.toUpperCase()}
-              </RadioButton>
-            </AnimRadioButton>
-          </Col>
-        </>)
-    })}
-    </RowSpaceBetween>)
-};
+  const generateRandomKey = () => Math.random().toString(36);
 
+  return (
+    <RowSpaceBetween style={{ width: "100%" }} key={generateRandomKey()}>
+      {options.map(({ label, value, icon, ariaLabel }: any) => {
+        return (
+          <>
+            <Col
+              xs={24}
+              sm={24}
+              md={spanValue(options)}
+              style={{ width: "100%" }}
+              key={value}
+              onClick={(e) => {
+                const target = e.target as HTMLButtonElement;
+                if (!target) throw new Error("Error while selecting an option");
+                clickedFn && clickedFn(target.value);
+              }}
+            >
+              <AnimRadioButton key={value}>
+                <RadioButton
+                  key={value}
+                  aria-label={ariaLabel}
+                  style={{ ...colorStyle(value) }}
+                  role="radio"
+                  name={radioGroupName}
+                  value={value}
+                  aria-checked={isSelected(value)}
+                >
+                  {haveIcon === "true" && <SpanBlockM02Y>{icon}</SpanBlockM02Y>}
+                  {label.toUpperCase()}
+                </RadioButton>
+              </AnimRadioButton>
+            </Col>
+          </>
+        );
+      })}
+    </RowSpaceBetween>
+  );
+};
 
 export default RediRadioButton;

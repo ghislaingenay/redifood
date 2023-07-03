@@ -11,14 +11,14 @@ import { buildLanguage } from "../../api/build-language";
 
 type IEditOrderProps = IGetEditOrderRes;
 
-const EditOrder = ({ foodList, orderItems, foodSection, order }: IEditOrderProps) => {
+const EditOrder = ({ foodList, orderFoodItems, foodSectionExtra, order }: IEditOrderProps) => {
   const { setFoodOrder } = useFood();
   const { t } = useTranslation("common");
 
-  const haveOrders = orderItems.length > 0;
+  const haveOrders = orderFoodItems.length > 0;
 
   useEffect(() => {
-    haveOrders && setFoodOrder(orderItems);
+    haveOrders && setFoodOrder(orderFoodItems);
   }, []);
 
   return (
@@ -29,7 +29,7 @@ const EditOrder = ({ foodList, orderItems, foodSection, order }: IEditOrderProps
       </Head>
       <body>
         <FoodLayout
-          sectionList={foodSection}
+          sectionList={foodSectionExtra}
           foods={foodList}
           mode={EFoodMode.EDIT}
           mainTitle={t("orders.edit-order")}
@@ -53,16 +53,16 @@ export async function getServerSideProps(appContext: any) {
     .then(async (res) => {
       const {
         data: {
-          results: { order, orderItems, foodList, foodSection },
+          results: { order, orderFoodItems, foodList, foodSectionExtra },
         },
       } = res as any;
 
       return {
         props: {
           order,
-          orderItems,
+          orderFoodItems,
           foodList,
-          foodSection,
+          foodSectionExtra,
           ...(await serverSideTranslations(getLanguageValue, ["common"])),
         },
       };
@@ -71,8 +71,9 @@ export async function getServerSideProps(appContext: any) {
       return {
         props: {
           order: [],
-          orderItems: [],
-          status: "error",
+          orderFoodItems: [],
+          foodList: [],
+          foodSectionExtra: [],
           ...(await serverSideTranslations(getLanguageValue, ["common"])),
         },
       };

@@ -1,7 +1,7 @@
 import { Col } from "antd";
 import { useTranslation } from "next-i18next";
 import { useContext } from "react";
-import { IFoodApi } from "../../../redifood-module/src/interfaces";
+import { IFoodGetApi } from "../../../redifood-module/src/interfaces";
 import { BACKGROUND_COLOR, GREY, ORANGE_DARK } from "../../constants";
 import AppContext from "../../contexts/app.context";
 import { hexToRgba } from "../../functions/global.fn";
@@ -11,7 +11,7 @@ import { RowSpaceAround } from "../styling/grid.styled";
 
 interface ISummaryTable {
   orderTotal: number;
-  foodList: IFoodApi[];
+  foodList: IFoodGetApi[];
   xSize?: number;
   sSize?: number;
   mSize?: number;
