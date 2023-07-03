@@ -2,19 +2,40 @@
 import { faBan, faFileCircleCheck, faFilePen, faSquarePlus, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Alert, Form, Modal, Select } from "antd";
+import axios from "axios";
 import { useTranslation } from "next-i18next";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Case, Default, Else, If, Switch, Then } from "react-if";
-import { IFoodApi, IFoodSectionList } from "../../../redifood-module/src/interfaces";
-import { GREY, ORANGE_DARK } from "../../constants";
+import { AxiosFunction } from "../../../pages/api/axios-request";
+import {
+  handleCreateExtra,
+  handleCreateFood,
+  handleCreateSection,
+  handleDeleteExtra,
+  handleDeleteSection,
+  handleUpdatedFood,
+} from "../../../pages/api/food-api";
+import {
+  IFoodApi,
+  IFoodGetApi,
+  IFoodSectionListWithExtra,
+  IGetSectionInfo,
+} from "../../../redifood-module/src/interfaces";
+import { GREY, ORANGE_DARK, initialFormValues } from "../../constants";
 import { useFood } from "../../contexts/food.context";
-import { convertFoodToSection } from "../../functions/food.fn";
+import {
+  checkDisability,
+  formDataToFood,
+  getDataBySectionId,
+  initializeDataForFoodForm,
+  recoverIdName,
+} from "../../functions/food.fn";
 import { capitalize } from "../../functions/global.fn";
 import useCurrency from "../../hooks/useCurrency.hook";
-import { EButtonType, IFormInterface } from "../../interfaces";
+import { EButtonType, EHandleType, IFormInterface } from "../../interfaces";
 import { SpacingDiv5X } from "../../styles/styledComponents/div.styled";
 import { RedSpan } from "../../styles/styledComponents/span.styled";
 import {
@@ -30,34 +51,7 @@ import { RediButton, RediIconButton } from "../styling/Button.style";
 import RediRadioButton, { Booleanish } from "../styling/RediRadioButton";
 import { RowCenter, RowCenterSp } from "../styling/grid.styled";
 const { Option } = Select;
-interface IFoodForm {
-  foodSection: IFoodSectionList[];
-  foodList: IFoodApi[];
-}
 
-interface IFoodFormValues {
-  itemName: string;
-  itemPrice: number;
-  sectionId: EHandleType;
-  extraId: EHandleType;
-  itemPhoto: string;
-  itemDescription?: string;
-  itemQuantity: number;
-  id?: undefined;
-}
-
-type PartialFormFood = Partial<IFoodFormValues>;
-type PartialFood = Partial<IFoodApi> | null;
-
-enum EHandleType {
-  NONE = "NONE",
-  CREATE = "CREATE",
-  EDIT = "EDIT",
-  ADDSECTION = "ADDSECTION",
-  DELETESECTION = "DELETESECTION",
-  ADDEXTRA = "ADDEXTRA",
-  DELETEEXTRA = "DELETEEXTRA",
-}
 // const getBase64 = (img: RcFile, callback: (url: string) => void) => {
 //   const reader = new FileReader();
 //   reader.addEventListener("load", () => callback(reader.result as string));
@@ -76,7 +70,7 @@ enum EHandleType {
 //   return isJpgOrPng && isLt2M;
 // };
 
-const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
+const FoodForm = () => {
   const router = useRouter();
   const { t } = useTranslation();
   const {
@@ -84,115 +78,53 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
     setFoodOrder,
     functions: { selectFood },
   } = useFood();
-  const { displayCurrency, convertPrice } = useCurrency();
+  const { displayCurrency } = useCurrency();
+
   const [form] = Form.useForm();
-  const pictureSize = 150;
   const pictureValue = Form.useWatch("itemPhoto", form);
   const sectionValue = Form.useWatch("itemSection", form);
   const extraValue = Form.useWatch("itemExtra", form);
-  const [editMode, setEditMode] = useState<Booleanish>("true");
 
+  const PICTURE_SIZE = 150;
+  const styleNoM = { margin: 0 };
   const foodRadioOptions = [
     { label: t("buttons.edit"), value: "true", icon: <FontAwesomeIcon icon={faFilePen} />, ariaLabel: "EDIT" },
     { label: t("buttons.create"), value: "false", icon: <FontAwesomeIcon icon={faSquarePlus} />, ariaLabel: "CREATE" },
   ];
 
-  const initialFormValues: PartialFormFood = {
-    itemName: undefined,
-    itemPrice: undefined,
-    sectionId: EHandleType.NONE,
-    extraId: EHandleType.NONE,
-    itemPhoto: undefined,
-    itemDescription: undefined,
-    itemQuantity: undefined,
-    id: undefined,
-  };
+  const [editMode, setEditMode] = useState<Booleanish>("false");
+  const currentMode = useDeferredValue(editMode);
+  const isEditModeWithoutFood = editMode === "true" && foodOrder.length === 0;
+  const isEditModeWithFood = editMode === "true" && foodOrder.length !== 0;
 
+  const isDeleteExtraMode = extraValue === EHandleType.DELETEEXTRA;
+  const isAddExtraMode = extraValue === EHandleType.ADDEXTRA;
+  const isDeleteSectionMode = sectionValue === EHandleType.DELETESECTION;
+  const isAddSectionMode = sectionValue === EHandleType.ADDSECTION;
+
+  const relatedToSectionAndExtra = isDeleteExtraMode || isAddExtraMode || isDeleteSectionMode || isAddSectionMode;
+  const isCreateNewFood = editMode === "false" && !relatedToSectionAndExtra;
+  const isEditFood = editMode === "true" && !relatedToSectionAndExtra;
+
+  const [sectionIdName, setSectionIdName] = useState<{ id: number; name: string }[]>([]);
+  const [allFoods, setAllFoods] = useState<IFoodGetApi[]>([]);
+  const [listSectionExtra, setListSectionExtra] = useState<IFoodSectionListWithExtra[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [onFinishLoading, setOnFinishLoading] = useState(false);
   const [handleType, setHandleType] = useState<EHandleType>(EHandleType.NONE);
-  const [sortedFood, setSortedFood] = useState<Record<string, string[]>>({});
-
-  const [newFoodData, setNewFoodData] = useState<IFoodApi | null>(null);
   const [inputSection, setInputSection] = useState<string>("");
   const [delSection, setDelSection] = useState<string>("");
   const [inputExtra, setInputExtra] = useState<string>("");
   const [delExtra, setDelExtra] = useState<string>("");
   const [error, setError] = useState(false);
-
   const [files, setFiles] = useState<any[]>([]);
-
+  const [urlFile, setUrlFile] = useState<string>("");
   const [confirmModal, setConfirmModal] = useState(false);
   const [cancelModal, setCancelModal] = useState(false);
 
-  const [currentFood, setCurrentFood] = useState<PartialFood>(foodOrder[0]);
-  // const [modifiedFood, setModifiedFood] = useState<PartialFood>(null);
-  // const {
-  //   res: resImage,
-  //   doRequest: doRequestUpload,
-  //   loading: uploading,
-  // } = useRequest<string>({
-  //   url: "/api/upload",
-  //   method: "post",
-  //   body: {
-  //     files,
-  //   },
-  //   queryParams: {},
-  // });
+  const haveFile = files.length !== 0;
 
-  // const { res: resData, doRequest: refreshData } = useRequest<{foodList: IFoods[], foodSection: string[]}>({
-  //   url: "/api/food/alter",
-  //   method: "post",
-  //   body: { newSection: inputSection },
-  //   queryParams: {},
-  // });
-  // const { res: resAddSection, doRequest: doRequestAddSection } = useRequest<{result: true}>({
-  //   url: "/api/food/add-section",
-  //   method: "post",
-  //   body: { newSection: inputSection },
-  //   queryParams: {},
-  // });
-  // const { res: resDelSection, doRequest: doRequestDelSection } = useRequest<{result: true}>({
-  //   url: "/api/food/add-section",
-  //   method: "post",
-  //   body: { deletedSection: delSection },
-  //   queryParams: {},
-  // });
-  // const { res: resAddExtra, doRequest: doRequestAddExtra } = useRequest<{result: true}>({
-  //   url: "/api/food/add-extra",
-  //   method: "post",
-  //   body: { newExtra: addSection },
-  //   queryParams: {},
-  // });
-  // const { res: resDelExtra, doRequest: doRequestDelExtra } = useRequest<{result: true}>({
-  //   url: "/api/food/delete-extra",
-  //   method: "post",
-  //   body: { deletedExtra: delExtra },
-  //   queryParams: {},
-  // });
-  // const { res: resCreate, doRequest: doRequestCreate} = useRequest<{result: true}>({
-  //   url: "/api/food/create",
-  //   method: "post",
-  //   body: fromData,
-  //   queryParams: {},
-  // });
-
-  const isDisabled =
-    sectionValue === EHandleType.NONE ||
-    sectionValue === EHandleType.ADDSECTION ||
-    sectionValue === EHandleType.DELETESECTION ||
-    extraValue === EHandleType.NONE ||
-    extraValue === EHandleType.ADDEXTRA ||
-    extraValue === EHandleType.DELETEEXTRA
-      ? true
-      : false;
-
-  const styleNoM = { margin: 0 };
   const optionsCreateFood = (fn: Function): IFormInterface[] => [
-    // {
-    //   label: "Picture",
-    //   name: "itemPhoto",
-    //   component: <RoundedInput style={styleNoM} />,
-    //   rules: [{ required: true, message: "A picture is required" }],
-    // },
     {
       label: t("foods.form-label.name"),
       name: "itemName",
@@ -251,69 +183,80 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
       // This is working for now
       formData.append("file", acceptedFiles[0]);
       console.log("acc", acceptedFiles);
-      // formData.append("upload_preset", String(process.env.NEXT_PUBLIC_UPLOAD_PRESET));
-      // const response = await axios.post(
-      //   `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_NAME}/image/upload`,
-      //   formData,
-      // );
-      // const { statusText, data } = response;
-      // console.log(data.secure_url);
-      // if (statusText === "OK") {
-      // return setUrlFile(data.secure_url);
-      // }
+      formData.append("upload_preset", String(process.env.NEXT_PUBLIC_UPLOAD_PRESET));
+      const response: any = await axios
+        .post(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_NAME}/image/upload`, formData)
+        .catch((err) => {
+          console.log("err", err);
+        });
+      console.log("res", response);
+      const { statusText, data } = response;
+      console.log(data.secure_url);
+      if (statusText === "OK") {
+        form.setFieldValue("itemPhoto", data.secure_url);
+        return setUrlFile(data.secure_url);
+      }
     },
   });
-
-  const checkFood = () => {
-    if (editMode === "true") {
-      return currentFood === newFoodData;
-    } else {
-      return foodOrder[0] === form.getFieldsValue();
-    }
-  };
 
   const handleCancel = () => {
     if (handleType === EHandleType.ADDSECTION || handleType === EHandleType.DELETESECTION) {
       setInputSection("");
       setDelSection("");
-      form.setFieldsValue({ itemSection: foodOrder[0].sectionId });
+      form.setFieldsValue({ itemSection: foodOrder[0].itemSection.id });
     } else if (handleType === EHandleType.ADDEXTRA || handleType === EHandleType.DELETEEXTRA) {
       setInputExtra("");
       setDelExtra("");
-      form.setFieldsValue({ itemExtra: foodOrder[0].extraId });
+      form.setFieldsValue({ itemExtra: foodOrder[0].itemExtra.id });
     } else if (handleType === EHandleType.EDIT) {
       form.setFieldsValue(foodOrder[0]);
     } else {
       form.setFieldsValue({});
     }
+    setOnFinishLoading(false);
+    router.refresh();
   };
 
-  const onFinish = (values: any) => {
-    console.log("validated");
-    if (files.length === 0) {
-      return setError(true);
-    }
+  const failToSave = () => {
+    setConfirmModal(false);
+    setOnFinishLoading(false);
+    return;
+  };
+
+  const onFinish = async (values: any) => {
+    setOnFinishLoading(true);
+    if (files.length === 0) return setError(true);
+    const formattedFoodData = formDataToFood({ ...values, itemPhoto: urlFile });
+    console.log("updated", formattedFoodData);
     setError(false);
     switch (handleType) {
       case EHandleType.ADDSECTION: {
         console.log("new section added", inputSection);
+        const createdSectionRes = await handleCreateSection(inputSection.toLowerCase(), listSectionExtra);
+        if (!createdSectionRes.created) return failToSave();
         setInputSection("");
         break;
       }
       case EHandleType.DELETESECTION: {
         console.log("deleted section", delSection);
+        const deleteSectionRes = await handleDeleteSection(Number(delSection));
+        if (!deleteSectionRes.deleted) return failToSave();
         setDelSection("");
         form.setFieldValue("itemSection", EHandleType.NONE);
         break;
       }
       case EHandleType.ADDEXTRA: {
         console.log("created extra", inputExtra);
+        const createExtraRes = await handleCreateExtra(inputExtra.toLowerCase(), sectionValue, listSectionExtra);
+        if (!createExtraRes.created) return failToSave();
         form.setFieldValue("itemExtra", EHandleType.NONE);
         setInputExtra("");
         break;
       }
       case EHandleType.DELETEEXTRA: {
         console.log("deleted extra", delExtra);
+        const deleteExtraRes = await handleDeleteExtra(Number(delExtra));
+        if (!deleteExtraRes.deleted) return failToSave();
         form.setFieldValue("itemExtra", EHandleType.NONE);
         setDelExtra("");
         break;
@@ -321,9 +264,36 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
       default: {
       }
     }
-    console.log("submitted", values);
+    if (isCreateNewFood) {
+      const createdFoodRes = await handleCreateFood(formattedFoodData);
+      if (!createdFoodRes.created) return failToSave();
+    }
+    if (isEditFood) {
+      const updateRes = await handleUpdatedFood(addAdditionnalFoodInfo(formattedFoodData), foodOrder[0].id);
+      if (!updateRes.updated) return failToSave();
+    }
     handleCancel();
   };
+
+  const getExtraOptions = useMemo(() => {
+    if (sectionValue === EHandleType.NONE) return;
+    return getDataBySectionId(listSectionExtra, sectionValue as number)?.extraList?.map(({ id, extraName }, index) => (
+      <Option key={index} value={id}>
+        {capitalize(extraName)}
+      </Option>
+    ));
+  }, [listSectionExtra, sectionValue]);
+
+  const getSectionOptions = sectionIdName?.map(({ id, name }, index) => (
+    <Option key={index} value={id}>
+      {capitalize(name)}
+    </Option>
+  ));
+
+  const getDeletedSectionName = delSection && sectionIdName?.find(({ id }) => id === Number(delSection))?.name;
+  const getDeletedExtraName = getDataBySectionId(listSectionExtra, sectionValue as number)?.extraList?.find(
+    (item) => item.id === Number(delExtra),
+  )?.extraName;
 
   // const beforeUpload = (file: RcFile) => {
   //   const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
@@ -336,29 +306,49 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
   //   }
   //   return isJpgOrPng && isLt2M;
   // };
-
-  useEffect(() => {
-    if (editMode === "true" && foodOrder.length !== 0) {
-      console.log("fdp", foodOrder[0]);
-      setCurrentFood(foodOrder[0]);
-      form.setFieldsValue({
-        itemQuantity: 0,
-        itemName: foodOrder[0].itemName,
-        itemDescription: foodOrder[0].itemDescription,
-        itemPrice: convertPrice(foodOrder[0].itemPrice, "backToFront", false),
-        itemPhoto: foodOrder[0].itemPhoto,
-        sectionId: foodOrder[0].sectionId,
-        extraId: foodOrder[0].extraId,
-      } as any);
+  const currentFood = useMemo(() => {
+    if (isEditModeWithFood) {
+      form.setFieldsValue(initializeDataForFoodForm(foodOrder[0]));
+      console.log(form.getFieldsValue());
       setFiles([foodOrder[0].itemPhoto]);
-      setSortedFood(convertFoodToSection(foodList, foodSection) as any);
+      console.log("foodOrder", foodOrder);
+      return foodOrder[0];
     } else {
       setFiles([]);
       form.setFieldsValue(initialFormValues);
-      setCurrentFood(initialFormValues as PartialFood);
+      return undefined;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectFood, editMode]);
+  }, [selectFood, editMode]); // add section list extended from useEffect and add with state
+
+  const addAdditionnalFoodInfo = (food: Omit<IFoodApi, "id" | "userId">): IFoodApi => {
+    return (currentFood && { ...food, id: currentFood.id, userId: currentFood.userId }) as IFoodApi;
+  };
+
+  useEffect(() => {
+    setLoading(true);
+    AxiosFunction({
+      method: "get",
+      url: "api/foods/section/information",
+      body: {},
+      queryParams: {},
+    })
+      .then((res: { results: IGetSectionInfo }) => {
+        const {
+          results: { listing, foods },
+        } = res;
+        setAllFoods(foods);
+        setListSectionExtra(listing);
+        setSectionIdName(recoverIdName(listing));
+        setLoading(false);
+      })
+      .catch(() => {
+        setLoading(false);
+        // toast.error(err.message)
+      });
+  }, []);
+
+  if (loading) return <p>Loading...</p>;
+
   return (
     <>
       <SpacingDiv5X>
@@ -368,22 +358,15 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
           fontSize="0.75rem"
           options={foodRadioOptions}
           haveIcon={"true"}
-          selectedButton={editMode}
-          // setSelectedButton={setEditMode}
-          clickedFn={() => {
+          selectedButton={currentMode}
+          clickedFn={(e) => {
             setFoodOrder([]);
-            form.setFieldsValue({
-              itemPhoto: "",
-              itemName: "",
-              itemPrice: "",
-              itemDescription: "",
-              itemSection: EHandleType.NONE,
-              itemExtra: EHandleType.NONE,
-            });
+            form.setFieldsValue(initialFormValues);
+            setEditMode(() => e);
           }}
         />
         <Switch>
-          <Case condition={editMode === "true" && foodOrder.length === 0}>
+          <Case condition={isEditModeWithoutFood}>
             <Alert
               type="warning"
               style={{ fontWeight: 700, height: "80vh", textAlign: "center", fontSize: "1rem", marginTop: "1.5rem" }}
@@ -392,7 +375,7 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
             />
           </Case>
           <Default>
-            <If condition={files.length === 0}>
+            <If condition={!haveFile}>
               <Then>
                 <RowCenter style={{ margin: "1rem 0" }}>
                   <div
@@ -414,8 +397,8 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                 <RowCenter style={{ marginTop: "1rem" }}>
                   {pictureValue && (
                     <Image
-                      height={pictureSize}
-                      width={pictureSize}
+                      height={PICTURE_SIZE}
+                      width={PICTURE_SIZE}
                       style={{ borderRadius: "50%", border: `1px dashed ${GREY}`, margin: "0 auto 1rem" }}
                       src={pictureValue}
                       alt="new food picture"
@@ -446,33 +429,32 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
               onFinish={onFinish}
               layout="vertical"
               onValuesChange={(e, all) => {
-                console.log("all", all);
+                console.log("onFinish - all", all);
                 console.log(e);
                 form.setFieldsValue(all);
-                if (editMode === "true") {
-                  setNewFoodData(all);
-                }
               }}
             >
               <Form.Item style={{ display: "none" }} name="itemPhoto" />
-              {optionsCreateFood(displayCurrency)?.map(({ label, name, component, rules }: IFormInterface) => {
-                return (
-                  <>
-                    <LabelFormBlack htmlFor={name}>
-                      {label} <RedSpan>*</RedSpan>
-                    </LabelFormBlack>
-                    <Form.Item
-                      id={name}
-                      style={{ fontWeight: 700, marginBottom: "0.5rem" }}
-                      key={name}
-                      name={name}
-                      rules={rules}
-                    >
-                      {component}
-                    </Form.Item>
-                  </>
-                );
-              })}
+              {optionsCreateFood(displayCurrency)?.map(
+                ({ label, name, component, rules }: IFormInterface, index: number) => {
+                  return (
+                    <div key={index}>
+                      <LabelFormBlack htmlFor={name}>
+                        {label} <RedSpan>*</RedSpan>
+                      </LabelFormBlack>
+                      <Form.Item
+                        id={name}
+                        style={{ fontWeight: 700, marginBottom: "0.5rem" }}
+                        key={name}
+                        name={name}
+                        rules={rules}
+                      >
+                        {component}
+                      </Form.Item>
+                    </div>
+                  );
+                },
+              )}
               <LabelFormBlack htmlFor="itemSection">
                 {t("foods.form-label.section")} <RedSpan>*</RedSpan>
               </LabelFormBlack>
@@ -484,18 +466,13 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                   }}
                 >
                   <Option value={EHandleType.NONE}>{t("foods.form-label.select")}</Option>
-                  {foodSection &&
-                    foodSection.map(({ id, sectionName }, index) => (
-                      <Option key={index} value={id}>
-                        {capitalize(sectionName)}
-                      </Option>
-                    ))}
+                  {getSectionOptions}
                   <Option value={EHandleType.ADDSECTION}>{t("foods.form-label.add-section")}</Option>
                   <Option value={EHandleType.DELETESECTION}>{t("foods.form-label.delete-section")}</Option>
                 </Select>
               </Form.Item>
               <Switch>
-                <Case condition={sectionValue === EHandleType.ADDSECTION}>
+                <Case condition={isAddSectionMode}>
                   <>
                     <LabelFormBlue>{t("foods.form-label.create-new-section")}</LabelFormBlue>
                     <RowCenterSp>
@@ -514,17 +491,17 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                     </RowCenterSp>
                   </>
                 </Case>
-                <Case condition={sectionValue === EHandleType.DELETESECTION}>
+                <Case condition={isDeleteSectionMode}>
                   <>
                     <LabelFormRed>{t("foods.form-label.delete-current-section")}</LabelFormRed>
                     <RowCenterSp>
-                      <Select value={delSection} style={{ marginBottom: "0.5rem" }} onChange={(e) => setDelSection(e)}>
+                      <Select
+                        value={delSection}
+                        style={{ marginBottom: "0.5rem", width: "100%" }}
+                        onChange={(e) => setDelSection(e)}
+                      >
                         <Option value={EHandleType.NONE}>Select ...</Option>
-                        {Object.keys(sortedFood)?.map((section, index) => (
-                          <Option key={index} value={section}>
-                            {capitalize(section)}
-                          </Option>
-                        ))}
+                        {getSectionOptions}
                       </Select>
                       <RediButton
                         aria-label="Delete section"
@@ -532,7 +509,6 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                         style={{ marginTop: "0.5rem" }}
                         disabled={delSection === "" || delSection === "all" ? true : false}
                         onClick={() => {
-                          // ViewSectionModel
                           setHandleType(EHandleType.DELETESECTION);
                           setConfirmModal(true);
                         }}
@@ -550,17 +526,13 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                     <Form.Item name="itemExtra" id="itemExtra" style={{ fontWeight: 700, marginBottom: "0.5rem" }}>
                       <Select>
                         <Option value={EHandleType.NONE}> {t("foods.form-label.select")}</Option>
-                        {sortedFood[sectionValue]?.map((extra, index) => (
-                          <Option key={index} value={extra}>
-                            {capitalize(extra)}
-                          </Option>
-                        ))}
+                        {getExtraOptions}
                         <Option value={EHandleType.ADDEXTRA}>{t("foods.form-label.add-extra")}</Option>
                         <Option value={EHandleType.DELETEEXTRA}>{t("foods.form-label.delete-extra")}</Option>
                       </Select>
                     </Form.Item>
                   </>
-                  {extraValue === EHandleType.ADDEXTRA && (
+                  {isAddExtraMode && (
                     <>
                       <LabelFormBlue>{t("foods.form-label.create-new-extra")}</LabelFormBlue>
                       <RowCenterSp>
@@ -579,17 +551,13 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
                       </RowCenterSp>
                     </>
                   )}
-                  {extraValue === EHandleType.DELETEEXTRA && (
+                  {isDeleteExtraMode && (
                     <>
                       <LabelFormRed>{t("foods.form-label.delete-current-extra")}</LabelFormRed>
                       <RowCenterSp style={{ marginBottom: 0 }}>
                         <Select value={delExtra} onChange={(e) => setDelExtra(e)}>
                           <Option value="">{t("foods.form-label.select")}</Option>
-                          {sortedFood[sectionValue]?.map((section, index) => (
-                            <Option key={index} value={section}>
-                              {capitalize(section)}
-                            </Option>
-                          ))}
+                          {getExtraOptions}
                         </Select>
                         <RediButton
                           aria-label="Delete extra"
@@ -611,30 +579,17 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
               <RowCenterSp style={{ marginTop: "1rem" }}>
                 <RediIconButton
                   buttonType={EButtonType.SUCCESS}
-                  disabled={isDisabled}
+                  disabled={checkDisability(sectionValue, extraValue)}
                   iconFt={faFileCircleCheck}
                   onClick={() => {
-                    if (editMode === "true") {
-                      setHandleType(EHandleType.EDIT);
-                    } else {
-                      setHandleType(EHandleType.CREATE);
-                    }
+                    if (editMode === "true") setHandleType(EHandleType.EDIT);
+                    else setHandleType(EHandleType.CREATE);
                     setConfirmModal(true);
                   }}
                 >
                   {t("buttons.confirm")}
                 </RediIconButton>
-                <RediIconButton
-                  buttonType={EButtonType.ERROR}
-                  iconFt={faBan}
-                  onClick={() => {
-                    if (checkFood()) {
-                      router.replace("/");
-                    } else {
-                      setCancelModal(true);
-                    }
-                  }}
-                >
+                <RediIconButton buttonType={EButtonType.ERROR} iconFt={faBan} onClick={() => router.replace("/")}>
                   {t("buttons.cancel")}
                 </RediIconButton>
               </RowCenterSp>
@@ -646,19 +601,22 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
         open={confirmModal}
         onCancel={() => setConfirmModal((prevValue: boolean) => !prevValue)}
         onOk={() => form.submit()}
+        confirmLoading={onFinishLoading}
       >
         <Switch>
+          <Case condition={isCreateNewFood}>Do you want to confirm new food ?</Case>
+          <Case condition={isEditFood}>Do you want to confirm update food ?</Case>
           <Case condition={handleType === EHandleType.ADDSECTION}>Do you want to create {inputSection} section ?</Case>
           <Case condition={handleType === EHandleType.DELETESECTION}>
             <>
-              <p>Do you want to delete {delSection} section ?</p>
+              <p>Do you want to delete {getDeletedSectionName} section ?</p>
               <p>These foods will be deleted</p>
-              {foodList &&
-                foodList
+              {allFoods &&
+                allFoods
                   .filter((food) => {
-                    return food.sectionId === (delSection as any);
+                    return food.itemSection.id === Number(delSection);
                   })
-                  .map((food: IFoodApi) => {
+                  .map((food) => {
                     return <p key={food.id}>{food.itemName}</p>;
                   })}
             </>
@@ -666,12 +624,12 @@ const FoodForm = ({ foodSection, foodList }: IFoodForm) => {
           <Case condition={handleType === EHandleType.ADDEXTRA}>Do you want to create {inputExtra} section ?</Case>
           <Case condition={handleType === EHandleType.DELETEEXTRA}>
             <>
-              <p>Do you want to delete {delExtra} extra ?</p>
+              <p>Do you want to delete {getDeletedExtraName} extra ?</p>
               <p>These foods will be deleted</p>
-              {foodList &&
-                foodList
-                  .filter((food) => food.extraId === (delExtra as any))
-                  .map((food: IFoodApi) => {
+              {allFoods &&
+                allFoods
+                  .filter((food) => food.itemExtra.id === Number(delExtra))
+                  .map((food) => {
                     return <p key={food.id}>{food.itemName}</p>;
                   })}
             </>

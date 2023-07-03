@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { useRouter as Router } from "next/router";
 import { useEffect, useState } from "react";
 import { Else, If, Then } from "react-if";
-import { IFoodApi, IFoodSectionList, IOrderApi } from "../../../redifood-module/src/interfaces";
+import { IFoodApi, IFoodGetApi, IFoodSectionListWithExtra, IOrderApi } from "../../../redifood-module/src/interfaces";
 import { useFood } from "../../contexts/food.context";
 import { handleCreateOrder } from "../../functions/create-order.fn";
 import { setOptionsSelection } from "../../functions/food.fn";
@@ -22,10 +22,10 @@ import OrderSection from "./OrderSection";
 const { Title } = Typography;
 interface IFoodLayoutProps {
   transaction?: IOrderApi;
-  foods: IFoodApi[];
+  foods: IFoodGetApi[];
   mode: EFoodMode;
   updateFood?: (food: IFoodApi) => any;
-  sectionList: IFoodSectionList[];
+  sectionList: IFoodSectionListWithExtra[];
   mainTitle: string;
 }
 
@@ -38,13 +38,12 @@ const FoodLayout = ({ foods, mode, sectionList, mainTitle, transaction }: IFoodL
 
   const { foodOrder } = useFood();
   const [width] = useWindowSize();
-
-  const [foodSection] = useState<IFoodSectionList[]>(sectionList);
+  const [foodSection] = useState<IFoodSectionListWithExtra[]>(sectionList);
   const [foodList] = useState(foods);
   const [loading, setLoading] = useState(false);
   const [sortedFoods, setSortedFoods] = useState(foodList);
   const [selectedSectionId, setSelectedSectionId] = useState(0);
-  const [currentOrder, setCurrentOrder] = useState<IFoodApi[]>([]);
+  const [currentOrder, setCurrentOrder] = useState<IFoodGetApi[]>([]);
   const [cancelOrderModal, setCancelOrderModal] = useState(false);
 
   const isLargeScreen = width && width > WIDTH_BREAKPOINT;
@@ -56,11 +55,11 @@ const FoodLayout = ({ foods, mode, sectionList, mainTitle, transaction }: IFoodL
   const changeActiveButton = (sectionId: number) => {
     setSelectedSectionId(sectionId);
     if (sectionId === 0) return setSortedFoods([...foodList]);
-    const filteredfoods = [...foodList]?.filter((food) => food.sectionId === sectionId);
+    const filteredfoods = [...foodList]?.filter((food) => food.itemSection.id === sectionId);
     return setSortedFoods([...filteredfoods]);
   };
 
-  const handleSubmit = async (foodOrder: IFoodApi[]) => {
+  const handleSubmit = async (foodOrder: IFoodGetApi[]) => {
     setLoading(true);
     if (isCreateMode) {
       const res = await handleCreateOrder(foodOrder, Number(tableNo));
@@ -85,7 +84,7 @@ const FoodLayout = ({ foods, mode, sectionList, mainTitle, transaction }: IFoodL
       <LGCard style={{ height: "100%", width: "100%" }}>
         <If condition={isAlterMode}>
           <Then>
-            <FoodForm foodSection={foodSection} foodList={foodList} />
+            <FoodForm />
           </Then>
           <Else>
             <OrderSection

@@ -1,4 +1,4 @@
-import { IFoodApi, IFoodOrder } from "../../redifood-module/src/interfaces";
+import { IFoodGetApi, IFoodOrder } from "../../redifood-module/src/interfaces";
 import { IErrorTableInput } from "../interfaces";
 
 export const sendErrorTableInput = (tableNumber: number | null, tableArray: number[]) => {
@@ -12,14 +12,14 @@ export const sendErrorTableInput = (tableNumber: number | null, tableArray: numb
   return errorState;
 };
 
-export const calculateTotal = (array: IFoodApi[]) => {
+export const calculateTotal = (array: IFoodGetApi[]) => {
   if (array.length === 0) {
     return 0;
   }
   return [...array].map((food) => food.itemQuantity * food.itemPrice).reduce((t, e) => t + e);
 };
 
-export const checkIfArrayAreTheSame = (array1: IFoodApi[], array2: IFoodApi[]) => {
+export const checkIfArrayAreTheSame = (array1: IFoodGetApi[], array2: IFoodGetApi[]) => {
   if (array1.length !== array2.length) {
     return false;
   }
@@ -31,12 +31,12 @@ export const checkIfArrayAreTheSame = (array1: IFoodApi[], array2: IFoodApi[]) =
   return true;
 };
 
-export const recoverQuantityFromOrderItems = (orderItems: IFoodOrder[], foodList: IFoodApi[]): IFoodApi[] => {
+export const recoverQuantityFromOrderItems = (orderItems: IFoodOrder[], foodList: IFoodGetApi[]): IFoodGetApi[] => {
   return [...foodList].map((food) => {
     const foodInOrder = [...orderItems].find((orderItem) => orderItem.id === food.id);
     return {
       ...food,
       itemQuantity: foodInOrder?.itemQuantity,
-    } as IFoodApi;
+    } as IFoodGetApi;
   });
 };

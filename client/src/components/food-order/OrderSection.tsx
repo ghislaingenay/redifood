@@ -1,7 +1,7 @@
 import { Divider, Space, Typography } from "antd";
 import { useTranslation } from "next-i18next";
 import { Else, If, Then } from "react-if";
-import { IFoodApi, IOrderApi } from "../../../redifood-module/src/interfaces";
+import { IFoodGetApi, IOrderApi } from "../../../redifood-module/src/interfaces";
 import { ORANGE, RED } from "../../constants";
 import { useFood } from "../../contexts/food.context";
 import { calculateTotal } from "../../functions/order.fn";
@@ -18,7 +18,7 @@ const { Title } = Typography;
 interface IOrderSectionProps {
   tableNumber: number | null;
   mode: EFoodMode;
-  handleSubmit: (foodOrder: IFoodApi[]) => void;
+  handleSubmit: (foodOrder: IFoodGetApi[]) => void;
   handleCancel: (url: string) => void;
   loading?: boolean;
   transaction?: IOrderApi;

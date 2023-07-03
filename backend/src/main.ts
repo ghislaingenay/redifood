@@ -45,9 +45,6 @@ async function bootstrap() {
     }),
     cookieParser(),
   );
-
-  // Catch issues for all routes
-  // app.useGlobalFilters(new AllExceptionsFilter(app.get(HttpAdapterHost)));
   try {
     await pool.connect({
       user: process.env.POSTGRES_USER,

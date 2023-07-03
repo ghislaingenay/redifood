@@ -1,12 +1,14 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
 import axios from 'axios';
-import { DatabaseError } from '../../redifood-module/src/handling-nestjs/database-error.exception';
+import { DatabaseError } from 'src/global/database-error.exception';
 import {
   EStatusCodes,
   IExtraApi,
   IExtraDB,
+  IFoodApi,
   IFoodGetApi,
-  IFoodSectionList,
+  IFoodSectionListWithExtra,
+  IGetSectionInfo,
   IGetServerSideData,
   ISectionFoodApi,
   UserPayload,
@@ -27,18 +29,26 @@ export class FoodService {
   async getAllFoods(userId: UserPayload['id']): Promise<
     IGetServerSideData<{
       foodResults: IFoodGetApi[];
-      sectionList: IFoodSectionList[];
+      sectionExtraList: IFoodSectionListWithExtra[];
     }>
   > {
-    const foodResults = await Foods.findAllFormatted(userId);
-    if (!foodResults) {
-      throw new DatabaseError();
-    }
-    const sectionList = await Foods.getSectionList(userId);
+    const { listing, foods } = await Foods.getAllInformationBySection(userId);
     return {
       statusCode: EStatusCodes.SUCCESS,
-      results: { foodResults, sectionList },
+      results: { foodResults: foods, sectionExtraList: listing },
       message: EFoodMessage.FOOD_RECOVERED,
+    };
+  }
+
+  async getOneFood(
+    foodId: number,
+    userId: UserPayload['id'],
+  ): Promise<IGetServerSideData<IFoodApi>> {
+    const food = await Foods.getOneFoodApiFormat(foodId, userId);
+    return {
+      results: food,
+      statusCode: HttpStatus.OK,
+      message: `Recovered food ${food.itemName} id #${food.id}`,
     };
   }
 
@@ -58,7 +68,21 @@ export class FoodService {
     };
   }
 
-  // @Post('/section')
+  async getSectionInfo(
+    userId: UserPayload['id'],
+  ): Promise<IGetServerSideData<IGetSectionInfo>> {
+    try {
+      const res = await Foods.getAllInformationBySection(userId);
+      return {
+        statusCode: HttpStatus.OK,
+        results: res,
+        message: EFoodMessage.FOOD_RECOVERED,
+      };
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
+  }
+
   async createSection(
     body: CreateSectionDto,
     userId: UserPayload['id'],
@@ -129,18 +153,21 @@ export class FoodService {
         message: `${body.itemName} was properly created`,
       };
     } catch (error) {
-      return {
-        results: {},
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: `Impossible to create ${body.itemName}. Please try again later`,
-      };
+      console.log(error);
+      throw new DatabaseError();
     }
   }
 
-  async updateFood(body: UpdateFoodDto, id: number) {
-    const postgresQuery = updateQuery(convertKeys(body, 'apiToDb'), 'food');
+  async updateFood(body: UpdateFoodDto, foodId: number) {
+    const foundFound = await Foods.getOneFoodApiFormat(foodId, body.userId);
+    // send update only input that changed
+    const updatedBody = Foods.returnModifiedElements(body, foundFound);
+    const postgresQuery = updateQuery(
+      convertKeys(updatedBody, 'apiToDb'),
+      'food',
+    );
     console.log('postgresQuery', postgresQuery);
-    const response = await Foods.updateRow(postgresQuery, id);
+    const response = await Foods.updateRow(postgresQuery, foodId);
 
     if (!response) {
       throw new DatabaseError();

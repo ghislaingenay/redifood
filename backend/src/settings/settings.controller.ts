@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post, Put, UseGuards } from '@nestjs/common';
-import { User } from '../../redifood-module/src/handling-nestjs/user-decorator';
+import { User } from 'src/global/user-decorator';
 import { ValidationPipe } from '../../src/global/validation.pipe';
 import { AuthGuard } from '../global/auth-guard';
 import { CreateSettingsDto, UpdateSettingsDto } from './settings.dto';

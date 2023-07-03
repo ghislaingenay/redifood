@@ -1,10 +1,12 @@
-import { DatabaseError } from '../../redifood-module/src/handling-nestjs/database-error.exception';
+import { BadRequestException } from '@nestjs/common';
+import { DatabaseError } from 'src/global/database-error.exception';
 import {
   IExtraApi,
   IFoodApi,
   IFoodDB,
   IFoodGetApi,
   IFoodSectionList,
+  IGetSectionInfo,
   ISectionFoodApi,
   UserPayload,
 } from '../../redifood-module/src/interfaces';
@@ -41,14 +43,10 @@ class Foods {
         userId,
       ])
     ).rows;
-
-    if (!response) {
-      throw new DatabaseError();
-    }
-
-    const updatedResponse: IFoodGetApi[] = response.map((item: any) => {
-      return this.formatFood(item);
-    });
+    if (!response) throw new DatabaseError();
+    const updatedResponse: IFoodGetApi[] = response.map((item: any) =>
+      this.formatFood(item),
+    );
     return updatedResponse;
   }
 
@@ -90,6 +88,27 @@ class Foods {
     return query;
   }
 
+  static async getOneFoodDBFormat(
+    foodId: IFoodApi['id'] | IFoodDB['id'],
+    userId: UserPayload['id'],
+  ): Promise<IFoodDB> {
+    const res = (await pool.query(
+      'SELECT * FROM food WHERE id = $1 SND user_id = $2',
+      [foodId, userId],
+    ).rows) as IFoodDB;
+    console.log('get one food', res);
+    if (!res) throw new BadRequestException('No found found with this id');
+    return res[0];
+  }
+
+  static async getOneFoodApiFormat(
+    foodId: IFoodApi['id'] | IFoodDB['id'],
+    userId: UserPayload['id'],
+  ): Promise<IFoodApi> {
+    const res = await Foods.getOneFoodDBFormat(foodId, userId);
+    return convertKeys<IFoodDB, IFoodApi>(res, 'dbToApi');
+  }
+
   static async getSectionList(
     userId: UserPayload['id'],
   ): Promise<IFoodSectionList[]> {
@@ -99,10 +118,11 @@ class Foods {
         [userId],
       )
     ).rows;
-    return response.map((item) => {
+    if (!response) throw new DatabaseError();
+    return response.map(({ section_name, id }) => {
       return {
-        sectionName: item.section_name,
-        id: item.id,
+        sectionName: section_name,
+        id,
       } as IFoodSectionList;
     });
   }
@@ -167,10 +187,11 @@ class Foods {
   static async getAllSectionName(
     userId: UserPayload['id'],
   ): Promise<Pick<ISectionFoodApi, 'sectionName'>[]> {
-    const response = await pool.query(
-      `SELECT * FROM food_section  WHERE user_id = $1`,
-      [userId],
-    );
+    const response = (
+      await pool.query(`SELECT * FROM food_section  WHERE user_id = $1`, [
+        userId,
+      ])
+    ).rows;
     const updatedResponseDB = response.map((item: any) => item.section_name);
     const updatedResponseApi = updatedResponseDB.map((item: any) =>
       convertKeys(item, 'dbToApi'),
@@ -194,16 +215,65 @@ class Foods {
   static async getFoodApiByFoodIdArray(
     foodArray: number[],
     userId: UserPayload['id'],
-  ): Promise<IFoodApi[]> {
-    const arrayString = `(${foodArray.join(',')})`;
+  ): Promise<IFoodGetApi[]> {
+    const foodsGet = await Foods.findAllFormatted(userId);
+    return [...foodsGet]?.filter((item) => foodArray.includes(item.id));
+  }
+
+  static async getExtraListBySectionId(
+    userId: UserPayload['id'],
+    sectionId: number,
+  ): Promise<IExtraApi[]> {
     const response = await pool.query(
-      `SELECT * FROM food WHERE id IN ${arrayString} AND user_id = $1`,
-      [userId],
+      `SELECT * FROM food_extra WHERE section_id = $1 AND user_id = $2`,
+      [sectionId, userId],
     );
-    const dbResponse: IFoodDB[] = response.rows;
+    const dbResponse: IExtraApi[] = response.rows;
     return [...dbResponse]?.map((item) => {
-      return convertKeys<IFoodDB, IFoodApi>(item, 'dbToApi');
+      return convertKeys<IExtraApi, IExtraApi>(item, 'dbToApi');
     });
+  }
+
+  static extraInformationToSectionList = (
+    userId: UserPayload['id'],
+    sectionList: IFoodSectionList[],
+  ) => {
+    try {
+      return Promise.all(
+        sectionList.map(async (section) => {
+          return {
+            ...section,
+            extraList: await Foods.getExtraListBySectionId(userId, section.id),
+          };
+        }),
+      );
+    } catch (err) {
+      throw new BadRequestException('Impossible to get the lisy of extra');
+    }
+  };
+  static async getAllInformationBySection(
+    userId: UserPayload['id'],
+  ): Promise<IGetSectionInfo> {
+    const sectionListing = await Foods.getSectionList(userId);
+    const extraSectionList = await Foods.extraInformationToSectionList(
+      userId,
+      sectionListing,
+    );
+    console.log('extra', extraSectionList);
+    const formattedFoods = await Foods.findAllFormatted(userId);
+    return { listing: extraSectionList, foods: formattedFoods };
+  }
+
+  static returnModifiedElements(
+    foodForm: Partial<IFoodApi>,
+    foodApi: Partial<IFoodApi>,
+  ) {
+    const newModifiedObj: Partial<IFoodApi> = {};
+    for (const key in foodApi) {
+      if (foodApi[key] !== foodForm[key]) newModifiedObj[key] = foodForm[key];
+    }
+    if (!newModifiedObj) throw new BadRequestException('No changes was made');
+    return newModifiedObj;
   }
 }
 

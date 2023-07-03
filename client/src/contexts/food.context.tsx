@@ -1,18 +1,18 @@
 import React, { useContext, useState } from "react";
-import { IFoodApi } from "../../redifood-module/src/interfaces";
+import { IFoodApi, IFoodGetApi } from "../../redifood-module/src/interfaces";
 
 // @ts-ignore
 export const FoodContext = React.createContext();
 
 interface IFoodContext {
-  foodOrder: IFoodApi[];
-  setFoodOrder: React.Dispatch<React.SetStateAction<IFoodApi[]>>;
+  foodOrder: IFoodGetApi[];
+  setFoodOrder: React.Dispatch<React.SetStateAction<IFoodGetApi[]>>;
   functions: {
-    deleteFood: (item: IFoodApi["id"]) => void;
-    addFood: (item: IFoodApi["id"]) => void;
-    removeFood: (item: IFoodApi["id"]) => void;
-    addToCart: (item: IFoodApi["id"], foodList: IFoodApi[]) => void;
-    selectFood: (item: IFoodApi["id"], foodList: IFoodApi[]) => void;
+    deleteFood: (item: IFoodGetApi["id"]) => void;
+    addFood: (item: IFoodGetApi["id"]) => void;
+    removeFood: (item: IFoodGetApi["id"]) => void;
+    addToCart: (item: IFoodGetApi["id"], foodList: IFoodGetApi[]) => void;
+    selectFood: (item: IFoodGetApi["id"], foodList: IFoodGetApi[]) => void;
   };
   foodPictures: {
     haveFoodDescription: boolean;
@@ -34,7 +34,7 @@ interface IFoodProvider {
 }
 
 export function FoodProvider({ children }: IFoodProvider) {
-  const [foodOrder, setFoodOrder] = useState<IFoodApi[]>([]);
+  const [foodOrder, setFoodOrder] = useState<IFoodGetApi[]>([]);
   const [haveFoodDescription, setHaveFoodDescription] = useState(true);
   const [haveFoodPicture, setHaveFoodPicture] = useState(true);
 
@@ -53,7 +53,7 @@ export function FoodProvider({ children }: IFoodProvider) {
     }
     setFoodOrder(currentOrder);
   };
-  const removeFood = (itemId: IFoodApi["id"]) => {
+  const removeFood = (itemId: IFoodGetApi["id"]) => {
     const currentOrder = [...foodOrder];
     for (let i = 0; i < currentOrder.length; i++) {
       if (currentOrder[i].id === itemId) {
@@ -64,7 +64,7 @@ export function FoodProvider({ children }: IFoodProvider) {
     setFoodOrder(currentOrder);
   };
 
-  const selectFood = (foodId: IFoodApi["id"], foodList: IFoodApi[]) => {
+  const selectFood = (foodId: IFoodApi["id"], foodList: IFoodGetApi[]) => {
     setFoodOrder([]);
     const foundFound = foodList.filter((food) => food.id === foodId);
     if (foundFound) {
@@ -73,7 +73,7 @@ export function FoodProvider({ children }: IFoodProvider) {
     return null;
   };
 
-  const addToCart = (foodId: IFoodApi["id"], foodList: IFoodApi[]) => {
+  const addToCart = (foodId: IFoodApi["id"], foodList: IFoodGetApi[]) => {
     const foundFound = foodOrder.find((food) => food.id === foodId);
     if (foundFound) {
       let currentOrder = [...foodOrder];
@@ -86,7 +86,7 @@ export function FoodProvider({ children }: IFoodProvider) {
     } else {
       let newFood = foodList.find((food) => food.id === foodId);
       if (newFood) newFood.itemQuantity = 1;
-      const currentOrder: IFoodApi[] = [...foodOrder];
+      const currentOrder: IFoodGetApi[] = [...foodOrder];
       currentOrder.push(newFood!);
       setFoodOrder(currentOrder);
     }
