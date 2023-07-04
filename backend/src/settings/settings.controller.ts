@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post, Put, UseGuards } from '@nestjs/common';
-import { UserPayload } from 'redifood-module/src/interfaces';
+import { UserInfo, UserPayload } from 'redifood-module/src/interfaces';
 import { User } from 'src/global/user-decorator';
 import { ValidationPipe } from '../../src/global/validation.pipe';
 import { AuthGuard } from '../global/auth-guard';
@@ -32,6 +32,12 @@ export class SettingsController {
   ) {
     const userId = user.id;
     return await this.settingsService.createSettings(body, userId);
+  }
+
+  @UseGuards(new AuthGuard())
+  @Put('user')
+  async changeUserInfo(@User() user: any, @Body() body: Partial<UserInfo>) {
+    return await this.settingsService.changeUserInfo(body, user.id);
   }
 
   @UseGuards(new AuthGuard())

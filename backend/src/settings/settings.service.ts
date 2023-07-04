@@ -1,6 +1,7 @@
 import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
 import {
   IGetServerSideData,
+  UserInfo,
   UserPayload,
 } from 'redifood-module/src/interfaces';
 import { DatabaseError } from 'src/global/database-error.exception';
@@ -33,6 +34,24 @@ export class SettingsService {
         statusCode: HttpStatus.OK,
         results: { settings, user } || {},
         message: 'Settings retrieved',
+      };
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
+  }
+
+  async changeUserInfo(
+    body: Partial<UserInfo>,
+    userId: string,
+  ): Promise<IGetServerSideData<any>> {
+    try {
+      const user = await User.findByIdAndUpdate({ _id: userId }, body, {
+        new: true,
+      });
+      return {
+        results: user,
+        message: `User ${userId} updated`,
+        statusCode: HttpStatus.CREATED,
       };
     } catch (err) {
       throw new BadRequestException(err.message);
