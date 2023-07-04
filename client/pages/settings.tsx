@@ -5,24 +5,25 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useRouter } from "next/navigation";
 import { useContext, useEffect } from "react";
-import { ECurrency, ELanguage } from "../redifood-module/src/interfaces";
+import { ECurrency, ELanguage, ISettingsApi } from "../redifood-module/src/interfaces";
 import { RowSpaceAround } from "../src/components/styling/grid.styled";
 import AppContext from "../src/contexts/app.context";
 import { useFood } from "../src/contexts/food.context";
-import { ServerInfo } from "../src/interfaces";
 import { CenteredTitle, NoSpacingDivider, RediDivider, RoundedInput, RoundedInputNum } from "../src/styles";
 import { AnimToTop } from "../src/styles/animations/global.anim";
+import buildClient from "./api/build-client";
 import { buildLanguage, setCookieInformation } from "./api/build-language";
 const { Title } = Typography;
 
 interface ISettingsProps {
-  language: ELanguage;
+  settingsInformation: ISettingsApi;
 }
-const Settings = ({ language }: ISettingsProps) => {
+const Settings = ({ settingsInformation }: ISettingsProps) => {
+  const { language, haveFoodImage } = settingsInformation;
   const { t } = useTranslation("common");
   const router = useRouter();
   const {
-    foodPictures: { setHaveFoodDescription, setHaveFoodPicture, haveFoodDescription, haveFoodPicture },
+    foodPictures: { setHaveFoodPicture },
   } = useFood();
   const {
     setCurrency,
@@ -34,9 +35,9 @@ const Settings = ({ language }: ISettingsProps) => {
   const [settingsForm] = Form.useForm();
 
   useEffect(() => {
+    setHaveFoodPicture(haveFoodImage);
     settingsForm.setFieldsValue({
-      haveFoodDescription,
-      haveFoodPicture,
+      haveFoodPicture: haveFoodImage,
       currency,
       language,
       vat,
@@ -213,28 +214,32 @@ const Settings = ({ language }: ISettingsProps) => {
 
 export default Settings;
 
-export async function getStaticProps({ locale, req }: ServerInfo) {
+export async function getServerSideProps(appContext: any) {
+  const { locale, req } = appContext;
+  const client = buildClient(appContext);
   const getLanguageValue = buildLanguage(locale, req);
-  return {
-    props: { language: getLanguageValue, ...(await serverSideTranslations(getLanguageValue, ["common"])) }, // will be passed to the page component as props
-  };
-  // const url = "/api/settings/:userid";
-  // await axios
-  //   .get(url)
-  //   .then(async (res) => {
-  //     const {
-  //       data: { results: {settingsInfo} },
-  //     } = res;
-  //     return {
-  //       props: {  settings: settingsInfo,  status: "success", ...(await serverSideTranslations(getLanguageValue, ["common"])) },
-  //     };
-  //   })
-  //   .catch((err) => {
-  //     console.log("erre", err);
-  //   });
-  // return {
-  //   props: {  settings: {},status: "error", ...(await serverSideTranslations(getLanguageValue, ["common"])) },
-  // };
-}
+  const url = "/api/settings/";
+  const res = await client
+    .get(url)
+    .then(async (res) => {
+      const {
+        data: { results },
+      } = res;
+      return {
+        props: {
+          settingsInformation: results,
+          ...(await serverSideTranslations(getLanguageValue, ["common"])),
+        },
+      };
+    })
+    .catch(async () => {
+      return {
+        props: {
+          settingsInformation: [],
+          ...(await serverSideTranslations(getLanguageValue, ["common"])),
+        },
+      };
+    });
 
-// /api/auth/currentuser
+  return res;
+}

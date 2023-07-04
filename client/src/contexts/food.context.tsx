@@ -15,8 +15,6 @@ interface IFoodContext {
     selectFood: (item: IFoodGetApi["id"], foodList: IFoodGetApi[]) => void;
   };
   foodPictures: {
-    haveFoodDescription: boolean;
-    setHaveFoodDescription: (val: boolean) => void;
     haveFoodPicture: boolean;
     setHaveFoodPicture: (val: boolean) => void;
   };
@@ -35,7 +33,6 @@ interface IFoodProvider {
 
 export function FoodProvider({ children }: IFoodProvider) {
   const [foodOrder, setFoodOrder] = useState<IFoodGetApi[]>([]);
-  const [haveFoodDescription, setHaveFoodDescription] = useState(true);
   const [haveFoodPicture, setHaveFoodPicture] = useState(true);
 
   const deleteFood = (itemId: IFoodApi["id"]) => {
@@ -103,8 +100,6 @@ export function FoodProvider({ children }: IFoodProvider) {
       selectFood: selectFood,
     },
     foodPictures: {
-      haveFoodDescription: haveFoodDescription,
-      setHaveFoodDescription: setHaveFoodDescription,
       haveFoodPicture: haveFoodPicture,
       setHaveFoodPicture: setHaveFoodPicture,
     },
