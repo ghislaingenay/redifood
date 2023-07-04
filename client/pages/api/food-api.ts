@@ -153,10 +153,10 @@ export const handleCreateFood = (food: Omit<IFoodApi, "id" | "userId">): Promise
       });
       return { created: true };
     })
-    .catch(() => {
+    .catch((err) => {
       NotificationRes.onFailure({
         title: "Failed to create food",
-        description: "Please try again",
+        description: err.message,
         placement: "bottomRight",
       });
       return { created: false };
@@ -180,10 +180,10 @@ export const handleUpdatedFood = (food: IFoodApi, foodId: IFoodApi["id"]): Promi
       });
       return { updated: true };
     })
-    .catch(() => {
+    .catch((err) => {
       NotificationRes.onFailure({
         title: "Failed to update food",
-        description: "Please try again",
+        description: err.message,
         placement: "bottomRight",
       });
       return { updated: false };

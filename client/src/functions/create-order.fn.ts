@@ -9,7 +9,6 @@ export const handleCreateOrder = async (
   tableNumber: number,
 ): Promise<{ success: boolean }> => {
   const updatedFoodList = setFoodItemsForDb([...foodOrder]);
-  console.log("updated food list", updatedFoodList);
   const bodyCreateOrder: TCreateOrderBody = {
     orderTableNumber: tableNumber as number,
     orderItems: updatedFoodList,

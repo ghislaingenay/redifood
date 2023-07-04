@@ -1,8 +1,20 @@
-FROM node:16-alpine
+FROM node:16-alpine AS base
 
-WORKDIR /app
-COPY package.json .
+FROM base as builder
+WORKDIR /usr/src/app
+COPY package*.json ./
 RUN npm install
 COPY . .
+RUN npm run build
 
-CMD ["npm", "run", "start:dev"]
+FROM base
+WORKDIR /usr/src/app
+# ENV JWT_TOKEN='thisisasecret'
+# ENV MONGO_URI='mongodb://mongo:27017'
+COPY --from=builder /usr/src/app/node_modules node_modules
+COPY --from=builder /usr/src/app/dist dist
+COPY --from=builder /usr/src/app/package.json .
+EXPOSE 3000
+ENV PORT 3000
+CMD ["node", "dist/src/main.js"]
+

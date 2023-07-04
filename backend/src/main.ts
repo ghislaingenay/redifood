@@ -15,7 +15,7 @@ async function bootstrap() {
   verifyKeys();
   app.enableCors({
     allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept',
-    origin: 'http://localhost:3001',
+    origin: ['http://localhost:3001', 'http://localhost:3000'],
     credentials: true,
   });
   app.use(

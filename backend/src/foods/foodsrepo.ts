@@ -259,7 +259,6 @@ class Foods {
       userId,
       sectionListing,
     );
-    console.log('extra', extraSectionList);
     const formattedFoods = await Foods.findAllFormatted(userId);
     return { listing: extraSectionList, foods: formattedFoods };
   }

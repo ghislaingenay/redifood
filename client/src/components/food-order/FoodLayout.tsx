@@ -84,7 +84,7 @@ const FoodLayout = ({ foods, mode, sectionList, mainTitle, transaction }: IFoodL
       <LGCard style={{ height: "100%", width: "100%" }}>
         <If condition={isAlterMode}>
           <Then>
-            <FoodForm />
+            <FoodForm allFoods={foods} listSectionExtra={sectionList} />
           </Then>
           <Else>
             <OrderSection
@@ -117,7 +117,7 @@ const FoodLayout = ({ foods, mode, sectionList, mainTitle, transaction }: IFoodL
               radioGroupName="food"
               haveIcon="false"
               selectedButton={selectedSectionId}
-              clickedFn={changeActiveButton}
+              clickedFn={(id: number) => changeActiveButton(id)}
             />
             <Row gutter={[5, 10]}>
               {sortedFoods?.map((food, index) => (
