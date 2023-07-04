@@ -6,10 +6,9 @@ import axios from "axios";
 import { useTranslation } from "next-i18next";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useDeferredValue, useEffect, useMemo, useState } from "react";
+import { useDeferredValue, useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Case, Default, Else, If, Switch, Then } from "react-if";
-import { AxiosFunction } from "../../../pages/api/axios-request";
 import {
   handleCreateExtra,
   handleCreateFood,
@@ -18,12 +17,7 @@ import {
   handleDeleteSection,
   handleUpdatedFood,
 } from "../../../pages/api/food-api";
-import {
-  IFoodApi,
-  IFoodGetApi,
-  IFoodSectionListWithExtra,
-  IGetSectionInfo,
-} from "../../../redifood-module/src/interfaces";
+import { IFoodApi, IFoodGetApi, IFoodSectionListWithExtra } from "../../../redifood-module/src/interfaces";
 import { GREY, ORANGE_DARK, initialFormValues } from "../../constants";
 import { useFood } from "../../contexts/food.context";
 import {
@@ -70,7 +64,21 @@ const { Option } = Select;
 //   return isJpgOrPng && isLt2M;
 // };
 
-const FoodForm = () => {
+// rules={[
+//   () => ({
+//     validator(_, __) {
+//       if (isSection) return Promise.resolve();
+//       else return Promise.reject(new Error("Please select a section"));
+//     },
+//   }),
+// ]}
+
+interface IFoodFormProps {
+  allFoods: IFoodGetApi[];
+  listSectionExtra: IFoodSectionListWithExtra[];
+}
+
+const FoodForm = ({ allFoods, listSectionExtra }: IFoodFormProps) => {
   const router = useRouter();
   const { t } = useTranslation();
   const {
@@ -92,23 +100,24 @@ const FoodForm = () => {
     { label: t("buttons.create"), value: "false", icon: <FontAwesomeIcon icon={faSquarePlus} />, ariaLabel: "CREATE" },
   ];
 
-  const [editMode, setEditMode] = useState<Booleanish>("false");
+  const [editMode, setEditMode] = useState<Booleanish>("true");
   const currentMode = useDeferredValue(editMode);
   const isEditModeWithoutFood = editMode === "true" && foodOrder.length === 0;
   const isEditModeWithFood = editMode === "true" && foodOrder.length !== 0;
+  const canEditName = isEditModeWithFood;
 
   const isDeleteExtraMode = extraValue === EHandleType.DELETEEXTRA;
   const isAddExtraMode = extraValue === EHandleType.ADDEXTRA;
   const isDeleteSectionMode = sectionValue === EHandleType.DELETESECTION;
   const isAddSectionMode = sectionValue === EHandleType.ADDSECTION;
+  const sectionIdName = useMemo(() => recoverIdName(listSectionExtra), [listSectionExtra]);
+  const isSection =
+    sectionValue !== EHandleType.NONE && sectionValue !== "all" && !isDeleteSectionMode && !isAddSectionMode;
+  const isExtra = extraValue !== EHandleType.NONE && !isDeleteExtraMode && !isAddExtraMode;
 
   const relatedToSectionAndExtra = isDeleteExtraMode || isAddExtraMode || isDeleteSectionMode || isAddSectionMode;
   const isCreateNewFood = editMode === "false" && !relatedToSectionAndExtra;
   const isEditFood = editMode === "true" && !relatedToSectionAndExtra;
-
-  const [sectionIdName, setSectionIdName] = useState<{ id: number; name: string }[]>([]);
-  const [allFoods, setAllFoods] = useState<IFoodGetApi[]>([]);
-  const [listSectionExtra, setListSectionExtra] = useState<IFoodSectionListWithExtra[]>([]);
   const [loading, setLoading] = useState(false);
   const [onFinishLoading, setOnFinishLoading] = useState(false);
   const [handleType, setHandleType] = useState<EHandleType>(EHandleType.NONE);
@@ -124,6 +133,31 @@ const FoodForm = () => {
 
   const haveFile = files.length !== 0;
 
+  const implementFunction = () => (relatedToSectionAndExtra ? onSave() : form.submit());
+
+  const resetSectionFields = () => {
+    form.setFieldValue("itemSection", EHandleType.NONE);
+    setInputSection("");
+    setDelSection("");
+  };
+  const resetExtraFields = () => {
+    setInputExtra("");
+    setDelExtra("");
+    form.setFieldValue("itemExtra", EHandleType.NONE);
+  };
+
+  const changeMode = (e: Booleanish) => {
+    console.log("change mode", e);
+
+    if (e) setEditMode(e);
+    if (!e) {
+      const switchingMode = editMode === "true" ? "false" : "true";
+      setEditMode(switchingMode);
+    }
+    // setFoodOrder([]);
+    form.resetFields();
+  };
+
   const optionsCreateFood = (fn: Function): IFormInterface[] => [
     {
       label: t("foods.form-label.name"),
@@ -134,6 +168,7 @@ const FoodForm = () => {
           placeholder={t("foods.form-label.name") as string}
           style={styleNoM}
           aria-label="itemName"
+          disabled={canEditName}
         />
       ),
       rules: [{ required: true, message: t("foods.form-label.rules-name") }],
@@ -179,21 +214,23 @@ const FoodForm = () => {
         ) as any,
       );
       const formData = new FormData();
+      setLoading(true);
 
       // This is working for now
       formData.append("file", acceptedFiles[0]);
       console.log("acc", acceptedFiles);
       formData.append("upload_preset", String(process.env.NEXT_PUBLIC_UPLOAD_PRESET));
       const response: any = await axios
-        .post(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_NAME}/image/upload`, formData)
+        .post(`https://api-ap.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_NAME}/upload`, formData)
         .catch((err) => {
-          console.log("err", err);
+          console.log("err cloudinary", err);
         });
-      console.log("res", response);
+      console.log("res cliudinary", response);
       const { statusText, data } = response;
       console.log(data.secure_url);
       if (statusText === "OK") {
         form.setFieldValue("itemPhoto", data.secure_url);
+        setLoading(false);
         return setUrlFile(data.secure_url);
       }
     },
@@ -203,11 +240,9 @@ const FoodForm = () => {
     if (handleType === EHandleType.ADDSECTION || handleType === EHandleType.DELETESECTION) {
       setInputSection("");
       setDelSection("");
-      form.setFieldsValue({ itemSection: foodOrder[0].itemSection.id });
     } else if (handleType === EHandleType.ADDEXTRA || handleType === EHandleType.DELETEEXTRA) {
       setInputExtra("");
       setDelExtra("");
-      form.setFieldsValue({ itemExtra: foodOrder[0].itemExtra.id });
     } else if (handleType === EHandleType.EDIT) {
       form.setFieldsValue(foodOrder[0]);
     } else {
@@ -223,47 +258,56 @@ const FoodForm = () => {
     return;
   };
 
-  const onFinish = async (values: any) => {
+  const onSave = async () => {
+    console.log("entered on save");
     setOnFinishLoading(true);
-    if (files.length === 0) return setError(true);
-    const formattedFoodData = formDataToFood({ ...values, itemPhoto: urlFile });
-    console.log("updated", formattedFoodData);
-    setError(false);
     switch (handleType) {
       case EHandleType.ADDSECTION: {
         console.log("new section added", inputSection);
         const createdSectionRes = await handleCreateSection(inputSection.toLowerCase(), listSectionExtra);
         if (!createdSectionRes.created) return failToSave();
-        setInputSection("");
+        resetSectionFields();
         break;
       }
       case EHandleType.DELETESECTION: {
         console.log("deleted section", delSection);
         const deleteSectionRes = await handleDeleteSection(Number(delSection));
         if (!deleteSectionRes.deleted) return failToSave();
-        setDelSection("");
-        form.setFieldValue("itemSection", EHandleType.NONE);
+        resetSectionFields();
         break;
       }
       case EHandleType.ADDEXTRA: {
         console.log("created extra", inputExtra);
         const createExtraRes = await handleCreateExtra(inputExtra.toLowerCase(), sectionValue, listSectionExtra);
         if (!createExtraRes.created) return failToSave();
-        form.setFieldValue("itemExtra", EHandleType.NONE);
-        setInputExtra("");
+        resetExtraFields();
         break;
       }
       case EHandleType.DELETEEXTRA: {
         console.log("deleted extra", delExtra);
         const deleteExtraRes = await handleDeleteExtra(Number(delExtra));
         if (!deleteExtraRes.deleted) return failToSave();
-        form.setFieldValue("itemExtra", EHandleType.NONE);
-        setDelExtra("");
+        resetExtraFields();
         break;
       }
       default: {
       }
     }
+    setConfirmModal(false);
+    setOnFinishLoading(false);
+    router.refresh();
+  };
+
+  const onFinish = async (values: any) => {
+    if (!isSection && !isExtra) return setError(true);
+    setOnFinishLoading(true);
+    if (files.length === 0) return setError(true);
+    const formattedFoodData = isCreateNewFood
+      ? formDataToFood({ ...values, itemPhoto: urlFile })
+      : formDataToFood({ ...values });
+    console.log("updated", formattedFoodData);
+    setError(false);
+
     if (isCreateNewFood) {
       const createdFoodRes = await handleCreateFood(formattedFoodData);
       if (!createdFoodRes.created) return failToSave();
@@ -324,30 +368,8 @@ const FoodForm = () => {
     return (currentFood && { ...food, id: currentFood.id, userId: currentFood.userId }) as IFoodApi;
   };
 
-  useEffect(() => {
-    setLoading(true);
-    AxiosFunction({
-      method: "get",
-      url: "api/foods/section/information",
-      body: {},
-      queryParams: {},
-    })
-      .then((res: { results: IGetSectionInfo }) => {
-        const {
-          results: { listing, foods },
-        } = res;
-        setAllFoods(foods);
-        setListSectionExtra(listing);
-        setSectionIdName(recoverIdName(listing));
-        setLoading(false);
-      })
-      .catch(() => {
-        setLoading(false);
-        // toast.error(err.message)
-      });
-  }, []);
-
   if (loading) return <p>Loading...</p>;
+  if (onFinishLoading) return <p>On finish loading...</p>;
 
   return (
     <>
@@ -359,11 +381,7 @@ const FoodForm = () => {
           options={foodRadioOptions}
           haveIcon={"true"}
           selectedButton={currentMode}
-          clickedFn={(e) => {
-            setFoodOrder([]);
-            form.setFieldsValue(initialFormValues);
-            setEditMode(() => e);
-          }}
+          clickedFn={(e) => changeMode(e)}
         />
         <Switch>
           <Case condition={isEditModeWithoutFood}>
@@ -600,7 +618,10 @@ const FoodForm = () => {
       <Modal
         open={confirmModal}
         onCancel={() => setConfirmModal((prevValue: boolean) => !prevValue)}
-        onOk={() => form.submit()}
+        onOk={() => {
+          implementFunction();
+          setConfirmModal(false);
+        }}
         confirmLoading={onFinishLoading}
       >
         <Switch>

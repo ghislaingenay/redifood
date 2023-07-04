@@ -3,81 +3,83 @@ import { FormLabelAlign } from "antd/es/form/interface";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
-import { useRouter } from "next/navigation";
-import { useContext, useEffect } from "react";
-import { ECurrency, ELanguage } from "../redifood-module/src/interfaces";
+import { useContext, useEffect, useState } from "react";
+import { useDebounce } from "usehooks-ts";
+import { ISettingsApi, PartialUserInfo, UserInfo } from "../redifood-module/src/interfaces";
 import { RowSpaceAround } from "../src/components/styling/grid.styled";
 import AppContext from "../src/contexts/app.context";
 import { useFood } from "../src/contexts/food.context";
-import { ServerInfo } from "../src/interfaces";
 import { CenteredTitle, NoSpacingDivider, RediDivider, RoundedInput, RoundedInputNum } from "../src/styles";
 import { AnimToTop } from "../src/styles/animations/global.anim";
-import { buildLanguage, setCookieInformation } from "./api/build-language";
+import buildClient from "./api/build-client";
+import { buildLanguage } from "./api/build-language";
+import { handleUpdateUserInformation, handleUpdateUserSettings } from "./api/setting-api";
 const { Title } = Typography;
 
 interface ISettingsProps {
-  language: ELanguage;
+  settingsInformation: ISettingsApi;
+  userInformation: UserInfo;
 }
-const Settings = ({ language }: ISettingsProps) => {
+const Settings = ({ settingsInformation, userInformation }: ISettingsProps) => {
+  const { language, haveFoodImage, vat, currency } = settingsInformation;
+  const { email, firstName, lastName } = userInformation;
   const { t } = useTranslation("common");
-  const router = useRouter();
   const {
-    foodPictures: { setHaveFoodDescription, setHaveFoodPicture, haveFoodDescription, haveFoodPicture },
+    foodPictures: { setHaveFoodPicture },
   } = useFood();
-  const {
-    setCurrency,
-    setLanguage,
-    setVaT,
-    state: { currency, vat },
-  } = useContext(AppContext);
+  const { setCurrency, setLanguage, setVaT } = useContext(AppContext);
   const [userForm] = Form.useForm();
   const [settingsForm] = Form.useForm();
 
+  const [userInfo, setUserInfo] = useState<PartialUserInfo>({
+    firstName: "",
+    lastName: "",
+  });
+
+  const [settingInfo, setSettingInfo] = useState<Pick<ISettingsApi, "vat" | "haveFoodImage">>({
+    haveFoodImage: haveFoodImage,
+    vat: vat,
+  });
+
+  const debounceUser = useDebounce(userInfo, 5000);
+  const debounceSettings = useDebounce(settingInfo, 5000);
+
   useEffect(() => {
+    setHaveFoodPicture(haveFoodImage);
     settingsForm.setFieldsValue({
-      haveFoodDescription,
-      haveFoodPicture,
+      haveFoodImage,
       currency,
       language,
       vat,
     });
+    setCurrency(currency);
+    setLanguage(language);
+    setVaT(vat);
+    setUserInfo({ firstName, lastName });
+    setSettingInfo({ haveFoodImage, vat });
+    userForm.setFieldsValue({
+      email,
+      firstName,
+      lastName,
+    });
   }, []);
 
-  interface ISettings {
-    email: string;
-    displayFoodDescription: boolean;
-    displayFoodImage: boolean;
-    language: string;
-    currency: ECurrency;
-    vat: number;
-  }
-  const handleUserInfo = (values: Pick<ISettings, "email">) => {
-    console.log(values);
+  const haveEmptyFields = <T extends any>(obj: T): boolean => {
+    if (!obj) return false;
+    return Object.values(obj).some((val) => val === "" || val === null || val === undefined);
   };
 
-  const handleSettingsInfo = (values: Omit<ISettings, "email">) => {
-    console.log(values);
-  };
+  const isValidData = <T extends any>(debounce: T): boolean => debounce && !haveEmptyFields<T>(debounce);
 
-  // const [settingsParams, setSettingsParams] = useState<Partial<Omit<ISettings, "email">>>(
-  //   settingsForm.getFieldsValue(),
-  // );
+  useEffect(() => {
+    if (!isValidData(debounceUser)) return;
+    handleUpdateUserInformation(debounceUser);
+  }, [debounceUser]);
 
-  // const { res, doRequest, loading } = useRequest<Omit<ISettings, "email">>({
-  //   url: "/api/settings",
-  //   method: "post",
-  //   body: {},
-  //   queryParams: {},
-  // });
-
-  // const loadData = async () => {
-  //   await doRequest();
-  //   settingsForm.setFieldsValue(res);
-  // };
-
-  // useEffect(() => {
-  //   loadData();
-  // }, [settingsParams]);
+  useEffect(() => {
+    if (!isValidData(debounceSettings)) return;
+    handleUpdateUserSettings(debounceSettings);
+  }, [debounceSettings]);
 
   const colSettingsSpan = { xs: 24, sm: 24, md: 24, lg: 12, xl: 12, xxl: 12 };
   const formItemLayout = {
@@ -104,13 +106,16 @@ const Settings = ({ language }: ISettingsProps) => {
             layout="horizontal"
             style={{ margin: "2rem auto" }}
             form={userForm}
-            onValuesChange={(e, all) => {
-              console.log(e);
-              handleUserInfo(all);
-            }}
+            onValuesChange={(_, all) => setUserInfo({ firstName: all.firstName, lastName: all.lastName })}
           >
             <Form.Item name="email" id="email" label="Email">
-              <RoundedInput type="text" aria-label="email" style={{ width: "50%" }} />
+              <RoundedInput type="text" aria-label="email" style={{ width: "50%" }} disabled />
+            </Form.Item>
+            <Form.Item name="firstName" id="firstName" label="First name">
+              <RoundedInput type="text" aria-label="firstName" style={{ width: "50%" }} />
+            </Form.Item>
+            <Form.Item name="lastName" id="lastName" label="Last name">
+              <RoundedInput type="text" aria-label="lastName" style={{ width: "50%" }} />
             </Form.Item>
           </Form>
           <RediDivider />
@@ -128,12 +133,12 @@ const Settings = ({ language }: ISettingsProps) => {
             layout="horizontal"
             onValuesChange={(_, all: any) => {
               console.log("all", all);
-              handleSettingsInfo(all);
+              setSettingInfo({ haveFoodImage: all.haveFoodImage, vat: all.vat || 0 });
               // setSettingsParams(all);
             }}
           >
             <RowSpaceAround>
-              <Col {...colSettingsSpan}>
+              {/* <Col {...colSettingsSpan}>
                 <Form.Item label="Language" name="language" {...formItemLayout}>
                   <Radio.Group
                     buttonStyle="solid"
@@ -148,8 +153,8 @@ const Settings = ({ language }: ISettingsProps) => {
                     <Radio.Button value={ELanguage.FRENCH}>{t("settings.form-values.french")}</Radio.Button>
                   </Radio.Group>
                 </Form.Item>
-              </Col>
-              <Col {...colSettingsSpan}>
+              </Col> */}
+              {/* <Col {...colSettingsSpan}>
                 <Form.Item label={t("settings.form-label.currency")} name="currency" {...formItemLayout}>
                   <Radio.Group
                     buttonStyle="solid"
@@ -162,9 +167,9 @@ const Settings = ({ language }: ISettingsProps) => {
                     <Radio.Button value={ECurrency.EUR}>€</Radio.Button>
                   </Radio.Group>
                 </Form.Item>
-              </Col>
+              </Col> */}
               <Col {...colSettingsSpan}>
-                <Form.Item label={t("settings.form-label.show-image")} name="haveFoodPicture" {...formItemLayout}>
+                <Form.Item label={t("settings.form-label.show-image")} name="haveFoodImage" {...formItemLayout}>
                   <Radio.Group buttonStyle="solid" onChange={(e) => setHaveFoodPicture(e.target.value as boolean)}>
                     <Radio.Button value={true}>{t("glossary.yes")}</Radio.Button>
                     <Radio.Button value={false}>{t("glossary.no")}</Radio.Button>
@@ -172,33 +177,8 @@ const Settings = ({ language }: ISettingsProps) => {
                 </Form.Item>
               </Col>
               <Col {...colSettingsSpan}>
-                <Form.Item
-                  label={t("settings.form-label.show-image-description")}
-                  name="haveFoodDescription"
-                  {...formItemLayout}
-                >
-                  <Radio.Group buttonStyle="solid" onChange={(e) => setHaveFoodDescription(e.target.value as boolean)}>
-                    <Radio.Button value={true}>{t("glossary.yes")}</Radio.Button>
-                    <Radio.Button value={false}>{t("glossary.no")}</Radio.Button>
-                  </Radio.Group>
-                </Form.Item>
-              </Col>
-              <Col {...colSettingsSpan}>
                 <Form.Item label={t("settings.form-label.vat")} name="vat" {...formItemLayout}>
-                  <RoundedInputNum
-                    onChange={(e) => {
-                      console.log(e);
-                      if (e && typeof e !== "undefined") {
-                        setVaT(Number(e));
-                      } else {
-                        setVaT(0);
-                      }
-                    }}
-                    type="number"
-                    minLength={1}
-                    aria-label="vat"
-                    style={{ width: "50%" }}
-                  />
+                  <RoundedInputNum type="number" minLength={1} aria-label="vat" style={{ width: "50%" }} />
                 </Form.Item>
               </Col>
               <Col {...colSettingsSpan}></Col>
@@ -213,28 +193,36 @@ const Settings = ({ language }: ISettingsProps) => {
 
 export default Settings;
 
-export async function getStaticProps({ locale, req }: ServerInfo) {
+export async function getServerSideProps(appContext: any) {
+  const { locale, req } = appContext;
+  const client = buildClient(appContext);
   const getLanguageValue = buildLanguage(locale, req);
-  return {
-    props: { language: getLanguageValue, ...(await serverSideTranslations(getLanguageValue, ["common"])) }, // will be passed to the page component as props
-  };
-  // const url = "/api/settings/:userid";
-  // await axios
-  //   .get(url)
-  //   .then(async (res) => {
-  //     const {
-  //       data: { results: {settingsInfo} },
-  //     } = res;
-  //     return {
-  //       props: {  settings: settingsInfo,  status: "success", ...(await serverSideTranslations(getLanguageValue, ["common"])) },
-  //     };
-  //   })
-  //   .catch((err) => {
-  //     console.log("erre", err);
-  //   });
-  // return {
-  //   props: {  settings: {},status: "error", ...(await serverSideTranslations(getLanguageValue, ["common"])) },
-  // };
-}
+  const url = "/api/settings/user";
+  const res = await client
+    .get(url)
+    .then(async (res) => {
+      const {
+        data: {
+          results: { settings, user },
+        },
+      } = res;
+      return {
+        props: {
+          settingsInformation: settings,
+          userInformation: user,
+          ...(await serverSideTranslations(getLanguageValue, ["common"])),
+        },
+      };
+    })
+    .catch(async () => {
+      return {
+        props: {
+          settingsInformation: [],
+          userInformation: [],
+          ...(await serverSideTranslations(getLanguageValue, ["common"])),
+        },
+      };
+    });
 
-// /api/auth/currentuser
+  return res;
+}

@@ -1,5 +1,4 @@
 import { ButtonProps, Col } from "antd";
-import { useEffect, useState } from "react";
 import { BACKGROUND_COLOR, LIGHT_GREY, ORANGE_DARK, ORANGE_LIGHT } from "../../constants";
 import { hexToRgba } from "../../functions/global.fn";
 import { RadioButton } from "../../styles";
@@ -49,10 +48,7 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
     fontSize,
   }: IRediRadioButtonProps<Booleanish> = props;
 
-  const [selectedValue, setSelectedValue] = useState(options[0].value);
-  useEffect(() => setSelectedValue(selectedButton), [selectedButton]);
-
-  const isSelected = (radioValue: string | number) => selectedValue === radioValue;
+  const isSelected = (radioValue: string | number) => selectedButton === radioValue;
 
   const spanValue = (options: IRediRadio[] | IRediRadioWithIcon[]) => {
     switch (options.length) {
@@ -91,17 +87,15 @@ const RediRadioButton = (props: IRediRadioButtonProps<Booleanish>) => {
               xs={24}
               sm={24}
               md={spanValue(options)}
+              lg={spanValue(options)}
               style={{ width: "100%" }}
-              key={value}
               onClick={(e) => {
                 const target = e.target as HTMLButtonElement;
-                if (!target) throw new Error("Error while selecting an option");
-                clickedFn && clickedFn(target.value);
+                return clickedFn && clickedFn(target.value);
               }}
             >
-              <AnimRadioButton key={value}>
+              <AnimRadioButton>
                 <RadioButton
-                  key={value}
                   aria-label={ariaLabel}
                   style={{ ...colorStyle(value) }}
                   role="radio"
