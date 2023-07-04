@@ -1,13 +1,14 @@
 import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
 import {
   IGetServerSideData,
+  ISettingsApi,
   UserInfo,
   UserPayload,
 } from 'redifood-module/src/interfaces';
 import { DatabaseError } from 'src/global/database-error.exception';
 import { User } from 'src/models/users.model';
 import { Setting } from '../../src/models/settings.model';
-import { CreateSettingsDto, UpdateSettingsDto } from './settings.dto';
+import { CreateSettingsDto } from './settings.dto';
 
 @Injectable()
 export class SettingsService {
@@ -82,7 +83,7 @@ export class SettingsService {
     }
   }
 
-  async updateSettings(body: UpdateSettingsDto, userId: string) {
+  async updateSettings(body: Partial<ISettingsApi>, userId: string) {
     try {
       if (!body) throw new BadRequestException('No body provided');
       if (!userId) throw new BadRequestException('No user id provided');
@@ -90,6 +91,7 @@ export class SettingsService {
       const savedSettings = await Setting.findOneAndUpdate(
         { user: userId },
         body,
+        { new: true },
       );
       if (!savedSettings) throw new DatabaseError();
       return {
