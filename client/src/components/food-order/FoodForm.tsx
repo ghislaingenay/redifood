@@ -6,11 +6,9 @@ import axios from "axios";
 import { useTranslation } from "next-i18next";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useDeferredValue, useEffect, useMemo, useState } from "react";
+import { useDeferredValue, useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Case, Default, Else, If, Switch, Then } from "react-if";
-import { toast } from "react-toastify";
-import { AxiosFunction } from "../../../pages/api/axios-request";
 import {
   handleCreateExtra,
   handleCreateFood,
@@ -19,12 +17,7 @@ import {
   handleDeleteSection,
   handleUpdatedFood,
 } from "../../../pages/api/food-api";
-import {
-  IFoodApi,
-  IFoodGetApi,
-  IFoodSectionListWithExtra,
-  IGetSectionInfo,
-} from "../../../redifood-module/src/interfaces";
+import { IFoodApi, IFoodGetApi, IFoodSectionListWithExtra } from "../../../redifood-module/src/interfaces";
 import { GREY, ORANGE_DARK, initialFormValues } from "../../constants";
 import { useFood } from "../../contexts/food.context";
 import {
@@ -80,7 +73,12 @@ const { Option } = Select;
 //   }),
 // ]}
 
-const FoodForm = () => {
+interface IFoodFormProps {
+  allFoods: IFoodGetApi[];
+  listSectionExtra: IFoodSectionListWithExtra[];
+}
+
+const FoodForm = ({ allFoods, listSectionExtra }: IFoodFormProps) => {
   const router = useRouter();
   const { t } = useTranslation();
   const {
@@ -112,7 +110,7 @@ const FoodForm = () => {
   const isAddExtraMode = extraValue === EHandleType.ADDEXTRA;
   const isDeleteSectionMode = sectionValue === EHandleType.DELETESECTION;
   const isAddSectionMode = sectionValue === EHandleType.ADDSECTION;
-
+  const sectionIdName = useMemo(() => recoverIdName(listSectionExtra), [listSectionExtra]);
   const isSection =
     sectionValue !== EHandleType.NONE && sectionValue !== "all" && !isDeleteSectionMode && !isAddSectionMode;
   const isExtra = extraValue !== EHandleType.NONE && !isDeleteExtraMode && !isAddExtraMode;
@@ -120,10 +118,6 @@ const FoodForm = () => {
   const relatedToSectionAndExtra = isDeleteExtraMode || isAddExtraMode || isDeleteSectionMode || isAddSectionMode;
   const isCreateNewFood = editMode === "false" && !relatedToSectionAndExtra;
   const isEditFood = editMode === "true" && !relatedToSectionAndExtra;
-
-  const [sectionIdName, setSectionIdName] = useState<{ id: number; name: string }[]>([]);
-  const [allFoods, setAllFoods] = useState<IFoodGetApi[]>([]);
-  const [listSectionExtra, setListSectionExtra] = useState<IFoodSectionListWithExtra[]>([]);
   const [loading, setLoading] = useState(false);
   const [onFinishLoading, setOnFinishLoading] = useState(false);
   const [handleType, setHandleType] = useState<EHandleType>(EHandleType.NONE);
@@ -373,34 +367,6 @@ const FoodForm = () => {
   const addAdditionnalFoodInfo = (food: Omit<IFoodApi, "id" | "userId">): IFoodApi => {
     return (currentFood && { ...food, id: currentFood.id, userId: currentFood.userId }) as IFoodApi;
   };
-
-  const loadData = async () => {
-    setLoading(true);
-    AxiosFunction({
-      method: "get",
-      url: "api/foods/section/information",
-      body: {},
-      queryParams: {},
-    })
-      .then((res: { results: IGetSectionInfo }) => {
-        const {
-          results: { listing, foods },
-        } = res;
-        setAllFoods(foods);
-        setListSectionExtra(listing);
-        setSectionIdName(recoverIdName(listing));
-        setLoading(false);
-      })
-      .catch((err) => {
-        setLoading(false);
-        toast.error(err.message);
-      });
-  };
-
-  useEffect(() => {
-    console.log('called')
-    loadData();
-  }, []);
 
   if (loading) return <p>Loading...</p>;
   if (onFinishLoading) return <p>On finish loading...</p>;
