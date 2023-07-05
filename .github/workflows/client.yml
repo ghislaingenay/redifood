@@ -1,32 +1,27 @@
-# name: client
-# on:
-#   pull_request:
-#     paths:
-#       - 'client/**'
-# jobs:
-#   build:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Caching
-#         uses: actions/cache@v3
-#         with:
-#           path: |
-#             ~/.npm
-#             ${{ github.workspace }}/.next/cache
-#           key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.[jt]s', '**/*.[jt]sx') }}
-#           restore-keys: |
-#             ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
-#       - name: Checkout 
-#         uses: actions/checkout@v3
-#         with:
-#           submodules: recursive
-#       - name: Install dependencies
-#         run: npm install
-#       #- run: cd client && npm ci --ignore-scripts && npm run test:ci
-#       - name: Build
-#         run: cd client && npm run build
 name: client
 on:
   pull_request:
+    branches:
+      - master
+      - development-monolith
     paths:
       - 'client/**'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Caching
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            ${{ github.workspace }}/.next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.[jt]s', '**/*.[jt]sx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
+      - name: Checkout 
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Build
+        run: cd client && npm run build
