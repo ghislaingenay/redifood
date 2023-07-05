@@ -3,14 +3,14 @@ on:
   pull_request:
     branches:
       - master
-      -  RED-16-monolith-app
+      - development-monolith
     paths:
-      - 'backend/**'
+      - "backend/**"
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout 
+      - name: Checkout
         uses: actions/checkout@v3
         with:
           submodules: recursive
