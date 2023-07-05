@@ -2,8 +2,8 @@ name: client
 on:
   pull_request:
     branches:
-      - master
-      - development-monolith
+      - "master/**"
+      - "development-monolith/**"
     paths:
       - "client/**"
 jobs:
