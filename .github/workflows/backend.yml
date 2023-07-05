@@ -16,5 +16,5 @@ jobs:
           submodules: recursive
       - name: Install depedencies
         run: cd backend && npm install & npm i @nestjs/cli       
-      - name: Build with nest cli
-        run: nest build
+      - name: Build 
+        run: npm run build
