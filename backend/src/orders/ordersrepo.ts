@@ -222,7 +222,6 @@ class Orders {
           };
         })
         .filter((item) => item.order_item_quantity > 0);
-      console.log('completedMenu', completedMenu);
       const createdQuery = createQuery<IOrderItemsDB[]>(
         completedMenu,
         'order_items',
@@ -253,10 +252,9 @@ class Orders {
       return item;
     });
     const filteredMenu = updatedMenu.filter((item) => item.itemQuantity > 0);
-    const totalAmount = filteredMenu.reduce((acc, item) => {
+    return filteredMenu.reduce((acc, item) => {
       return acc + item.itemPrice * item.itemQuantity;
     }, 0);
-    return totalAmount;
   }
 
   static getFoodIdArrayFromOrderItems(orderItems: IFoodOrder[]) {
