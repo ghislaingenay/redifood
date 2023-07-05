@@ -23,7 +23,6 @@ export const handlers = [
   }),
 
   rest.get("/api/orders", async (req, res, ctx) => {
-    const resres = await req.json();
     const { selectedOption }: { selectedOption: string } = await req.json();
     const filter = selectedOption ? selectedOption : null;
 

@@ -154,7 +154,7 @@ const FoodForm = ({ allFoods, listSectionExtra }: IFoodFormProps) => {
       const switchingMode = editMode === "true" ? "false" : "true";
       setEditMode(switchingMode);
     }
-    // setFoodOrder([]);
+    setFoodOrder([]);
     form.resetFields();
   };
 

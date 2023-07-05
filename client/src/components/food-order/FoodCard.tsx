@@ -1,6 +1,5 @@
 import Image from "next/image";
 import { IFoodGetApi } from "../../../redifood-module/src/interfaces";
-import { BACKGROUND_COLOR } from "../../constants";
 import { useFood } from "../../contexts/food.context";
 import { EFoodMode } from "../../interfaces";
 import { AnimCard } from "../../styles/animations/global.anim";
@@ -13,7 +12,7 @@ interface IFoodCard {
 const FoodCard = ({ food, foodList, mode }: IFoodCard) => {
   const {
     functions: { addToCart, selectFood },
-    foodPictures: { haveFoodDescription, haveFoodPicture },
+    foodPictures: { haveFoodPicture },
   } = useFood();
   return (
     <>
@@ -53,21 +52,6 @@ const FoodCard = ({ food, foodList, mode }: IFoodCard) => {
         >
           {food.itemName}
         </div>
-        {haveFoodDescription && (
-          <div
-            style={{
-              height: "2rem",
-              fontSize: "0.75rem",
-              overflow: "clip",
-              marginTop: "0.25rem",
-              alignContent: "center",
-              justifyContent: "center",
-              color: BACKGROUND_COLOR,
-            }}
-          >
-            {food.itemDescription}
-          </div>
-        )}
       </AnimCard>
     </>
   );
