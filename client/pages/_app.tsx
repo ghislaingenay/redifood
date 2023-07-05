@@ -19,7 +19,6 @@ import { FoodProvider } from "../src/contexts/food.context";
 // Tell Font Awesome to skip adding the CSS automatically
 // since it's already imported above
 import Head from "next/head";
-// import faviconRedifood from "../public/favicon-redifood.png";
 import "../i18n";
 import Loading from "../src/components/Loading";
 
