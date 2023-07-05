@@ -20,6 +20,7 @@ const History = ({}) => {
   const { t } = useTranslation("common");
   const [form] = Form.useForm();
   const PAGE_SIZE_OPTIONS = ["10", "20"];
+  const ZERO_MARGIN_PADDING_STYLE = { margin: 0, height: "100%", padding: 0 };
 
   const [params, setParams] = useState<TGetHistoryParams>({
     startDate: undefined,
@@ -110,13 +111,13 @@ const History = ({}) => {
               setParams({ ...params, ...updatedDates });
             }}
           >
-            <RowCenter style={{ margin: 0, height: "100%", padding: 0 }}>
+            <RowCenter style={{ ...ZERO_MARGIN_PADDING_STYLE }}>
               <Col span={11} style={{ margin: 0, height: "100%", padding: 0 }}>
                 <Form.Item name="startDate" label={t("history.form-label.from")}>
                   <DatePicker showToday showNow format={DATE_FORMAT_WITHOUT_TIME} />
                 </Form.Item>
               </Col>
-              <Col span={11} style={{ margin: 0, height: "100%", padding: 0 }}>
+              <Col span={11} style={{ ...ZERO_MARGIN_PADDING_STYLE }}>
                 <Form.Item name="endDate" label={t("history.form-label.to")}>
                   <DatePicker showToday showNow format={DATE_FORMAT_WITHOUT_TIME} />
                 </Form.Item>
