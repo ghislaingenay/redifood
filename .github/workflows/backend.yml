@@ -21,4 +21,4 @@ jobs:
       - name: Verify npm classic 2
         run: cd ./backend && npm run
       - name: Build
-        run: cd ./backend && npm run build
+        run: cd backend && npm run build
