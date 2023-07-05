@@ -348,7 +348,7 @@ class Orders {
       user_id: userId,
       order_id: orderId,
       payment_stripe_id: '',
-      payment_status: EPaymentStatus.COMPLETED, //EPaymentStatus.AWAITING ::::
+      payment_status: EPaymentStatus.COMPLETED, //EPaymentStatus.AWAITING
       payment_type: paymentType,
       payment_amount: orderTotal,
       payment_date: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
