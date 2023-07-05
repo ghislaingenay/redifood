@@ -16,7 +16,11 @@ jobs:
           submodules: recursive
       - name: Install depedencies
         run: cd backend && npm install & npm i @nestjs/cli
-      - name: Verify npm 
+      - name: Verify npm classic
         run: npm run
+      - name: Verify npm classic 1
+        run: cd ./backend && npm run
+      - name: Verify npm classic 2
+        run: cd backend && npm run
       - name: Build 
-        run: npm run build
+        run: cd backend && npm run build
