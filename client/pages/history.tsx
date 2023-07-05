@@ -5,7 +5,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Case, Default, Else, If, Switch, Then } from "react-if";
+import { Case, Default, Switch } from "react-if";
 import { toast } from "react-toastify";
 import { IGetHistoryOrders, IOrderApi, IPagination, TGetHistoryParams } from "../redifood-module/src/interfaces";
 import OrderHistoryCard from "../src/components/food-order/OrderHistoryCard";
@@ -20,6 +20,7 @@ const History = ({}) => {
   const { t } = useTranslation("common");
   const [form] = Form.useForm();
   const PAGE_SIZE_OPTIONS = ["10", "20"];
+  const ZERO_MARGIN_PADDING_STYLE = { margin: 0, height: "100%", padding: 0 };
 
   const [params, setParams] = useState<TGetHistoryParams>({
     startDate: undefined,
@@ -110,13 +111,14 @@ const History = ({}) => {
               setParams({ ...params, ...updatedDates });
             }}
           >
-            <RowCenter style={{ margin: 0, height: "100%", padding: 0 }}>
+            <RowCenter style={{ ...ZERO_MARGIN_PADDING_STYLE }}>
               <Col span={11} style={{ margin: 0, height: "100%", padding: 0 }}>
                 <Form.Item name="startDate" label={t("history.form-label.from")}>
                   <DatePicker showToday showNow format={DATE_FORMAT_WITHOUT_TIME} />
                 </Form.Item>
               </Col>
-              <Col span={11} style={{ margin: 0, height: "100%", padding: 0 }}>
+              {""}
+              <Col span={11} style={{ ...ZERO_MARGIN_PADDING_STYLE }}>
                 <Form.Item name="endDate" label={t("history.form-label.to")}>
                   <DatePicker showToday showNow format={DATE_FORMAT_WITHOUT_TIME} />
                 </Form.Item>
@@ -139,19 +141,16 @@ const History = ({}) => {
               <p>Forget to catch this error</p>
             </Default>
           </Switch>
-          <If condition={showPagination}>
-            <Then>
-              <Pagination
-                style={{ marginTop: "1rem" }}
-                onChange={(page, pageSize) => handlePagination(page, pageSize)}
-                pageSize={pageSize}
-                pageSizeOptions={PAGE_SIZE_OPTIONS}
-                current={selectedPage}
-                total={totalResults}
-              />
-            </Then>
-            <Else></Else>
-          </If>
+          {showPagination && (
+            <Pagination
+              style={{ marginTop: "1rem" }}
+              onChange={(page, pageSize) => handlePagination(page, pageSize)}
+              pageSize={pageSize}
+              pageSizeOptions={PAGE_SIZE_OPTIONS}
+              current={selectedPage}
+              total={totalResults}
+            />
+          )}
         </AnimToTop>
       </main>
     </>
