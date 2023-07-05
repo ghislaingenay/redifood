@@ -49,7 +49,6 @@ describe('FoodController (e2e)', () => {
 
   describe('SECTION', () => {
     it.skip('POST create a section - show error if not authenticated', async () => {
-      console.log('app', request(app), request.agent(app));
       await request(app)
         .post('/api/foods/section')
         .send({ sectionName: 'pizza', sectionDescription: 'Pizza' })

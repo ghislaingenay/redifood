@@ -132,9 +132,7 @@ const Settings = ({ settingsInformation, userInformation }: ISettingsProps) => {
             form={settingsForm}
             layout="horizontal"
             onValuesChange={(_, all: any) => {
-              console.log("all", all);
               setSettingInfo({ haveFoodImage: all.haveFoodImage, vat: all.vat || 0 });
-              // setSettingsParams(all);
             }}
           >
             <RowSpaceAround>

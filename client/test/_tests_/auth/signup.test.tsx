@@ -154,7 +154,6 @@ describe("Signup - Validation", () => {
     await user.clear(passwordElement!);
     await user.type(passwordElement!, "FHTU*vn9H_");
     await user.type(confirmPasswordElement!, "FHTU*vn9H_");
-    console.log("data", passwordElement, confirmPasswordElement);
     await clickButton(/submit/i, user);
     // expect(await screen.findByRole("heading", { name: /Account succesfully created/i })).toBeInTheDocument();
     await waitFor(() => {

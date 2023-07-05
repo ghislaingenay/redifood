@@ -13,7 +13,6 @@ export const handleUpdateOrder = async (
   const bodyUpdateOrder: TUpdateOrderBody = {
     orderItems: updatedFoodList,
   };
-  console.log({ bodyUpdateOrder });
   const response = AxiosFunction({
     method: "put",
     url: `/api/orders/${order.id}`,

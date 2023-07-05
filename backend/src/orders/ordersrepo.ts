@@ -17,7 +17,11 @@ import {
   UserPayload,
 } from 'redifood-module/src/interfaces';
 import Foods from 'src/foods/foodsrepo';
-import { convertKeys, updateQuery } from 'src/foods/global.function';
+import {
+  convertKeys,
+  createQuery,
+  updateQuery,
+} from 'src/foods/global.function';
 import { DatabaseError } from 'src/global/database-error.exception';
 import { pool } from '../pool.pg';
 import { AwaitPaymentDto } from './orders.dto';
@@ -187,10 +191,11 @@ class Orders {
     }
   }
 
-  static async setOrderItems(idList: IMenuId) {
+  static async setOrderItems(idList: IMenuId): Promise<{ created: boolean }> {
     try {
       const { userId, orderId } = idList;
       const { orderItems } = await Orders.findOne(idList);
+      console.log('orderItems', orderItems);
       const orderMenu: IFoodOrder[] = JSON.parse(orderItems);
       const foodList = await Foods.findAllFormatted(userId);
       const updatedMenu: IFoodGetApi[] = foodList.map((item: IFoodGetApi) => {
@@ -205,27 +210,26 @@ class Orders {
         }
         return item;
       });
-      const completedMenu: IOrderItemsDB[] = updatedMenu.map((item) => {
-        return {
-          order_id: orderId,
-          user_id: userId,
-          food_id: item.id,
-          order_item_quantity: item.itemQuantity,
-          order_item_price: item.itemPrice,
-          order_item_name: item.itemName,
-        };
-      });
-
-      console.log('cmp menu', completedMenu);
-      // const createdQuery = createQuery<IOrderItemsDB[]>(
-      //   completedMenu,
-      //   'order_items',
-      // );
-      // const response = await pool.query(createdQuery);
-      // return response;
-      return true;
+      const completedMenu: IOrderItemsDB[] = updatedMenu
+        .map((item) => {
+          return {
+            order_id: orderId,
+            user_id: userId,
+            food_id: item.id,
+            order_item_quantity: item.itemQuantity,
+            order_item_price: Number(item.itemPrice),
+            order_item_name: item.itemName,
+          };
+        })
+        .filter((item) => item.order_item_quantity > 0);
+      const createdQuery = createQuery<IOrderItemsDB[]>(
+        completedMenu,
+        'order_items',
+      );
+      await pool.query(createdQuery);
+      return { created: true };
     } catch (err) {
-      throw new BadRequestException("Can't create order items");
+      return { created: false };
     }
   }
 
@@ -234,7 +238,6 @@ class Orders {
     userId: UserPayload['id'],
   ): Promise<number> {
     const foodList = await Foods.findAllFoods(userId);
-    console.log({ foodList, orderItems });
     const updatedMenu: IFoodApi[] = foodList.map((item) => {
       const foundItem = [...orderItems].find(
         (orderItem: IFoodOrder) => orderItem.id === item.id,
@@ -248,10 +251,9 @@ class Orders {
       return item;
     });
     const filteredMenu = updatedMenu.filter((item) => item.itemQuantity > 0);
-    const totalAmount = filteredMenu.reduce((acc, item) => {
+    return filteredMenu.reduce((acc, item) => {
       return acc + item.itemPrice * item.itemQuantity;
     }, 0);
-    return totalAmount;
   }
 
   static getFoodIdArrayFromOrderItems(orderItems: IFoodOrder[]) {
@@ -320,16 +322,17 @@ class Orders {
     params: TGetHistoryParams,
     userId: UserPayload['id'],
   ): Promise<IPagination> {
+    const { results, page } = params;
     const sqlConditions = Orders.createHistorySqlQuery(params, userId);
     const response = await pool.query(
       `SELECT id FROM (SELECT *, TO_CHAR(order_finished, 'YYYY-MM-DD') AS order_date FROM orders) AS ord WHERE ${sqlConditions} AND ord.order_status = 'finished'`,
     );
     const count = response.rowCount;
     if (!response) throw new BadRequestException('No count recovered');
-    const pages = Math.ceil(count / Number(params.results));
+    const pages = Math.ceil(count / Number(results));
     return {
-      page: Number(params.page),
-      results: Number(params.results),
+      page: Number(page),
+      results: Number(results),
       pages,
       total: count,
     };
@@ -345,7 +348,7 @@ class Orders {
       user_id: userId,
       order_id: orderId,
       payment_stripe_id: '',
-      payment_status: EPaymentStatus.COMPLETED, //EPaymentStatus.AWAITING
+      payment_status: EPaymentStatus.COMPLETED, //EPaymentStatus.AWAITING ffdd
       payment_type: paymentType,
       payment_amount: orderTotal,
       payment_date: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),

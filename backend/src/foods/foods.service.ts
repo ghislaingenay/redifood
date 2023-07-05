@@ -26,7 +26,7 @@ import { convertKeys, createQuery, updateQuery } from './global.function';
 @Injectable()
 export class FoodService {
   // Get foods/all
-  async getAllFoods(userId: UserPayload['id']): Promise<
+  async getAllFormattedFoods(userId: UserPayload['id']): Promise<
     IGetServerSideData<{
       foodResults: IFoodGetApi[];
       sectionExtraList: IFoodSectionListWithExtra[];
@@ -36,6 +36,17 @@ export class FoodService {
     return {
       statusCode: EStatusCodes.SUCCESS,
       results: { foodResults: foods, sectionExtraList: listing },
+      message: EFoodMessage.FOOD_RECOVERED,
+    };
+  }
+
+  async getAllFoods(
+    userId: UserPayload['id'],
+  ): Promise<IGetServerSideData<IFoodApi[]>> {
+    const foods = await Foods.findAllFoods(userId);
+    return {
+      statusCode: EStatusCodes.SUCCESS,
+      results: foods,
       message: EFoodMessage.FOOD_RECOVERED,
     };
   }
@@ -166,7 +177,6 @@ export class FoodService {
       convertKeys(updatedBody, 'apiToDb'),
       'food',
     );
-    console.log('postgresQuery', postgresQuery);
     const response = await Foods.updateRow(postgresQuery, foodId);
 
     if (!response) {
@@ -232,7 +242,6 @@ export class FoodService {
       // data:image/png;base64,......
       const formData = new FormData();
       const buff = Buffer.from(dataBase64, 'base64').toString();
-      console.log('buff', buff);
       formData.append('file', buff);
       formData.append('upload_preset', String(process.env.UPLOAD_PRESET));
       const response = await axios.post(
@@ -240,7 +249,6 @@ export class FoodService {
         formData,
       );
       const { statusText, data } = response;
-      console.log('url', data.secure_url);
       if (statusText === 'OK') {
         return data.secure_url;
       }

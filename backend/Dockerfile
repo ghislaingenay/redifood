@@ -9,8 +9,6 @@ RUN npm run build
 
 FROM base
 WORKDIR /usr/src/app
-# ENV JWT_TOKEN='thisisasecret'
-# ENV MONGO_URI='mongodb://mongo:27017'
 COPY --from=builder /usr/src/app/node_modules node_modules
 COPY --from=builder /usr/src/app/dist dist
 COPY --from=builder /usr/src/app/package.json .

@@ -5,14 +5,16 @@ on:
       - master
       - development-monolith
     paths:
-      - 'backend/**'
+      - "backend/**"
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout 
+      - name: Checkout
         uses: actions/checkout@v3
         with:
           submodules: recursive
+      - name: Install depedencies
+        run: cd backend && npm install & npm i @nestjs/cli
       - name: Build
         run: cd backend && npm run build

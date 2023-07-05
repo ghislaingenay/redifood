@@ -71,7 +71,6 @@
 //   }, [response]);
 
 //   const doRequest = useCallback(async <T, K>(): Promise<void> => {
-//     console.log("data", data);
 //     setLoading(true);
 //     getAxios()!
 //       .then((res: AxiosResponse<IGetServerSideData<T, K>>) => {

@@ -154,7 +154,7 @@ const FoodForm = ({ allFoods, listSectionExtra }: IFoodFormProps) => {
       const switchingMode = editMode === "true" ? "false" : "true";
       setEditMode(switchingMode);
     }
-    // setFoodOrder([]);
+    setFoodOrder([]);
     form.resetFields();
   };
 
@@ -218,16 +218,13 @@ const FoodForm = ({ allFoods, listSectionExtra }: IFoodFormProps) => {
 
       // This is working for now
       formData.append("file", acceptedFiles[0]);
-      console.log("acc", acceptedFiles);
       formData.append("upload_preset", String(process.env.NEXT_PUBLIC_UPLOAD_PRESET));
       const response: any = await axios
         .post(`https://api-ap.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_NAME}/upload`, formData)
         .catch((err) => {
           console.log("err cloudinary", err);
         });
-      console.log("res cliudinary", response);
       const { statusText, data } = response;
-      console.log(data.secure_url);
       if (statusText === "OK") {
         form.setFieldValue("itemPhoto", data.secure_url);
         setLoading(false);
@@ -259,32 +256,27 @@ const FoodForm = ({ allFoods, listSectionExtra }: IFoodFormProps) => {
   };
 
   const onSave = async () => {
-    console.log("entered on save");
     setOnFinishLoading(true);
     switch (handleType) {
       case EHandleType.ADDSECTION: {
-        console.log("new section added", inputSection);
         const createdSectionRes = await handleCreateSection(inputSection.toLowerCase(), listSectionExtra);
         if (!createdSectionRes.created) return failToSave();
         resetSectionFields();
         break;
       }
       case EHandleType.DELETESECTION: {
-        console.log("deleted section", delSection);
         const deleteSectionRes = await handleDeleteSection(Number(delSection));
         if (!deleteSectionRes.deleted) return failToSave();
         resetSectionFields();
         break;
       }
       case EHandleType.ADDEXTRA: {
-        console.log("created extra", inputExtra);
         const createExtraRes = await handleCreateExtra(inputExtra.toLowerCase(), sectionValue, listSectionExtra);
         if (!createExtraRes.created) return failToSave();
         resetExtraFields();
         break;
       }
       case EHandleType.DELETEEXTRA: {
-        console.log("deleted extra", delExtra);
         const deleteExtraRes = await handleDeleteExtra(Number(delExtra));
         if (!deleteExtraRes.deleted) return failToSave();
         resetExtraFields();
@@ -353,9 +345,7 @@ const FoodForm = ({ allFoods, listSectionExtra }: IFoodFormProps) => {
   const currentFood = useMemo(() => {
     if (isEditModeWithFood) {
       form.setFieldsValue(initializeDataForFoodForm(foodOrder[0]));
-      console.log(form.getFieldsValue());
       setFiles([foodOrder[0].itemPhoto]);
-      console.log("foodOrder", foodOrder);
       return foodOrder[0];
     } else {
       setFiles([]);
@@ -446,11 +436,7 @@ const FoodForm = ({ allFoods, listSectionExtra }: IFoodFormProps) => {
               form={form}
               onFinish={onFinish}
               layout="vertical"
-              onValuesChange={(e, all) => {
-                console.log("onFinish - all", all);
-                console.log(e);
-                form.setFieldsValue(all);
-              }}
+              onValuesChange={(_, all) => form.setFieldsValue(all)}
             >
               <Form.Item style={{ display: "none" }} name="itemPhoto" />
               {optionsCreateFood(displayCurrency)?.map(

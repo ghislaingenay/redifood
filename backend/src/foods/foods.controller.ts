@@ -28,8 +28,8 @@ export class FoodController {
 
   @UseGuards(new AuthGuard())
   @Get('all')
-  async getAllFoods(@User() user: UserPayload) {
-    return await this.foodService.getAllFoods(user.id);
+  async getAllFormattedFoods(@User() user: UserPayload) {
+    return await this.foodService.getAllFormattedFoods(user.id);
   }
 
   @UseGuards(new AuthGuard())
@@ -62,6 +62,12 @@ export class FoodController {
     @User() user: UserPayload,
   ) {
     return await this.foodService.getFoodBySectionId(id, user.id);
+  }
+
+  @UseGuards(new AuthGuard())
+  @Get()
+  async getAllFoods(@User() user: UserPayload) {
+    return await this.foodService.getAllFoods(user.id);
   }
 
   @UseGuards(new AuthGuard())

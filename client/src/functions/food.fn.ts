@@ -27,7 +27,7 @@ export const setFoodItemsForDb = (foodOrder: IFoodGetApi[]): IFoodOrder[] => {
   });
 };
 
-export const setOptionsSelection = (foodSection: IFoodSectionList[]) => {
+export const setOptionsSelection = (foodSection: IFoodSectionList[] | IFoodSectionListWithExtra[]) => {
   const newFoodSection = [{ label: "ALL", value: 0, ariaLabel: "ALL" }];
   const options = [...foodSection].map((section) => {
     return {
@@ -66,7 +66,6 @@ export const getDataBySectionId = (
 
 export const initializeDataForFoodForm = (food: IFoodGetApi) => {
   const { id, itemName, itemPrice, itemSection, itemExtra, itemPhoto, itemDescription } = food;
-  console.log("food", food);
   return {
     id,
     itemPhoto,
