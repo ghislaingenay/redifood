@@ -2,8 +2,8 @@ name: backend
 on:
   pull_request:
     branches:
-      - master
-      - development-monolith
+      - "master/**"
+      - "development-monolith/**"
     paths:
       - "backend/**"
 jobs:
