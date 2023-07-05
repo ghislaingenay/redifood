@@ -10,9 +10,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Install depedencies
+        run: cd backend && npm install & npm i @nestjs/cli
       - name: Checkout
         uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Build
-        run: cd backend && npm install & npm i @nestjs/cli && npm run build
+        run: cd backend && npm run build
