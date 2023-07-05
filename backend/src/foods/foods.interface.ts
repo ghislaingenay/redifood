@@ -7,4 +7,5 @@ export enum EFoodMessage {
   EXTRA_DELETED = 'Extra was properly deleted',
   SECTION_DELETED = 'Section was properly deleted',
   FOOD_DELETED = 'Food was properly deleted',
+  FOOD_NOT_FOUND = 'Food not found',
 }
