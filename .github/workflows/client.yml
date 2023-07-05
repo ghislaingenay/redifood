@@ -3,7 +3,7 @@ on:
   pull_request:
     branches:
       - master
-      - RED-16-monolith-app
+      - development-monolith
     paths:
       - "client/**"
 jobs:
