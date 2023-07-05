@@ -117,6 +117,7 @@ const History = ({}) => {
                   <DatePicker showToday showNow format={DATE_FORMAT_WITHOUT_TIME} />
                 </Form.Item>
               </Col>
+              {""}
               <Col span={11} style={{ ...ZERO_MARGIN_PADDING_STYLE }}>
                 <Form.Item name="endDate" label={t("history.form-label.to")}>
                   <DatePicker showToday showNow format={DATE_FORMAT_WITHOUT_TIME} />
