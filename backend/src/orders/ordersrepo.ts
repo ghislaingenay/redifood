@@ -229,7 +229,6 @@ class Orders {
       await pool.query(createdQuery);
       return { created: true };
     } catch (err) {
-      console.log('rrr', err);
       return { created: false };
     }
   }
