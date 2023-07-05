@@ -322,16 +322,17 @@ class Orders {
     params: TGetHistoryParams,
     userId: UserPayload['id'],
   ): Promise<IPagination> {
+    const { results, page } = params;
     const sqlConditions = Orders.createHistorySqlQuery(params, userId);
     const response = await pool.query(
       `SELECT id FROM (SELECT *, TO_CHAR(order_finished, 'YYYY-MM-DD') AS order_date FROM orders) AS ord WHERE ${sqlConditions} AND ord.order_status = 'finished'`,
     );
     const count = response.rowCount;
     if (!response) throw new BadRequestException('No count recovered');
-    const pages = Math.ceil(count / Number(params.results));
+    const pages = Math.ceil(count / Number(results));
     return {
-      page: Number(params.page),
-      results: Number(params.results),
+      page: Number(page),
+      results: Number(results),
       pages,
       total: count,
     };
