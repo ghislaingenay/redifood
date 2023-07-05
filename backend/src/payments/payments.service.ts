@@ -91,7 +91,7 @@ export class PaymentsService {
       });
       try {
         const chargeData = await stripePayment.payCharge();
-        console.log('chrged', chargeData);
+        console.log('charged', chargeData);
         return {
           results: { isPaid: true },
           statusCode: HttpStatus.OK,

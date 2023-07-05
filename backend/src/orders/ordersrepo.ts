@@ -234,7 +234,6 @@ class Orders {
     userId: UserPayload['id'],
   ): Promise<number> {
     const foodList = await Foods.findAllFoods(userId);
-    console.log({ foodList, orderItems });
     const updatedMenu: IFoodApi[] = foodList.map((item) => {
       const foundItem = [...orderItems].find(
         (orderItem: IFoodOrder) => orderItem.id === item.id,

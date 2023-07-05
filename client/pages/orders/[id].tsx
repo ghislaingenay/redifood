@@ -33,15 +33,14 @@ const CurrentOrder = ({ currentOrder, foodList }: ICurrentOrderProps) => {
   const { t } = useTranslation("common");
   const router = useRouter();
   const { orderCreatedDate, orderNo, orderTableNumber, orderStatus, id, orderFinished, orderTotal } = currentOrder;
-  console.log({ orderFinished, orderCreatedDate, orderStatus });
-  const COL_ID_SPAN = { xs: 12, sm: 12, md: 8, lg: 8 };
 
-  console.log({ foodList });
+  const COL_ID_SPAN = { xs: 12, sm: 12, md: 8, lg: 8 };
+  const DATE_FORMAT_WITH_MINUTES = "DD/MM/YYYY HH:mm";
 
   const [paymentChoice, setPaymentChoice] = useState<EPaymentType | null>(null);
 
   const isOrderCompleted = orderStatus === EOrderStatus.COMPLETE;
-  const appliedDate = moment(orderFinished || orderCreatedDate).format("DD/MM/YYYY HH:mm");
+  const appliedDate = moment(orderFinished || orderCreatedDate).format(DATE_FORMAT_WITH_MINUTES);
 
   const isDisabled = paymentChoice === null ? true : false;
   const alertMessage = isOrderCompleted ? t("orders.paid") : t("orders.not-paid");
@@ -96,7 +95,7 @@ const CurrentOrder = ({ currentOrder, foodList }: ICurrentOrderProps) => {
               </RowSpaceBetween>
             </LGCard>
             <SummaryTable orderTotal={orderTotal} foodList={foodList} />
-            {orderStatus !== EOrderStatus.COMPLETE && (
+            {!isOrderCompleted && (
               <>
                 <RediRadioButton
                   radioGroupName="payment"

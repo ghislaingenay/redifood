@@ -66,7 +66,6 @@ export const getDataBySectionId = (
 
 export const initializeDataForFoodForm = (food: IFoodGetApi) => {
   const { id, itemName, itemPrice, itemSection, itemExtra, itemPhoto, itemDescription } = food;
-  console.log("food", food);
   return {
     id,
     itemPhoto,

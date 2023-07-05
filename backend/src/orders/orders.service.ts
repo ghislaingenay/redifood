@@ -158,12 +158,10 @@ export class OrdersService {
       body.orderItems,
       userId,
     );
-
     // Check the table if not already allocated
     const orderItemsResults = await Orders.findTable(userId);
-    if (orderItemsResults.includes(body.orderTableNumber)) {
+    if (orderItemsResults.includes(body.orderTableNumber))
       throw new BadRequestError('Table already has an order');
-    }
     const getOrderNo = await Orders.countOrders();
     const today = new Date();
     // Generate order number

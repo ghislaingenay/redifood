@@ -14,12 +14,10 @@ interface IUseAuth {
 
 export function useAuth() {
   const userValue = useContext(AuthContext);
-  console.log(userValue);
-  if (!userValue) {
+  if (!userValue)
     throw new Error(
       "useAuth must be used within an AuthProvider" as (string & ErrorProps) | Readonly<string & ErrorProps>,
     );
-  }
   return userValue;
 }
 

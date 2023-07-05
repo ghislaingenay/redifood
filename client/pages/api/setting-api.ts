@@ -23,7 +23,6 @@ export const handleUpdateUserInformation = async (user: PartialUserInfo) => {
 };
 
 export const handleUpdateUserSettings = async (settings: Partial<ISettingsApi>) => {
-  console.log(settings);
   AxiosFunction({
     url: "/api/settings",
     method: "put",
