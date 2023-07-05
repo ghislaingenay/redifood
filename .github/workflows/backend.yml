@@ -18,7 +18,5 @@ jobs:
           submodules: recursive
       - name: Verify npm classic 1
         run: cd backend && npm run
-      - name: Verify npm classic 2
-        run: cd ./backend && npm run
       - name: Build
-        run: cd backend && npm run build
+        run: cd backend && npm run-script build
