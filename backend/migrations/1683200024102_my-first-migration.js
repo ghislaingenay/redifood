@@ -35,7 +35,7 @@ exports.up = (pgm) => {
     item_quantity SMALLINT NOT NULL DEFAULT 0
   );
 
-
+  CREATE TYPE orderstatus AS ENUM ('created', 'paid', 'cancelled', 'finished');
 
   CREATE TABLE orders (
     id SERIAL PRIMARY KEY,
@@ -54,7 +54,7 @@ exports.up = (pgm) => {
     id SERIAL PRIMARY KEY,
     order_id INTEGER REFERENCES orders(id),
     user_id VARCHAR NOT NULL,
-    food_id INTEGER REFERENCES food(id),
+    food_id INTEGER DEFAULT 0 NOT NULL,
     order_item_quantity SMALLINT NOT NULL DEFAULT 0,
     order_item_name VARCHAR(20) NOT NULL,
     order_item_price NUMERIC NOT NULL CHECK (order_item_price > 0)
@@ -95,7 +95,7 @@ exports.down = (pgm) => {
   DROP TABLE food;
   DROP TABLE food_extra;
   DROP TABLE food_section;
-  DROP TABLE order;
+  DROP TABLE orders;
   DROP TABLE order_items;
   DROP TABLE discount;
   DROP TABLE payment;

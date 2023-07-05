@@ -222,7 +222,7 @@ class Orders {
           };
         })
         .filter((item) => item.order_item_quantity > 0);
-
+      console.log('completedMenu', completedMenu);
       const createdQuery = createQuery<IOrderItemsDB[]>(
         completedMenu,
         'order_items',
