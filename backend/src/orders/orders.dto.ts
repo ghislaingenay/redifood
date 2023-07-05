@@ -3,6 +3,7 @@ import {
   IsEnum,
   IsInt,
   IsNotEmpty,
+  IsNumber,
   IsPositive,
   IsString,
 } from 'class-validator';
@@ -76,6 +77,7 @@ export class ReceiptBodyDto {
 
 export class CreateOrderItemsDto {
   @IsInt()
+  @IsNumber()
   @IsNotEmpty()
   orderId: number;
 }

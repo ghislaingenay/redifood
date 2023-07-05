@@ -198,6 +198,8 @@ export class OrdersService {
       userId,
       orderId,
     });
+    if (!orderItemsResults.created)
+      throw new BadRequestError('Order items not created');
     return {
       statusCode: HttpStatus.CREATED,
       results: orderItemsResults,

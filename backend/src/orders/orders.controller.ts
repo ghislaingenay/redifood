@@ -108,6 +108,19 @@ export class OrdersController {
   }
 
   @UseGuards(new AuthGuard())
+  @Post('items')
+  async createOrderItems(
+    @User() user: UserPayload,
+    @Body(new ValidationPipe()) createOrderItemsDto: CreateOrderItemsDto,
+  ) {
+    const { orderId } = createOrderItemsDto;
+    return await this.ordersService.createOrderItems({
+      orderId,
+      userId: user.id,
+    });
+  }
+
+  @UseGuards(new AuthGuard())
   @Post(':id')
   async awaitPayment(
     @Param(
@@ -161,18 +174,5 @@ export class OrdersController {
     @User() user: UserPayload,
   ) {
     return await this.ordersService.cancelOrder(orderId, user.id);
-  }
-
-  @UseGuards(new AuthGuard())
-  @Post('items')
-  async createOrderItems(
-    @User() user: UserPayload,
-    @Body(new ValidationPipe()) createOrderItemsDto: CreateOrderItemsDto,
-  ) {
-    const { orderId } = createOrderItemsDto;
-    return await this.ordersService.createOrderItems({
-      orderId,
-      userId: user.id,
-    });
   }
 }
