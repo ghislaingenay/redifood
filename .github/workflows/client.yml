@@ -24,4 +24,4 @@ jobs:
         with:
           submodules: recursive
       - name: Build
-        run: cd client && npm run build
+        run: cd client && npm install --omit=dev && npm run build
