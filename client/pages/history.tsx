@@ -5,7 +5,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Case, Default, Else, If, Switch, Then } from "react-if";
+import { Case, Default, Switch } from "react-if";
 import { toast } from "react-toastify";
 import { IGetHistoryOrders, IOrderApi, IPagination, TGetHistoryParams } from "../redifood-module/src/interfaces";
 import OrderHistoryCard from "../src/components/food-order/OrderHistoryCard";
@@ -139,19 +139,16 @@ const History = ({}) => {
               <p>Forget to catch this error</p>
             </Default>
           </Switch>
-          <If condition={showPagination}>
-            <Then>
-              <Pagination
-                style={{ marginTop: "1rem" }}
-                onChange={(page, pageSize) => handlePagination(page, pageSize)}
-                pageSize={pageSize}
-                pageSizeOptions={PAGE_SIZE_OPTIONS}
-                current={selectedPage}
-                total={totalResults}
-              />
-            </Then>
-            <Else></Else>
-          </If>
+          {showPagination && (
+            <Pagination
+              style={{ marginTop: "1rem" }}
+              onChange={(page, pageSize) => handlePagination(page, pageSize)}
+              pageSize={pageSize}
+              pageSizeOptions={PAGE_SIZE_OPTIONS}
+              current={selectedPage}
+              total={totalResults}
+            />
+          )}
         </AnimToTop>
       </main>
     </>
