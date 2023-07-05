@@ -8,7 +8,7 @@ import { google, sheets_v4 } from 'googleapis';
 import {
   EPaymentType,
   IGetServerSideData,
-} from 'redifood-module/src/interfaces';
+} from '../../redifood-module/src/interfaces';
 
 interface IOrderHeaders {
   column: string;

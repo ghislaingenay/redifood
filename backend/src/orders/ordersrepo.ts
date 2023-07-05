@@ -222,7 +222,6 @@ class Orders {
           };
         })
         .filter((item) => item.order_item_quantity > 0);
-      console.log('completedMenu', completedMenu);
       const createdQuery = createQuery<IOrderItemsDB[]>(
         completedMenu,
         'order_items',
@@ -230,7 +229,6 @@ class Orders {
       await pool.query(createdQuery);
       return { created: true };
     } catch (err) {
-      console.log('rrr', err);
       return { created: false };
     }
   }
@@ -253,10 +251,9 @@ class Orders {
       return item;
     });
     const filteredMenu = updatedMenu.filter((item) => item.itemQuantity > 0);
-    const totalAmount = filteredMenu.reduce((acc, item) => {
+    return filteredMenu.reduce((acc, item) => {
       return acc + item.itemPrice * item.itemQuantity;
     }, 0);
-    return totalAmount;
   }
 
   static getFoodIdArrayFromOrderItems(orderItems: IFoodOrder[]) {
@@ -325,16 +322,17 @@ class Orders {
     params: TGetHistoryParams,
     userId: UserPayload['id'],
   ): Promise<IPagination> {
+    const { results, page } = params;
     const sqlConditions = Orders.createHistorySqlQuery(params, userId);
     const response = await pool.query(
       `SELECT id FROM (SELECT *, TO_CHAR(order_finished, 'YYYY-MM-DD') AS order_date FROM orders) AS ord WHERE ${sqlConditions} AND ord.order_status = 'finished'`,
     );
     const count = response.rowCount;
     if (!response) throw new BadRequestException('No count recovered');
-    const pages = Math.ceil(count / Number(params.results));
+    const pages = Math.ceil(count / Number(results));
     return {
-      page: Number(params.page),
-      results: Number(params.results),
+      page: Number(page),
+      results: Number(results),
       pages,
       total: count,
     };
@@ -350,7 +348,7 @@ class Orders {
       user_id: userId,
       order_id: orderId,
       payment_stripe_id: '',
-      payment_status: EPaymentStatus.COMPLETED, //EPaymentStatus.AWAITING
+      payment_status: EPaymentStatus.COMPLETED, //EPaymentStatus.AWAITING ffdd
       payment_type: paymentType,
       payment_amount: orderTotal,
       payment_date: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),

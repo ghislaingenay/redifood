@@ -144,7 +144,6 @@ class Foods {
       await pool.query(`DELETE FROM food_section WHERE id = $1`, [id]);
       return { deleted: true };
     } catch (err) {
-      console.log(err);
       throw new DatabaseError();
     }
   }
