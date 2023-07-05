@@ -17,7 +17,11 @@ import {
   UserPayload,
 } from 'redifood-module/src/interfaces';
 import Foods from 'src/foods/foodsrepo';
-import { convertKeys, updateQuery } from 'src/foods/global.function';
+import {
+  convertKeys,
+  createQuery,
+  updateQuery,
+} from 'src/foods/global.function';
 import { DatabaseError } from 'src/global/database-error.exception';
 import { pool } from '../pool.pg';
 import { AwaitPaymentDto } from './orders.dto';
@@ -187,10 +191,11 @@ class Orders {
     }
   }
 
-  static async setOrderItems(idList: IMenuId) {
+  static async setOrderItems(idList: IMenuId): Promise<{ created: boolean }> {
     try {
       const { userId, orderId } = idList;
       const { orderItems } = await Orders.findOne(idList);
+      console.log('orderItems', orderItems);
       const orderMenu: IFoodOrder[] = JSON.parse(orderItems);
       const foodList = await Foods.findAllFormatted(userId);
       const updatedMenu: IFoodGetApi[] = foodList.map((item: IFoodGetApi) => {
@@ -205,27 +210,28 @@ class Orders {
         }
         return item;
       });
-      const completedMenu: IOrderItemsDB[] = updatedMenu.map((item) => {
-        return {
-          order_id: orderId,
-          user_id: userId,
-          food_id: item.id,
-          order_item_quantity: item.itemQuantity,
-          order_item_price: item.itemPrice,
-          order_item_name: item.itemName,
-        };
-      });
-
-      console.log('cmp menu', completedMenu);
-      // const createdQuery = createQuery<IOrderItemsDB[]>(
-      //   completedMenu,
-      //   'order_items',
-      // );
-      // const response = await pool.query(createdQuery);
-      // return response;
-      return true;
+      const completedMenu: IOrderItemsDB[] = updatedMenu
+        .map((item) => {
+          return {
+            order_id: orderId,
+            user_id: userId,
+            food_id: item.id,
+            order_item_quantity: item.itemQuantity,
+            order_item_price: Number(item.itemPrice),
+            order_item_name: item.itemName,
+          };
+        })
+        .filter((item) => item.order_item_quantity > 0);
+      console.log('completedMenu', completedMenu);
+      const createdQuery = createQuery<IOrderItemsDB[]>(
+        completedMenu,
+        'order_items',
+      );
+      await pool.query(createdQuery);
+      return { created: true };
     } catch (err) {
-      throw new BadRequestException("Can't create order items");
+      console.log('rrr', err);
+      return { created: false };
     }
   }
 
@@ -234,7 +240,6 @@ class Orders {
     userId: UserPayload['id'],
   ): Promise<number> {
     const foodList = await Foods.findAllFoods(userId);
-    console.log({ foodList, orderItems });
     const updatedMenu: IFoodApi[] = foodList.map((item) => {
       const foundItem = [...orderItems].find(
         (orderItem: IFoodOrder) => orderItem.id === item.id,

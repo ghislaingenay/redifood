@@ -24,7 +24,6 @@ export const handlers = [
 
   rest.get("/api/orders", async (req, res, ctx) => {
     const resres = await req.json();
-    console.log("rerererer", resres.params);
     const { selectedOption }: { selectedOption: string } = await req.json();
     const filter = selectedOption ? selectedOption : null;
 
@@ -41,7 +40,6 @@ export const handlers = [
     // const response = await req.json();
     return res.once(ctx.status(200), ctx.json({ foodList: mockedFoodData, status: "success" }));
     // const response = await req.json();
-    // console.log("rerererer", response.params);
 
     // const filter = "all";
     // if (filter === "all") {

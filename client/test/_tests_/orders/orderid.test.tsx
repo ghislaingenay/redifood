@@ -24,7 +24,6 @@ describe("Order - Unit Testing", () => {
   });
   it("should contain a disabled button 'PAY'", async () => {
     render(<CurrentOrder {...successPropsOrderId} />);
-    console.log("byn", await screen.findByRole("button"));
     // await waitFor(() => {
     expect(await findButton(/PAY/i)).toBeInTheDocument();
     // });
@@ -85,7 +84,6 @@ describe("Order - Paid Order", () => {
   });
   it("should not have pay button", async () => {
     render(<CurrentOrder {...paidOrderProps} />);
-    console.log("hey", successPropsOrderId);
     await waitFor(() => {
       expect(screen.queryByRole("button", { name: /pay/i })).not.toBeInTheDocument();
     });

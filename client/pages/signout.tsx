@@ -15,7 +15,6 @@ const SignOut = () => {
       queryParams: {},
     })
       .then(() => {
-        console.log("success");
         NotificationRes.onSuccess({
           title: "Sign out",
           description: "You have been signed out successfully",
@@ -26,7 +25,6 @@ const SignOut = () => {
         }, 1000);
       })
       .catch((err) => {
-        console.log("failure");
         console.log("err", err);
         NotificationRes.onFailure({
           title: "Sign out",

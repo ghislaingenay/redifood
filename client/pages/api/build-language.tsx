@@ -32,7 +32,6 @@ export const getCookieInformation = (lang: string) => {
 
 export const setCookieInformation = (lang: ELanguage) => {
   Cookies.remove("lang");
-  console.log("lang choice", lang);
   Cookies.set("lang", encodeCookie(lang));
 };
 export const buildLanguage = (locale: any, req: any) => {

@@ -129,7 +129,6 @@ const AllOrdersPage = ({ allOrders, getList }: IAllOrdersPageProps) => {
       };
     });
     if (selectedOption === "ALL") {
-      console.log("here");
       setFilteredOrders(() => sortedData);
     } else {
       const newList = [...sortedData].filter((order) => order?.orderNo === option);
