@@ -1,7 +1,7 @@
 import { Col, Modal, Row, Typography } from "antd";
 import { useRouter } from "next/navigation";
 import { useRouter as Router } from "next/router";
-import { useEffect, useState } from "react";
+import { useDeferredValue, useEffect, useState } from "react";
 import { Else, If, Then } from "react-if";
 import { IFoodApi, IFoodGetApi, IFoodSectionListWithExtra, IOrderApi } from "../../../redifood-module/src/interfaces";
 import { useFood } from "../../contexts/food.context";
@@ -38,10 +38,8 @@ const FoodLayout = ({ foods, mode, sectionList, mainTitle, transaction }: IFoodL
 
   const { foodOrder } = useFood();
   const [width] = useWindowSize();
-  const [foodSection] = useState<IFoodSectionListWithExtra[]>(sectionList);
-  const [foodList] = useState(foods);
   const [loading, setLoading] = useState(false);
-  const [sortedFoods, setSortedFoods] = useState(foodList);
+  const [sortedFoods, setSortedFoods] = useState(foods);
   const [selectedSectionId, setSelectedSectionId] = useState(0);
   const [currentOrder, setCurrentOrder] = useState<IFoodGetApi[]>([]);
   const [cancelOrderModal, setCancelOrderModal] = useState(false);
@@ -52,12 +50,19 @@ const FoodLayout = ({ foods, mode, sectionList, mainTitle, transaction }: IFoodL
   const isAlterMode = mode === EFoodMode.ALTER;
   const ariaLabelMainTitle = isAlterMode ? "FOOD SECTION" : isCreateMode ? "CREATE ORDER" : "EDIT ORDER";
 
-  const changeActiveButton = (sectionId: number) => {
-    setSelectedSectionId(sectionId);
-    if (sectionId === 0) return setSortedFoods([...foodList]);
-    const filteredfoods = [...foodList]?.filter((food) => food.itemSection.id === sectionId);
-    return setSortedFoods([...filteredfoods]);
-  };
+  const changeActiveButton = (sectionId: number) => sectionId && setSelectedSectionId(() => Number(sectionId));
+  const deferredSectionId = useDeferredValue(selectedSectionId);
+
+  useEffect(() => {
+    setLoading(true);
+    if (selectedSectionId === 0) {
+      setSortedFoods([...foods]);
+    } else {
+      const filteredFoods = [...foods]?.filter((food) => food.itemSection.id === selectedSectionId);
+      setSortedFoods([...filteredFoods]);
+    }
+    setLoading(false);
+  }, [deferredSectionId]);
 
   const handleSubmit = async (foodOrder: IFoodGetApi[]) => {
     setLoading(true);
@@ -113,18 +118,25 @@ const FoodLayout = ({ foods, mode, sectionList, mainTitle, transaction }: IFoodL
               fontSize="1rem"
               padding="0.5rem 0.5rem"
               disabled={isDisabled}
-              options={setOptionsSelection(foodSection) as any}
+              options={setOptionsSelection(sectionList) as any}
               radioGroupName="food"
               haveIcon="false"
-              selectedButton={selectedSectionId}
+              selectedButton={deferredSectionId}
               clickedFn={(id: number) => changeActiveButton(id)}
             />
             <Row gutter={[5, 10]}>
-              {sortedFoods?.map((food, index) => (
-                <Col key={index} xs={12} sm={12} md={8} lg={8} xl={6}>
-                  <FoodCard foodList={foodList} food={food} mode={mode} />
-                </Col>
-              ))}
+              <If condition={loading}>
+                <Then>
+                  <RowCenter>Loading ...</RowCenter>
+                </Then>
+                <Else>
+                  {sortedFoods?.map((food, index) => (
+                    <Col key={index} xs={12} sm={12} md={8} lg={8} xl={6}>
+                      <FoodCard foodList={foods} food={food} mode={mode} />
+                    </Col>
+                  ))}
+                </Else>
+              </If>
             </Row>
           </Col>
 
@@ -135,7 +147,7 @@ const FoodLayout = ({ foods, mode, sectionList, mainTitle, transaction }: IFoodL
               </Col>
             </Then>
             <Else>
-              <RowCenter style={{ marginTop: "1rem" }}>
+              <RowCenter style={{ marginTop: "1rem", width: "100%" }}>
                 <RenderLGCard />
               </RowCenter>
             </Else>
