@@ -1,7 +1,6 @@
 import axios from "axios";
 
 interface IAxiosRequest {
-  // authToken?: IAuthContext;
   body: any;
   queryParams: any;
   method: "get" | "post" | "put" | "delete";
@@ -13,7 +12,8 @@ const returnAxiosCall = (data: IAxiosRequest) => {
   // const userValue = authToken?.authorization;
 
   const axiosFn = axios.create({
-    baseURL: `${process.env.NEXT_PUBLIC_BACK_END}`,
+    // baseURL: `${process.env.NEXT_PUBLIC_BACK_END}`,
+    baseURL: "",
   });
   // const headers = {
   //   Cookie: "session",
