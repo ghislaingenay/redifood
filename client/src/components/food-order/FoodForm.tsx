@@ -106,6 +106,7 @@ const FoodForm = ({ allFoods, listSectionExtra }: IFoodFormProps) => {
   const isEditModeWithFood = editMode === "true" && foodOrder.length !== 0;
   const canEditName = isEditModeWithFood;
 
+  const switchingMode = editMode === "true" ? "false" : "true";
   const isDeleteExtraMode = extraValue === EHandleType.DELETEEXTRA;
   const isAddExtraMode = extraValue === EHandleType.ADDEXTRA;
   const isDeleteSectionMode = sectionValue === EHandleType.DELETESECTION;
@@ -147,14 +148,8 @@ const FoodForm = ({ allFoods, listSectionExtra }: IFoodFormProps) => {
   };
 
   const changeMode = (e: Booleanish) => {
-    console.log("change mode", e);
-
     if (e) setEditMode(e);
-    if (!e) {
-      const switchingMode = editMode === "true" ? "false" : "true";
-      setEditMode(switchingMode);
-    }
-    setFoodOrder([]);
+    if (!e) setEditMode(switchingMode);
     form.resetFields();
   };
 
