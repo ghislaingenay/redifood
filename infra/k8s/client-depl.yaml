@@ -15,6 +15,18 @@ spec:
       containers:
         - name: client
           image: ghislaingenay/redifood-client
+          env:
+            - name: NEXT_PUBLIC_CLOUDINARY_NAME
+              valueFrom:
+                secretKeyRef:
+                  key: NEXT_PUBLIC_CLOUDINARY_NAME
+                  name: secret
+            - name: NEXT_PUBLIC_UPLOAD_PRESET
+              valueFrom:
+                secretKeyRef:
+                  key: NEXT_PUBLIC_UPLOAD_PRESET
+                  name: secret
+
 ---
 apiVersion: v1
 kind: Service
