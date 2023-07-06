@@ -83,7 +83,6 @@ const FoodForm = ({ allFoods, listSectionExtra }: IFoodFormProps) => {
   const { t } = useTranslation();
   const {
     foodOrder,
-    setFoodOrder,
     functions: { selectFood },
   } = useFood();
   const { displayCurrency } = useCurrency();
