@@ -11,6 +11,7 @@ import { AnimButton } from "../../styles/animations/styled.anim";
 import { Scroll } from "../../styles/styledComponents/div.styled";
 import { CenteredTitle } from "../../styles/styledComponents/typography.styled";
 import { RediButton } from "../styling/Button.style";
+import { Spinning } from "../styling/Spinning";
 import { RowCenter } from "../styling/grid.styled";
 import FoodOrderCard from "./FoodOrderCard";
 const { Title } = Typography;
@@ -59,9 +60,16 @@ const OrderSection = ({ tableNumber, mode, handleSubmit, handleCancel, loading, 
         {t("orders.order-list").toUpperCase()}
       </Divider>
       <Scroll>
-        {foodOrder?.map((food) => (
-          <FoodOrderCard key={food.id} food={food} />
-        ))}
+        <If condition={loading}>
+          <Then>
+            <Spinning size="large" />
+          </Then>
+          <Else>
+            {foodOrder?.map((food) => (
+              <FoodOrderCard key={food.id} food={food} />
+            ))}
+          </Else>
+        </If>
       </Scroll>
       <CenteredTitle level={5} style={{ color: RED, visibility: isVisible }}>
         Total: {convertPrice(Number(calculateTotal(foodOrder)), "backToFront", true)}
@@ -85,6 +93,7 @@ const OrderSection = ({ tableNumber, mode, handleSubmit, handleCancel, loading, 
             <RediButton
               buttonType={EButtonType.ERROR}
               shape="round"
+              loading={loading}
               onClick={() => handleCancel("/")}
               aria-label="cancel order"
             >

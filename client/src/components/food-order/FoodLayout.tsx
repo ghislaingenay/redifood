@@ -14,6 +14,7 @@ import { EFoodMode } from "../../interfaces/food.interface";
 import { LGCard } from "../../styles";
 import { AnimToTop } from "../../styles/animations/global.anim";
 import RediRadioButton from "../styling/RediRadioButton";
+import { Spinning } from "../styling/Spinning";
 import { RowCenter } from "../styling/grid.styled";
 import FoodCard from "./FoodCard";
 import FoodForm from "./FoodForm";
@@ -64,14 +65,17 @@ const FoodLayout = ({ foods, mode, sectionList, mainTitle, transaction }: IFoodL
     setLoading(false);
   }, [deferredSectionId]);
 
+  const goBackToHome = () => setTimeout(() => router.push("/"), 2000);
+
   const handleSubmit = async (foodOrder: IFoodGetApi[]) => {
     setLoading(true);
     if (isCreateMode) {
       const res = await handleCreateOrder(foodOrder, Number(tableNo));
-      if (res.success) return router.replace("/");
+
+      if (res.success) return goBackToHome();
     } else {
       const res = await handleUpdateOrder(foodOrder, transaction as IOrderApi);
-      if (res.success) return router.replace("/");
+      if (res.success) return goBackToHome();
     }
     setLoading(false);
   };
@@ -127,7 +131,7 @@ const FoodLayout = ({ foods, mode, sectionList, mainTitle, transaction }: IFoodL
             <Row gutter={[5, 10]}>
               <If condition={loading}>
                 <Then>
-                  <RowCenter>Loading ...</RowCenter>
+                  <Spinning size={15} />
                 </Then>
                 <Else>
                   {sortedFoods?.map((food, index) => (
