@@ -1,7 +1,6 @@
 import axios from "axios";
 
 interface IAxiosRequest {
-  // authToken?: IAuthContext;
   body: any;
   queryParams: any;
   method: "get" | "post" | "put" | "delete";
@@ -10,15 +9,11 @@ interface IAxiosRequest {
 
 const returnAxiosCall = (data: IAxiosRequest) => {
   const { body, queryParams, method, url } = data;
-  // const userValue = authToken?.authorization;
 
   const axiosFn = axios.create({
-    baseURL: `${process.env.NEXT_PUBLIC_BACK_END}`,
+    baseURL: `${process.env.NEXT_PUBLIC_BACK_END}` || "",
   });
-  // const headers = {
-  //   Cookie: "session",
-  //   authToken: userValue,
-  // };
+
   switch (method) {
     case "get":
       return axiosFn.get(url, {
