@@ -11,7 +11,7 @@ const returnAxiosCall = (data: IAxiosRequest) => {
   const { body, queryParams, method, url } = data;
 
   const axiosFn = axios.create({
-    baseURL: `${process.env.NEXT_PUBLIC_BACK_END}` || "",
+    baseURL: "",
   });
 
   switch (method) {

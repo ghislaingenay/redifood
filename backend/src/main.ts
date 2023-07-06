@@ -20,13 +20,13 @@ async function bootstrap() {
   );
   app.set('trust proxy', true);
 
-  if (process.env.ENVIRONMENT === 'local') {
-    app.enableCors({
-      allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept',
-      origin: ['http://localhost:3001'],
-      credentials: true,
-    });
-  }
+  // if (process.env.ENVIRONMENT === 'local') {
+  //   app.enableCors({
+  //     allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept',
+  //     origin: ['http://localhost:3001'],
+  //     credentials: true,
+  //   });
+  // }
 
   app.use(
     // session({
