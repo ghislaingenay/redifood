@@ -43,6 +43,7 @@ import {
 } from "../../styles/styledComponents/typography.styled";
 import { RediButton, RediIconButton } from "../styling/Button.style";
 import RediRadioButton, { Booleanish } from "../styling/RediRadioButton";
+import { Spinning } from "../styling/Spinning";
 import { RowCenter, RowCenterSp } from "../styling/grid.styled";
 const { Option } = Select;
 
@@ -352,8 +353,8 @@ const FoodForm = ({ allFoods, listSectionExtra }: IFoodFormProps) => {
     return (currentFood && { ...food, id: currentFood.id, userId: currentFood.userId }) as IFoodApi;
   };
 
-  if (loading) return <p>Loading...</p>;
-  if (onFinishLoading) return <p>On finish loading...</p>;
+  if (loading) return <Spinning />;
+  if (onFinishLoading) return <Spinning />;
 
   return (
     <>
