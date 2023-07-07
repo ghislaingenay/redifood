@@ -27,5 +27,7 @@ jobs:
           uses: digitalocean/actions-doctl@v2
           with:
             token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-      - run: doctl kubernetes cluster kubeconfig save redifood
-      - run: kubectl rollout restart deployment client-depl
+      - name: Save Cluster
+        run: doctl kubernetes cluster kubeconfig save redifood
+      - name: Restart Client container
+        run: kubectl rollout restart deployment client-depl
