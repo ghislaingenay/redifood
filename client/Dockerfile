@@ -13,15 +13,15 @@ ENV NEXT_TELEMETRY_DISABLED 1
 COPY . .
 RUN npm run build 
 
-#if something inside deployment folder
-# COPY deployment/.env.${NODE_ENV} .env
-
 FROM base AS runner
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED 1
+ENV ENVIRONMENT=production
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
+COPY --from=builder /app/next-i18next.config.js ./
+COPY --from=builder /app/next.config.js ./
 COPY --from=builder /app/node_modules ./node_modules
 ENV NODE_ENV=production
 EXPOSE 3000

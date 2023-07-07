@@ -13,17 +13,20 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   verifyKeys();
-  app.enableCors({
-    allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept',
-    origin: ['http://localhost:3001', 'http://localhost:3000'],
-    credentials: true,
-  });
   app.use(
     urlencoded({
       extended: true,
     }),
   );
   app.set('trust proxy', true);
+
+  if (process.env.ENVIRONMENT === 'local') {
+    app.enableCors({
+      allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept',
+      origin: ['http://localhost:3001'],
+      credentials: true,
+    });
+  }
 
   app.use(
     // session({

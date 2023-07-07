@@ -43,6 +43,7 @@ import {
 } from "../../styles/styledComponents/typography.styled";
 import { RediButton, RediIconButton } from "../styling/Button.style";
 import RediRadioButton, { Booleanish } from "../styling/RediRadioButton";
+import { Spinning } from "../styling/Spinning";
 import { RowCenter, RowCenterSp } from "../styling/grid.styled";
 const { Option } = Select;
 
@@ -83,7 +84,6 @@ const FoodForm = ({ allFoods, listSectionExtra }: IFoodFormProps) => {
   const { t } = useTranslation();
   const {
     foodOrder,
-    setFoodOrder,
     functions: { selectFood },
   } = useFood();
   const { displayCurrency } = useCurrency();
@@ -106,6 +106,7 @@ const FoodForm = ({ allFoods, listSectionExtra }: IFoodFormProps) => {
   const isEditModeWithFood = editMode === "true" && foodOrder.length !== 0;
   const canEditName = isEditModeWithFood;
 
+  const switchingMode = editMode === "true" ? "false" : "true";
   const isDeleteExtraMode = extraValue === EHandleType.DELETEEXTRA;
   const isAddExtraMode = extraValue === EHandleType.ADDEXTRA;
   const isDeleteSectionMode = sectionValue === EHandleType.DELETESECTION;
@@ -147,14 +148,8 @@ const FoodForm = ({ allFoods, listSectionExtra }: IFoodFormProps) => {
   };
 
   const changeMode = (e: Booleanish) => {
-    console.log("change mode", e);
-
     if (e) setEditMode(e);
-    if (!e) {
-      const switchingMode = editMode === "true" ? "false" : "true";
-      setEditMode(switchingMode);
-    }
-    setFoodOrder([]);
+    if (!e) setEditMode(switchingMode);
     form.resetFields();
   };
 
@@ -358,8 +353,8 @@ const FoodForm = ({ allFoods, listSectionExtra }: IFoodFormProps) => {
     return (currentFood && { ...food, id: currentFood.id, userId: currentFood.userId }) as IFoodApi;
   };
 
-  if (loading) return <p>Loading...</p>;
-  if (onFinishLoading) return <p>On finish loading...</p>;
+  if (loading) return <Spinning />;
+  if (onFinishLoading) return <Spinning />;
 
   return (
     <>
