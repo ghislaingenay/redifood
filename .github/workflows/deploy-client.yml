@@ -24,7 +24,7 @@ jobs:
       - name: Push image to Docker Hub
         run: docker push ghislaingenay/redifood-client
       - name: Activate Digital Ocean
-        uses: digitalocean/actions-doctl@v2
+        uses: digitalocean/action-doctl@v2
         with:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
       - name: Save Cluster
