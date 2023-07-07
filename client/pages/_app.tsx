@@ -21,6 +21,7 @@ import { FoodProvider } from "../src/contexts/food.context";
 import Head from "next/head";
 import "../i18n";
 import Loading from "../src/components/Loading";
+import { Spinning } from "../src/components/styling/Spinning";
 
 config.autoAddCss = false;
 
@@ -61,13 +62,7 @@ const AppComponent = ({ Component, pageProps, isSignOutPage, loadingPage }: IApp
                     <RediHeader bgColor={BACKGROUND_COLOR} color={ORANGE_LIGHT} />
                     <Layout className="layout" style={{ backgroundColor: ORANGE_LIGHT, overflowY: "hidden" }}>
                       <RediContent>
-                        <Suspense
-                          fallback={
-                            <div style={{ width: "100%", height: "100%", backgroundColor: "black", color: "white" }}>
-                              Loading...
-                            </div>
-                          }
-                        >
+                        <Suspense fallback={<Spinning />}>
                           <Component {...pageProps} />
                         </Suspense>
                       </RediContent>
