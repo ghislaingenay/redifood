@@ -10,31 +10,27 @@ interface IAxiosRequest {
 const returnAxiosCall = (data: IAxiosRequest) => {
   const { body, queryParams, method, url } = data;
 
-  const axiosFn = axios.create({
-    baseURL: `${process.env.NEXT_PUBLIC_BACK_END}` || "",
-  });
-
   switch (method) {
     case "get":
-      return axiosFn.get(url, {
+      return axios.get(url, {
         withCredentials: true,
         // headers,
         params: queryParams,
       });
     case "post":
-      return axiosFn.post(url, body, {
+      return axios.post(url, body, {
         withCredentials: true,
         // headers,
         params: queryParams,
       });
     case "put":
-      return axiosFn.put(url, body, {
+      return axios.put(url, body, {
         withCredentials: true,
         // headers,
         params: queryParams,
       });
     case "delete":
-      return axiosFn.delete(url, {
+      return axios.delete(url, {
         withCredentials: true,
         // headers,
       });
