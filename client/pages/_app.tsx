@@ -71,7 +71,6 @@ const AppComponent = ({ Component, pageProps, isSignOutPage, loadingPage }: IApp
                 </>
               )}
             </AuthProvider>
-
             <ToastContainer />
           </ConfigProvider>
         </FoodProvider>

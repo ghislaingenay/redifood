@@ -11,6 +11,7 @@ import { verifyKeys } from './verifykeys';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  console.log('Starting...');
 
   verifyKeys();
   app.use(
