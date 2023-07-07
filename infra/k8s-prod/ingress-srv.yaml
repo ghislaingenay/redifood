@@ -7,7 +7,7 @@ metadata:
     nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
   rules:
-    - host: rediapp.net
+    - host: www.rediapp.net
       http:
         paths:
           - path: /api/?(.*)
