@@ -23,11 +23,11 @@ jobs:
         run: cd backend && docker build -t ghislaingenay/redifood-backend .
       - name: Push image to Docker Hub
         run: docker push ghislaingenay/redifood-backend
-      - name: Activate Digital Ocean
+      - name: Install doctl
         uses: digitalocean/action-doctl@v2
         with:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-      - name: Save Cluster
+      - name: Save DigitalOcean kubeconfig
         run: doctl kubernetes cluster kubeconfig save redifood
-      - name: Restart Client container
+      - name: Restart backend Pod
         run: kubectl rollout restart deployment backend-depl
