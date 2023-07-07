@@ -20,7 +20,7 @@ jobs:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       - name: Build Docker image
-        run: cd backend && docker build -t ghislaingenay/redifood-client .
+        run: cd client && docker build -t ghislaingenay/redifood-client .
       - name: Push image to Docker Hub
         run: docker push ghislaingenay/redifood-client
 #        - name: Activate Digital Ocean
