@@ -14,6 +14,9 @@ const returnAxiosCall = (data: IAxiosRequest) => {
     baseURL: "",
   });
 
+  console.log("url: ", url);
+  console.log("axiosFN: ", axiosFn);
+
   switch (method) {
     case "get":
       return axiosFn.get(url, {
