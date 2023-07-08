@@ -179,6 +179,7 @@ const AllOrdersPage = ({ allOrders, getList }: IAllOrdersPageProps) => {
                 loading={spinLoading}
                 rowKey="id"
                 columns={columns}
+                style={{ overflowX: "auto" }}
                 dataSource={filteredOrders}
                 pagination={false}
                 expandable={{
