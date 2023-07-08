@@ -1,7 +1,7 @@
 import { EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
 import { faRegistered, faSign } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Button, Col, Divider, Form, Input } from "antd";
+import { Col, Divider, Form, Input } from "antd";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -206,9 +206,9 @@ const Auth = () => {
                       </RediButton>
                     </Col>
                     <Col span={12} style={{ textAlign: "right" }}>
-                      <Button loading={clicked} type="link" aria-label="Forgot password" style={{ padding: 0 }}>
+                      {/* <Button loading={clicked} type="link" aria-label="Forgot password" style={{ padding: 0 }}>
                         {t("auth.forget-password")}
-                      </Button>
+                      </Button> */}
                     </Col>
                   </RowSpaceBetween>
                 </Form>
