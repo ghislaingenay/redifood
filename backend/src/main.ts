@@ -50,11 +50,7 @@ async function bootstrap() {
   );
   try {
     await pool.connect({
-      user: process.env.POSTGRES_USER,
-      host: process.env.POSTGRES_HOST,
-      database: process.env.POSTGRES_DB_NAME,
-      password: process.env.POSTGRES_PASSWORD,
-      port: parseInt(process.env.POSTGRES_PORT),
+      connectionString: process.env.POSTGRES_URL,
     });
 
     await mongoose.connect(process.env.MONGO_URI);
