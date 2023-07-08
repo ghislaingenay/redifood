@@ -195,7 +195,6 @@ class Orders {
     try {
       const { userId, orderId } = idList;
       const { orderItems } = await Orders.findOne(idList);
-      console.log('orderItems', orderItems);
       const orderMenu: IFoodOrder[] = JSON.parse(orderItems);
       const foodList = await Foods.findAllFormatted(userId);
       const updatedMenu: IFoodGetApi[] = foodList.map((item: IFoodGetApi) => {

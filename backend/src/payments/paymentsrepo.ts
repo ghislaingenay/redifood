@@ -71,7 +71,6 @@ class Payments {
 
   static async createOne(data: IPaymentDB): Promise<{ created: boolean }> {
     const postgresQuery = createQuery(data, 'payment');
-    console.log(postgresQuery);
     try {
       await pool.query(postgresQuery);
       return { created: true };

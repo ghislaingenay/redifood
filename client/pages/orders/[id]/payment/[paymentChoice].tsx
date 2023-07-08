@@ -63,7 +63,6 @@ const PaymentSystem = ({ paymentType, currentOrder }: IPaymentProps) => {
 
   useEffect(() => {
     const isOrderCompleted = orderStatus === EOrderStatus.COMPLETE;
-    console.log(isOrderCompleted, orderStatus);
     if (isOrderCompleted) return router.replace(`/orders/${orderId}`);
   }, []);
 
