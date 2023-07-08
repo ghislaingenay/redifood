@@ -216,8 +216,8 @@ const FoodForm = ({ allFoods, listSectionExtra }: IFoodFormProps) => {
       formData.append("upload_preset", String(process.env.NEXT_PUBLIC_UPLOAD_PRESET));
       const response: any = await axios
         .post(`https://api-ap.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_NAME}/upload`, formData)
-        .catch((err) => {
-          console.log("err cloudinary", err);
+        .catch(() => {
+          // empty
         });
       const { statusText, data } = response;
       if (statusText === "OK") {
@@ -292,7 +292,6 @@ const FoodForm = ({ allFoods, listSectionExtra }: IFoodFormProps) => {
     const formattedFoodData = isCreateNewFood
       ? formDataToFood({ ...values, itemPhoto: urlFile })
       : formDataToFood({ ...values });
-    console.log("updated", formattedFoodData);
     setError(false);
 
     if (isCreateNewFood) {

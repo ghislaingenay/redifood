@@ -18,15 +18,14 @@ import {
 import { RediIconButton } from "../../../../src/components/styling/Button.style";
 import { RowAroundSp, RowCenter, RowCenterSp } from "../../../../src/components/styling/grid.styled";
 import AppContext from "../../../../src/contexts/app.context";
-import { NotificationRes } from "../../../../src/definitions/notification.class";
 import { keepDigitsInText } from "../../../../src/functions/payment.fn";
 import useCurrency from "../../../../src/hooks/useCurrency.hook";
 import { EButtonType } from "../../../../src/interfaces";
 import { CenteredLabel, LRoundedInput } from "../../../../src/styles";
 import { AnimToTop } from "../../../../src/styles/animations/global.anim";
-import { AxiosFunction } from "../../../api/axios-request";
 import buildClient from "../../../api/build-client";
 import { buildLanguage } from "../../../api/build-language";
+import { payOrder } from "../../../api/payment-api";
 const { Title } = Typography;
 
 interface IPaymentProps {
@@ -64,38 +63,14 @@ const PaymentSystem = ({ paymentType, currentOrder }: IPaymentProps) => {
 
   useEffect(() => {
     const isOrderCompleted = orderStatus === EOrderStatus.COMPLETE;
-    console.log(isOrderCompleted, orderStatus);
     if (isOrderCompleted) return router.replace(`/orders/${orderId}`);
   }, []);
 
-  const handlePayOrder = () => {
+  const handlePayOrder = async () => {
     setPayOrderLoading(true);
-    AxiosFunction({
-      url: `api/orders/${orderId}`,
-      body: { paymentType },
-      queryParams: {},
-      method: "post",
-    })
-      .then(() => {
-        NotificationRes.onSuccess({
-          placement: "top",
-          title: "Payment successful",
-          description: "You will be redirected to the main page",
-        });
-        setTimeout(() => {
-          router.replace("/");
-          setPayOrderLoading(false);
-        }, 1000);
-      })
-      .catch(() => {
-        NotificationRes.onFailure({
-          placement: "top",
-          title: "Please try again",
-          description:
-            "An error occured during the process. If this issue occur multiple times, please contact Redifood team",
-        });
-        setPayOrderLoading(false);
-      });
+    const payOrderRes = await payOrder(Number(orderId), paymentType);
+    if (payOrderRes.isPaid) router.replace("/");
+    setPayOrderLoading(false);
   };
 
   return (

@@ -90,8 +90,7 @@ export class PaymentsService {
         service: 'payments',
       });
       try {
-        const chargeData = await stripePayment.payCharge();
-        console.log('charged', chargeData);
+        await stripePayment.payCharge();
         return {
           results: { isPaid: true },
           statusCode: HttpStatus.OK,

@@ -132,7 +132,6 @@ const AllOrdersPage = ({ allOrders, getList }: IAllOrdersPageProps) => {
       setFilteredOrders(() => sortedData);
     } else {
       const newList = [...sortedData].filter((order) => order?.orderNo === option);
-      console.log("nl", newList);
       setFilteredOrders(() => newList);
     }
     setSpinLoading(false);

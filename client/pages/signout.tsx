@@ -24,8 +24,7 @@ const SignOut = () => {
           router.push("/");
         }, 1000);
       })
-      .catch((err) => {
-        console.log("err", err);
+      .catch(() => {
         NotificationRes.onFailure({
           title: "Sign out",
           description: "Error while sign out, please try again",
