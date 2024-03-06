@@ -76,8 +76,8 @@ const PaymentSystem = ({ paymentType, currentOrder }: IPaymentProps) => {
   return (
     <>
       <Head>
-        <title>{t("payments.head-view.title")}</title>
-        <meta name="description" content={t("payments.head-view.description") as string} />
+        <title>Payment</title>
+        <meta name="description" content="Payment of the order" />
       </Head>
       <main>
         <AnimToTop>
