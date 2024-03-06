@@ -10,11 +10,11 @@ metadata:
 spec:
   tls:
     - hosts:
-        - rediapp.net
-        - www.rediapp.net
-      secretName: rediapp-net
+        - redifood.redicoding.com
+        - www.redifood.redicoding.com
+      secretName: food-redicoding-com
   rules:
-    - host: rediapp.net
+    - host: redifood.redicoding.com
       http:
         paths:
           - path: /api/?(.*)
@@ -31,7 +31,7 @@ spec:
                 name: client-srv
                 port:
                   number: 3000
-    - host: www.rediapp.net
+    - host: redifood.redicoding.com
       http:
         paths:
           - path: /api/?(.*)
@@ -55,7 +55,7 @@ kind: Service
 metadata:
   annotations:
     service.beta.kubernetes.io/do-loadbalancer-enable-proxy-protocol: "true"
-    service.beta.kubernetes.io/do-loadbalancer-hostname: "www.rediapp.net"
+    service.beta.kubernetes.io/do-loadbalancer-hostname: "www.redifood.redicoding.com"
   labels:
     helm.sh/chart: ingress-nginx-2.0.3
     app.kubernetes.io/name: ingress-nginx

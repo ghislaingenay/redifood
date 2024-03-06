@@ -2,14 +2,14 @@ apiVersion: cert-manager.io/v1
 
 kind: Certificate
 metadata:
-  name: rediapp-net-tls
+  name: food-redicoding-com-tls
 spec:
-  secretName: rediapp-net
+  secretName: food-redicoding-com
   issuerRef:
     name: letsencrypt-prod
     kind: ClusterIssuer
-  commonName: rediapp.net
+  commonName: redifood.redicoding.com
   dnsNames:
-    - rediapp.net
-    - www.rediapp.net
+    - redifood.redicoding.com
+    - www.redifood.redicoding.com
   # https://www.udemy.com/course/docker-and-kubernetes-the-complete-guide/learn/lecture/11628364#questions/8558842/
