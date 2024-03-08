@@ -60,12 +60,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: backend-srv
+  name: { { .Values.backendSrv } }
 spec:
   selector:
     app: backend
   ports:
     - name: backend
       protocol: TCP
-      port: 3000
-      targetPort: 3000
+      port: { { .Values.backendPort } }
+      targetPort: { { .Values.backendPort } }

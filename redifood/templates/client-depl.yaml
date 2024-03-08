@@ -31,12 +31,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: client-srv
+  name: {{ .Values.clientSrv }}
+  namespace: default
 spec:
   selector:
     app: client
   ports:
     - name: client
       protocol: TCP
-      port: 3000
-      targetPort: 3000
+      port: { { .Values.clientPort } }
+      targetPort: { { .Values.clientPort } }
