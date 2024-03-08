@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: ghislaingenay/redifood-backend
+          env:
+            - name: JWT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  key: JWT_TOKEN
+                  name: secret
+            - name: MONGO_URI
+              valueFrom:
+                secretKeyRef:
+                  key: MONGO_URI
+                  name: secret
+            - name: POSTGRES_PORT
+              valueFrom:
+                secretKeyRef:
+                  key: POSTGRES_PORT
+                  name: secret
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  key: POSTGRES_USER
+                  name: secret
+            - name: POSTGRES_HOST
+              valueFrom:
+                secretKeyRef:
+                  key: POSTGRES_HOST
+                  name: secret
+            - name: POSTGRES_DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  key: POSTGRES_DB_NAME
+                  name: secret
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: POSTGRES_PASSWORD
+                  name: secret
+            - name: POSTGRES_URL
+              valueFrom:
+                secretKeyRef:
+                  key: POSTGRES_URL
+                  name: secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-srv
+spec:
+  selector:
+    app: backend
+  ports:
+    - name: backend
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
